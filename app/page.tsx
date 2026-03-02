@@ -761,7 +761,6 @@ export default function FixAIPortal() {
     </button>
   )
 
-  // Tab Bar Component
   const TabBar = () => {
     const tabs = [
       { id: "home" as Tab, label: "Home", icon: Home, iconColor: isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]" },
@@ -770,8 +769,8 @@ export default function FixAIPortal() {
       { id: "testcase" as Tab, label: "TestCase", icon: TestTube, iconColor: isDarkMode ? "text-[#ce93d8]" : "text-[#7b1fa2]" },
       { id: "settings" as Tab, label: "Settings", icon: Settings, iconColor: isDarkMode ? "text-[#90a4ae]" : "text-[#546e7a]" },
     ]
-  
-  const handleTabClick = (tabId: Tab) => {
+
+    const handleTabClick = (tabId: Tab) => {
   setActiveTab(tabId)
   // Home tab should navigate to FIX Dashboard
   if (tabId === "home") {
