@@ -772,11 +772,10 @@ export default function FixAIPortal() {
     ]
 
     const handleTabClick = (tabId: Tab) => {
-  setActiveTab(tabId)
-  // Home tab should navigate to FIX Dashboard
-  if (tabId === "home") {
-  setActiveSidebarItem("dashboard")
-  }
+      setActiveTab(tabId)
+      if (tabId === "home") {
+        setActiveSidebarItem("dashboard")
+      }
   }
   
   return (
@@ -3256,276 +3255,326 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
     return () => clearInterval(interval)
   }, [])
 
+  // BControl Logo Component
+  const BControlLogo = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => {
+    const sizes = {
+      sm: { outer: "h-8 w-8", text: "text-xs", inner: "text-[6px]" },
+      md: { outer: "h-12 w-12", text: "text-lg", inner: "text-[8px]" },
+      lg: { outer: "h-16 w-16", text: "text-2xl", inner: "text-[10px]" },
+    }
+    const s = sizes[size]
+    return (
+      <div className={`relative ${s.outer} flex items-center justify-center rounded-xl bg-gradient-to-br from-[#0a1628] via-[#1976d2] to-[#00bcd4] shadow-lg`}>
+        <span className={`font-bold text-white ${s.text}`}>B</span>
+        <div className={`absolute inset-0 flex items-center justify-center`}>
+          <span className={`font-medium text-white/80 mt-3 ${s.inner} tracking-tight`}>control</span>
+        </div>
+      </div>
+    )
+  }
+
   // Home Screen
   const HomeScreen = () => (
-  <div className="min-h-screen bg-gradient-to-br from-white via-[#f0f9ff] to-[#e0f2fe] transition-colors">
-  <ThemeToggle />
-  
-  {/* Navigation Bar */}
-  <nav className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-4 backdrop-blur-md bg-white/80 border-b border-[#e2e8f0]">
-    <div className="flex items-center gap-3">
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#0a1628] to-[#1976d2]">
-        <GitCompare className="h-5 w-5 text-white" />
-      </div>
-      <span className="text-xl font-bold text-[#0a1628]">FIX AI Portal</span>
-    </div>
-    <div className="hidden md:flex items-center gap-8">
-      <a href="#features" className="text-sm font-medium text-[#64748b] hover:text-[#0a1628] transition-colors">Features</a>
-      <a href="#how-it-works" className="text-sm font-medium text-[#64748b] hover:text-[#0a1628] transition-colors">How it Works</a>
-      <a href="#contact" className="text-sm font-medium text-[#64748b] hover:text-[#0a1628] transition-colors">Contact</a>
-    </div>
-    <Button variant="primary" onClick={() => setShowRoleSelection(true)}>
-      Login
-    </Button>
-  </nav>
-  
-  {/* Hero Section */}
-  <div className="relative pt-32 pb-20 px-6 overflow-hidden">
-    {/* Animated Background Elements */}
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <div className="absolute top-20 left-10 w-72 h-72 bg-[#00bcd4]/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#1976d2]/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-br from-[#00e5ff]/5 to-transparent rounded-full" />
-    </div>
-    
-    <div className="relative mx-auto max-w-7xl">
-      <div className="grid lg:grid-cols-2 gap-12 items-center">
-        {/* Left: Text Content */}
-        <div className="space-y-8">
-          <div className="inline-flex items-center gap-2 rounded-full bg-[#0a1628]/5 px-4 py-2 text-sm">
-            <span className="flex h-2 w-2 rounded-full bg-[#4caf50] animate-pulse" />
-            <span className="text-[#0a1628] font-medium">FIX Protocol Testing Platform</span>
-          </div>
-          
-          <h1 className="text-5xl lg:text-6xl font-bold text-[#0a1628] leading-tight text-balance">
-            Intelligent FIX Protocol
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#1976d2] to-[#00bcd4]">
-              Certification Testing
-            </span>
-          </h1>
-          
-          <p className="text-lg text-[#64748b] max-w-lg leading-relaxed text-pretty">
-            Streamline your FIX specification comparison, log analysis, and test case generation with AI-powered automation designed for trading firms.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button 
-              variant="primary" 
-              size="lg" 
-              className="text-base px-8 py-4 rounded-xl shadow-lg shadow-[#0a1628]/20 hover:shadow-xl transition-shadow"
-              onClick={() => setShowRoleSelection(true)}
-            >
-              Get Started
-              <ChevronRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button variant="outline" size="lg" className="text-base px-8 py-4 rounded-xl">
-              <Play className="mr-2 h-5 w-5" />
-              Watch Demo
-            </Button>
-          </div>
-          
-          {/* Trust Badges */}
-          <div className="pt-8 border-t border-[#e2e8f0]">
-            <p className="text-xs text-[#94a3b8] mb-4 uppercase tracking-wider font-medium">Trusted by leading institutions</p>
-            <div className="flex flex-wrap gap-8 items-center opacity-60">
-              <span className="text-lg font-bold text-[#0a1628]">BlackRock</span>
-              <span className="text-lg font-bold text-[#0a1628]">Goldman Sachs</span>
-              <span className="text-lg font-bold text-[#0a1628]">JP Morgan</span>
-              <span className="text-lg font-bold text-[#0a1628]">UBS</span>
-            </div>
-          </div>
+    <div className={`min-h-screen transition-colors ${
+      isDarkMode 
+        ? "bg-gradient-to-br from-[#0a1628] via-[#0d1f3c] to-[#0a1628]" 
+        : "bg-gradient-to-br from-white via-[#f0f9ff] to-[#e0f2fe]"
+    }`}>
+      <ThemeToggle />
+      
+      {/* Navigation Bar */}
+      <nav className={`fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-4 backdrop-blur-md border-b ${
+        isDarkMode 
+          ? "bg-[#0a1628]/90 border-[#1e4976]" 
+          : "bg-white/80 border-[#e2e8f0]"
+      }`}>
+        <div className="flex items-center gap-3">
+          <BControlLogo size="sm" />
+          <span className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>BControl</span>
+        </div>
+        <div className="hidden md:flex items-center gap-8">
+          <a href="#features" className={`text-sm font-medium transition-colors ${isDarkMode ? "text-[#90caf9] hover:text-white" : "text-[#64748b] hover:text-[#0a1628]"}`}>Features</a>
+          <a href="#how-it-works" className={`text-sm font-medium transition-colors ${isDarkMode ? "text-[#90caf9] hover:text-white" : "text-[#64748b] hover:text-[#0a1628]"}`}>How it Works</a>
+          <a href="#contact" className={`text-sm font-medium transition-colors ${isDarkMode ? "text-[#90caf9] hover:text-white" : "text-[#64748b] hover:text-[#0a1628]"}`}>Contact</a>
+        </div>
+        <Button variant="primary" onClick={() => setShowRoleSelection(true)}>
+          Login
+        </Button>
+      </nav>
+      
+      {/* Hero Section */}
+      <div className="relative pt-32 pb-20 px-6 overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className={`absolute top-20 left-10 w-72 h-72 rounded-full blur-3xl animate-pulse ${isDarkMode ? "bg-[#00bcd4]/20" : "bg-[#00bcd4]/10"}`} />
+          <div className={`absolute bottom-20 right-10 w-96 h-96 rounded-full blur-3xl animate-pulse ${isDarkMode ? "bg-[#1976d2]/20" : "bg-[#1976d2]/10"}`} style={{ animationDelay: "1s" }} />
+          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full ${isDarkMode ? "bg-gradient-to-br from-[#00e5ff]/10 to-transparent" : "bg-gradient-to-br from-[#00e5ff]/5 to-transparent"}`} />
         </div>
         
-        {/* Right: Animated Trading Visualization */}
-        <div className="relative">
-          <div className="relative bg-white rounded-3xl shadow-2xl border border-[#e2e8f0] p-6 overflow-hidden">
-            {/* Window Header */}
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-3 h-3 rounded-full bg-[#f44336]" />
-              <div className="w-3 h-3 rounded-full bg-[#ffc107]" />
-              <div className="w-3 h-3 rounded-full bg-[#4caf50]" />
-              <span className="ml-4 text-sm font-medium text-[#64748b]">FIX Message Flow</span>
-            </div>
-            
-            {/* Candlestick Chart Animation */}
-            <div className="mb-6 p-4 bg-[#f8fafc] rounded-xl">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-semibold text-[#0a1628]">Market Data Stream</span>
-                <span className="text-xs text-[#4caf50] font-medium">LIVE</span>
+        <div className="relative mx-auto max-w-7xl">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Text Content */}
+            <div className="space-y-8">
+              <div className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm ${isDarkMode ? "bg-[#00e5ff]/10" : "bg-[#0a1628]/5"}`}>
+                <span className="flex h-2 w-2 rounded-full bg-[#4caf50] animate-pulse" />
+                <span className={`font-medium ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`}>FIX Protocol Testing Platform</span>
               </div>
-              <div className="flex items-end gap-2 h-24">
-                {candleData.map((candle, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center transition-all duration-500">
-                    {/* High-Low Line */}
-                    <div 
-                      className="w-0.5 bg-[#94a3b8]"
-                      style={{ height: `${(candle.high - candle.low) * 1.5}px` }}
-                    />
-                    {/* Candle Body */}
-                    <div 
-                      className="w-3 rounded-sm transition-all duration-500"
-                      style={{ 
-                        height: `${Math.abs(candle.close - candle.open) * 2 + 4}px`,
-                        backgroundColor: candle.color,
-                        marginTop: `-${(candle.high - Math.max(candle.open, candle.close)) * 1.5}px`
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Order Flow Animation */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold text-[#0a1628]">Order Flow</span>
-                <span className="text-xs text-[#1976d2] font-medium">Real-time</span>
-              </div>
-              {orders.map((order, i) => (
-                <div 
-                  key={order.id} 
-                  className={`flex items-center justify-between p-3 rounded-lg transition-all duration-300 ${
-                    i === orders.length - 1 ? "bg-[#e3f2fd] scale-[1.02]" : "bg-[#f8fafc]"
-                  }`}
+              
+              <h1 className={`text-5xl lg:text-6xl font-bold leading-tight text-balance ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                Intelligent FIX Protocol
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#1976d2] to-[#00bcd4]">
+                  Certification Testing
+                </span>
+              </h1>
+              
+              <p className={`text-lg max-w-lg leading-relaxed text-pretty ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
+                Streamline your FIX specification comparison, log analysis, and test case generation with AI-powered automation designed for trading firms.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button 
+                  variant="primary" 
+                  size="lg" 
+                  className="text-base px-8 py-4 rounded-xl shadow-lg shadow-[#0a1628]/20 hover:shadow-xl transition-shadow"
+                  onClick={() => setShowRoleSelection(true)}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className={`px-2 py-0.5 rounded text-xs font-bold ${
-                      order.type === "BUY" ? "bg-[#4caf50]/20 text-[#2e7d32]" : "bg-[#f44336]/20 text-[#c62828]"
-                    }`}>
-                      {order.type}
-                    </span>
-                    <span className="font-mono text-sm font-medium text-[#0a1628]">{order.symbol}</span>
+                  Get Started
+                  <ChevronRight className="ml-2 h-5 w-5" />
+                </Button>
+                <Button variant="outline" size="lg" className="text-base px-8 py-4 rounded-xl">
+                  <Play className="mr-2 h-5 w-5" />
+                  Watch Demo
+                </Button>
+              </div>
+              
+              {/* Trust Badges */}
+              <div className={`pt-8 border-t ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
+                <p className={`text-xs mb-4 uppercase tracking-wider font-medium ${isDarkMode ? "text-[#64b5f6]" : "text-[#94a3b8]"}`}>Trusted by leading institutions</p>
+                <div className="flex flex-wrap gap-8 items-center opacity-60">
+                  <span className={`text-lg font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>BlackRock</span>
+                  <span className={`text-lg font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Goldman Sachs</span>
+                  <span className={`text-lg font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>JP Morgan</span>
+                  <span className={`text-lg font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>UBS</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Right: Animated Trading Visualization */}
+            <div className="relative">
+              <div className={`relative rounded-3xl shadow-2xl p-6 overflow-hidden ${
+                isDarkMode 
+                  ? "bg-[#0d1f3c] border border-[#1e4976]" 
+                  : "bg-white border border-[#e2e8f0]"
+              }`}>
+                {/* Window Header */}
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-3 h-3 rounded-full bg-[#f44336]" />
+                  <div className="w-3 h-3 rounded-full bg-[#ffc107]" />
+                  <div className="w-3 h-3 rounded-full bg-[#4caf50]" />
+                  <span className={`ml-4 text-sm font-medium ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>FIX Message Flow</span>
+                </div>
+                
+                {/* Candlestick Chart Animation */}
+                <div className={`mb-6 p-4 rounded-xl ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className={`text-sm font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Market Data Stream</span>
+                    <span className="text-xs text-[#4caf50] font-medium">LIVE</span>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm text-[#64748b]">{order.qty}</span>
-                    <span className="font-mono text-sm font-medium text-[#0a1628]">${order.price}</span>
-                    <span className={`w-2 h-2 rounded-full ${
-                      order.status === "filled" ? "bg-[#4caf50]" : 
-                      order.status === "pending" ? "bg-[#ffc107] animate-pulse" : "bg-[#2196f3]"
-                    }`} />
+                  <div className="flex items-end gap-2 h-24">
+                    {candleData.map((candle, i) => (
+                      <div key={i} className="flex-1 flex flex-col items-center transition-all duration-500">
+                        <div 
+                          className={`w-0.5 ${isDarkMode ? "bg-[#64b5f6]" : "bg-[#94a3b8]"}`}
+                          style={{ height: `${(candle.high - candle.low) * 1.5}px` }}
+                        />
+                        <div 
+                          className="w-3 rounded-sm transition-all duration-500"
+                          style={{ 
+                            height: `${Math.abs(candle.close - candle.open) * 2 + 4}px`,
+                            backgroundColor: candle.color,
+                            marginTop: `-${(candle.high - Math.max(candle.open, candle.close)) * 1.5}px`
+                          }}
+                        />
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
-            </div>
-            
-            {/* FIX Message Preview */}
-            <div className="mt-4 p-3 bg-[#0a1628] rounded-lg overflow-hidden">
-              <div className="font-mono text-xs text-[#4caf50] whitespace-nowrap animate-pulse">
-                8=FIX.4.4|9=148|35=D|49=SENDER|56=TARGET|34=2|52=20250302...
+                
+                {/* Order Flow Animation */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={`text-sm font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Order Flow</span>
+                    <span className="text-xs text-[#1976d2] font-medium">Real-time</span>
+                  </div>
+                  {orders.map((order, i) => (
+                    <div 
+                      key={order.id} 
+                      className={`flex items-center justify-between p-3 rounded-lg transition-all duration-300 ${
+                        i === orders.length - 1 
+                          ? isDarkMode ? "bg-[#1e4976] scale-[1.02]" : "bg-[#e3f2fd] scale-[1.02]"
+                          : isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                          order.type === "BUY" ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#f44336]/20 text-[#f44336]"
+                        }`}>
+                          {order.type}
+                        </span>
+                        <span className={`font-mono text-sm font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{order.symbol}</span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>{order.qty}</span>
+                        <span className={`font-mono text-sm font-medium ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`}>${order.price}</span>
+                        <span className={`w-2 h-2 rounded-full ${
+                          order.status === "filled" ? "bg-[#4caf50]" : 
+                          order.status === "pending" ? "bg-[#ffc107] animate-pulse" : "bg-[#2196f3]"
+                        }`} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* FIX Message Preview */}
+                <div className={`mt-4 p-3 rounded-lg overflow-hidden ${isDarkMode ? "bg-[#0a1628] border border-[#1e4976]" : "bg-[#0a1628]"}`}>
+                  <div className="font-mono text-xs text-[#4caf50] whitespace-nowrap animate-pulse">
+                    8=FIX.4.4|9=148|35=D|49=SENDER|56=TARGET|34=2|52=20250302...
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          
-          {/* Floating Stats */}
-          <div className="absolute -left-4 top-1/4 bg-white rounded-xl shadow-lg border border-[#e2e8f0] p-4 animate-bounce" style={{ animationDuration: "3s" }}>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-[#4caf50]" />
-              <div>
-                <p className="text-xs text-[#64748b]">Tests Passed</p>
-                <p className="text-lg font-bold text-[#0a1628]">2,847</p>
+              
+              {/* Floating Stats */}
+              <div className={`absolute -left-4 top-1/4 rounded-xl shadow-lg p-4 animate-bounce ${
+                isDarkMode ? "bg-[#0d1f3c] border border-[#1e4976]" : "bg-white border border-[#e2e8f0]"
+              }`} style={{ animationDuration: "3s" }}>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-[#4caf50]" />
+                  <div>
+                    <p className={`text-xs ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Tests Passed</p>
+                    <p className={`text-lg font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>2,847</p>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          
-          <div className="absolute -right-4 bottom-1/4 bg-white rounded-xl shadow-lg border border-[#e2e8f0] p-4 animate-bounce" style={{ animationDuration: "3.5s", animationDelay: "0.5s" }}>
-            <div className="flex items-center gap-2">
-              <GitCompare className="h-5 w-5 text-[#1976d2]" />
-              <div>
-                <p className="text-xs text-[#64748b]">Specs Compared</p>
-                <p className="text-lg font-bold text-[#0a1628]">156</p>
+              
+              <div className={`absolute -right-4 bottom-1/4 rounded-xl shadow-lg p-4 animate-bounce ${
+                isDarkMode ? "bg-[#0d1f3c] border border-[#1e4976]" : "bg-white border border-[#e2e8f0]"
+              }`} style={{ animationDuration: "3.5s", animationDelay: "0.5s" }}>
+                <div className="flex items-center gap-2">
+                  <GitCompare className="h-5 w-5 text-[#1976d2]" />
+                  <div>
+                    <p className={`text-xs ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Specs Compared</p>
+                    <p className={`text-lg font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>156</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-  
-  {/* Features Section */}
-  <div id="features" className="py-20 px-6 bg-white">
-    <div className="mx-auto max-w-7xl">
-      <div className="text-center mb-16">
-        <h2 className="text-3xl font-bold text-[#0a1628] mb-4">Powerful Features for FIX Protocol Testing</h2>
-        <p className="text-[#64748b] max-w-2xl mx-auto">Everything you need to validate, compare, and test FIX specifications with confidence.</p>
       </div>
       
-      <div className="grid md:grid-cols-3 gap-8">
-        {[
-          { icon: GitCompare, title: "FIX Spec Comparison", desc: "Compare FIX specifications side-by-side with intelligent diff analysis", color: "#1976d2" },
-          { icon: FileCheck, title: "FIX Log Analysis", desc: "Analyze FIX logs against specifications to identify discrepancies", color: "#4caf50" },
-          { icon: TestTube, title: "Test Generation", desc: "Auto-generate comprehensive test cases from your FIX specs", color: "#9c27b0" },
-          { icon: MessageSquare, title: "FIX Message Builder", desc: "Create and validate FIX messages with our intuitive builder", color: "#f57c00" },
-          { icon: AlertTriangle, title: "Alerts & Monitoring", desc: "Real-time alerts for certification issues and failures", color: "#f44336" },
-          { icon: Users, title: "Client Management", desc: "Manage multiple clients and track their certification progress", color: "#00bcd4" },
-        ].map((feature, i) => (
-          <div key={i} className="group p-6 rounded-2xl border border-[#e2e8f0] hover:border-[#1976d2]/30 hover:shadow-xl transition-all duration-300 bg-white">
-            <div className={`inline-flex p-3 rounded-xl mb-4`} style={{ backgroundColor: `${feature.color}15` }}>
-              <feature.icon className="h-6 w-6" style={{ color: feature.color }} />
-            </div>
-            <h3 className="text-lg font-semibold text-[#0a1628] mb-2">{feature.title}</h3>
-            <p className="text-sm text-[#64748b]">{feature.desc}</p>
+      {/* Features Section */}
+      <div id="features" className={`py-20 px-6 ${isDarkMode ? "bg-[#0d1f3c]" : "bg-white"}`}>
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center mb-16">
+            <h2 className={`text-3xl font-bold mb-4 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Powerful Features for FIX Protocol Testing</h2>
+            <p className={`max-w-2xl mx-auto ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Everything you need to validate, compare, and test FIX specifications with confidence.</p>
           </div>
-        ))}
-      </div>
-    </div>
-  </div>
-  
-  {/* Role Selection Modal */}
-  {showRoleSelection && (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md mx-4 animate-in fade-in zoom-in duration-200">
-        <div className="text-center mb-8">
-          <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-[#0a1628] to-[#1976d2] mb-4">
-            <GitCompare className="h-8 w-8 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold text-[#0a1628]">Choose Your Portal</h2>
-          <p className="text-[#64748b] mt-2">Select your role to continue</p>
-        </div>
-        
-        <div className="space-y-4">
-          <button
-            onClick={() => { setShowRoleSelection(false); handleLogin("admin"); }}
-            className="w-full p-5 rounded-2xl border-2 border-[#e2e8f0] hover:border-[#1976d2] hover:bg-[#e3f2fd] transition-all group text-left"
-          >
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-[#1976d2]/10 group-hover:bg-[#1976d2]/20 transition-colors">
-                <Settings className="h-6 w-6 text-[#1976d2]" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-[#0a1628]">Admin Portal</h3>
-                <p className="text-sm text-[#64748b]">Manage specs, run comparisons, generate tests</p>
-              </div>
-              <ChevronRight className="h-5 w-5 text-[#94a3b8] ml-auto group-hover:text-[#1976d2] group-hover:translate-x-1 transition-all" />
-            </div>
-          </button>
           
-          <button
-            onClick={() => { setShowRoleSelection(false); handleLogin("client"); }}
-            className="w-full p-5 rounded-2xl border-2 border-[#e2e8f0] hover:border-[#4caf50] hover:bg-[#e8f5e9] transition-all group text-left"
-          >
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-[#4caf50]/10 group-hover:bg-[#4caf50]/20 transition-colors">
-                <Building2 className="h-6 w-6 text-[#4caf50]" />
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { icon: GitCompare, title: "FIX Spec Comparison", desc: "Compare FIX specifications side-by-side with intelligent diff analysis", color: "#1976d2" },
+              { icon: FileCheck, title: "FIX Log Analysis", desc: "Analyze FIX logs against specifications to identify discrepancies", color: "#4caf50" },
+              { icon: TestTube, title: "Test Generation", desc: "Auto-generate comprehensive test cases from your FIX specs", color: "#9c27b0" },
+              { icon: MessageSquare, title: "FIX Message Builder", desc: "Create and validate FIX messages with our intuitive builder", color: "#f57c00" },
+              { icon: AlertTriangle, title: "Alerts & Monitoring", desc: "Real-time alerts for certification issues and failures", color: "#f44336" },
+              { icon: Users, title: "Client Management", desc: "Manage multiple clients and track their certification progress", color: "#00bcd4" },
+            ].map((feature, i) => (
+              <div key={i} className={`group p-6 rounded-2xl border transition-all duration-300 ${
+                isDarkMode 
+                  ? "bg-[#0a1628] border-[#1e4976] hover:border-[#00e5ff]/50 hover:shadow-xl hover:shadow-[#00e5ff]/10" 
+                  : "bg-white border-[#e2e8f0] hover:border-[#1976d2]/30 hover:shadow-xl"
+              }`}>
+                <div className="inline-flex p-3 rounded-xl mb-4" style={{ backgroundColor: `${feature.color}20` }}>
+                  <feature.icon className="h-6 w-6" style={{ color: feature.color }} />
+                </div>
+                <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{feature.title}</h3>
+                <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>{feature.desc}</p>
               </div>
-              <div>
-                <h3 className="font-semibold text-[#0a1628]">Client Portal</h3>
-                <p className="text-sm text-[#64748b]">Upload specs, download files, generate messages</p>
-              </div>
-              <ChevronRight className="h-5 w-5 text-[#94a3b8] ml-auto group-hover:text-[#4caf50] group-hover:translate-x-1 transition-all" />
-            </div>
-          </button>
+            ))}
+          </div>
         </div>
-        
-        <button
-          onClick={() => setShowRoleSelection(false)}
-          className="mt-6 w-full py-3 text-sm text-[#64748b] hover:text-[#0a1628] transition-colors"
-        >
-          Cancel
-        </button>
       </div>
+      
+      {/* Role Selection Modal */}
+      {showRoleSelection && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className={`rounded-3xl shadow-2xl p-8 w-full max-w-md mx-4 ${
+            isDarkMode ? "bg-[#0d1f3c] border border-[#1e4976]" : "bg-white"
+          }`}>
+            <div className="text-center mb-8">
+              <div className="inline-block mb-4">
+                <BControlLogo size="lg" />
+              </div>
+              <h2 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Choose Your Portal</h2>
+              <p className={`mt-2 ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Select your role to continue</p>
+            </div>
+            
+            <div className="space-y-4">
+              <button
+                onClick={() => { setShowRoleSelection(false); handleLogin("admin"); }}
+                className={`w-full p-5 rounded-2xl border-2 transition-all group text-left ${
+                  isDarkMode 
+                    ? "border-[#1e4976] hover:border-[#1976d2] hover:bg-[#1976d2]/10" 
+                    : "border-[#e2e8f0] hover:border-[#1976d2] hover:bg-[#e3f2fd]"
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 rounded-xl transition-colors ${
+                    isDarkMode ? "bg-[#1976d2]/20 group-hover:bg-[#1976d2]/30" : "bg-[#1976d2]/10 group-hover:bg-[#1976d2]/20"
+                  }`}>
+                    <Settings className="h-6 w-6 text-[#1976d2]" />
+                  </div>
+                  <div>
+                    <h3 className={`font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Admin Portal</h3>
+                    <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Manage specs, run comparisons, generate tests</p>
+                  </div>
+                  <ChevronRight className={`h-5 w-5 ml-auto group-hover:translate-x-1 transition-all ${isDarkMode ? "text-[#64b5f6] group-hover:text-[#1976d2]" : "text-[#94a3b8] group-hover:text-[#1976d2]"}`} />
+                </div>
+              </button>
+              
+              <button
+                onClick={() => { setShowRoleSelection(false); handleLogin("client"); }}
+                className={`w-full p-5 rounded-2xl border-2 transition-all group text-left ${
+                  isDarkMode 
+                    ? "border-[#1e4976] hover:border-[#4caf50] hover:bg-[#4caf50]/10" 
+                    : "border-[#e2e8f0] hover:border-[#4caf50] hover:bg-[#e8f5e9]"
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 rounded-xl transition-colors ${
+                    isDarkMode ? "bg-[#4caf50]/20 group-hover:bg-[#4caf50]/30" : "bg-[#4caf50]/10 group-hover:bg-[#4caf50]/20"
+                  }`}>
+                    <Building2 className="h-6 w-6 text-[#4caf50]" />
+                  </div>
+                  <div>
+                    <h3 className={`font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Client Portal</h3>
+                    <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Upload specs, download files, generate messages</p>
+                  </div>
+                  <ChevronRight className={`h-5 w-5 ml-auto group-hover:translate-x-1 transition-all ${isDarkMode ? "text-[#64b5f6] group-hover:text-[#4caf50]" : "text-[#94a3b8] group-hover:text-[#4caf50]"}`} />
+                </div>
+              </button>
+            </div>
+            
+            <button
+              onClick={() => setShowRoleSelection(false)}
+              className={`mt-6 w-full py-3 text-sm transition-colors ${isDarkMode ? "text-[#90caf9] hover:text-white" : "text-[#64748b] hover:text-[#0a1628]"}`}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
-  )}
-  </div>
   )
 
   // Tag Editor Modal Component
