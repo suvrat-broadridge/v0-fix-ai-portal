@@ -762,6 +762,7 @@ export default function FixAIPortal() {
     </button>
   )
 
+  // TabBar component for navigation
   const TabBar = () => {
     const tabs = [
       { id: "home" as Tab, label: "Home", icon: Home, iconColor: isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]" },
@@ -3255,20 +3256,46 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
     return () => clearInterval(interval)
   }, [])
 
-  // BControl Logo Component
-  const BControlLogo = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => {
+  // BControl Logo Component - BTCS Certification Onboarding Network Testing Routing Operations Lifecycle
+  const BControlLogo = ({ size = "md", showExpanded = false }: { size?: "sm" | "md" | "lg", showExpanded?: boolean }) => {
     const sizes = {
-      sm: { outer: "h-8 w-8", text: "text-xs", inner: "text-[6px]" },
-      md: { outer: "h-12 w-12", text: "text-lg", inner: "text-[8px]" },
-      lg: { outer: "h-16 w-16", text: "text-2xl", inner: "text-[10px]" },
+      sm: { outer: "h-10 w-10", text: "text-sm", inner: "text-[5px]" },
+      md: { outer: "h-12 w-12", text: "text-lg", inner: "text-[6px]" },
+      lg: { outer: "h-20 w-20", text: "text-3xl", inner: "text-[8px]" },
     }
     const s = sizes[size]
+    
+    const acronymParts = [
+      { letter: "B", word: "BTCS", color: "#00e5ff" },
+      { letter: "C", word: "Certification", color: "#4caf50" },
+      { letter: "O", word: "Onboarding", color: "#ff9800" },
+      { letter: "N", word: "Network Monitoring", color: "#e91e63" },
+      { letter: "T", word: "Testing", color: "#9c27b0" },
+      { letter: "R", word: "Routing Config", color: "#2196f3" },
+      { letter: "O", word: "Operations", color: "#ff5722" },
+      { letter: "L", word: "Lifecycle Mgmt", color: "#00bcd4" },
+    ]
+    
     return (
-      <div className={`relative ${s.outer} flex items-center justify-center rounded-xl bg-gradient-to-br from-[#0a1628] via-[#1976d2] to-[#00bcd4] shadow-lg`}>
-        <span className={`font-bold text-white ${s.text}`}>B</span>
-        <div className={`absolute inset-0 flex items-center justify-center`}>
-          <span className={`font-medium text-white/80 mt-3 ${s.inner} tracking-tight`}>control</span>
+      <div className="flex flex-col items-center gap-2">
+        <div className={`relative ${s.outer} flex items-center justify-center rounded-2xl bg-gradient-to-br from-[#0a1628] via-[#1976d2] to-[#00bcd4] shadow-xl overflow-hidden`}>
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent" />
+          <span className={`font-bold text-white ${s.text} relative z-10`}>B</span>
+          <div className="absolute bottom-1 left-0 right-0 flex justify-center">
+            <span className={`font-semibold text-white/90 ${s.inner} tracking-wide uppercase`}>control</span>
+          </div>
         </div>
+        {showExpanded && (
+          <div className="flex flex-wrap justify-center gap-1 max-w-xs">
+            {acronymParts.map((part, i) => (
+              <span key={i} className="text-[10px] font-medium" style={{ color: part.color }}>
+                <span className="font-bold">{part.letter}</span>
+                <span className={isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}>{part.word.slice(1)}</span>
+                {i < acronymParts.length - 1 && <span className={isDarkMode ? "text-[#1e4976]" : "text-[#e2e8f0]"}> · </span>}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     )
   }
@@ -3513,9 +3540,9 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
           }`}>
             <div className="text-center mb-8">
               <div className="inline-block mb-4">
-                <BControlLogo size="lg" />
+                <BControlLogo size="lg" showExpanded />
               </div>
-              <h2 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Choose Your Portal</h2>
+              <h2 className={`text-2xl font-bold mt-4 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Choose Your Portal</h2>
               <p className={`mt-2 ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Select your role to continue</p>
             </div>
             
