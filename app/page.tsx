@@ -762,7 +762,7 @@ export default function FixAIPortal() {
   )
 
 // Tab Bar Component
-> const TabBar = () => {
+  const TabBar = () => {
   const tabs = [
   { id: "home" as Tab, label: "Home", icon: Home, iconColor: isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]" },
   { id: "projects" as Tab, label: "Projects", icon: FolderOpen, iconColor: isDarkMode ? "text-[#00e5ff]" : "text-[#0097a7]" },
