@@ -34,6 +34,7 @@ import {
   Minus,
   LayoutDashboard,
   FileUp,
+  LogOut,
 } from "lucide-react"
 
 type Screen = "home" | "admin-tools" | "client-tools"
