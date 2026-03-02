@@ -135,6 +135,14 @@ export default function FixAIPortal() {
     { tag: "15", value: "USD" },
   ])
 
+  // Message Generator state
+  const [msgGenSpecFile, setMsgGenSpecFile] = useState<string | null>(null)
+  const [msgGenLogFile, setMsgGenLogFile] = useState<string | null>(null)
+  const [msgGenStep, setMsgGenStep] = useState<1 | 2 | 3>(1)
+  const [msgGenSelectedType, setMsgGenSelectedType] = useState<string | null>(null)
+  const [msgGenFields, setMsgGenFields] = useState<{tag: string; name: string; value: string; editable: boolean}[]>([])
+  const [msgGenOutput, setMsgGenOutput] = useState<string | null>(null)
+
   // Spec Compare state
   const [spec1File, setSpec1File] = useState<string | null>(null)
   const [spec2File, setSpec2File] = useState<string | null>(null)
@@ -367,6 +375,126 @@ export default function FixAIPortal() {
     ]
     setTestCases((prev) => [...newTestCases, ...prev])
     addHistoryEntry("Generated Test Cases", "success", `${newTestCases.length} test cases created`)
+  }
+
+  // Message Generator functions
+  const handleMsgGenSpecUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setMsgGenSpecFile(file.name)
+      setMsgGenLogFile(null) // Clear log if spec is selected
+      addHistoryEntry("Uploaded FIX Spec for Message Gen", "success", file.name)
+    }
+  }
+
+  const handleMsgGenLogUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setMsgGenLogFile(file.name)
+      setMsgGenSpecFile(null) // Clear spec if log is selected
+      addHistoryEntry("Uploaded Log File for Message Gen", "success", file.name)
+    }
+  }
+
+  const selectMsgGenType = (msgType: string) => {
+    setMsgGenSelectedType(msgType)
+    // Initialize fields based on message type
+    const fieldsByType: Record<string, {tag: string; name: string; value: string; editable: boolean}[]> = {
+      "D": [ // New Order Single
+        { tag: "8", name: "BeginString", value: "FIX.4.4", editable: false },
+        { tag: "35", name: "MsgType", value: "D", editable: false },
+        { tag: "49", name: "SenderCompID", value: "SENDER", editable: true },
+        { tag: "56", name: "TargetCompID", value: "TARGET", editable: true },
+        { tag: "11", name: "ClOrdID", value: "ORD001", editable: true },
+        { tag: "55", name: "Symbol", value: "IBM", editable: true },
+        { tag: "54", name: "Side", value: "1", editable: true },
+        { tag: "38", name: "OrderQty", value: "100", editable: true },
+        { tag: "40", name: "OrdType", value: "2", editable: true },
+        { tag: "44", name: "Price", value: "150.00", editable: true },
+        { tag: "59", name: "TimeInForce", value: "0", editable: true },
+        { tag: "60", name: "TransactTime", value: new Date().toISOString().replace(/[-:]/g, "").slice(0, 17), editable: true },
+      ],
+      "8": [ // Execution Report
+        { tag: "8", name: "BeginString", value: "FIX.4.4", editable: false },
+        { tag: "35", name: "MsgType", value: "8", editable: false },
+        { tag: "49", name: "SenderCompID", value: "EXCHANGE", editable: true },
+        { tag: "56", name: "TargetCompID", value: "CLIENT", editable: true },
+        { tag: "17", name: "ExecID", value: "EXEC001", editable: true },
+        { tag: "37", name: "OrderID", value: "ORD001", editable: true },
+        { tag: "11", name: "ClOrdID", value: "CLORD001", editable: true },
+        { tag: "55", name: "Symbol", value: "IBM", editable: true },
+        { tag: "54", name: "Side", value: "1", editable: true },
+        { tag: "39", name: "OrdStatus", value: "2", editable: true },
+        { tag: "150", name: "ExecType", value: "F", editable: true },
+        { tag: "32", name: "LastQty", value: "100", editable: true },
+        { tag: "31", name: "LastPx", value: "150.00", editable: true },
+      ],
+      "F": [ // Order Cancel Request
+        { tag: "8", name: "BeginString", value: "FIX.4.4", editable: false },
+        { tag: "35", name: "MsgType", value: "F", editable: false },
+        { tag: "49", name: "SenderCompID", value: "SENDER", editable: true },
+        { tag: "56", name: "TargetCompID", value: "TARGET", editable: true },
+        { tag: "11", name: "ClOrdID", value: "CANCEL001", editable: true },
+        { tag: "41", name: "OrigClOrdID", value: "ORD001", editable: true },
+        { tag: "55", name: "Symbol", value: "IBM", editable: true },
+        { tag: "54", name: "Side", value: "1", editable: true },
+        { tag: "60", name: "TransactTime", value: new Date().toISOString().replace(/[-:]/g, "").slice(0, 17), editable: true },
+      ],
+      "G": [ // Order Cancel/Replace Request
+        { tag: "8", name: "BeginString", value: "FIX.4.4", editable: false },
+        { tag: "35", name: "MsgType", value: "G", editable: false },
+        { tag: "49", name: "SenderCompID", value: "SENDER", editable: true },
+        { tag: "56", name: "TargetCompID", value: "TARGET", editable: true },
+        { tag: "11", name: "ClOrdID", value: "REPLACE001", editable: true },
+        { tag: "41", name: "OrigClOrdID", value: "ORD001", editable: true },
+        { tag: "55", name: "Symbol", value: "IBM", editable: true },
+        { tag: "54", name: "Side", value: "1", editable: true },
+        { tag: "38", name: "OrderQty", value: "200", editable: true },
+        { tag: "40", name: "OrdType", value: "2", editable: true },
+        { tag: "44", name: "Price", value: "155.00", editable: true },
+      ],
+      "A": [ // Logon
+        { tag: "8", name: "BeginString", value: "FIX.4.4", editable: false },
+        { tag: "35", name: "MsgType", value: "A", editable: false },
+        { tag: "49", name: "SenderCompID", value: "SENDER", editable: true },
+        { tag: "56", name: "TargetCompID", value: "TARGET", editable: true },
+        { tag: "98", name: "EncryptMethod", value: "0", editable: true },
+        { tag: "108", name: "HeartBtInt", value: "30", editable: true },
+        { tag: "141", name: "ResetSeqNumFlag", value: "Y", editable: true },
+      ],
+      "0": [ // Heartbeat
+        { tag: "8", name: "BeginString", value: "FIX.4.4", editable: false },
+        { tag: "35", name: "MsgType", value: "0", editable: false },
+        { tag: "49", name: "SenderCompID", value: "SENDER", editable: true },
+        { tag: "56", name: "TargetCompID", value: "TARGET", editable: true },
+        { tag: "112", name: "TestReqID", value: "TEST001", editable: true },
+      ],
+    }
+    setMsgGenFields(fieldsByType[msgType] || fieldsByType["D"])
+    setMsgGenStep(3)
+  }
+
+  const updateMsgGenField = (index: number, newValue: string) => {
+    const newFields = [...msgGenFields]
+    newFields[index].value = newValue
+    setMsgGenFields(newFields)
+  }
+
+  const generateFinalMessage = () => {
+    const tags = msgGenFields.map((f) => `${f.tag}=${f.value}`).join("|")
+    const bodyLength = tags.length
+    const msg = `8=${msgGenFields[0]?.value || "FIX.4.4"}|9=${bodyLength}|${tags}|10=000|`
+    setMsgGenOutput(msg)
+    addHistoryEntry("FIX Message Generated", "success", `MsgType=${msgGenSelectedType}`)
+  }
+
+  const resetMsgGenerator = () => {
+    setMsgGenSpecFile(null)
+    setMsgGenLogFile(null)
+    setMsgGenStep(1)
+    setMsgGenSelectedType(null)
+    setMsgGenFields([])
+    setMsgGenOutput(null)
   }
 
   // Status message state
@@ -2099,6 +2227,281 @@ export default function FixAIPortal() {
     </Card>
   )
 
+  // Message Generator Panel
+  const MessageGeneratorPanel = () => (
+    <div className="p-6">
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>FIX Message Generator</h2>
+          <p className={`text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Build FIX messages from spec or log files</p>
+        </div>
+        {msgGenStep > 1 && (
+          <Button variant="ghost" size="sm" onClick={resetMsgGenerator}>
+            <RefreshCw className="mr-1 h-4 w-4" />
+            Start Over
+          </Button>
+        )}
+      </div>
+
+      {/* Progress Steps */}
+      <div className="mb-6 flex items-center justify-center gap-4">
+        {[1, 2, 3].map((step) => (
+          <div key={step} className="flex items-center gap-2">
+            <div className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-all ${
+              msgGenStep >= step 
+                ? isDarkMode ? "bg-[#00e5ff] text-[#0a1628]" : "bg-[#0a1628] text-white"
+                : isDarkMode ? "bg-[#1e4976] text-[#64b5f6]" : "bg-[#e2e8f0] text-[#64748b]"
+            }`}>
+              {step}
+            </div>
+            <span className={`text-sm font-medium ${
+              msgGenStep >= step 
+                ? isDarkMode ? "text-white" : "text-[#0a1628]"
+                : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"
+            }`}>
+              {step === 1 ? "Upload File" : step === 2 ? "Select Message" : "Edit Fields"}
+            </span>
+            {step < 3 && <ChevronRight className={`h-4 w-4 ${isDarkMode ? "text-[#1e4976]" : "text-[#cbd5e1]"}`} />}
+          </div>
+        ))}
+      </div>
+
+      {/* Step 1: Upload File */}
+      {msgGenStep === 1 && (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Upload FIX Spec */}
+          <Card 
+            className={`cursor-pointer p-6 transition-all hover:shadow-lg ${
+              msgGenSpecFile 
+                ? isDarkMode ? "border-[#4caf50] bg-[#4caf50]/10" : "border-[#4caf50] bg-[#4caf50]/5"
+                : ""
+            }`}
+            onClick={() => handleFileUpload("msg-gen-spec")}
+          >
+            <div className="flex flex-col items-center text-center">
+              <div className={`mb-4 flex h-16 w-16 items-center justify-center rounded-2xl ${
+                msgGenSpecFile 
+                  ? "bg-[#4caf50]/20"
+                  : isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"
+              }`}>
+                <FileText className={`h-8 w-8 ${
+                  msgGenSpecFile ? "text-[#4caf50]" : isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"
+                }`} />
+              </div>
+              <h3 className={`mb-2 text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                Upload FIX Specification
+              </h3>
+              <p className={`mb-4 text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+                {msgGenSpecFile || "XML or TXT format"}
+              </p>
+              <Button variant={msgGenSpecFile ? "primary" : "secondary"} size="sm">
+                {msgGenSpecFile ? "Change File" : "Select Spec File"}
+              </Button>
+            </div>
+            <input type="file" id="msg-gen-spec" className="hidden" accept=".xml,.txt" onChange={handleMsgGenSpecUpload} />
+          </Card>
+
+          {/* Upload Log File */}
+          <Card 
+            className={`cursor-pointer p-6 transition-all hover:shadow-lg ${
+              msgGenLogFile 
+                ? isDarkMode ? "border-[#4caf50] bg-[#4caf50]/10" : "border-[#4caf50] bg-[#4caf50]/5"
+                : ""
+            }`}
+            onClick={() => handleFileUpload("msg-gen-log")}
+          >
+            <div className="flex flex-col items-center text-center">
+              <div className={`mb-4 flex h-16 w-16 items-center justify-center rounded-2xl ${
+                msgGenLogFile 
+                  ? "bg-[#4caf50]/20"
+                  : isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"
+              }`}>
+                <Upload className={`h-8 w-8 ${
+                  msgGenLogFile ? "text-[#4caf50]" : isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"
+                }`} />
+              </div>
+              <h3 className={`mb-2 text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                Upload Log File
+              </h3>
+              <p className={`mb-4 text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+                {msgGenLogFile || "LOG or TXT format"}
+              </p>
+              <Button variant={msgGenLogFile ? "primary" : "secondary"} size="sm">
+                {msgGenLogFile ? "Change File" : "Select Log File"}
+              </Button>
+            </div>
+            <input type="file" id="msg-gen-log" className="hidden" accept=".log,.txt" onChange={handleMsgGenLogUpload} />
+          </Card>
+        </div>
+      )}
+
+      {/* Continue Button for Step 1 */}
+      {msgGenStep === 1 && (msgGenSpecFile || msgGenLogFile) && (
+        <div className="mt-6 flex justify-center">
+          <Button variant="primary" onClick={() => setMsgGenStep(2)}>
+            Continue to Message Selection
+            <ChevronRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      )}
+
+      {/* Step 2: Select Message Type */}
+      {msgGenStep === 2 && (
+        <Card className="p-6">
+          <h3 className={`mb-4 text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+            Select Message Type
+          </h3>
+          <p className={`mb-6 text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+            Choose the FIX message type you want to generate
+          </p>
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+            {msgTypes.map((type) => (
+              <button
+                key={type.code}
+                onClick={() => selectMsgGenType(type.code)}
+                className={`flex flex-col items-center rounded-xl border-2 p-4 transition-all ${
+                  msgGenSelectedType === type.code
+                    ? isDarkMode 
+                      ? "border-[#00e5ff] bg-[#00e5ff]/10" 
+                      : "border-[#0a1628] bg-[#0a1628]/5"
+                    : isDarkMode 
+                      ? "border-[#1e4976] hover:border-[#00e5ff]/50 hover:bg-[#1e4976]/50" 
+                      : "border-[#e2e8f0] hover:border-[#0a1628]/30 hover:bg-[#f1f5f9]"
+                }`}
+              >
+                <span className={`mb-1 text-2xl font-bold ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`}>
+                  {type.code}
+                </span>
+                <span className={`text-center text-xs ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
+                  {type.name}
+                </span>
+              </button>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Step 3: Edit Fields */}
+      {msgGenStep === 3 && (
+        <div className="space-y-6">
+          {/* Field Editor */}
+          <Card className="p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                  Edit Message Fields
+                </h3>
+                <p className={`text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+                  Customize the field values for your {msgTypes.find(t => t.code === msgGenSelectedType)?.name} message
+                </p>
+              </div>
+              <span className={`rounded-lg px-3 py-1 text-sm font-semibold ${isDarkMode ? "bg-[#00e5ff]/20 text-[#00e5ff]" : "bg-[#0a1628]/10 text-[#0a1628]"}`}>
+                MsgType: {msgGenSelectedType}
+              </span>
+            </div>
+
+            <div className="overflow-hidden rounded-xl border ${isDarkMode ? 'border-[#1e4976]' : 'border-[#e2e8f0]'}">
+              <table className="w-full">
+                <thead>
+                  <tr className={isDarkMode ? "bg-[#0d1f3c]" : "bg-[#f8fafc]"}>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Tag</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Field Name</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Value</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {msgGenFields.map((field, i) => (
+                    <tr key={i} className={`border-t ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"} ${i % 2 === 0 ? (isDarkMode ? "bg-[#0f2847]" : "bg-white") : (isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]")}`}>
+                      <td className={`px-4 py-3 font-mono text-sm ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`}>
+                        {field.tag}
+                      </td>
+                      <td className={`px-4 py-3 text-sm ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                        {field.name}
+                      </td>
+                      <td className="px-4 py-3">
+                        {field.editable ? (
+                          <input
+                            type="text"
+                            value={field.value}
+                            onChange={(e) => updateMsgGenField(i, e.target.value)}
+                            className={`w-full rounded-lg border px-3 py-1.5 text-sm ${
+                              isDarkMode 
+                                ? "border-[#1e4976] bg-[#0a1628] text-white focus:border-[#00e5ff]" 
+                                : "border-[#e2e8f0] bg-white text-[#0a1628] focus:border-[#0a1628]"
+                            }`}
+                          />
+                        ) : (
+                          <span className={`font-mono text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
+                            {field.value}
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                          field.editable 
+                            ? "bg-[#4caf50]/20 text-[#4caf50]" 
+                            : isDarkMode ? "bg-[#1e4976] text-[#64b5f6]" : "bg-[#e2e8f0] text-[#64748b]"
+                        }`}>
+                          {field.editable ? "Editable" : "Fixed"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <Button variant="secondary" onClick={() => setMsgGenStep(2)}>
+                Back to Message Type
+              </Button>
+              <Button variant="primary" onClick={generateFinalMessage}>
+                <MessageSquare className="mr-2 h-4 w-4" />
+                Generate FIX Message
+              </Button>
+            </div>
+          </Card>
+
+          {/* Generated Output */}
+          {msgGenOutput && (
+            <Card className="p-6">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                  Generated FIX Message
+                </h3>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    onClick={() => navigator.clipboard.writeText(msgGenOutput.replace(/\|/g, String.fromCharCode(1)))}
+                  >
+                    <FileText className="mr-1 h-4 w-4" />
+                    Copy (SOH)
+                  </Button>
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    onClick={() => navigator.clipboard.writeText(msgGenOutput)}
+                  >
+                    <FileText className="mr-1 h-4 w-4" />
+                    Copy (Pipe)
+                  </Button>
+                </div>
+              </div>
+              <div className={`rounded-xl p-4 font-mono text-sm break-all ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+                <span className={isDarkMode ? "text-[#4caf50]" : "text-[#388e3c]"}>{msgGenOutput}</span>
+              </div>
+              <p className={`mt-3 text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+                Tip: Use "Copy (SOH)" for actual FIX protocol delimiter or "Copy (Pipe)" for readable format
+              </p>
+            </Card>
+          )}
+        </div>
+      )}
+    </div>
+  )
+
   // Admin Sidebar Items - with accent colors from Broadridge palette
   const adminSidebarItems: SidebarItem[] = [
   { icon: LayoutDashboard, label: "Dashboard", id: "dashboard", iconColor: isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]" },
@@ -2133,6 +2536,8 @@ export default function FixAIPortal() {
         return <SpecComparePanel />
       case "log-analysis":
         return <LogAnalysisPanel />
+      case "msg-generator":
+        return <MessageGeneratorPanel />
       case "test-cases":
         return <TestCasesPanel />
       case "clients":
@@ -2372,8 +2777,8 @@ export default function FixAIPortal() {
           }`}
         >
           <div>
-            <h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Admin Tools</h1>
-            <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>FIX Protocol Management Dashboard</p>
+<h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>FIX Protocol Dashboard</h1>
+  <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Manage, Test & Analyze FIX Messages</p>
           </div>
           <div className="flex items-center gap-3">
             <TabBar />
