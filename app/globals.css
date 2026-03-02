@@ -6,9 +6,9 @@
 /* Broadridge Color Palette */
 :root {
   /* Base colors - Light Theme */
-  --background: #ffffff;
+  --background: #f8fafc;
   --foreground: #0a1628;
-  --card: #f5f5f5;
+  --card: #ffffff;
   --card-foreground: #0a1628;
   --popover: #ffffff;
   --popover-foreground: #0a1628;
@@ -23,33 +23,41 @@
   --fresh-blue: #42a5f5;
   --clear-blue: #90caf9;
   
-  /* Primary & Secondary */
-  --primary: #1976d2;
+  /* Primary & Secondary - Deep Blue Buttons */
+  --primary: #0a1628;
   --primary-foreground: #ffffff;
   --secondary: #e8f4fc;
   --secondary-foreground: #0a1628;
-  --muted: #d0d0d0;
-  --muted-foreground: #5c6370;
-  --accent: #00bcd4;
-  --accent-foreground: #0a1628;
+  --muted: #e2e8f0;
+  --muted-foreground: #475569;
+  --accent: #1976d2;
+  --accent-foreground: #ffffff;
+  
+  /* Button specific colors */
+  --btn-bg: #0a1628;
+  --btn-bg-hover: #1e3a5f;
+  --btn-secondary-bg: #e2e8f0;
+  --btn-secondary-hover: #cbd5e1;
+  --btn-text: #ffffff;
+  --btn-secondary-text: #0a1628;
   
   /* Functional colors */
   --destructive: #d32f2f;
   --destructive-foreground: #ffffff;
   --success: #4caf50;
   --warning: #ffeb3b;
-  --border: #c0c0c0;
-  --input: #e0e0e0;
+  --border: #cbd5e1;
+  --input: #e2e8f0;
   --ring: #1976d2;
   
   --radius: 0.625rem;
-  --sidebar: #f0f4f8;
+  --sidebar: #f1f5f9;
   --sidebar-foreground: #0a1628;
-  --sidebar-primary: #1976d2;
+  --sidebar-primary: #0a1628;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e8f4fc;
+  --sidebar-accent: #e2e8f0;
   --sidebar-accent-foreground: #0a1628;
-  --sidebar-border: #c0c0c0;
+  --sidebar-border: #cbd5e1;
   --sidebar-ring: #1976d2;
 }
 
@@ -57,35 +65,43 @@
   /* Base colors - Dark Theme */
   --background: #0a1628;
   --foreground: #ffffff;
-  --card: #0d1f3c;
+  --card: #0f2847;
   --card-foreground: #ffffff;
-  --popover: #0d1f3c;
+  --popover: #0f2847;
   --popover-foreground: #ffffff;
   
-  /* Primary & Secondary */
+  /* Primary & Secondary - Bright Cyan Buttons */
   --primary: #00bcd4;
   --primary-foreground: #0a1628;
-  --secondary: #1a3a5c;
+  --secondary: #162d50;
   --secondary-foreground: #ffffff;
-  --muted: #1a3a5c;
+  --muted: #1e3a5f;
   --muted-foreground: #90caf9;
   --accent: #00bcd4;
   --accent-foreground: #0a1628;
   
+  /* Button specific colors */
+  --btn-bg: #00bcd4;
+  --btn-bg-hover: #00e5ff;
+  --btn-secondary-bg: #1e4976;
+  --btn-secondary-hover: #2a5f8f;
+  --btn-text: #0a1628;
+  --btn-secondary-text: #ffffff;
+  
   /* Functional colors */
   --destructive: #f44336;
   --destructive-foreground: #ffffff;
-  --border: #2b4a6f;
-  --input: #1a3a5c;
+  --border: #1e4976;
+  --input: #162d50;
   --ring: #00bcd4;
   
-  --sidebar: #0d1f3c;
+  --sidebar: #0f2847;
   --sidebar-foreground: #ffffff;
   --sidebar-primary: #00bcd4;
   --sidebar-primary-foreground: #0a1628;
-  --sidebar-accent: #1a3a5c;
+  --sidebar-accent: #1e4976;
   --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #2b4a6f;
+  --sidebar-border: #1e4976;
   --sidebar-ring: #00bcd4;
 }
 

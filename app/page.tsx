@@ -2,12 +2,8 @@
 
 import { useState, useEffect } from "react"
 import {
-  FileImage,
   FileText,
-  RefreshCcw,
-  RotateCcw,
   FolderOpen,
-  Star,
   X,
   Upload,
   ChevronRight,
@@ -17,6 +13,16 @@ import {
   Settings,
   TestTube,
   FileUp,
+  LayoutDashboard,
+  GitCompare,
+  MessageSquare,
+  FileCheck,
+  Download,
+  Users,
+  History,
+  Bell,
+  HelpCircle,
+  LogOut,
 } from "lucide-react"
 
 type Screen = "home" | "admin-tools" | "client-tools"
@@ -28,6 +34,13 @@ interface TagValue {
   value: string
 }
 
+interface SidebarItem {
+  icon: React.ElementType
+  label: string
+  id: string
+  badge?: number
+}
+
 export default function FixAIPortal() {
   const [currentScreen, setCurrentScreen] = useState<Screen>("home")
   const [showLoginModal, setShowLoginModal] = useState(false)
@@ -37,6 +50,7 @@ export default function FixAIPortal() {
   const [password, setPassword] = useState("")
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [activeTab, setActiveTab] = useState<Tab>("home")
+  const [activeSidebarItem, setActiveSidebarItem] = useState("dashboard")
 
   // Test it out section state
   const [uploadedSpec, setUploadedSpec] = useState<string | null>(null)
@@ -147,14 +161,146 @@ export default function FixAIPortal() {
     }
   }
 
-  // Theme Toggle Button
+  // Modern Button Component
+  const Button = ({
+    children,
+    variant = "primary",
+    size = "md",
+    className = "",
+    ...props
+  }: {
+    children: React.ReactNode
+    variant?: "primary" | "secondary" | "outline" | "ghost"
+    size?: "sm" | "md" | "lg"
+    className?: string
+    onClick?: () => void
+  }) => {
+    const baseStyles =
+      "inline-flex items-center justify-center font-medium transition-all duration-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2"
+    const sizeStyles = {
+      sm: "px-3 py-1.5 text-xs",
+      md: "px-4 py-2.5 text-sm",
+      lg: "px-6 py-3 text-base",
+    }
+    const variantStyles = {
+      primary: isDarkMode
+        ? "bg-[#00e5ff] text-[#0a1628] hover:bg-[#18ffff] shadow-lg shadow-[#00e5ff]/25 focus:ring-[#00e5ff]"
+        : "bg-[#0a1628] text-white hover:bg-[#1e3a5f] shadow-lg shadow-[#0a1628]/25 focus:ring-[#0a1628]",
+      secondary: isDarkMode
+        ? "bg-[#1e4976] text-white hover:bg-[#2a5f8f] shadow-md focus:ring-[#1e4976]"
+        : "bg-[#e2e8f0] text-[#0a1628] hover:bg-[#cbd5e1] shadow-md focus:ring-[#e2e8f0]",
+      outline: isDarkMode
+        ? "border-2 border-[#00e5ff] text-[#00e5ff] hover:bg-[#00e5ff]/10 focus:ring-[#00e5ff]"
+        : "border-2 border-[#0a1628] text-[#0a1628] hover:bg-[#0a1628]/5 focus:ring-[#0a1628]",
+      ghost: isDarkMode
+        ? "text-[#90caf9] hover:bg-[#1e4976]/50 focus:ring-[#1e4976]"
+        : "text-[#0a1628] hover:bg-[#e2e8f0] focus:ring-[#e2e8f0]",
+    }
+
+    return (
+      <button className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`} {...props}>
+        {children}
+      </button>
+    )
+  }
+
+  // Modern Sidebar Component
+  const Sidebar = ({ items, title }: { items: SidebarItem[]; title: string }) => (
+    <div
+      className={`flex h-full w-56 flex-col border-r transition-colors ${
+        isDarkMode ? "border-[#1e4976] bg-[#0d1f3c]" : "border-[#e2e8f0] bg-[#f8fafc]"
+      }`}
+    >
+      {/* Logo/Brand */}
+      <div className={`flex items-center gap-3 border-b px-4 py-5 ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
+        <div
+          className={`flex h-9 w-9 items-center justify-center rounded-lg ${
+            isDarkMode ? "bg-[#00e5ff] text-[#0a1628]" : "bg-[#0a1628] text-white"
+          }`}
+        >
+          <MessageSquare className="h-5 w-5" />
+        </div>
+        <span className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{title}</span>
+      </div>
+
+      {/* Navigation Items */}
+      <nav className="flex-1 overflow-y-auto px-3 py-4">
+        <div className={`mb-2 px-3 text-xs font-semibold uppercase tracking-wider ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+          Navigation
+        </div>
+        {items.map((item) => {
+          const Icon = item.icon
+          const isActive = activeSidebarItem === item.id
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveSidebarItem(item.id)}
+              className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
+                isActive
+                  ? isDarkMode
+                    ? "bg-[#00e5ff]/20 text-[#00e5ff]"
+                    : "bg-[#0a1628]/10 text-[#0a1628]"
+                  : isDarkMode
+                    ? "text-[#90caf9] hover:bg-[#1e4976]/50 hover:text-white"
+                    : "text-[#64748b] hover:bg-[#e2e8f0] hover:text-[#0a1628]"
+              }`}
+            >
+              <Icon className="h-5 w-5" />
+              <span>{item.label}</span>
+              {item.badge && (
+                <span
+                  className={`ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold ${
+                    isDarkMode ? "bg-[#f44336] text-white" : "bg-[#ef4444] text-white"
+                  }`}
+                >
+                  {item.badge}
+                </span>
+              )}
+            </button>
+          )
+        })}
+      </nav>
+
+      {/* Theme Toggle & Logout */}
+      <div className={`border-t px-3 py-4 ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
+        <button
+          onClick={() => setIsDarkMode(!isDarkMode)}
+          className={`mb-2 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
+            isDarkMode
+              ? "text-[#90caf9] hover:bg-[#1e4976]/50 hover:text-white"
+              : "text-[#64748b] hover:bg-[#e2e8f0] hover:text-[#0a1628]"
+          }`}
+        >
+          {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
+        </button>
+        <button
+          onClick={() => {
+            setCurrentScreen("home")
+            setLoggedInUser(null)
+            setActiveTab("home")
+          }}
+          className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
+            isDarkMode
+              ? "text-[#f44336] hover:bg-[#f44336]/10"
+              : "text-[#ef4444] hover:bg-[#fef2f2]"
+          }`}
+        >
+          <LogOut className="h-5 w-5" />
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  )
+
+  // Theme Toggle Button (for home screen)
   const ThemeToggle = () => (
     <button
       onClick={() => setIsDarkMode(!isDarkMode)}
-      className={`fixed right-4 top-4 z-50 rounded-full p-3 shadow-lg transition-all ${
+      className={`fixed right-4 top-4 z-50 rounded-xl p-3 shadow-lg transition-all ${
         isDarkMode
-          ? "bg-[var(--secondary)] text-[var(--intelligent-cyan)] hover:bg-[var(--muted)]"
-          : "bg-[var(--deep-blue)] text-[var(--clear-blue)] hover:bg-[var(--broadridge-blue)]"
+          ? "bg-[#1e4976] text-[#00e5ff] hover:bg-[#2a5f8f]"
+          : "bg-white text-[#0a1628] hover:bg-[#f1f5f9] shadow-md"
       }`}
       aria-label="Toggle theme"
     >
@@ -163,7 +309,7 @@ export default function FixAIPortal() {
   )
 
   // Tab Bar Component
-  const TabBar = ({ showLogout = false }: { showLogout?: boolean }) => {
+  const TabBar = () => {
     const tabs = [
       { id: "home" as Tab, label: "Home", icon: Home },
       { id: "projects" as Tab, label: "Projects", icon: FolderOpen },
@@ -174,10 +320,8 @@ export default function FixAIPortal() {
 
     return (
       <div
-        className={`flex items-center gap-1 rounded-t-lg border-b px-2 ${
-          isDarkMode
-            ? "border-[var(--border)] bg-[var(--card)]"
-            : "border-[var(--border)] bg-[var(--secondary)]"
+        className={`flex items-center gap-1 rounded-xl p-1.5 ${
+          isDarkMode ? "bg-[#0d1f3c]" : "bg-[#e2e8f0]"
         }`}
       >
         {tabs.map((tab) => {
@@ -186,14 +330,14 @@ export default function FixAIPortal() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 rounded-t-lg px-4 py-2 text-sm font-medium transition-all ${
+              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
                 activeTab === tab.id
                   ? isDarkMode
-                    ? "bg-[var(--vibrant-blue)] text-white"
-                    : "bg-[var(--true-blue)] text-white"
+                    ? "bg-[#00e5ff] text-[#0a1628] shadow-md"
+                    : "bg-white text-[#0a1628] shadow-md"
                   : isDarkMode
-                    ? "text-[var(--muted-foreground)] hover:bg-[var(--secondary)] hover:text-white"
-                    : "text-[var(--foreground)] hover:bg-[var(--card)]"
+                    ? "text-[#90caf9] hover:bg-[#1e4976]/50 hover:text-white"
+                    : "text-[#64748b] hover:bg-white/50 hover:text-[#0a1628]"
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -201,168 +345,125 @@ export default function FixAIPortal() {
             </button>
           )
         })}
-        {showLogout && (
-          <button
-            onClick={() => {
-              setCurrentScreen("home")
-              setLoggedInUser(null)
-              setActiveTab("home")
-            }}
-            className={`ml-auto flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium ${
-              isDarkMode
-                ? "text-red-400 hover:bg-red-500/20"
-                : "text-red-600 hover:bg-red-100"
-            }`}
-          >
-            <X className="h-4 w-4" />
-            Logout
-          </button>
-        )}
       </div>
     )
   }
+
+  // Modern Card Component
+  const Card = ({
+    children,
+    className = "",
+    hover = false,
+  }: {
+    children: React.ReactNode
+    className?: string
+    hover?: boolean
+  }) => (
+    <div
+      className={`rounded-2xl border transition-all ${
+        isDarkMode
+          ? `border-[#1e4976] bg-[#0d1f3c] ${hover ? "hover:border-[#00e5ff]/50 hover:shadow-lg hover:shadow-[#00e5ff]/10" : ""}`
+          : `border-[#e2e8f0] bg-white ${hover ? "hover:border-[#0a1628]/20 hover:shadow-lg" : ""}`
+      } ${className}`}
+    >
+      {children}
+    </div>
+  )
 
   // Home Screen
   const HomeScreen = () => (
     <div
       className={`min-h-screen p-6 transition-colors ${
-        isDarkMode ? "bg-[var(--background)]" : "bg-[var(--background)]"
+        isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"
       }`}
     >
       <ThemeToggle />
 
       {/* Header */}
-      <div className="mx-auto mb-4 max-w-5xl">
+      <div className="mx-auto mb-6 max-w-5xl">
         <div
-          className={`rounded-lg px-8 py-4 text-center shadow-lg ${
+          className={`rounded-2xl px-8 py-6 text-center shadow-xl ${
             isDarkMode
-              ? "bg-gradient-to-r from-[var(--true-blue)] via-[var(--intelligent-cyan)] to-[var(--true-blue)] shadow-[var(--intelligent-cyan)]/30"
-              : "bg-gradient-to-r from-[var(--true-blue)] via-[var(--vibrant-blue)] to-[var(--true-blue)] shadow-[var(--true-blue)]/30"
+              ? "bg-gradient-to-r from-[#0d47a1] via-[#00bcd4] to-[#0d47a1] shadow-[#00bcd4]/20"
+              : "bg-gradient-to-r from-[#0a1628] via-[#1976d2] to-[#0a1628] shadow-[#0a1628]/20"
           }`}
         >
-          <h1 className="text-3xl font-bold tracking-wide text-white drop-shadow-lg">
+          <h1 className="text-4xl font-bold tracking-wide text-white drop-shadow-lg">
             BTCS AI Interface
           </h1>
+          <p className="mt-2 text-sm text-white/80">FIX Protocol Management & Testing Portal</p>
         </div>
       </div>
 
       {/* Tab Bar */}
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto mb-8 flex max-w-5xl justify-center">
         <TabBar />
       </div>
 
       {/* Login Cards */}
-      <div className="mx-auto mb-8 grid max-w-5xl grid-cols-1 gap-8 pt-6 md:grid-cols-2">
+      <div className="mx-auto mb-8 grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2">
         {/* Admin Login Card */}
-        <div
-          className={`rounded-lg border-2 p-6 shadow-lg transition-colors ${
-            isDarkMode
-              ? "border-[var(--border)] bg-[var(--card)] shadow-[var(--vibrant-blue)]/20"
-              : "border-[var(--border)] bg-[var(--card)]"
-          }`}
-        >
-          <button
+        <Card hover className="p-6">
+          <Button
+            variant="primary"
+            size="lg"
+            className="mb-6 w-full"
             onClick={() => handleLogin("admin")}
-            className={`mb-4 w-full rounded-lg px-6 py-3 text-xl font-semibold text-white shadow-lg transition ${
-              isDarkMode
-                ? "bg-gradient-to-r from-[var(--true-blue)] to-[var(--vibrant-blue)] shadow-[var(--vibrant-blue)]/30 hover:from-[var(--vibrant-blue)] hover:to-[var(--fresh-blue)]"
-                : "bg-gradient-to-r from-[var(--true-blue)] to-[var(--vibrant-blue)] hover:from-[var(--vibrant-blue)] hover:to-[var(--fresh-blue)]"
-            }`}
           >
-            Admin login
-          </button>
-          <ul
-            className={`space-y-2 ${isDarkMode ? "text-[var(--clear-blue)]" : "text-[var(--deep-blue)]"}`}
-          >
-            <li className="flex items-center gap-2">
-              <ChevronRight
-                className={`h-4 w-4 ${isDarkMode ? "text-[var(--intelligent-cyan)]" : "text-[var(--true-blue)]"}`}
-              />
-              Compare between FIX Specs
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight
-                className={`h-4 w-4 ${isDarkMode ? "text-[var(--intelligent-cyan)]" : "text-[var(--true-blue)]"}`}
-              />
-              Compare FIX SPECS vs Log Files
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight
-                className={`h-4 w-4 ${isDarkMode ? "text-[var(--intelligent-cyan)]" : "text-[var(--true-blue)]"}`}
-              />
-              Create FIX message from Log File
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight
-                className={`h-4 w-4 ${isDarkMode ? "text-[var(--intelligent-cyan)]" : "text-[var(--true-blue)]"}`}
-              />
-              Create Test Cases from Fix Specs
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight
-                className={`h-4 w-4 ${isDarkMode ? "text-[var(--intelligent-cyan)]" : "text-[var(--true-blue)]"}`}
-              />
-              Create Test Cases from Log Files
-            </li>
+            Admin Login
+          </Button>
+          <ul className="space-y-3">
+            {[
+              "Compare between FIX Specs",
+              "Compare FIX SPECS vs Log Files",
+              "Create FIX message from Log File",
+              "Create Test Cases from Fix Specs",
+              "Create Test Cases from Log Files",
+            ].map((item, i) => (
+              <li key={i} className="flex items-center gap-3">
+                <ChevronRight
+                  className={`h-4 w-4 ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`}
+                />
+                <span className={isDarkMode ? "text-[#90caf9]" : "text-[#475569]"}>{item}</span>
+              </li>
+            ))}
           </ul>
-        </div>
+        </Card>
 
         {/* Client Login Card */}
-        <div
-          className={`rounded-lg border-2 p-6 shadow-lg transition-colors ${
-            isDarkMode
-              ? "border-[var(--border)] bg-[var(--card)] shadow-[var(--vibrant-blue)]/20"
-              : "border-[var(--border)] bg-[var(--card)]"
-          }`}
-        >
-          <button
+        <Card hover className="p-6">
+          <Button
+            variant="primary"
+            size="lg"
+            className="mb-6 w-full"
             onClick={() => handleLogin("client")}
-            className={`mb-4 w-full rounded-lg px-6 py-3 text-xl font-semibold text-white shadow-lg transition ${
-              isDarkMode
-                ? "bg-gradient-to-r from-[var(--true-blue)] to-[var(--vibrant-blue)] shadow-[var(--vibrant-blue)]/30 hover:from-[var(--vibrant-blue)] hover:to-[var(--fresh-blue)]"
-                : "bg-gradient-to-r from-[var(--true-blue)] to-[var(--vibrant-blue)] hover:from-[var(--vibrant-blue)] hover:to-[var(--fresh-blue)]"
-            }`}
           >
-            Client login
-          </button>
-          <ul
-            className={`space-y-2 ${isDarkMode ? "text-[var(--clear-blue)]" : "text-[var(--deep-blue)]"}`}
-          >
-            <li className="flex items-center gap-2">
-              <ChevronRight
-                className={`h-4 w-4 ${isDarkMode ? "text-[var(--intelligent-cyan)]" : "text-[var(--true-blue)]"}`}
-              />
-              Upload FIX specs
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight
-                className={`h-4 w-4 ${isDarkMode ? "text-[var(--intelligent-cyan)]" : "text-[var(--true-blue)]"}`}
-              />
-              Download FIX Spec
-            </li>
-            <li className="flex items-center gap-2">
-              <ChevronRight
-                className={`h-4 w-4 ${isDarkMode ? "text-[var(--intelligent-cyan)]" : "text-[var(--true-blue)]"}`}
-              />
-              Generate FIX message from Spec
-            </li>
+            Client Login
+          </Button>
+          <ul className="space-y-3">
+            {[
+              "Upload FIX specs",
+              "Download FIX Spec",
+              "Generate FIX message from Spec",
+            ].map((item, i) => (
+              <li key={i} className="flex items-center gap-3">
+                <ChevronRight
+                  className={`h-4 w-4 ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`}
+                />
+                <span className={isDarkMode ? "text-[#90caf9]" : "text-[#475569]"}>{item}</span>
+              </li>
+            ))}
           </ul>
-        </div>
+        </Card>
       </div>
 
       {/* Test it Out Section */}
-      <div
-        className={`mx-auto max-w-5xl rounded-lg border-2 p-6 shadow-lg transition-colors ${
-          isDarkMode
-            ? "border-[var(--border)] bg-[var(--card)] shadow-[var(--vibrant-blue)]/20"
-            : "border-[var(--border)] bg-[var(--card)]"
-        }`}
-      >
+      <Card className="mx-auto max-w-5xl p-6">
         <div
-          className={`mb-6 rounded-lg px-6 py-2 text-center ${
+          className={`mb-6 rounded-xl px-6 py-3 text-center ${
             isDarkMode
-              ? "bg-gradient-to-r from-[var(--true-blue)] to-[var(--vibrant-blue)]"
-              : "bg-gradient-to-r from-[var(--true-blue)] to-[var(--vibrant-blue)]"
+              ? "bg-gradient-to-r from-[#0d47a1] to-[#00bcd4]"
+              : "bg-gradient-to-r from-[#0a1628] to-[#1976d2]"
           }`}
         >
           <h2 className="text-xl font-semibold text-white">Test it Out!</h2>
@@ -371,24 +472,16 @@ export default function FixAIPortal() {
         <div className="flex flex-col gap-6 md:flex-row">
           {/* Controls */}
           <div
-            className={`flex-1 rounded-lg border p-4 ${
-              isDarkMode
-                ? "border-[var(--border)] bg-[var(--background)]"
-                : "border-[var(--border)] bg-white"
+            className={`flex-1 rounded-xl border p-5 ${
+              isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#f8fafc]"
             }`}
           >
             <div className="grid grid-cols-2 gap-4">
               <div className="relative">
-                <button
-                  onClick={() => handleFileUpload("spec-upload")}
-                  className={`w-full rounded-lg px-4 py-3 text-sm shadow-md transition ${
-                    isDarkMode
-                      ? "bg-[var(--secondary)] text-white hover:bg-[var(--muted)]"
-                      : "bg-[var(--secondary)] text-[var(--foreground)] hover:bg-[var(--open-blue)] hover:text-white"
-                  }`}
-                >
+                <Button variant="secondary" className="w-full" onClick={() => handleFileUpload("spec-upload")}>
+                  <Upload className="mr-2 h-4 w-4" />
                   Upload FIX Spec
-                </button>
+                </Button>
                 <input
                   type="file"
                   id="spec-upload"
@@ -397,50 +490,34 @@ export default function FixAIPortal() {
                   onChange={handleSpecUpload}
                 />
                 {uploadedSpec && (
-                  <span className="mt-1 block text-xs text-[var(--success)]">
-                    {uploadedSpec}
-                  </span>
+                  <span className="mt-2 block text-xs text-green-500">{uploadedSpec}</span>
                 )}
               </div>
 
-              <button
-                onClick={() => setShowTagEditor(true)}
-                className={`rounded-lg px-4 py-3 text-sm shadow-md transition ${
-                  isDarkMode
-                    ? "bg-[var(--secondary)] text-white hover:bg-[var(--muted)]"
-                    : "bg-[var(--secondary)] text-[var(--foreground)] hover:bg-[var(--open-blue)] hover:text-white"
-                }`}
-              >
+              <Button variant="secondary" onClick={() => setShowTagEditor(true)}>
+                <Settings className="mr-2 h-4 w-4" />
                 Change Tag Values
-              </button>
+              </Button>
 
               <div className="relative">
-                <button
-                  onClick={() => setShowMsgTypeDropdown(!showMsgTypeDropdown)}
-                  className={`w-full rounded-lg px-4 py-3 text-sm shadow-md transition ${
-                    isDarkMode
-                      ? "bg-[var(--secondary)] text-white hover:bg-[var(--muted)]"
-                      : "bg-[var(--secondary)] text-[var(--foreground)] hover:bg-[var(--open-blue)] hover:text-white"
-                  }`}
-                >
+                <Button variant="secondary" className="w-full" onClick={() => setShowMsgTypeDropdown(!showMsgTypeDropdown)}>
+                  <FileText className="mr-2 h-4 w-4" />
                   {selectedMsgType ? `MsgType: ${selectedMsgType}` : "Select MsgType"}
-                </button>
+                </Button>
                 {showMsgTypeDropdown && (
                   <div
-                    className={`absolute left-0 top-full z-10 mt-1 w-64 rounded-lg border shadow-xl ${
-                      isDarkMode
-                        ? "border-[var(--border)] bg-[var(--card)]"
-                        : "border-[var(--border)] bg-white"
+                    className={`absolute left-0 top-full z-10 mt-2 w-64 overflow-hidden rounded-xl border shadow-xl ${
+                      isDarkMode ? "border-[#1e4976] bg-[#0d1f3c]" : "border-[#e2e8f0] bg-white"
                     }`}
                   >
                     {msgTypes.map((type) => (
                       <button
                         key={type.code}
                         onClick={() => selectMsgType(type.code)}
-                        className={`block w-full px-4 py-2 text-left text-sm ${
+                        className={`block w-full px-4 py-2.5 text-left text-sm transition-colors ${
                           isDarkMode
-                            ? "text-[var(--clear-blue)] hover:bg-[var(--secondary)]"
-                            : "text-[var(--foreground)] hover:bg-[var(--secondary)]"
+                            ? "text-[#90caf9] hover:bg-[#1e4976] hover:text-white"
+                            : "text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0a1628]"
                         }`}
                       >
                         {type.code} - {type.name}
@@ -450,41 +527,32 @@ export default function FixAIPortal() {
                 )}
               </div>
 
-              <button
-                onClick={generateFixMessage}
-                className={`rounded-lg px-4 py-3 text-sm font-semibold shadow-md transition ${
-                  isDarkMode
-                    ? "bg-gradient-to-r from-[var(--true-blue)] to-[var(--vibrant-blue)] text-white hover:from-[var(--vibrant-blue)] hover:to-[var(--fresh-blue)]"
-                    : "bg-gradient-to-r from-[var(--true-blue)] to-[var(--vibrant-blue)] text-white hover:from-[var(--vibrant-blue)] hover:to-[var(--fresh-blue)]"
-                }`}
-              >
+              <Button variant="primary" onClick={generateFixMessage}>
                 Generate FIX Msg
-              </button>
+              </Button>
             </div>
           </div>
 
           {/* Arrow */}
           <div className="flex items-center justify-center">
-            <div className={isDarkMode ? "text-[var(--vibrant-blue)]" : "text-[var(--true-blue)]"}>
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" />
-              </svg>
+            <div
+              className={`rounded-full p-3 ${
+                isDarkMode ? "bg-[#00e5ff]/20 text-[#00e5ff]" : "bg-[#0a1628]/10 text-[#0a1628]"
+              }`}
+            >
+              <ChevronRight className="h-6 w-6" />
             </div>
           </div>
 
           {/* Output */}
           <div
-            className={`flex-1 rounded-lg border p-4 ${
-              isDarkMode
-                ? "border-[var(--border)] bg-[var(--background)]"
-                : "border-[var(--border)] bg-white"
+            className={`flex-1 rounded-xl border p-5 ${
+              isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#f8fafc]"
             }`}
           >
             <div
-              className={`min-h-32 rounded p-3 font-mono text-xs ${
-                isDarkMode
-                  ? "bg-[var(--card)] text-[var(--intelligent-cyan)]"
-                  : "bg-[var(--secondary)] text-[var(--deep-blue)]"
+              className={`min-h-32 rounded-lg p-4 font-mono text-xs leading-relaxed ${
+                isDarkMode ? "bg-[#0d1f3c] text-[#00e5ff]" : "bg-white text-[#0a1628] border border-[#e2e8f0]"
               }`}
             >
               {generatedMessage ||
@@ -492,7 +560,7 @@ export default function FixAIPortal() {
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Tag Editor Modal */}
       {showTagEditor && <TagEditorModal />}
@@ -501,32 +569,26 @@ export default function FixAIPortal() {
 
   // Tag Editor Modal Component
   const TagEditorModal = () => (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div
-        className={`w-full max-w-md rounded-lg border-2 p-6 ${
-          isDarkMode
-            ? "border-[var(--border)] bg-[var(--card)]"
-            : "border-[var(--border)] bg-white"
-        }`}
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <Card className="w-full max-w-md p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h3
-            className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[var(--foreground)]"}`}
-          >
+          <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
             Edit Tag Values
           </h3>
           <button
             onClick={() => setShowTagEditor(false)}
-            className={isDarkMode ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-black"}
+            className={`rounded-lg p-2 transition-colors ${
+              isDarkMode ? "hover:bg-[#1e4976] text-[#90caf9]" : "hover:bg-[#f1f5f9] text-[#64748b]"
+            }`}
           >
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className="max-h-80 space-y-2 overflow-y-auto">
+        <div className="max-h-80 space-y-3 overflow-y-auto pr-2">
           {tagValues.map((tag, index) => (
-            <div key={index} className="flex items-center gap-2">
+            <div key={index} className="flex items-center gap-3">
               <span
-                className={`w-12 text-sm ${isDarkMode ? "text-[var(--clear-blue)]" : "text-[var(--true-blue)]"}`}
+                className={`w-16 text-sm font-medium ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`}
               >
                 Tag {tag.tag}
               </span>
@@ -534,48 +596,35 @@ export default function FixAIPortal() {
                 type="text"
                 value={tag.value}
                 onChange={(e) => updateTagValue(index, e.target.value)}
-                className={`flex-1 rounded border px-3 py-1 text-sm ${
+                className={`flex-1 rounded-lg border px-3 py-2 text-sm transition-colors ${
                   isDarkMode
-                    ? "border-[var(--border)] bg-[var(--background)] text-white"
-                    : "border-[var(--border)] bg-white text-[var(--foreground)]"
+                    ? "border-[#1e4976] bg-[#0a1628] text-white focus:border-[#00e5ff] focus:ring-1 focus:ring-[#00e5ff]"
+                    : "border-[#e2e8f0] bg-white text-[#0a1628] focus:border-[#1976d2] focus:ring-1 focus:ring-[#1976d2]"
                 }`}
               />
             </div>
           ))}
         </div>
-        <button
-          onClick={() => setShowTagEditor(false)}
-          className={`mt-4 w-full rounded-lg px-4 py-2 text-white ${
-            isDarkMode
-              ? "bg-[var(--true-blue)] hover:bg-[var(--vibrant-blue)]"
-              : "bg-[var(--true-blue)] hover:bg-[var(--vibrant-blue)]"
-          }`}
-        >
+        <Button variant="primary" className="mt-6 w-full" onClick={() => setShowTagEditor(false)}>
           Save Changes
-        </button>
-      </div>
+        </Button>
+      </Card>
     </div>
   )
 
   // MsgType Modal Component
   const MsgTypeModal = () => (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div
-        className={`w-full max-w-sm rounded-lg border-2 p-6 ${
-          isDarkMode
-            ? "border-[var(--border)] bg-[var(--card)]"
-            : "border-[var(--border)] bg-white"
-        }`}
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <Card className="w-full max-w-sm p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h3
-            className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[var(--foreground)]"}`}
-          >
+          <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
             Select Message Type
           </h3>
           <button
             onClick={() => setShowMsgTypeDropdown(false)}
-            className={isDarkMode ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-black"}
+            className={`rounded-lg p-2 transition-colors ${
+              isDarkMode ? "hover:bg-[#1e4976] text-[#90caf9]" : "hover:bg-[#f1f5f9] text-[#64748b]"
+            }`}
           >
             <X className="h-5 w-5" />
           </button>
@@ -588,214 +637,168 @@ export default function FixAIPortal() {
                 setSelectedMsgType(type.code)
                 setShowMsgTypeDropdown(false)
               }}
-              className={`block w-full rounded px-4 py-2 text-left text-sm ${
+              className={`block w-full rounded-lg px-4 py-2.5 text-left text-sm transition-colors ${
                 isDarkMode
-                  ? "text-[var(--clear-blue)] hover:bg-[var(--secondary)]"
-                  : "text-[var(--foreground)] hover:bg-[var(--secondary)]"
+                  ? "text-[#90caf9] hover:bg-[#1e4976] hover:text-white"
+                  : "text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0a1628]"
               }`}
             >
               {type.code} - {type.name}
             </button>
           ))}
         </div>
-      </div>
+      </Card>
     </div>
   )
 
-  // Tool Panel Component
+  // Modern Tool Panel Component
   const ToolPanel = ({
     title,
+    icon: Icon,
     buttons,
   }: {
     title: string
-    buttons: { label: string; action: () => void; primary?: boolean }[]
+    icon: React.ElementType
+    buttons: { label: string; action: () => void; primary?: boolean; icon?: React.ElementType }[]
   }) => (
-    <div
-      className={`rounded-lg border-2 p-4 shadow-lg transition-colors ${
-        isDarkMode
-          ? "border-[var(--border)] bg-[var(--card)] shadow-[var(--vibrant-blue)]/20"
-          : "border-[var(--border)] bg-[var(--card)]"
-      }`}
-    >
+    <Card hover className="overflow-hidden">
       <div
-        className={`mb-4 rounded-lg px-4 py-2 text-center ${
-          isDarkMode
-            ? "bg-gradient-to-r from-[var(--true-blue)] to-[var(--vibrant-blue)]"
-            : "bg-gradient-to-r from-[var(--true-blue)] to-[var(--vibrant-blue)]"
+        className={`flex items-center gap-3 border-b px-5 py-4 ${
+          isDarkMode ? "border-[#1e4976] bg-[#0d1f3c]" : "border-[#e2e8f0] bg-[#f8fafc]"
         }`}
       >
-        <h3 className="text-lg font-semibold italic text-white">{title}</h3>
-      </div>
-      <div className="flex items-center gap-4">
-        <div className="grid flex-1 grid-cols-2 gap-3">
-          {buttons.map((btn, index) => (
-            <button
-              key={index}
-              onClick={btn.action}
-              className={`rounded-lg px-3 py-2 text-sm font-medium shadow-md transition ${
-                btn.primary
-                  ? "bg-gradient-to-r from-[var(--true-blue)] to-[var(--vibrant-blue)] text-white hover:from-[var(--vibrant-blue)] hover:to-[var(--fresh-blue)]"
-                  : isDarkMode
-                    ? "bg-[var(--secondary)] text-white hover:bg-[var(--muted)]"
-                    : "bg-[var(--secondary)] text-[var(--foreground)] hover:bg-[var(--open-blue)] hover:text-white"
-              }`}
-            >
-              {btn.label}
-            </button>
-          ))}
+        <div
+          className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+            isDarkMode ? "bg-[#00e5ff]/20 text-[#00e5ff]" : "bg-[#0a1628]/10 text-[#0a1628]"
+          }`}
+        >
+          <Icon className="h-5 w-5" />
         </div>
-        <div className={isDarkMode ? "text-[var(--vibrant-blue)]" : "text-[var(--true-blue)]"}>
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" />
-          </svg>
+        <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+          {title}
+        </h3>
+      </div>
+      <div className="p-5">
+        <div className="grid grid-cols-2 gap-3">
+          {buttons.map((btn, index) => {
+            const BtnIcon = btn.icon
+            return (
+              <Button
+                key={index}
+                variant={btn.primary ? "primary" : "secondary"}
+                size="sm"
+                onClick={btn.action}
+                className="justify-start"
+              >
+                {BtnIcon && <BtnIcon className="mr-2 h-4 w-4" />}
+                {btn.label}
+              </Button>
+            )
+          })}
         </div>
       </div>
-    </div>
+    </Card>
   )
+
+  // Admin Sidebar Items
+  const adminSidebarItems: SidebarItem[] = [
+    { icon: LayoutDashboard, label: "Dashboard", id: "dashboard" },
+    { icon: GitCompare, label: "Spec Compare", id: "spec-compare" },
+    { icon: FileCheck, label: "Log Analysis", id: "log-analysis" },
+    { icon: MessageSquare, label: "Message Generator", id: "msg-generator" },
+    { icon: TestTube, label: "Test Cases", id: "test-cases" },
+    { icon: Users, label: "Clients", id: "clients" },
+    { icon: History, label: "History", id: "history" },
+    { icon: Bell, label: "Alerts", id: "alerts", badge: 5 },
+    { icon: Settings, label: "Settings", id: "settings" },
+    { icon: HelpCircle, label: "Help", id: "help" },
+  ]
+
+  // Client Sidebar Items
+  const clientSidebarItems: SidebarItem[] = [
+    { icon: LayoutDashboard, label: "Dashboard", id: "dashboard" },
+    { icon: Upload, label: "Upload Specs", id: "upload" },
+    { icon: Download, label: "Download Specs", id: "download" },
+    { icon: MessageSquare, label: "Generate Message", id: "msg-generator" },
+    { icon: History, label: "History", id: "history" },
+    { icon: Settings, label: "Settings", id: "settings" },
+    { icon: HelpCircle, label: "Help", id: "help" },
+  ]
 
   // Admin Tools Screen
   const AdminToolsScreen = () => (
-    <div
-      className={`flex min-h-screen transition-colors ${
-        isDarkMode ? "bg-[var(--background)]" : "bg-[var(--background)]"
-      }`}
-    >
-      <ThemeToggle />
-
-      {/* Sidebar */}
-      <div
-        className={`flex w-14 flex-col items-center gap-4 border-r py-4 ${
-          isDarkMode
-            ? "border-[var(--border)] bg-[var(--card)]"
-            : "border-[var(--border)] bg-[var(--sidebar)]"
-        }`}
-      >
-        <button
-          className={`rounded p-2 ${
-            isDarkMode
-              ? "text-[var(--intelligent-cyan)] hover:bg-[var(--secondary)]"
-              : "text-[var(--true-blue)] hover:bg-[var(--secondary)]"
-          }`}
-        >
-          <FileImage className="h-5 w-5" />
-        </button>
-        <button
-          className={`rounded p-2 ${
-            isDarkMode
-              ? "text-[var(--intelligent-cyan)] hover:bg-[var(--secondary)]"
-              : "text-[var(--true-blue)] hover:bg-[var(--secondary)]"
-          }`}
-        >
-          <FileText className="h-5 w-5" />
-        </button>
-        <button
-          className={`rounded p-2 ${
-            isDarkMode
-              ? "text-[var(--intelligent-cyan)] hover:bg-[var(--secondary)]"
-              : "text-[var(--true-blue)] hover:bg-[var(--secondary)]"
-          }`}
-        >
-          <RefreshCcw className="h-5 w-5" />
-        </button>
-        <button
-          className={`rounded p-2 ${
-            isDarkMode
-              ? "text-[var(--intelligent-cyan)] hover:bg-[var(--secondary)]"
-              : "text-[var(--true-blue)] hover:bg-[var(--secondary)]"
-          }`}
-        >
-          <RotateCcw className="h-5 w-5" />
-        </button>
-        <button
-          className={`rounded p-2 ${
-            isDarkMode
-              ? "text-[var(--intelligent-cyan)] hover:bg-[var(--secondary)]"
-              : "text-[var(--true-blue)] hover:bg-[var(--secondary)]"
-          }`}
-        >
-          <FolderOpen className="h-5 w-5" />
-        </button>
-        <button className="rounded p-2 text-yellow-400 hover:bg-yellow-500/20">
-          <Star className="h-5 w-5" />
-        </button>
-        <div className="mt-auto">
-          <button
-            onClick={() => {
-              setCurrentScreen("home")
-              setLoggedInUser(null)
-              setActiveTab("home")
-            }}
-            className="rounded p-2 text-red-400 hover:bg-red-500/20"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-      </div>
+    <div className={`flex min-h-screen transition-colors ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+      <Sidebar items={adminSidebarItems} title="FIX Admin" />
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
-        {/* Header */}
+      <div className="flex-1 overflow-auto">
+        {/* Top Bar */}
         <div
-          className={`mb-4 rounded-lg px-8 py-4 text-center shadow-lg ${
-            isDarkMode
-              ? "bg-gradient-to-r from-[var(--true-blue)] via-[var(--intelligent-cyan)] to-[var(--true-blue)] shadow-[var(--intelligent-cyan)]/30"
-              : "bg-gradient-to-r from-[var(--true-blue)] via-[var(--vibrant-blue)] to-[var(--true-blue)] shadow-[var(--true-blue)]/30"
+          className={`sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4 ${
+            isDarkMode ? "border-[#1e4976] bg-[#0a1628]/95 backdrop-blur" : "border-[#e2e8f0] bg-white/95 backdrop-blur"
           }`}
         >
-          <h1 className="text-3xl font-bold tracking-wide text-white">Admin Tools</h1>
+          <div>
+            <h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+              Admin Tools
+            </h1>
+            <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
+              FIX Protocol Management Dashboard
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <TabBar />
+          </div>
         </div>
 
-        {/* Tab Bar */}
-        <TabBar showLogout />
-
         {/* Tool Panels */}
-        <div className="grid grid-cols-1 gap-6 pt-6 lg:grid-cols-2">
-          {/* FIX Spec Compare */}
+        <div className="grid grid-cols-1 gap-6 p-6 lg:grid-cols-2">
           <ToolPanel
             title="FIX Spec Compare"
+            icon={GitCompare}
             buttons={[
-              { label: "Select Spec 1", action: () => handleFileUpload("spec1") },
-              { label: "Select Spec 2", action: () => handleFileUpload("spec2") },
-              { label: "Check Compatibility", action: () => callServerEndpoint("check-compatibility") },
-              { label: "Compare Specs", action: () => callServerEndpoint("compare-specs"), primary: true },
+              { label: "Select Spec 1", action: () => handleFileUpload("spec1"), icon: FileText },
+              { label: "Select Spec 2", action: () => handleFileUpload("spec2"), icon: FileText },
+              { label: "Check Compatibility", action: () => callServerEndpoint("check-compatibility"), icon: FileCheck },
+              { label: "Compare Specs", action: () => callServerEndpoint("compare-specs"), primary: true, icon: GitCompare },
             ]}
           />
           <input type="file" id="spec1" className="hidden" accept=".xml,.txt" />
           <input type="file" id="spec2" className="hidden" accept=".xml,.txt" />
 
-          {/* FIX Logs & Spec Compare */}
           <ToolPanel
             title="FIX Logs & Spec Compare"
+            icon={FileCheck}
             buttons={[
-              { label: "Select FIX Spec", action: () => handleFileUpload("fix-spec") },
-              { label: "Select Log File", action: () => handleFileUpload("log-file") },
-              { label: "Check Compatibility", action: () => callServerEndpoint("check-log-compatibility") },
-              { label: "Find differences", action: () => callServerEndpoint("find-differences"), primary: true },
+              { label: "Select FIX Spec", action: () => handleFileUpload("fix-spec"), icon: FileText },
+              { label: "Select Log File", action: () => handleFileUpload("log-file"), icon: FileText },
+              { label: "Check Compatibility", action: () => callServerEndpoint("check-log-compatibility"), icon: FileCheck },
+              { label: "Find Differences", action: () => callServerEndpoint("find-differences"), primary: true, icon: GitCompare },
             ]}
           />
           <input type="file" id="fix-spec" className="hidden" accept=".xml,.txt" />
           <input type="file" id="log-file" className="hidden" accept=".log,.txt" />
 
-          {/* FIX Msg Generator */}
           <ToolPanel
-            title="FIX Msg Generator"
+            title="FIX Message Generator"
+            icon={MessageSquare}
             buttons={[
-              { label: "Select FIX Spec", action: () => handleFileUpload("gen-spec") },
-              { label: "Change Tag Values", action: () => setShowTagEditor(true) },
-              { label: "Select MsgType", action: () => setShowMsgTypeDropdown(true) },
-              { label: "Generate FIX Msg", action: () => callServerEndpoint("generate-fix-msg"), primary: true },
+              { label: "Select FIX Spec", action: () => handleFileUpload("gen-spec"), icon: FileText },
+              { label: "Change Tag Values", action: () => setShowTagEditor(true), icon: Settings },
+              { label: "Select MsgType", action: () => setShowMsgTypeDropdown(true), icon: FileText },
+              { label: "Generate FIX Msg", action: () => callServerEndpoint("generate-fix-msg"), primary: true, icon: MessageSquare },
             ]}
           />
           <input type="file" id="gen-spec" className="hidden" accept=".xml,.txt" />
 
-          {/* Generate Test Cases */}
           <ToolPanel
             title="Generate Test Cases"
+            icon={TestTube}
             buttons={[
-              { label: "Select FIX Spec", action: () => handleFileUpload("test-spec") },
-              { label: "Select Log File", action: () => handleFileUpload("test-log") },
-              { label: "Select Coverage", action: () => alert("Coverage options: Full, Partial, Minimal") },
-              { label: "Find differences", action: () => callServerEndpoint("generate-tests"), primary: true },
+              { label: "Select FIX Spec", action: () => handleFileUpload("test-spec"), icon: FileText },
+              { label: "Select Log File", action: () => handleFileUpload("test-log"), icon: FileText },
+              { label: "Select Coverage", action: () => alert("Coverage options: Full, Partial, Minimal"), icon: FileCheck },
+              { label: "Generate Tests", action: () => callServerEndpoint("generate-tests"), primary: true, icon: TestTube },
             ]}
           />
           <input type="file" id="test-spec" className="hidden" accept=".xml,.txt" />
@@ -803,144 +806,91 @@ export default function FixAIPortal() {
         </div>
       </div>
 
-      {/* Tag Editor Modal */}
+      {/* Modals */}
       {showTagEditor && <TagEditorModal />}
-
-      {/* MsgType Modal */}
       {showMsgTypeDropdown && <MsgTypeModal />}
     </div>
   )
 
   // Client Tools Screen
   const ClientToolsScreen = () => (
-    <div
-      className={`flex min-h-screen transition-colors ${
-        isDarkMode ? "bg-[var(--background)]" : "bg-[var(--background)]"
-      }`}
-    >
-      <ThemeToggle />
-
-      {/* Sidebar */}
-      <div
-        className={`flex w-14 flex-col items-center gap-4 border-r py-4 ${
-          isDarkMode
-            ? "border-[var(--border)] bg-[var(--card)]"
-            : "border-[var(--border)] bg-[var(--sidebar)]"
-        }`}
-      >
-        <button
-          className={`rounded p-2 ${
-            isDarkMode
-              ? "text-[var(--intelligent-cyan)] hover:bg-[var(--secondary)]"
-              : "text-[var(--true-blue)] hover:bg-[var(--secondary)]"
-          }`}
-        >
-          <Upload className="h-5 w-5" />
-        </button>
-        <button
-          className={`rounded p-2 ${
-            isDarkMode
-              ? "text-[var(--intelligent-cyan)] hover:bg-[var(--secondary)]"
-              : "text-[var(--true-blue)] hover:bg-[var(--secondary)]"
-          }`}
-        >
-          <FileText className="h-5 w-5" />
-        </button>
-        <div className="mt-auto">
-          <button
-            onClick={() => {
-              setCurrentScreen("home")
-              setLoggedInUser(null)
-              setActiveTab("home")
-            }}
-            className="rounded p-2 text-red-400 hover:bg-red-500/20"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-      </div>
+    <div className={`flex min-h-screen transition-colors ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+      <Sidebar items={clientSidebarItems} title="FIX Client" />
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
-        {/* Header */}
+      <div className="flex-1 overflow-auto">
+        {/* Top Bar */}
         <div
-          className={`mb-4 rounded-lg px-8 py-4 text-center shadow-lg ${
-            isDarkMode
-              ? "bg-gradient-to-r from-[var(--true-blue)] via-[var(--intelligent-cyan)] to-[var(--true-blue)] shadow-[var(--intelligent-cyan)]/30"
-              : "bg-gradient-to-r from-[var(--true-blue)] via-[var(--vibrant-blue)] to-[var(--true-blue)] shadow-[var(--true-blue)]/30"
+          className={`sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4 ${
+            isDarkMode ? "border-[#1e4976] bg-[#0a1628]/95 backdrop-blur" : "border-[#e2e8f0] bg-white/95 backdrop-blur"
           }`}
         >
-          <h1 className="text-3xl font-bold tracking-wide text-white">Client Tools</h1>
+          <div>
+            <h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+              Client Tools
+            </h1>
+            <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
+              FIX Specification Management
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <TabBar />
+          </div>
         </div>
 
-        {/* Tab Bar */}
-        <TabBar showLogout />
-
         {/* Tool Panels */}
-        <div className="grid grid-cols-1 gap-6 pt-6 lg:grid-cols-2">
-          {/* Upload FIX Specs */}
+        <div className="grid grid-cols-1 gap-6 p-6 lg:grid-cols-2">
           <ToolPanel
             title="Upload FIX Specs"
+            icon={Upload}
             buttons={[
-              { label: "Browse Files", action: () => handleFileUpload("client-upload") },
-              { label: "Upload to Server", action: () => callServerEndpoint("upload-specs"), primary: true },
+              { label: "Browse Files", action: () => handleFileUpload("client-upload"), icon: FolderOpen },
+              { label: "Upload to Server", action: () => callServerEndpoint("upload-specs"), primary: true, icon: Upload },
             ]}
           />
           <input type="file" id="client-upload" className="hidden" accept=".xml,.txt" />
 
-          {/* Download FIX Spec */}
           <ToolPanel
             title="Download FIX Spec"
+            icon={Download}
             buttons={[
-              { label: "Select Version", action: () => alert("Versions: FIX 4.0, 4.2, 4.4, 5.0") },
-              { label: "Download", action: () => callServerEndpoint("download-spec"), primary: true },
+              { label: "Select Version", action: () => alert("Versions: FIX 4.0, 4.2, 4.4, 5.0"), icon: FileText },
+              { label: "Download", action: () => callServerEndpoint("download-spec"), primary: true, icon: Download },
             ]}
           />
 
-          {/* Generate FIX Message */}
           <ToolPanel
             title="Generate FIX Message"
+            icon={MessageSquare}
             buttons={[
-              { label: "Select FIX Spec", action: () => handleFileUpload("client-gen-spec") },
-              { label: "Select MsgType", action: () => setShowMsgTypeDropdown(true) },
-              { label: "Change Tag Values", action: () => setShowTagEditor(true) },
-              { label: "Generate Message", action: () => callServerEndpoint("generate-message"), primary: true },
+              { label: "Select FIX Spec", action: () => handleFileUpload("client-gen-spec"), icon: FileText },
+              { label: "Select MsgType", action: () => setShowMsgTypeDropdown(true), icon: FileText },
+              { label: "Change Tag Values", action: () => setShowTagEditor(true), icon: Settings },
+              { label: "Generate Message", action: () => callServerEndpoint("generate-message"), primary: true, icon: MessageSquare },
             ]}
           />
           <input type="file" id="client-gen-spec" className="hidden" accept=".xml,.txt" />
         </div>
       </div>
 
-      {/* Tag Editor Modal */}
+      {/* Modals */}
       {showTagEditor && <TagEditorModal />}
-
-      {/* MsgType Modal */}
       {showMsgTypeDropdown && <MsgTypeModal />}
     </div>
   )
 
   // Login Modal
   const LoginModal = () => (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div
-        className={`w-full max-w-sm rounded-lg border-2 p-6 shadow-2xl ${
-          isDarkMode
-            ? "border-[var(--border)] bg-[var(--card)]"
-            : "border-[var(--border)] bg-white"
-        }`}
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <Card className="w-full max-w-sm p-6">
         <h3
-          className={`mb-6 text-center text-lg font-medium ${
-            isDarkMode ? "text-white" : "text-[var(--foreground)]"
-          }`}
+          className={`mb-6 text-center text-xl font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}
         >
-          Log in to AI Portal as {loginType}
+          Log in as {loginType === "admin" ? "Admin" : "Client"}
         </h3>
         <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <label
-              className={`w-20 text-sm ${isDarkMode ? "text-[var(--muted-foreground)]" : "text-gray-600"}`}
-            >
+          <div>
+            <label className={`mb-2 block text-sm font-medium ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
               Username
             </label>
             <input
@@ -948,55 +898,39 @@ export default function FixAIPortal() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="AIUser@broadridge.com"
-              className={`flex-1 rounded border px-3 py-2 text-sm ${
+              className={`w-full rounded-xl border px-4 py-3 text-sm transition-colors ${
                 isDarkMode
-                  ? "border-[var(--border)] bg-[var(--background)] text-white placeholder-gray-500"
-                  : "border-gray-300 bg-white text-[var(--foreground)]"
+                  ? "border-[#1e4976] bg-[#0a1628] text-white placeholder-[#64748b] focus:border-[#00e5ff] focus:ring-1 focus:ring-[#00e5ff]"
+                  : "border-[#e2e8f0] bg-white text-[#0a1628] placeholder-[#94a3b8] focus:border-[#1976d2] focus:ring-1 focus:ring-[#1976d2]"
               }`}
             />
           </div>
-          <div className="flex items-center gap-3">
-            <label
-              className={`w-20 text-sm ${isDarkMode ? "text-[var(--muted-foreground)]" : "text-gray-600"}`}
-            >
+          <div>
+            <label className={`mb-2 block text-sm font-medium ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
               Password
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="********"
-              className={`flex-1 rounded border px-3 py-2 text-sm ${
+              placeholder="Enter your password"
+              className={`w-full rounded-xl border px-4 py-3 text-sm transition-colors ${
                 isDarkMode
-                  ? "border-[var(--border)] bg-[var(--background)] text-white placeholder-gray-500"
-                  : "border-gray-300 bg-white text-[var(--foreground)]"
+                  ? "border-[#1e4976] bg-[#0a1628] text-white placeholder-[#64748b] focus:border-[#00e5ff] focus:ring-1 focus:ring-[#00e5ff]"
+                  : "border-[#e2e8f0] bg-white text-[#0a1628] placeholder-[#94a3b8] focus:border-[#1976d2] focus:ring-1 focus:ring-[#1976d2]"
               }`}
             />
           </div>
         </div>
-        <div className="mt-6 flex justify-center gap-4">
-          <button
-            onClick={submitLogin}
-            className={`rounded-full border-2 px-6 py-2 text-sm font-medium transition ${
-              isDarkMode
-                ? "border-[var(--intelligent-cyan)] bg-transparent text-[var(--intelligent-cyan)] hover:bg-[var(--intelligent-cyan)] hover:text-[var(--deep-blue)]"
-                : "border-[var(--true-blue)] bg-white text-[var(--true-blue)] hover:bg-[var(--true-blue)] hover:text-white"
-            }`}
-          >
+        <div className="mt-6 flex gap-3">
+          <Button variant="primary" className="flex-1" onClick={submitLogin}>
             Log In
-          </button>
-          <button
-            onClick={() => setShowLoginModal(false)}
-            className={`rounded-full border-2 px-6 py-2 text-sm font-medium transition ${
-              isDarkMode
-                ? "border-gray-500 bg-transparent text-gray-400 hover:bg-gray-700"
-                : "border-gray-400 bg-white text-gray-600 hover:bg-gray-100"
-            }`}
-          >
-            Register
-          </button>
+          </Button>
+          <Button variant="outline" className="flex-1" onClick={() => setShowLoginModal(false)}>
+            Cancel
+          </Button>
         </div>
-      </div>
+      </Card>
     </div>
   )
 
