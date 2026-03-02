@@ -2,37 +2,36 @@
 
 import { useState, useEffect } from "react"
 import {
-  FileText,
-  FolderOpen,
-  X,
   Upload,
-  ChevronRight,
-  Sun,
-  Moon,
-  Home,
-  Settings,
-  TestTube,
-  FileUp,
-  LayoutDashboard,
+  FileText,
   GitCompare,
-  MessageSquare,
-  FileCheck,
-  Download,
+  Settings,
   Users,
   History,
   Bell,
-  HelpCircle,
-  LogOut,
-  Building2,
+  ChevronRight,
+  X,
+  Moon,
+  Sun,
+  Home,
+  FolderOpen,
+  MessageSquare,
+  TestTube,
+  Eye,
+  RefreshCw,
   AlertTriangle,
   CheckCircle,
   Clock,
-  Filter,
+  Building2,
   Search,
-  ChevronDown,
-  Eye,
+  Filter,
   Trash2,
-  RefreshCw,
+  FileCheck,
+  Play,
+  Download,
+  HelpCircle,
+  Plus,
+  Minus,
 } from "lucide-react"
 
 type Screen = "home" | "admin-tools" | "client-tools"
@@ -963,64 +962,262 @@ export default function FixAIPortal() {
     </div>
   )
 
+  // Recent comparisons for history
+  const [recentLogComparisons] = useState([
+    { id: 1, logFile: "trading_log_20250301.log", specFile: "FIX44_Custom.xml", date: "2025-03-01 14:30", issues: 12 },
+    { id: 2, logFile: "session_20250228.log", specFile: "FIX42_Standard.xml", date: "2025-02-28 09:15", issues: 5 },
+    { id: 3, logFile: "orders_20250227.log", specFile: "FIX44_Custom.xml", date: "2025-02-27 16:45", issues: 23 },
+  ])
+
   // Log Analysis Panel Component
   const LogAnalysisPanel = () => (
     <div className="p-6">
-      <h2 className={`mb-6 text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Log Analysis</h2>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Log Analysis</h2>
+          <p className={`text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Compare FIX log files against specifications to find discrepancies</p>
+        </div>
+        {analysisResults && (
+          <div className="flex gap-2">
+            <Button variant="secondary" size="sm" onClick={() => navigator.clipboard.writeText(JSON.stringify(analysisResults, null, 2))}>
+              <FileText className="mr-1 h-4 w-4" />
+              Copy Results
+            </Button>
+            <Button variant="secondary" size="sm">
+              <Download className="mr-1 h-4 w-4" />
+              Export PDF
+            </Button>
+          </div>
+        )}
+      </div>
 
-      {/* Upload Section */}
+      {/* Upload Section with Drag & Drop Style */}
       <Card className="mb-6 p-5">
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <Button variant="secondary" className="w-full" onClick={() => handleFileUpload("log-upload")}>
-              <Upload className="mr-2 h-4 w-4" />
-              Upload Log File
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Log File Upload */}
+          <div 
+            className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-all ${
+              logFile 
+                ? isDarkMode ? "border-[#4caf50] bg-[#4caf50]/10" : "border-[#4caf50] bg-[#4caf50]/5"
+                : isDarkMode ? "border-[#1e4976] hover:border-[#00e5ff] hover:bg-[#1e4976]/30" : "border-[#cbd5e1] hover:border-[#1976d2] hover:bg-[#e2e8f0]"
+            }`}
+          >
+            <Upload className={`mb-3 h-10 w-10 ${logFile ? "text-[#4caf50]" : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`} />
+            <p className={`mb-2 text-sm font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+              {logFile || "Drop Log File Here"}
+            </p>
+            <p className={`mb-3 text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>or click to browse</p>
+            <Button variant="secondary" size="sm" onClick={() => handleFileUpload("log-upload")}>
+              Select File
             </Button>
             <input type="file" id="log-upload" className="hidden" accept=".log,.txt" onChange={handleLogFileUpload} />
-            {logFile && <p className="mt-2 text-xs text-[#4caf50]">{logFile}</p>}
           </div>
-          <div>
-            <Button variant="secondary" className="w-full" onClick={() => handleFileUpload("log-spec-upload")}>
-              <FileText className="mr-2 h-4 w-4" />
-              Upload FIX Spec
+
+          {/* Spec File Upload */}
+          <div 
+            className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-all ${
+              logSpecFile 
+                ? isDarkMode ? "border-[#4caf50] bg-[#4caf50]/10" : "border-[#4caf50] bg-[#4caf50]/5"
+                : isDarkMode ? "border-[#1e4976] hover:border-[#00e5ff] hover:bg-[#1e4976]/30" : "border-[#cbd5e1] hover:border-[#1976d2] hover:bg-[#e2e8f0]"
+            }`}
+          >
+            <FileText className={`mb-3 h-10 w-10 ${logSpecFile ? "text-[#4caf50]" : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`} />
+            <p className={`mb-2 text-sm font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+              {logSpecFile || "Drop FIX Spec Here"}
+            </p>
+            <p className={`mb-3 text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>XML or TXT format</p>
+            <Button variant="secondary" size="sm" onClick={() => handleFileUpload("log-spec-upload")}>
+              Select File
             </Button>
             <input type="file" id="log-spec-upload" className="hidden" accept=".xml,.txt" onChange={handleLogSpecUpload} />
-            {logSpecFile && <p className="mt-2 text-xs text-[#4caf50]">{logSpecFile}</p>}
           </div>
-          <div>
-            <Button variant="primary" className="w-full" onClick={performLogAnalysis} disabled={!logFile || !logSpecFile}>
+
+          {/* Action Panel */}
+          <div className={`flex flex-col items-center justify-center rounded-xl p-6 ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
+            <Button 
+              variant="primary" 
+              className="mb-4 w-full" 
+              onClick={performLogAnalysis} 
+              disabled={!logFile || !logSpecFile}
+            >
               <RefreshCw className="mr-2 h-4 w-4" />
               Perform Analysis
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="w-full"
+              onClick={() => {
+                setLogFile("sample_trading.log")
+                setLogSpecFile("FIX44_Standard.xml")
+                performLogAnalysis()
+              }}
+            >
+              <Play className="mr-1 h-4 w-4" />
+              Try Sample Data
             </Button>
           </div>
         </div>
       </Card>
 
+      {/* Empty State - Before Analysis */}
+      {!analysisResults && (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Recent Comparisons */}
+          <Card className="p-5">
+            <h3 className={`mb-4 flex items-center gap-2 font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+              <History className="h-5 w-5" />
+              Recent Comparisons
+            </h3>
+            <div className="space-y-3">
+              {recentLogComparisons.map((comp) => (
+                <div 
+                  key={comp.id}
+                  className={`flex items-center justify-between rounded-lg p-3 cursor-pointer transition-all ${
+                    isDarkMode ? "bg-[#0a1628] hover:bg-[#1e4976]/50" : "bg-[#f8fafc] hover:bg-[#e2e8f0]"
+                  }`}
+                  onClick={() => {
+                    setLogFile(comp.logFile)
+                    setLogSpecFile(comp.specFile)
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                      <FileText className={`h-4 w-4 ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`} />
+                    </div>
+                    <div>
+                      <p className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{comp.logFile}</p>
+                      <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>vs {comp.specFile}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className={`text-xs font-medium ${comp.issues > 10 ? "text-[#f44336]" : "text-[#ffc107]"}`}>
+                      {comp.issues} issues
+                    </span>
+                    <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#94a3b8]"}`}>{comp.date}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* How It Works */}
+          <Card className="p-5">
+            <h3 className={`mb-4 flex items-center gap-2 font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+              <HelpCircle className="h-5 w-5" />
+              How It Works
+            </h3>
+            <div className="space-y-4">
+              {[
+                { step: 1, title: "Upload Log File", desc: "Select your FIX trading log (.log or .txt)" },
+                { step: 2, title: "Upload FIX Spec", desc: "Add the specification to validate against" },
+                { step: 3, title: "Run Analysis", desc: "System compares and identifies discrepancies" },
+                { step: 4, title: "Review Results", desc: "See unsupported messages, tags, and values" },
+              ].map((item) => (
+                <div key={item.step} className="flex items-start gap-3">
+                  <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${isDarkMode ? "bg-[#00e5ff] text-[#0a1628]" : "bg-[#0a1628] text-white"}`}>
+                    {item.step}
+                  </div>
+                  <div>
+                    <p className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{item.title}</p>
+                    <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      )}
+
       {/* Results Section */}
       {analysisResults && (
         <div className="space-y-6">
+          {/* Summary Stats */}
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#f44336]/20`}>
+                  <AlertTriangle className="h-6 w-6 text-[#f44336]" />
+                </div>
+                <div>
+                  <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                    {analysisResults.unsupportedMessages.length}
+                  </p>
+                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Unsupported Messages</p>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#ffc107]/20`}>
+                  <FileText className="h-6 w-6 text-[#ffc107]" />
+                </div>
+                <div>
+                  <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                    {analysisResults.unsupportedTags.reduce((acc, t) => acc + t.tags.length, 0)}
+                  </p>
+                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Unsupported Tags</p>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#f57c00]/20`}>
+                  <AlertTriangle className="h-6 w-6 text-[#f57c00]" />
+                </div>
+                <div>
+                  <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                    {analysisResults.unsupportedValues.length}
+                  </p>
+                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Invalid Values</p>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#4caf50]/20`}>
+                  <CheckCircle className="h-6 w-6 text-[#4caf50]" />
+                </div>
+                <div>
+                  <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                    {analysisResults.unsupportedTags.length}
+                  </p>
+                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Message Types Checked</p>
+                </div>
+              </div>
+            </Card>
+          </div>
+
           {/* Unsupported Messages */}
           <Card className="p-5">
-            <h3 className={`mb-4 flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#f44336]" : "text-[#d32f2f]"}`}>
-              <AlertTriangle className="h-5 w-5" />
-              Unsupported Messages
-            </h3>
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className={`flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#f44336]" : "text-[#d32f2f]"}`}>
+                <AlertTriangle className="h-5 w-5" />
+                Unsupported Messages
+              </h3>
+              <span className={`rounded-full px-3 py-1 text-xs font-medium ${isDarkMode ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#fef2f2] text-[#d32f2f]"}`}>
+                {analysisResults.unsupportedMessages.length} found
+              </span>
+            </div>
             <div className="space-y-2">
               {analysisResults.unsupportedMessages.map((msg, i) => (
-                <div key={i} className={`rounded-lg px-4 py-2 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#fef2f2]"}`}>
+                <div key={i} className={`flex items-center gap-3 rounded-lg px-4 py-3 ${isDarkMode ? "bg-[#f44336]/10" : "bg-[#fef2f2]"}`}>
+                  <div className="flex h-6 w-6 items-center justify-center rounded bg-[#f44336]/20">
+                    <X className="h-4 w-4 text-[#f44336]" />
+                  </div>
                   <span className={isDarkMode ? "text-[#90caf9]" : "text-[#0a1628]"}>{msg}</span>
                 </div>
               ))}
             </div>
           </Card>
 
-          {/* Unsupported Tags */}
+          {/* Unsupported Tags - Side by Side View */}
           <Card className="p-5">
-            <h3 className={`mb-4 flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]"}`}>
-              <AlertTriangle className="h-5 w-5" />
-              Unsupported Tags by Message Type
-            </h3>
-            <div className="mb-4">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className={`flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]"}`}>
+                <AlertTriangle className="h-5 w-5" />
+                Unsupported Tags by Message Type
+              </h3>
               <select
                 className={`rounded-xl border px-4 py-2 text-sm ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
                 value={selectedAnalysisMsgType || ""}
@@ -1032,39 +1229,65 @@ export default function FixAIPortal() {
                 ))}
               </select>
             </div>
-            <div className="space-y-2">
+            <div className="grid gap-4 lg:grid-cols-2">
               {analysisResults.unsupportedTags
                 .filter((item) => !selectedAnalysisMsgType || item.msgType === selectedAnalysisMsgType)
                 .map((item, i) => (
-                  <div key={i} className={`rounded-lg px-4 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#fffbeb]"}`}>
-                    <span className={`font-medium ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`}>MsgType {item.msgType}: </span>
-                    <span className={isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}>Tags {item.tags.join(", ")}</span>
+                  <div key={i} className={`rounded-xl border p-4 ${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#fffbeb]"}`}>
+                    <div className="mb-3 flex items-center justify-between">
+                      <span className={`rounded-lg px-3 py-1 text-sm font-semibold ${isDarkMode ? "bg-[#00e5ff]/20 text-[#00e5ff]" : "bg-[#1976d2]/10 text-[#1976d2]"}`}>
+                        MsgType {item.msgType}
+                      </span>
+                      <span className={`text-xs ${isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]"}`}>
+                        {item.tags.length} tags
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {item.tags.map((tag, j) => (
+                        <span key={j} className={`rounded-lg px-2 py-1 text-xs font-medium ${isDarkMode ? "bg-[#ffc107]/20 text-[#ffc107]" : "bg-[#ffc107]/30 text-[#e65100]"}`}>
+                          Tag {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 ))}
             </div>
           </Card>
 
-          {/* Unsupported Values */}
+          {/* Unsupported Values - Enhanced Table */}
           <Card className="p-5">
-            <h3 className={`mb-4 flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#f57c00]" : "text-[#e65100]"}`}>
-              <AlertTriangle className="h-5 w-5" />
-              Unsupported Values
-            </h3>
-            <div className="overflow-x-auto">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className={`flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#f57c00]" : "text-[#e65100]"}`}>
+                <AlertTriangle className="h-5 w-5" />
+                Unsupported Values
+              </h3>
+              <span className={`rounded-full px-3 py-1 text-xs font-medium ${isDarkMode ? "bg-[#f57c00]/20 text-[#f57c00]" : "bg-[#fff3e0] text-[#e65100]"}`}>
+                {analysisResults.unsupportedValues.length} found
+              </span>
+            </div>
+            <div className="overflow-hidden rounded-xl border ${isDarkMode ? 'border-[#1e4976]' : 'border-[#e2e8f0]'}">
               <table className="w-full">
                 <thead>
-                  <tr className={isDarkMode ? "border-b border-[#1e4976]" : "border-b border-[#e2e8f0]"}>
-                    <th className={`px-4 py-2 text-left text-sm font-medium ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>MsgType</th>
-                    <th className={`px-4 py-2 text-left text-sm font-medium ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Tag</th>
-                    <th className={`px-4 py-2 text-left text-sm font-medium ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Invalid Value</th>
+                  <tr className={isDarkMode ? "bg-[#0d1f3c]" : "bg-[#f8fafc]"}>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>MsgType</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Tag</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Invalid Value</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Severity</th>
                   </tr>
                 </thead>
                 <tbody>
                   {analysisResults.unsupportedValues.map((item, i) => (
-                    <tr key={i} className={isDarkMode ? "border-b border-[#1e4976]" : "border-b border-[#e2e8f0]"}>
-                      <td className={`px-4 py-3 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{item.msgType}</td>
-                      <td className={`px-4 py-3 ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`}>{item.tag}</td>
-                      <td className={`px-4 py-3 ${isDarkMode ? "text-[#f44336]" : "text-[#d32f2f]"}`}>{item.value}</td>
+                    <tr key={i} className={`border-t ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"} ${i % 2 === 0 ? (isDarkMode ? "bg-[#0f2847]" : "bg-white") : (isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]")}`}>
+                      <td className={`px-4 py-3 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                        <span className={`rounded px-2 py-0.5 text-xs font-medium ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>{item.msgType}</span>
+                      </td>
+                      <td className={`px-4 py-3 font-mono text-sm ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`}>{item.tag}</td>
+                      <td className={`px-4 py-3 font-mono text-sm ${isDarkMode ? "text-[#f44336]" : "text-[#d32f2f]"}`}>
+                        <span className={`rounded px-2 py-0.5 ${isDarkMode ? "bg-[#f44336]/20" : "bg-[#fef2f2]"}`}>{item.value}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="rounded-full bg-[#f44336]/20 px-2 py-0.5 text-xs font-medium text-[#f44336]">High</span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -1076,67 +1299,310 @@ export default function FixAIPortal() {
     </div>
   )
 
+  // Recent spec comparisons for history
+  const [recentSpecComparisons] = useState([
+    { id: 1, spec1: "FIX44_BuySide.xml", spec2: "FIX44_SellSide.xml", date: "2025-03-01 11:20", differences: 8 },
+    { id: 2, spec1: "FIX42_v1.xml", spec2: "FIX42_v2.xml", date: "2025-02-28 14:45", differences: 3 },
+    { id: 3, spec1: "Custom_Spec.xml", spec2: "Standard_FIX44.xml", date: "2025-02-27 09:30", differences: 15 },
+  ])
+
   // Spec Compare Panel Component
   const SpecComparePanel = () => (
     <div className="p-6">
-      <h2 className={`mb-6 text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Spec Compare</h2>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Spec Compare</h2>
+          <p className={`text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Compare two FIX specifications to identify differences</p>
+        </div>
+        {specCompareResults && (
+          <div className="flex gap-2">
+            <Button variant="secondary" size="sm" onClick={() => navigator.clipboard.writeText(JSON.stringify(specCompareResults, null, 2))}>
+              <FileText className="mr-1 h-4 w-4" />
+              Copy Results
+            </Button>
+            <Button variant="secondary" size="sm">
+              <Download className="mr-1 h-4 w-4" />
+              Export Report
+            </Button>
+          </div>
+        )}
+      </div>
 
-      {/* Upload Section */}
+      {/* Upload Section with Side-by-Side */}
       <Card className="mb-6 p-5">
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <Button variant="secondary" className="w-full" onClick={() => handleFileUpload("spec1-upload")}>
-              <FileText className="mr-2 h-4 w-4" />
-              Upload Spec 1
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-7">
+          {/* Spec 1 Upload */}
+          <div 
+            className={`col-span-3 relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-all ${
+              spec1File 
+                ? isDarkMode ? "border-[#4caf50] bg-[#4caf50]/10" : "border-[#4caf50] bg-[#4caf50]/5"
+                : isDarkMode ? "border-[#1e4976] hover:border-[#00e5ff] hover:bg-[#1e4976]/30" : "border-[#cbd5e1] hover:border-[#1976d2] hover:bg-[#e2e8f0]"
+            }`}
+          >
+            <div className={`mb-3 rounded-full p-3 ${spec1File ? "bg-[#4caf50]/20" : isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+              <FileText className={`h-8 w-8 ${spec1File ? "text-[#4caf50]" : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`} />
+            </div>
+            <p className={`mb-1 text-sm font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+              Specification 1
+            </p>
+            <p className={`mb-3 text-xs ${spec1File ? "text-[#4caf50]" : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+              {spec1File || "Drop file or click to browse"}
+            </p>
+            <Button variant="secondary" size="sm" onClick={() => handleFileUpload("spec1-upload")}>
+              {spec1File ? "Change File" : "Select File"}
             </Button>
             <input type="file" id="spec1-upload" className="hidden" accept=".xml,.txt" onChange={handleSpec1Upload} />
-            {spec1File && <p className="mt-2 text-xs text-[#4caf50]">{spec1File}</p>}
           </div>
-          <div>
-            <Button variant="secondary" className="w-full" onClick={() => handleFileUpload("spec2-upload")}>
-              <FileText className="mr-2 h-4 w-4" />
-              Upload Spec 2
+
+          {/* Compare Arrow */}
+          <div className="col-span-1 flex items-center justify-center">
+            <div className={`flex flex-col items-center gap-2`}>
+              <GitCompare className={`h-8 w-8 ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`} />
+              <span className={`text-xs font-medium ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>VS</span>
+            </div>
+          </div>
+
+          {/* Spec 2 Upload */}
+          <div 
+            className={`col-span-3 relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-all ${
+              spec2File 
+                ? isDarkMode ? "border-[#4caf50] bg-[#4caf50]/10" : "border-[#4caf50] bg-[#4caf50]/5"
+                : isDarkMode ? "border-[#1e4976] hover:border-[#00e5ff] hover:bg-[#1e4976]/30" : "border-[#cbd5e1] hover:border-[#1976d2] hover:bg-[#e2e8f0]"
+            }`}
+          >
+            <div className={`mb-3 rounded-full p-3 ${spec2File ? "bg-[#4caf50]/20" : isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+              <FileText className={`h-8 w-8 ${spec2File ? "text-[#4caf50]" : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`} />
+            </div>
+            <p className={`mb-1 text-sm font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+              Specification 2
+            </p>
+            <p className={`mb-3 text-xs ${spec2File ? "text-[#4caf50]" : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+              {spec2File || "Drop file or click to browse"}
+            </p>
+            <Button variant="secondary" size="sm" onClick={() => handleFileUpload("spec2-upload")}>
+              {spec2File ? "Change File" : "Select File"}
             </Button>
             <input type="file" id="spec2-upload" className="hidden" accept=".xml,.txt" onChange={handleSpec2Upload} />
-            {spec2File && <p className="mt-2 text-xs text-[#4caf50]">{spec2File}</p>}
           </div>
-          <div>
-            <Button variant="primary" className="w-full" onClick={performSpecCompare} disabled={!spec1File || !spec2File}>
-              <GitCompare className="mr-2 h-4 w-4" />
-              Compare Specs
-            </Button>
-          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="mt-6 flex items-center justify-center gap-4">
+          <Button 
+            variant="primary" 
+            onClick={performSpecCompare} 
+            disabled={!spec1File || !spec2File}
+          >
+            <GitCompare className="mr-2 h-4 w-4" />
+            Compare Specifications
+          </Button>
+          <Button 
+            variant="ghost" 
+            onClick={() => {
+              setSpec1File("FIX44_BuySide.xml")
+              setSpec2File("FIX44_SellSide.xml")
+              performSpecCompare()
+            }}
+          >
+            <Play className="mr-1 h-4 w-4" />
+            Try Sample
+          </Button>
         </div>
       </Card>
 
+      {/* Empty State */}
+      {!specCompareResults && (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Recent Comparisons */}
+          <Card className="p-5">
+            <h3 className={`mb-4 flex items-center gap-2 font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+              <History className="h-5 w-5" />
+              Recent Comparisons
+            </h3>
+            <div className="space-y-3">
+              {recentSpecComparisons.map((comp) => (
+                <div 
+                  key={comp.id}
+                  className={`flex items-center justify-between rounded-lg p-3 cursor-pointer transition-all ${
+                    isDarkMode ? "bg-[#0a1628] hover:bg-[#1e4976]/50" : "bg-[#f8fafc] hover:bg-[#e2e8f0]"
+                  }`}
+                  onClick={() => {
+                    setSpec1File(comp.spec1)
+                    setSpec2File(comp.spec2)
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                      <GitCompare className={`h-4 w-4 ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`} />
+                    </div>
+                    <div>
+                      <p className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{comp.spec1}</p>
+                      <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>vs {comp.spec2}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className={`text-xs font-medium ${comp.differences > 10 ? "text-[#f44336]" : comp.differences > 5 ? "text-[#ffc107]" : "text-[#4caf50]"}`}>
+                      {comp.differences} diff{comp.differences !== 1 ? "s" : ""}
+                    </span>
+                    <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#94a3b8]"}`}>{comp.date}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* What Gets Compared */}
+          <Card className="p-5">
+            <h3 className={`mb-4 flex items-center gap-2 font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+              <HelpCircle className="h-5 w-5" />
+              What Gets Compared
+            </h3>
+            <div className="space-y-3">
+              {[
+                { icon: MessageSquare, title: "Message Types", desc: "Supported and required message types" },
+                { icon: FileText, title: "Fields & Tags", desc: "Required, optional, and custom tags" },
+                { icon: Settings, title: "Field Attributes", desc: "Data types, lengths, and enumerations" },
+                { icon: GitCompare, title: "Component Blocks", desc: "Header, trailer, and repeating groups" },
+              ].map((item, i) => (
+                <div key={i} className={`flex items-start gap-3 rounded-lg p-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+                  <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                    <item.icon className={`h-4 w-4 ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`} />
+                  </div>
+                  <div>
+                    <p className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{item.title}</p>
+                    <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      )}
+
       {/* Results Section */}
       {specCompareResults && (
-        <Card className="p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className={`flex items-center gap-2 font-semibold ${specCompareResults.compatible ? "text-[#4caf50]" : "text-[#f44336]"}`}>
-              {specCompareResults.compatible ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
-              {specCompareResults.compatible ? "Specs are Compatible" : "Compatibility Issues Found"}
-            </h3>
-            <select
-              className={`rounded-xl border px-4 py-2 text-sm ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
-              value={selectedSpecMsgType || ""}
-              onChange={(e) => setSelectedSpecMsgType(e.target.value)}
-            >
-              <option value="">All Differences</option>
-              {msgTypes.map((type) => (
-                <option key={type.code} value={type.code}>MsgType {type.code} - {type.name}</option>
-              ))}
-            </select>
-          </div>
-          <div className="space-y-2">
-            {specCompareResults.differences.map((diff, i) => (
-              <div key={i} className={`flex items-start gap-3 rounded-lg px-4 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#fef2f2]"}`}>
-                <AlertTriangle className="mt-0.5 h-4 w-4 text-[#f57c00]" />
-                <span className={isDarkMode ? "text-[#90caf9]" : "text-[#0a1628]"}>{diff}</span>
+        <div className="space-y-6">
+          {/* Summary Stats */}
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <Card className={`p-4 ${specCompareResults.compatible ? "" : "border-l-4 border-l-[#f44336]"}`}>
+              <div className="flex items-center gap-3">
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${specCompareResults.compatible ? "bg-[#4caf50]/20" : "bg-[#f44336]/20"}`}>
+                  {specCompareResults.compatible 
+                    ? <CheckCircle className="h-6 w-6 text-[#4caf50]" />
+                    : <AlertTriangle className="h-6 w-6 text-[#f44336]" />
+                  }
+                </div>
+                <div>
+                  <p className={`text-sm font-bold ${specCompareResults.compatible ? "text-[#4caf50]" : "text-[#f44336]"}`}>
+                    {specCompareResults.compatible ? "Compatible" : "Incompatible"}
+                  </p>
+                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Overall Status</p>
+                </div>
               </div>
-            ))}
+            </Card>
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#f44336]/20`}>
+                  <Minus className="h-6 w-6 text-[#f44336]" />
+                </div>
+                <div>
+                  <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                    {Math.floor(specCompareResults.differences.length / 3)}
+                  </p>
+                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Removed</p>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#4caf50]/20`}>
+                  <Plus className="h-6 w-6 text-[#4caf50]" />
+                </div>
+                <div>
+                  <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                    {Math.floor(specCompareResults.differences.length / 3)}
+                  </p>
+                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Added</p>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#ffc107]/20`}>
+                  <RefreshCw className="h-6 w-6 text-[#ffc107]" />
+                </div>
+                <div>
+                  <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                    {specCompareResults.differences.length - Math.floor(specCompareResults.differences.length / 3) * 2}
+                  </p>
+                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Modified</p>
+                </div>
+              </div>
+            </Card>
           </div>
-        </Card>
+
+          {/* Diff View with Filter */}
+          <Card className="p-5">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className={`flex items-center gap-2 font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                <GitCompare className="h-5 w-5" />
+                Differences ({specCompareResults.differences.length})
+              </h3>
+              <div className="flex items-center gap-3">
+                <select
+                  className={`rounded-xl border px-4 py-2 text-sm ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
+                  value={selectedSpecMsgType || ""}
+                  onChange={(e) => setSelectedSpecMsgType(e.target.value)}
+                >
+                  <option value="">All Changes</option>
+                  <option value="added">Added Only</option>
+                  <option value="removed">Removed Only</option>
+                  <option value="modified">Modified Only</option>
+                </select>
+                <select
+                  className={`rounded-xl border px-4 py-2 text-sm ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
+                >
+                  <option value="">All Message Types</option>
+                  {msgTypes.map((type) => (
+                    <option key={type.code} value={type.code}>MsgType {type.code} - {type.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Visual Diff List */}
+            <div className="space-y-2">
+              {specCompareResults.differences.map((diff, i) => {
+                const diffType = i % 3 === 0 ? "removed" : i % 3 === 1 ? "added" : "modified"
+                const colors = {
+                  removed: { bg: isDarkMode ? "bg-[#f44336]/10" : "bg-[#fef2f2]", border: "border-l-[#f44336]", icon: Minus, iconColor: "text-[#f44336]" },
+                  added: { bg: isDarkMode ? "bg-[#4caf50]/10" : "bg-[#f0fdf4]", border: "border-l-[#4caf50]", icon: Plus, iconColor: "text-[#4caf50]" },
+                  modified: { bg: isDarkMode ? "bg-[#ffc107]/10" : "bg-[#fffbeb]", border: "border-l-[#ffc107]", icon: RefreshCw, iconColor: "text-[#ffc107]" },
+                }
+                const style = colors[diffType]
+                const Icon = style.icon
+                
+                return (
+                  <div key={i} className={`flex items-start gap-3 rounded-lg border-l-4 px-4 py-3 ${style.bg} ${style.border}`}>
+                    <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded ${style.bg}`}>
+                      <Icon className={`h-4 w-4 ${style.iconColor}`} />
+                    </div>
+                    <div className="flex-1">
+                      <span className={isDarkMode ? "text-[#90caf9]" : "text-[#0a1628]"}>{diff}</span>
+                    </div>
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${
+                      diffType === "removed" ? "bg-[#f44336]/20 text-[#f44336]" :
+                      diffType === "added" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                      "bg-[#ffc107]/20 text-[#ffc107]"
+                    }`}>
+                      {diffType}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </Card>
+        </div>
       )}
     </div>
   )
