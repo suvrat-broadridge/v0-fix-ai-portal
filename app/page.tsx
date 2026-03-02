@@ -32,6 +32,7 @@ import {
   HelpCircle,
   Plus,
   Minus,
+  LayoutDashboard,
 } from "lucide-react"
 
 type Screen = "home" | "admin-tools" | "client-tools"
