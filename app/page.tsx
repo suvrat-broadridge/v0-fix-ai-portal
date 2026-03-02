@@ -761,7 +761,7 @@ export default function FixAIPortal() {
     </button>
   )
 
-// Tab Bar Component
+  // Tab Bar Component
   const TabBar = () => {
   const tabs = [
   { id: "home" as Tab, label: "Home", icon: Home, iconColor: isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]" },
