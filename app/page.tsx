@@ -3187,148 +3187,345 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
     }
   }
 
+  // Login flow state
+  const [showRoleSelection, setShowRoleSelection] = useState(false)
+
+  // Animated candlestick data
+  const [candleData, setCandleData] = useState([
+    { open: 45, close: 52, high: 55, low: 43, color: "#4caf50" },
+    { open: 52, close: 48, high: 54, low: 46, color: "#f44336" },
+    { open: 48, close: 56, high: 58, low: 47, color: "#4caf50" },
+    { open: 56, close: 54, high: 59, low: 52, color: "#f44336" },
+    { open: 54, close: 62, high: 65, low: 53, color: "#4caf50" },
+    { open: 62, close: 58, high: 64, low: 56, color: "#f44336" },
+    { open: 58, close: 67, high: 70, low: 57, color: "#4caf50" },
+    { open: 67, close: 64, high: 69, low: 62, color: "#f44336" },
+  ])
+
+  // Animate candlestick data
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCandleData(prev => {
+        const newData = [...prev]
+        const lastCandle = newData[newData.length - 1]
+        const change = (Math.random() - 0.5) * 8
+        const newClose = Math.max(30, Math.min(80, lastCandle.close + change))
+        const newOpen = lastCandle.close
+        const newHigh = Math.max(newOpen, newClose) + Math.random() * 3
+        const newLow = Math.min(newOpen, newClose) - Math.random() * 3
+        newData.shift()
+        newData.push({
+          open: newOpen,
+          close: newClose,
+          high: newHigh,
+          low: newLow,
+          color: newClose > newOpen ? "#4caf50" : "#f44336"
+        })
+        return newData
+      })
+    }, 1500)
+    return () => clearInterval(interval)
+  }, [])
+
+  // Order flow animation
+  const [orders, setOrders] = useState([
+    { id: 1, type: "BUY", symbol: "AAPL", qty: 500, price: 182.45, status: "filled" },
+    { id: 2, type: "SELL", symbol: "GOOGL", qty: 200, price: 141.23, status: "pending" },
+    { id: 3, type: "BUY", symbol: "MSFT", qty: 350, price: 378.91, status: "filled" },
+  ])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const symbols = ["AAPL", "GOOGL", "MSFT", "AMZN", "NVDA", "META", "TSLA"]
+      const types = ["BUY", "SELL"]
+      const statuses = ["filled", "pending", "partial"]
+      setOrders(prev => {
+        const newOrders = [...prev]
+        newOrders.shift()
+        newOrders.push({
+          id: Date.now(),
+          type: types[Math.floor(Math.random() * types.length)],
+          symbol: symbols[Math.floor(Math.random() * symbols.length)],
+          qty: Math.floor(Math.random() * 900) + 100,
+          price: (Math.random() * 300 + 100).toFixed(2),
+          status: statuses[Math.floor(Math.random() * statuses.length)]
+        })
+        return newOrders
+      })
+    }, 2000)
+    return () => clearInterval(interval)
+  }, [])
+
   // Home Screen
   const HomeScreen = () => (
-    <div className={`min-h-screen p-6 transition-colors ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
-      <ThemeToggle />
-
-      {/* Header */}
-      <div className="mx-auto mb-6 max-w-5xl">
-        <div
-          className={`rounded-2xl px-8 py-6 text-center shadow-xl ${
-            isDarkMode
-              ? "bg-gradient-to-r from-[#0d47a1] via-[#00bcd4] to-[#0d47a1] shadow-[#00bcd4]/20"
-              : "bg-gradient-to-r from-[#0a1628] via-[#1976d2] to-[#0a1628] shadow-[#0a1628]/20"
-          }`}
-        >
-          <h1 className="text-4xl font-bold tracking-wide text-white drop-shadow-lg">BTCS AI Interface</h1>
-          <p className="mt-2 text-sm text-white/80">FIX Protocol Management & Testing Portal</p>
-        </div>
+  <div className="min-h-screen bg-gradient-to-br from-white via-[#f0f9ff] to-[#e0f2fe] transition-colors">
+  <ThemeToggle />
+  
+  {/* Navigation Bar */}
+  <nav className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-4 backdrop-blur-md bg-white/80 border-b border-[#e2e8f0]">
+    <div className="flex items-center gap-3">
+      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#0a1628] to-[#1976d2]">
+        <GitCompare className="h-5 w-5 text-white" />
       </div>
-
-      {/* Tab Bar */}
-      <div className="mx-auto mb-8 flex max-w-5xl justify-center">
-        <TabBar />
-      </div>
-
-      {/* Login Cards */}
-      <div className="mx-auto mb-8 grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2">
-        <Card hover className="p-6">
-          <Button variant="primary" size="lg" className="mb-6 w-full" onClick={() => handleLogin("admin")}>
-            Admin Login
-          </Button>
-          <ul className="space-y-3">
-            {["Compare between FIX Specs", "Compare FIX SPECS vs Log Files", "Create FIX message from Log File", "Create Test Cases from Fix Specs", "Create Test Cases from Log Files"].map(
-              (item, i) => (
-                <li key={i} className="flex items-center gap-3">
-                  <ChevronRight className={`h-4 w-4 ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`} />
-                  <span className={isDarkMode ? "text-[#90caf9]" : "text-[#475569]"}>{item}</span>
-                </li>
-              )
-            )}
-          </ul>
-        </Card>
-
-        <Card hover className="p-6">
-          <Button variant="primary" size="lg" className="mb-6 w-full" onClick={() => handleLogin("client")}>
-            Client Login
-          </Button>
-          <ul className="space-y-3">
-            {["Upload FIX specs", "Download FIX Spec", "Generate FIX message from Spec"].map((item, i) => (
-              <li key={i} className="flex items-center gap-3">
-                <ChevronRight className={`h-4 w-4 ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`} />
-                <span className={isDarkMode ? "text-[#90caf9]" : "text-[#475569]"}>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      </div>
-
-      {/* Test it Out Section */}
-      <Card className="mx-auto max-w-5xl p-6">
-        <div
-          className={`mb-6 rounded-xl px-6 py-3 text-center ${
-            isDarkMode ? "bg-gradient-to-r from-[#0d47a1] to-[#00bcd4]" : "bg-gradient-to-r from-[#0a1628] to-[#1976d2]"
-          }`}
-        >
-          <h2 className="text-xl font-semibold text-white">Test it Out!</h2>
-        </div>
-
-        <div className="flex flex-col gap-6 md:flex-row">
-          <div className={`flex-1 rounded-xl border p-5 ${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#f8fafc]"}`}>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="relative">
-                <Button variant="secondary" className="w-full" onClick={() => handleFileUpload("spec-upload")}>
-                  <Upload className="mr-2 h-4 w-4" />
-                  Upload FIX Spec
-                </Button>
-                <input type="file" id="spec-upload" className="hidden" accept=".xml,.txt" onChange={handleSpecUpload} />
-                {uploadedSpec && (
-                  <span className="mt-2 flex items-center gap-1 text-xs text-[#4caf50]">
-                    <span className="inline-block h-2 w-2 rounded-full bg-[#4caf50]"></span>
-                    {uploadedSpec}
-                  </span>
-                )}
-              </div>
-
-              <Button variant="secondary" onClick={() => setShowTagEditor(true)}>
-                <Settings className="mr-2 h-4 w-4" />
-                Change Tag Values
-              </Button>
-
-              <div className="relative">
-                <Button variant="secondary" className="w-full" onClick={() => setShowMsgTypeDropdown(!showMsgTypeDropdown)}>
-                  <FileText className="mr-2 h-4 w-4" />
-                  {selectedMsgType ? `MsgType: ${selectedMsgType}` : "Select MsgType"}
-                </Button>
-                {showMsgTypeDropdown && (
-                  <div
-                    className={`absolute left-0 top-full z-10 mt-2 w-64 overflow-hidden rounded-xl border shadow-xl ${
-                      isDarkMode ? "border-[#1e4976] bg-[#0d1f3c]" : "border-[#e2e8f0] bg-white"
-                    }`}
-                  >
-                    {msgTypes.map((type) => (
-                      <button
-                        key={type.code}
-                        onClick={() => selectMsgType(type.code)}
-                        className={`block w-full px-4 py-2.5 text-left text-sm transition-colors ${
-                          isDarkMode ? "text-[#90caf9] hover:bg-[#1e4976] hover:text-white" : "text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0a1628]"
-                        }`}
-                      >
-                        {type.code} - {type.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <Button variant="primary" onClick={generateFixMessage}>
-                Generate FIX Msg
-              </Button>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-center">
-            <div className={`rounded-full p-3 ${isDarkMode ? "bg-[#00e5ff]/20 text-[#00e5ff]" : "bg-[#0a1628]/10 text-[#0a1628]"}`}>
-              <ChevronRight className="h-6 w-6" />
-            </div>
-          </div>
-
-          <div className={`flex-1 rounded-xl border p-5 ${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#f8fafc]"}`}>
-            <div
-              className={`min-h-32 rounded-lg p-4 font-mono text-xs leading-relaxed ${
-                isDarkMode ? "bg-[#0d1f3c] text-[#00e5ff]" : "bg-white text-[#0a1628] border border-[#e2e8f0]"
-              }`}
-            >
-              {generatedMessage ||
-                "8=FIX.4.2|9=159|35=D|49=SNDR|56=RCV|34=159|52=20251224-19:38:43.158|11=Order13|1=TestAccount|21=3|55=IBM|54=2|60=20251224-19:38:43.158|38=1000|40=2|44=90.00|15=USD|59=0|10=176|"}
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {showTagEditor && <TagEditorModal />}
+      <span className="text-xl font-bold text-[#0a1628]">FIX AI Portal</span>
     </div>
+    <div className="hidden md:flex items-center gap-8">
+      <a href="#features" className="text-sm font-medium text-[#64748b] hover:text-[#0a1628] transition-colors">Features</a>
+      <a href="#how-it-works" className="text-sm font-medium text-[#64748b] hover:text-[#0a1628] transition-colors">How it Works</a>
+      <a href="#contact" className="text-sm font-medium text-[#64748b] hover:text-[#0a1628] transition-colors">Contact</a>
+    </div>
+    <Button variant="primary" onClick={() => setShowRoleSelection(true)}>
+      Login
+    </Button>
+  </nav>
+  
+  {/* Hero Section */}
+  <div className="relative pt-32 pb-20 px-6 overflow-hidden">
+    {/* Animated Background Elements */}
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute top-20 left-10 w-72 h-72 bg-[#00bcd4]/10 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#1976d2]/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-br from-[#00e5ff]/5 to-transparent rounded-full" />
+    </div>
+    
+    <div className="relative mx-auto max-w-7xl">
+      <div className="grid lg:grid-cols-2 gap-12 items-center">
+        {/* Left: Text Content */}
+        <div className="space-y-8">
+          <div className="inline-flex items-center gap-2 rounded-full bg-[#0a1628]/5 px-4 py-2 text-sm">
+            <span className="flex h-2 w-2 rounded-full bg-[#4caf50] animate-pulse" />
+            <span className="text-[#0a1628] font-medium">FIX Protocol Testing Platform</span>
+          </div>
+          
+          <h1 className="text-5xl lg:text-6xl font-bold text-[#0a1628] leading-tight text-balance">
+            Intelligent FIX Protocol
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#1976d2] to-[#00bcd4]">
+              Certification Testing
+            </span>
+          </h1>
+          
+          <p className="text-lg text-[#64748b] max-w-lg leading-relaxed text-pretty">
+            Streamline your FIX specification comparison, log analysis, and test case generation with AI-powered automation designed for trading firms.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button 
+              variant="primary" 
+              size="lg" 
+              className="text-base px-8 py-4 rounded-xl shadow-lg shadow-[#0a1628]/20 hover:shadow-xl transition-shadow"
+              onClick={() => setShowRoleSelection(true)}
+            >
+              Get Started
+              <ChevronRight className="ml-2 h-5 w-5" />
+            </Button>
+            <Button variant="outline" size="lg" className="text-base px-8 py-4 rounded-xl">
+              <Play className="mr-2 h-5 w-5" />
+              Watch Demo
+            </Button>
+          </div>
+          
+          {/* Trust Badges */}
+          <div className="pt-8 border-t border-[#e2e8f0]">
+            <p className="text-xs text-[#94a3b8] mb-4 uppercase tracking-wider font-medium">Trusted by leading institutions</p>
+            <div className="flex flex-wrap gap-8 items-center opacity-60">
+              <span className="text-lg font-bold text-[#0a1628]">BlackRock</span>
+              <span className="text-lg font-bold text-[#0a1628]">Goldman Sachs</span>
+              <span className="text-lg font-bold text-[#0a1628]">JP Morgan</span>
+              <span className="text-lg font-bold text-[#0a1628]">UBS</span>
+            </div>
+          </div>
+        </div>
+        
+        {/* Right: Animated Trading Visualization */}
+        <div className="relative">
+          <div className="relative bg-white rounded-3xl shadow-2xl border border-[#e2e8f0] p-6 overflow-hidden">
+            {/* Window Header */}
+            <div className="flex items-center gap-2 mb-6">
+              <div className="w-3 h-3 rounded-full bg-[#f44336]" />
+              <div className="w-3 h-3 rounded-full bg-[#ffc107]" />
+              <div className="w-3 h-3 rounded-full bg-[#4caf50]" />
+              <span className="ml-4 text-sm font-medium text-[#64748b]">FIX Message Flow</span>
+            </div>
+            
+            {/* Candlestick Chart Animation */}
+            <div className="mb-6 p-4 bg-[#f8fafc] rounded-xl">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-semibold text-[#0a1628]">Market Data Stream</span>
+                <span className="text-xs text-[#4caf50] font-medium">LIVE</span>
+              </div>
+              <div className="flex items-end gap-2 h-24">
+                {candleData.map((candle, i) => (
+                  <div key={i} className="flex-1 flex flex-col items-center transition-all duration-500">
+                    {/* High-Low Line */}
+                    <div 
+                      className="w-0.5 bg-[#94a3b8]"
+                      style={{ height: `${(candle.high - candle.low) * 1.5}px` }}
+                    />
+                    {/* Candle Body */}
+                    <div 
+                      className="w-3 rounded-sm transition-all duration-500"
+                      style={{ 
+                        height: `${Math.abs(candle.close - candle.open) * 2 + 4}px`,
+                        backgroundColor: candle.color,
+                        marginTop: `-${(candle.high - Math.max(candle.open, candle.close)) * 1.5}px`
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Order Flow Animation */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-semibold text-[#0a1628]">Order Flow</span>
+                <span className="text-xs text-[#1976d2] font-medium">Real-time</span>
+              </div>
+              {orders.map((order, i) => (
+                <div 
+                  key={order.id} 
+                  className={`flex items-center justify-between p-3 rounded-lg transition-all duration-300 ${
+                    i === orders.length - 1 ? "bg-[#e3f2fd] scale-[1.02]" : "bg-[#f8fafc]"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                      order.type === "BUY" ? "bg-[#4caf50]/20 text-[#2e7d32]" : "bg-[#f44336]/20 text-[#c62828]"
+                    }`}>
+                      {order.type}
+                    </span>
+                    <span className="font-mono text-sm font-medium text-[#0a1628]">{order.symbol}</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm text-[#64748b]">{order.qty}</span>
+                    <span className="font-mono text-sm font-medium text-[#0a1628]">${order.price}</span>
+                    <span className={`w-2 h-2 rounded-full ${
+                      order.status === "filled" ? "bg-[#4caf50]" : 
+                      order.status === "pending" ? "bg-[#ffc107] animate-pulse" : "bg-[#2196f3]"
+                    }`} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* FIX Message Preview */}
+            <div className="mt-4 p-3 bg-[#0a1628] rounded-lg overflow-hidden">
+              <div className="font-mono text-xs text-[#4caf50] whitespace-nowrap animate-pulse">
+                8=FIX.4.4|9=148|35=D|49=SENDER|56=TARGET|34=2|52=20250302...
+              </div>
+            </div>
+          </div>
+          
+          {/* Floating Stats */}
+          <div className="absolute -left-4 top-1/4 bg-white rounded-xl shadow-lg border border-[#e2e8f0] p-4 animate-bounce" style={{ animationDuration: "3s" }}>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-[#4caf50]" />
+              <div>
+                <p className="text-xs text-[#64748b]">Tests Passed</p>
+                <p className="text-lg font-bold text-[#0a1628]">2,847</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="absolute -right-4 bottom-1/4 bg-white rounded-xl shadow-lg border border-[#e2e8f0] p-4 animate-bounce" style={{ animationDuration: "3.5s", animationDelay: "0.5s" }}>
+            <div className="flex items-center gap-2">
+              <GitCompare className="h-5 w-5 text-[#1976d2]" />
+              <div>
+                <p className="text-xs text-[#64748b]">Specs Compared</p>
+                <p className="text-lg font-bold text-[#0a1628]">156</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  {/* Features Section */}
+  <div id="features" className="py-20 px-6 bg-white">
+    <div className="mx-auto max-w-7xl">
+      <div className="text-center mb-16">
+        <h2 className="text-3xl font-bold text-[#0a1628] mb-4">Powerful Features for FIX Protocol Testing</h2>
+        <p className="text-[#64748b] max-w-2xl mx-auto">Everything you need to validate, compare, and test FIX specifications with confidence.</p>
+      </div>
+      
+      <div className="grid md:grid-cols-3 gap-8">
+        {[
+          { icon: GitCompare, title: "Spec Comparison", desc: "Compare FIX specifications side-by-side with intelligent diff analysis", color: "#1976d2" },
+          { icon: FileCheck, title: "Log Analysis", desc: "Analyze FIX logs against specifications to identify discrepancies", color: "#4caf50" },
+          { icon: TestTube, title: "Test Generation", desc: "Auto-generate comprehensive test cases from your FIX specs", color: "#9c27b0" },
+          { icon: MessageSquare, title: "Message Builder", desc: "Create and validate FIX messages with our intuitive builder", color: "#f57c00" },
+          { icon: AlertTriangle, title: "Alerts & Monitoring", desc: "Real-time alerts for certification issues and failures", color: "#f44336" },
+          { icon: Users, title: "Client Management", desc: "Manage multiple clients and track their certification progress", color: "#00bcd4" },
+        ].map((feature, i) => (
+          <div key={i} className="group p-6 rounded-2xl border border-[#e2e8f0] hover:border-[#1976d2]/30 hover:shadow-xl transition-all duration-300 bg-white">
+            <div className={`inline-flex p-3 rounded-xl mb-4`} style={{ backgroundColor: `${feature.color}15` }}>
+              <feature.icon className="h-6 w-6" style={{ color: feature.color }} />
+            </div>
+            <h3 className="text-lg font-semibold text-[#0a1628] mb-2">{feature.title}</h3>
+            <p className="text-sm text-[#64748b]">{feature.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+  
+  {/* Role Selection Modal */}
+  {showRoleSelection && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md mx-4 animate-in fade-in zoom-in duration-200">
+        <div className="text-center mb-8">
+          <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-[#0a1628] to-[#1976d2] mb-4">
+            <GitCompare className="h-8 w-8 text-white" />
+          </div>
+          <h2 className="text-2xl font-bold text-[#0a1628]">Welcome Back</h2>
+          <p className="text-[#64748b] mt-2">Select your role to continue</p>
+        </div>
+        
+        <div className="space-y-4">
+          <button
+            onClick={() => { setShowRoleSelection(false); handleLogin("admin"); }}
+            className="w-full p-5 rounded-2xl border-2 border-[#e2e8f0] hover:border-[#1976d2] hover:bg-[#e3f2fd] transition-all group text-left"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-[#1976d2]/10 group-hover:bg-[#1976d2]/20 transition-colors">
+                <Settings className="h-6 w-6 text-[#1976d2]" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-[#0a1628]">Admin Portal</h3>
+                <p className="text-sm text-[#64748b]">Manage specs, run comparisons, generate tests</p>
+              </div>
+              <ChevronRight className="h-5 w-5 text-[#94a3b8] ml-auto group-hover:text-[#1976d2] group-hover:translate-x-1 transition-all" />
+            </div>
+          </button>
+          
+          <button
+            onClick={() => { setShowRoleSelection(false); handleLogin("client"); }}
+            className="w-full p-5 rounded-2xl border-2 border-[#e2e8f0] hover:border-[#4caf50] hover:bg-[#e8f5e9] transition-all group text-left"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-[#4caf50]/10 group-hover:bg-[#4caf50]/20 transition-colors">
+                <Building2 className="h-6 w-6 text-[#4caf50]" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-[#0a1628]">Client Portal</h3>
+                <p className="text-sm text-[#64748b]">Upload specs, download files, generate messages</p>
+              </div>
+              <ChevronRight className="h-5 w-5 text-[#94a3b8] ml-auto group-hover:text-[#4caf50] group-hover:translate-x-1 transition-all" />
+            </div>
+          </button>
+        </div>
+        
+        <button
+          onClick={() => setShowRoleSelection(false)}
+          className="mt-6 w-full py-3 text-sm text-[#64748b] hover:text-[#0a1628] transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  )}
+  </div>
   )
 
   // Tag Editor Modal Component
