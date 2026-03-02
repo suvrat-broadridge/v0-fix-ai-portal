@@ -74,6 +74,12 @@ interface Client {
   specs: number
   lastActivity: string
   status: "active" | "inactive"
+  progress: {
+    specComparison: "done" | "progress" | "pending" | "error"
+    logComparison: "done" | "progress" | "pending" | "error"
+    testCases: "done" | "progress" | "pending" | "error"
+    msgGeneration: "done" | "progress" | "pending" | "error"
+  }
 }
 
 interface TestCase {
@@ -165,16 +171,22 @@ export default function FixAIPortal() {
   ])
 
   // Clients state
-  const [clients] = useState<Client[]>([
-    { id: "C001", name: "BlackRock", specs: 12, lastActivity: "2025-03-02 10:30", status: "active" },
-    { id: "C002", name: "Goldman Sachs", specs: 8, lastActivity: "2025-03-02 09:45", status: "active" },
-    { id: "C003", name: "JP Morgan", specs: 15, lastActivity: "2025-03-02 10:15", status: "active" },
-    { id: "C004", name: "UBS", specs: 6, lastActivity: "2025-03-01 16:30", status: "inactive" },
-    { id: "C005", name: "Raymond James", specs: 4, lastActivity: "2025-03-02 08:00", status: "active" },
-    { id: "C006", name: "HSBC", specs: 9, lastActivity: "2025-03-02 10:00", status: "active" },
-    { id: "C007", name: "Bank of America", specs: 11, lastActivity: "2025-03-01 14:20", status: "inactive" },
+  const [clients, setClients] = useState<Client[]>([
+    { id: "C001", name: "BlackRock", specs: 12, lastActivity: "2025-03-02 10:30", status: "active", progress: { specComparison: "done", logComparison: "progress", testCases: "done", msgGeneration: "done" } },
+    { id: "C002", name: "Goldman Sachs", specs: 8, lastActivity: "2025-03-02 09:45", status: "active", progress: { specComparison: "done", logComparison: "done", testCases: "progress", msgGeneration: "pending" } },
+    { id: "C003", name: "JP Morgan", specs: 15, lastActivity: "2025-03-02 10:15", status: "active", progress: { specComparison: "progress", logComparison: "pending", testCases: "pending", msgGeneration: "pending" } },
+    { id: "C004", name: "UBS", specs: 6, lastActivity: "2025-03-01 16:30", status: "inactive", progress: { specComparison: "done", logComparison: "done", testCases: "done", msgGeneration: "done" } },
+    { id: "C005", name: "Raymond James", specs: 4, lastActivity: "2025-03-02 08:00", status: "active", progress: { specComparison: "done", logComparison: "error", testCases: "pending", msgGeneration: "pending" } },
+    { id: "C006", name: "HSBC", specs: 9, lastActivity: "2025-03-02 10:00", status: "active", progress: { specComparison: "done", logComparison: "done", testCases: "progress", msgGeneration: "progress" } },
+    { id: "C007", name: "Bank of America", specs: 11, lastActivity: "2025-03-01 14:20", status: "inactive", progress: { specComparison: "error", logComparison: "pending", testCases: "pending", msgGeneration: "pending" } },
   ])
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
+  const [clientSortBy, setClientSortBy] = useState<"name" | "progress" | "status">("name")
+  const [clientSortOrder, setClientSortOrder] = useState<"asc" | "desc">("asc")
+  const [clientStatusFilter, setClientStatusFilter] = useState<"all" | "active" | "inactive">("all")
+  const [showAddClientModal, setShowAddClientModal] = useState(false)
+  const [editingClient, setEditingClient] = useState<Client | null>(null)
+  const [newClientName, setNewClientName] = useState("")
 
   const msgTypes = [
     { code: "D", name: "New Order Single" },
@@ -592,12 +604,87 @@ export default function FixAIPortal() {
     </div>
   )
 
+  // Client helper functions
+  const getProgressCount = (client: Client) => {
+    const progressValues = Object.values(client.progress)
+    return progressValues.filter(p => p === "done").length
+  }
+
+  const getProgressPercent = (client: Client) => {
+    return (getProgressCount(client) / 4) * 100
+  }
+
+  const sortedClients = [...clients]
+    .filter(c => clientStatusFilter === "all" || c.status === clientStatusFilter)
+    .sort((a, b) => {
+      let comparison = 0
+      if (clientSortBy === "name") {
+        comparison = a.name.localeCompare(b.name)
+      } else if (clientSortBy === "progress") {
+        comparison = getProgressCount(b) - getProgressCount(a)
+      } else if (clientSortBy === "status") {
+        comparison = a.status.localeCompare(b.status)
+      }
+      return clientSortOrder === "asc" ? comparison : -comparison
+    })
+
+  const addClient = () => {
+    if (newClientName.trim()) {
+      const newClient: Client = {
+        id: `C${Date.now()}`,
+        name: newClientName.trim(),
+        specs: 0,
+        lastActivity: new Date().toISOString().replace("T", " ").substring(0, 16),
+        status: "active",
+        progress: { specComparison: "pending", logComparison: "pending", testCases: "pending", msgGeneration: "pending" }
+      }
+      setClients(prev => [...prev, newClient])
+      setNewClientName("")
+      setShowAddClientModal(false)
+      addHistoryEntry("Added Client", "success", `Client "${newClientName}" added`)
+    }
+  }
+
+  const updateClient = (clientId: string, updates: Partial<Client>) => {
+    setClients(prev => prev.map(c => c.id === clientId ? { ...c, ...updates } : c))
+    addHistoryEntry("Updated Client", "success", `Client updated`)
+  }
+
+  const removeClient = (clientId: string) => {
+    const client = clients.find(c => c.id === clientId)
+    setClients(prev => prev.filter(c => c.id !== clientId))
+    addHistoryEntry("Removed Client", "warning", `Client "${client?.name}" removed`)
+  }
+
+  const ProgressBadge = ({ status }: { status: "done" | "progress" | "pending" | "error" }) => {
+    const styles = {
+      done: "bg-[#4caf50]/20 text-[#4caf50]",
+      progress: "bg-[#2196f3]/20 text-[#2196f3]",
+      pending: "bg-[#9e9e9e]/20 text-[#9e9e9e]",
+      error: "bg-[#f44336]/20 text-[#f44336]"
+    }
+    const labels = { done: "Done", progress: "In Progress", pending: "Pending", error: "Error" }
+    return (
+      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${styles[status]}`}>
+        {labels[status]}
+      </span>
+    )
+  }
+
   // Clients Panel Component
   const ClientsPanel = () => (
     <div className="p-6">
       <div className="mb-6 flex items-center justify-between">
         <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Clients</h2>
-        <div className="flex items-center gap-3">
+        <Button variant="primary" onClick={() => setShowAddClientModal(true)}>
+          <Users className="mr-2 h-4 w-4" />
+          Add Client
+        </Button>
+      </div>
+
+      {/* Filters and Sorting */}
+      <Card className="mb-6 p-4">
+        <div className="flex flex-wrap items-center gap-4">
           <div className={`flex items-center gap-2 rounded-xl border px-3 py-2 ${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-white"}`}>
             <Search className={`h-4 w-4 ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`} />
             <input
@@ -606,11 +693,37 @@ export default function FixAIPortal() {
               className={`bg-transparent text-sm outline-none ${isDarkMode ? "text-white placeholder-[#64748b]" : "text-[#0a1628] placeholder-[#94a3b8]"}`}
             />
           </div>
+          <select
+            value={clientSortBy}
+            onChange={(e) => setClientSortBy(e.target.value as "name" | "progress" | "status")}
+            className={`rounded-xl border px-3 py-2 text-sm ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
+          >
+            <option value="name">Sort by Name</option>
+            <option value="progress">Sort by Progress</option>
+            <option value="status">Sort by Status</option>
+          </select>
+          <select
+            value={clientSortOrder}
+            onChange={(e) => setClientSortOrder(e.target.value as "asc" | "desc")}
+            className={`rounded-xl border px-3 py-2 text-sm ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
+          >
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
+          <select
+            value={clientStatusFilter}
+            onChange={(e) => setClientStatusFilter(e.target.value as "all" | "active" | "inactive")}
+            className={`rounded-xl border px-3 py-2 text-sm ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active Only</option>
+            <option value="inactive">Inactive Only</option>
+          </select>
         </div>
-      </div>
+      </Card>
 
       <div className="grid gap-4">
-        {clients.map((client) => (
+        {sortedClients.map((client) => (
           <Card key={client.id} hover className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -622,6 +735,18 @@ export default function FixAIPortal() {
                   <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
                     {client.specs} specs | Last active: {client.lastActivity}
                   </p>
+                  {/* Progress bar */}
+                  <div className="mt-2 flex items-center gap-2">
+                    <div className={`h-2 w-32 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                      <div 
+                        className="h-full rounded-full bg-[#4caf50] transition-all"
+                        style={{ width: `${getProgressPercent(client)}%` }}
+                      />
+                    </div>
+                    <span className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+                      {getProgressCount(client)}/4 tasks
+                    </span>
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -638,11 +763,42 @@ export default function FixAIPortal() {
                   <Eye className="mr-1 h-4 w-4" />
                   View
                 </Button>
+                <Button variant="ghost" size="sm" onClick={() => setEditingClient(client)}>
+                  <Settings className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => removeClient(client.id)}>
+                  <Trash2 className="h-4 w-4 text-[#f44336]" />
+                </Button>
               </div>
             </div>
           </Card>
         ))}
       </div>
+
+      {/* Add Client Modal */}
+      {showAddClientModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <Card className="w-full max-w-md p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Add New Client</h3>
+              <button onClick={() => setShowAddClientModal(false)} className={`rounded-lg p-2 ${isDarkMode ? "hover:bg-[#1e4976]" : "hover:bg-[#f1f5f9]"}`}>
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <input
+              type="text"
+              placeholder="Client name..."
+              value={newClientName}
+              onChange={(e) => setNewClientName(e.target.value)}
+              className={`mb-4 w-full rounded-xl border px-4 py-3 text-sm ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
+            />
+            <div className="flex gap-3">
+              <Button variant="secondary" className="flex-1" onClick={() => setShowAddClientModal(false)}>Cancel</Button>
+              <Button variant="primary" className="flex-1" onClick={addClient}>Add Client</Button>
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* Client Detail Modal */}
       {selectedClient && (
@@ -661,6 +817,30 @@ export default function FixAIPortal() {
                 <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Total Specs</p>
                 <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{selectedClient.specs}</p>
               </div>
+              
+              {/* Progress Details */}
+              <div className={`rounded-xl p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+                <p className={`mb-3 text-sm font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Work Progress</p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>FIX Spec Comparison</span>
+                    <ProgressBadge status={selectedClient.progress.specComparison} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Log Comparison</span>
+                    <ProgressBadge status={selectedClient.progress.logComparison} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Test Cases</span>
+                    <ProgressBadge status={selectedClient.progress.testCases} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Message Generation</span>
+                    <ProgressBadge status={selectedClient.progress.msgGeneration} />
+                  </div>
+                </div>
+              </div>
+
               <div className={`rounded-xl p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
                 <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Last Activity</p>
                 <p className={`font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{selectedClient.lastActivity}</p>
@@ -669,6 +849,46 @@ export default function FixAIPortal() {
                 <Button variant="primary" className="flex-1">View Specs</Button>
                 <Button variant="secondary" className="flex-1">View History</Button>
               </div>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Edit Client Modal */}
+      {editingClient && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <Card className="w-full max-w-md p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Edit Client</h3>
+              <button onClick={() => setEditingClient(null)} className={`rounded-lg p-2 ${isDarkMode ? "hover:bg-[#1e4976]" : "hover:bg-[#f1f5f9]"}`}>
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className={`mb-1 block text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Client Name</label>
+                <input
+                  type="text"
+                  value={editingClient.name}
+                  onChange={(e) => setEditingClient({ ...editingClient, name: e.target.value })}
+                  className={`w-full rounded-xl border px-4 py-2 text-sm ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
+                />
+              </div>
+              <div>
+                <label className={`mb-1 block text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Status</label>
+                <select
+                  value={editingClient.status}
+                  onChange={(e) => setEditingClient({ ...editingClient, status: e.target.value as "active" | "inactive" })}
+                  className={`w-full rounded-xl border px-4 py-2 text-sm ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+            </div>
+            <div className="mt-6 flex gap-3">
+              <Button variant="secondary" className="flex-1" onClick={() => setEditingClient(null)}>Cancel</Button>
+              <Button variant="primary" className="flex-1" onClick={() => { updateClient(editingClient.id, editingClient); setEditingClient(null); }}>Save Changes</Button>
             </div>
           </Card>
         </div>
@@ -1076,57 +1296,107 @@ export default function FixAIPortal() {
 
   // Dashboard Panel (default)
   const DashboardPanel = () => (
-    <div className="grid grid-cols-1 gap-6 p-6 lg:grid-cols-2">
-      <ToolPanel
-        title="FIX Spec Compare"
-        icon={GitCompare}
-        buttons={[
-          { label: "Select Spec 1", action: () => handleFileUpload("spec1"), icon: FileText },
-          { label: "Select Spec 2", action: () => handleFileUpload("spec2"), icon: FileText },
-          { label: "Check Compatibility", action: () => callServerEndpoint("check-compatibility"), icon: FileCheck },
-          { label: "Compare Specs", action: () => { setActiveSidebarItem("spec-compare"); performSpecCompare(); }, primary: true, icon: GitCompare },
-        ]}
-      />
-      <input type="file" id="spec1" className="hidden" accept=".xml,.txt" onChange={handleSpec1Upload} />
-      <input type="file" id="spec2" className="hidden" accept=".xml,.txt" onChange={handleSpec2Upload} />
+    <div className="p-6">
+      {/* Client Work Progress Section */}
+      <div className="mb-8">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Client Work Progress</h2>
+          <Button variant="ghost" size="sm" onClick={() => setActiveSidebarItem("clients")}>
+            View All Clients
+            <ChevronRight className="ml-1 h-4 w-4" />
+          </Button>
+        </div>
+        <div className="grid gap-4">
+          {clients.slice(0, 5).map((client) => (
+            <Card key={client.id} className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                    <Building2 className={`h-5 w-5 ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`} />
+                  </div>
+                  <div>
+                    <h3 className={`font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{client.name}</h3>
+                    <span className={`text-xs ${client.status === "active" ? "text-[#4caf50]" : "text-[#f57c00]"}`}>{client.status}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Spec Compare:</span>
+                    <ProgressBadge status={client.progress.specComparison} />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Log Compare:</span>
+                    <ProgressBadge status={client.progress.logComparison} />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Test Cases:</span>
+                    <ProgressBadge status={client.progress.testCases} />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Msg Gen:</span>
+                    <ProgressBadge status={client.progress.msgGeneration} />
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
 
-      <ToolPanel
-        title="FIX Logs & Spec Compare"
-        icon={FileCheck}
-        buttons={[
-          { label: "Select FIX Spec", action: () => handleFileUpload("fix-spec"), icon: FileText },
-          { label: "Select Log File", action: () => handleFileUpload("log-file"), icon: FileText },
-          { label: "Check Compatibility", action: () => callServerEndpoint("check-log-compatibility"), icon: FileCheck },
-          { label: "Find Differences", action: () => { setActiveSidebarItem("log-analysis"); performLogAnalysis(); }, primary: true, icon: GitCompare },
-        ]}
-      />
-      <input type="file" id="fix-spec" className="hidden" accept=".xml,.txt" onChange={handleLogSpecUpload} />
-      <input type="file" id="log-file" className="hidden" accept=".log,.txt" onChange={handleLogFileUpload} />
+      {/* Tools Grid */}
+      <h2 className={`mb-4 text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Quick Tools</h2>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <ToolPanel
+          title="FIX Spec Compare"
+          icon={GitCompare}
+          buttons={[
+            { label: "Select Spec 1", action: () => handleFileUpload("spec1"), icon: FileText },
+            { label: "Select Spec 2", action: () => handleFileUpload("spec2"), icon: FileText },
+            { label: "Check Compatibility", action: () => callServerEndpoint("check-compatibility"), icon: FileCheck },
+            { label: "Compare Specs", action: () => { setActiveSidebarItem("spec-compare"); performSpecCompare(); }, primary: true, icon: GitCompare },
+          ]}
+        />
+        <input type="file" id="spec1" className="hidden" accept=".xml,.txt" onChange={handleSpec1Upload} />
+        <input type="file" id="spec2" className="hidden" accept=".xml,.txt" onChange={handleSpec2Upload} />
 
-      <ToolPanel
-        title="FIX Message Generator"
-        icon={MessageSquare}
-        buttons={[
-          { label: "Select FIX Spec", action: () => handleFileUpload("gen-spec"), icon: FileText },
-          { label: "Change Tag Values", action: () => setShowTagEditor(true), icon: Settings },
-          { label: "Select MsgType", action: () => setShowMsgTypeDropdown(true), icon: FileText },
-          { label: "Generate FIX Msg", action: () => callServerEndpoint("generate-fix-msg"), primary: true, icon: MessageSquare },
-        ]}
-      />
-      <input type="file" id="gen-spec" className="hidden" accept=".xml,.txt" />
+        <ToolPanel
+          title="FIX Logs & Spec Compare"
+          icon={FileCheck}
+          buttons={[
+            { label: "Select FIX Spec", action: () => handleFileUpload("fix-spec"), icon: FileText },
+            { label: "Select Log File", action: () => handleFileUpload("log-file"), icon: FileText },
+            { label: "Check Compatibility", action: () => callServerEndpoint("check-log-compatibility"), icon: FileCheck },
+            { label: "Find Differences", action: () => { setActiveSidebarItem("log-analysis"); performLogAnalysis(); }, primary: true, icon: GitCompare },
+          ]}
+        />
+        <input type="file" id="fix-spec" className="hidden" accept=".xml,.txt" onChange={handleLogSpecUpload} />
+        <input type="file" id="log-file" className="hidden" accept=".log,.txt" onChange={handleLogFileUpload} />
 
-      <ToolPanel
-        title="Generate Test Cases"
-        icon={TestTube}
-        buttons={[
-          { label: "Select FIX Spec", action: () => handleFileUpload("test-spec"), icon: FileText },
-          { label: "Select Log File", action: () => handleFileUpload("test-log"), icon: FileText },
-          { label: "Select Coverage", action: () => alert("Coverage options: Full, Partial, Minimal"), icon: FileCheck },
-          { label: "Generate Tests", action: () => { setActiveSidebarItem("test-cases"); generateTestCases(); }, primary: true, icon: TestTube },
-        ]}
-      />
-      <input type="file" id="test-spec" className="hidden" accept=".xml,.txt" />
-      <input type="file" id="test-log" className="hidden" accept=".log,.txt" />
+        <ToolPanel
+          title="FIX Message Generator"
+          icon={MessageSquare}
+          buttons={[
+            { label: "Select FIX Spec", action: () => handleFileUpload("gen-spec"), icon: FileText },
+            { label: "Change Tag Values", action: () => setShowTagEditor(true), icon: Settings },
+            { label: "Select MsgType", action: () => setShowMsgTypeDropdown(true), icon: FileText },
+            { label: "Generate FIX Msg", action: () => callServerEndpoint("generate-fix-msg"), primary: true, icon: MessageSquare },
+          ]}
+        />
+        <input type="file" id="gen-spec" className="hidden" accept=".xml,.txt" />
+
+        <ToolPanel
+          title="Generate Test Cases"
+          icon={TestTube}
+          buttons={[
+            { label: "Select FIX Spec", action: () => handleFileUpload("test-spec"), icon: FileText },
+            { label: "Select Log File", action: () => handleFileUpload("test-log"), icon: FileText },
+            { label: "Select Coverage", action: () => alert("Coverage options: Full, Partial, Minimal"), icon: FileCheck },
+            { label: "Generate Tests", action: () => { setActiveSidebarItem("test-cases"); generateTestCases(); }, primary: true, icon: TestTube },
+          ]}
+        />
+        <input type="file" id="test-spec" className="hidden" accept=".xml,.txt" />
+        <input type="file" id="test-log" className="hidden" accept=".log,.txt" />
+      </div>
     </div>
   )
 
