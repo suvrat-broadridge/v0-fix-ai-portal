@@ -763,13 +763,13 @@ export default function FixAIPortal() {
 
   // Tab Bar Component
   const TabBar = () => {
-  const tabs = [
-  { id: "home" as Tab, label: "Home", icon: Home, iconColor: isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]" },
-  { id: "projects" as Tab, label: "Projects", icon: FolderOpen, iconColor: isDarkMode ? "text-[#00e5ff]" : "text-[#0097a7]" },
-  { id: "uploads" as Tab, label: "Uploads", icon: FileUp, iconColor: isDarkMode ? "text-[#4caf50]" : "text-[#388e3c]" },
-  { id: "testcase" as Tab, label: "TestCase", icon: TestTube, iconColor: isDarkMode ? "text-[#ce93d8]" : "text-[#7b1fa2]" },
-  { id: "settings" as Tab, label: "Settings", icon: Settings, iconColor: isDarkMode ? "text-[#90a4ae]" : "text-[#546e7a]" },
-  ]
+    const tabs = [
+      { id: "home" as Tab, label: "Home", icon: Home, iconColor: isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]" },
+      { id: "projects" as Tab, label: "Projects", icon: FolderOpen, iconColor: isDarkMode ? "text-[#00e5ff]" : "text-[#0097a7]" },
+      { id: "uploads" as Tab, label: "Uploads", icon: FileUp, iconColor: isDarkMode ? "text-[#4caf50]" : "text-[#388e3c]" },
+      { id: "testcase" as Tab, label: "TestCase", icon: TestTube, iconColor: isDarkMode ? "text-[#ce93d8]" : "text-[#7b1fa2]" },
+      { id: "settings" as Tab, label: "Settings", icon: Settings, iconColor: isDarkMode ? "text-[#90a4ae]" : "text-[#546e7a]" },
+    ]
   
   const handleTabClick = (tabId: Tab) => {
   setActiveTab(tabId)
@@ -3478,7 +3478,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
           <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-[#0a1628] to-[#1976d2] mb-4">
             <GitCompare className="h-8 w-8 text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-[#0a1628]">Welcome Back</h2>
+          <h2 className="text-2xl font-bold text-[#0a1628]">Choose Your Portal</h2>
           <p className="text-[#64748b] mt-2">Select your role to continue</p>
         </div>
         
