@@ -2700,93 +2700,93 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
 
           {/* Step 1: Upload File */}
           {msgGenStep === 1 && (
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Upload FIX Spec */}
-          <Card 
-            className={`cursor-pointer p-6 transition-all hover:shadow-lg ${
-              msgGenSpecFile 
-                ? isDarkMode ? "border-[#4caf50] bg-[#4caf50]/10" : "border-[#4caf50] bg-[#4caf50]/5"
-                : ""
-            }`}
-            onClick={() => handleFileUpload("msg-gen-spec")}
-          >
-            <div className="flex flex-col items-center text-center">
-              <div className={`mb-4 flex h-16 w-16 items-center justify-center rounded-2xl ${
-                msgGenSpecFile 
-                  ? "bg-[#4caf50]/20"
-                  : isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"
-              }`}>
-                <FileText className={`h-8 w-8 ${
-                  msgGenSpecFile ? "text-[#4caf50]" : isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"
-                }`} />
-              </div>
-              <h3 className={`mb-2 text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                Upload FIX Specification
-              </h3>
-              <p className={`mb-4 text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
-                {msgGenSpecFile || "XML or TXT format"}
-              </p>
-              <Button variant={msgGenSpecFile ? "primary" : "secondary"} size="sm">
-                {msgGenSpecFile ? "Change File" : "Select Spec File"}
-              </Button>
-            </div>
-            <input type="file" id="msg-gen-spec" className="hidden" accept=".xml,.txt" onChange={handleMsgGenSpecUpload} />
-          </Card>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                {/* Upload FIX Spec */}
+                <Card 
+                  className={`cursor-pointer p-6 transition-all hover:shadow-lg ${
+                    msgGenSpecFile 
+                      ? isDarkMode ? "border-[#4caf50] bg-[#4caf50]/10" : "border-[#4caf50] bg-[#4caf50]/5"
+                      : ""
+                  }`}
+                  onClick={() => handleFileUpload("msg-gen-spec")}
+                >
+                  <div className="flex flex-col items-center text-center">
+                    <div className={`mb-4 flex h-16 w-16 items-center justify-center rounded-2xl ${
+                      msgGenSpecFile 
+                        ? "bg-[#4caf50]/20"
+                        : isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"
+                    }`}>
+                      <FileText className={`h-8 w-8 ${
+                        msgGenSpecFile ? "text-[#4caf50]" : isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"
+                      }`} />
+                    </div>
+                    <h3 className={`mb-2 text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                      Upload FIX Specification
+                    </h3>
+                    <p className={`mb-4 text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+                      {msgGenSpecFile || "XML or TXT format"}
+                    </p>
+                    <Button variant={msgGenSpecFile ? "primary" : "secondary"} size="sm">
+                      {msgGenSpecFile ? "Change File" : "Select Spec File"}
+                    </Button>
+                  </div>
+                  <input type="file" id="msg-gen-spec" className="hidden" accept=".xml,.txt" onChange={handleMsgGenSpecUpload} />
+                </Card>
 
-          {/* Upload Log File */}
-          <Card 
-            className={`cursor-pointer p-6 transition-all hover:shadow-lg ${
-              msgGenLogFile 
-                ? isDarkMode ? "border-[#4caf50] bg-[#4caf50]/10" : "border-[#4caf50] bg-[#4caf50]/5"
-                : ""
-            }`}
-            onClick={() => handleFileUpload("msg-gen-log")}
-          >
-            <div className="flex flex-col items-center text-center">
-              <div className={`mb-4 flex h-16 w-16 items-center justify-center rounded-2xl ${
-                msgGenLogFile 
-                  ? "bg-[#4caf50]/20"
-                  : isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"
-              }`}>
-                <Upload className={`h-8 w-8 ${
-                  msgGenLogFile ? "text-[#4caf50]" : isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"
-                }`} />
+                {/* Upload Log File */}
+                <Card 
+                  className={`cursor-pointer p-6 transition-all hover:shadow-lg ${
+                    msgGenLogFile 
+                      ? isDarkMode ? "border-[#4caf50] bg-[#4caf50]/10" : "border-[#4caf50] bg-[#4caf50]/5"
+                      : ""
+                  }`}
+                  onClick={() => handleFileUpload("msg-gen-log")}
+                >
+                  <div className="flex flex-col items-center text-center">
+                    <div className={`mb-4 flex h-16 w-16 items-center justify-center rounded-2xl ${
+                      msgGenLogFile 
+                        ? "bg-[#4caf50]/20"
+                        : isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"
+                    }`}>
+                      <Upload className={`h-8 w-8 ${
+                        msgGenLogFile ? "text-[#4caf50]" : isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"
+                      }`} />
+                    </div>
+                    <h3 className={`mb-2 text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                      Upload Log File
+                    </h3>
+                    <p className={`mb-4 text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+                      {msgGenLogFile || "LOG or TXT format"}
+                    </p>
+                    <Button variant={msgGenLogFile ? "primary" : "secondary"} size="sm">
+                      {msgGenLogFile ? "Change File" : "Select Log File"}
+                    </Button>
+                  </div>
+                  <input type="file" id="msg-gen-log" className="hidden" accept=".log,.txt" onChange={handleMsgGenLogUpload} />
+                </Card>
               </div>
-              <h3 className={`mb-2 text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                Upload Log File
-              </h3>
-              <p className={`mb-4 text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
-                {msgGenLogFile || "LOG or TXT format"}
-              </p>
-              <Button variant={msgGenLogFile ? "primary" : "secondary"} size="sm">
-                {msgGenLogFile ? "Change File" : "Select Log File"}
-              </Button>
-            </div>
-            <input type="file" id="msg-gen-log" className="hidden" accept=".log,.txt" onChange={handleMsgGenLogUpload} />
-          </Card>
-        </div>
-      )}
 
-      {/* Continue Button for Step 1 */}
-      {msgGenStep === 1 && (
-        <div className="mt-6 flex justify-center gap-4">
-          {(msgGenSpecFile || msgGenLogFile) && (
-            <Button variant="primary" onClick={() => setMsgGenStep(2)}>
-              Continue to Message Selection
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </Button>
-          )}
-          <Button 
-            variant="ghost" 
-            onClick={() => {
-              setMsgGenSpecFile("FIX44_Sample.xml")
-              setMsgGenStep(2)
-            }}
-          >
-            <Play className="mr-1 h-4 w-4" />
-            Try Sample
-          </Button>
-        </div>
+              {/* Continue Button for Step 1 */}
+              <div className="flex justify-center gap-4">
+                {(msgGenSpecFile || msgGenLogFile) && (
+                  <Button variant="primary" onClick={() => setMsgGenStep(2)}>
+                    Continue to Message Selection
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                )}
+                <Button 
+                  variant="ghost" 
+                  onClick={() => {
+                    setMsgGenSpecFile("FIX44_Sample.xml")
+                    setMsgGenStep(2)
+                  }}
+                >
+                  <Play className="mr-1 h-4 w-4" />
+                  Try Sample
+                </Button>
+              </div>
+            </div>
           )}
 
           {/* Step 2: Select Message Type */}
@@ -2837,54 +2837,54 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                     </h3>
                     <p className={`text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
                       Customize the field values for your {msgTypes.find(t => t.code === msgGenSelectedType)?.name} message
-                </p>
-              </div>
-              <span className={`rounded-lg px-3 py-1 text-sm font-semibold ${isDarkMode ? "bg-[#00e5ff]/20 text-[#00e5ff]" : "bg-[#0a1628]/10 text-[#0a1628]"}`}>
-                MsgType: {msgGenSelectedType}
-              </span>
-            </div>
+                    </p>
+                  </div>
+                  <span className={`rounded-lg px-3 py-1 text-sm font-semibold ${isDarkMode ? "bg-[#00e5ff]/20 text-[#00e5ff]" : "bg-[#0a1628]/10 text-[#0a1628]"}`}>
+                    MsgType: {msgGenSelectedType}
+                  </span>
+                </div>
 
-            <div className="overflow-hidden rounded-xl border ${isDarkMode ? 'border-[#1e4976]' : 'border-[#e2e8f0]'}">
-              <table className="w-full">
-                <thead>
-                  <tr className={isDarkMode ? "bg-[#0d1f3c]" : "bg-[#f8fafc]"}>
-                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Tag</th>
-                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Field Name</th>
-                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Value</th>
-                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {msgGenFields.map((field, i) => (
-                    <tr key={i} className={`border-t ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"} ${i % 2 === 0 ? (isDarkMode ? "bg-[#0f2847]" : "bg-white") : (isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]")}`}>
-                      <td className={`px-4 py-3 font-mono text-sm ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`}>
-                        {field.tag}
-                      </td>
-                      <td className={`px-4 py-3 text-sm ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                        {field.name}
-                      </td>
-                      <td className="px-4 py-3">
-                        {field.editable ? (
-                          <input
-                            type="text"
-                            value={field.value}
-                            onChange={(e) => updateMsgGenField(i, e.target.value)}
-                            className={`w-full rounded-lg border px-3 py-1.5 text-sm ${
-                              isDarkMode 
-                                ? "border-[#1e4976] bg-[#0a1628] text-white focus:border-[#00e5ff]" 
-                                : "border-[#e2e8f0] bg-white text-[#0a1628] focus:border-[#0a1628]"
-                            }`}
-                          />
-                        ) : (
-                          <span className={`font-mono text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
-                            {field.value}
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                          field.editable 
-                            ? "bg-[#4caf50]/20 text-[#4caf50]" 
+                <div className={`overflow-hidden rounded-xl border ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
+                  <table className="w-full">
+                    <thead>
+                      <tr className={isDarkMode ? "bg-[#0d1f3c]" : "bg-[#f8fafc]"}>
+                        <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Tag</th>
+                        <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Field Name</th>
+                        <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Value</th>
+                        <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {msgGenFields.map((field, i) => (
+                        <tr key={i} className={`border-t ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"} ${i % 2 === 0 ? (isDarkMode ? "bg-[#0f2847]" : "bg-white") : (isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]")}`}>
+                          <td className={`px-4 py-3 font-mono text-sm ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`}>
+                            {field.tag}
+                          </td>
+                          <td className={`px-4 py-3 text-sm ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                            {field.name}
+                          </td>
+                          <td className="px-4 py-3">
+                            {field.editable ? (
+                              <input
+                                type="text"
+                                value={field.value}
+                                onChange={(e) => updateMsgGenField(i, e.target.value)}
+                                className={`w-full rounded-lg border px-3 py-1.5 text-sm ${
+                                  isDarkMode 
+                                    ? "border-[#1e4976] bg-[#0a1628] text-white focus:border-[#00e5ff]" 
+                                    : "border-[#e2e8f0] bg-white text-[#0a1628] focus:border-[#0a1628]"
+                                }`}
+                              />
+                            ) : (
+                              <span className={`font-mono text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
+                                {field.value}
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                              field.editable 
+                                ? "bg-[#4caf50]/20 text-[#4caf50]" 
                             : isDarkMode ? "bg-[#1e4976] text-[#64b5f6]" : "bg-[#e2e8f0] text-[#64748b]"
                         }`}>
                           {field.editable ? "Editable" : "Fixed"}
@@ -2892,20 +2892,20 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                       </td>
                     </tr>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                    </tbody>
+                  </table>
+                </div>
 
-            <div className="mt-6 flex justify-end gap-3">
-              <Button variant="secondary" onClick={() => setMsgGenStep(2)}>
-                Back to Message Type
-              </Button>
-              <Button variant="primary" onClick={generateFinalMessage}>
-                <MessageSquare className="mr-2 h-4 w-4" />
-                Generate FIX Message
-              </Button>
-            </div>
-          </Card>
+                <div className="mt-6 flex justify-end gap-3">
+                  <Button variant="secondary" onClick={() => setMsgGenStep(2)}>
+                    Back to Message Type
+                  </Button>
+                  <Button variant="primary" onClick={generateFinalMessage}>
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    Generate FIX Message
+                  </Button>
+                </div>
+              </Card>
 
           {/* Generated Output */}
           {msgGenOutput && (
@@ -2951,7 +2951,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
               </p>
             </Card>
           )}
-            </div>
+          </div>
           )}
         </div>
 
