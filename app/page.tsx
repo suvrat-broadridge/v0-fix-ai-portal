@@ -102,6 +102,20 @@ interface AnalysisResult {
   unsupportedValues: { msgType: string; tag: string; value: string }[]
 }
 
+interface SpecCompareResult {
+  compatible: boolean
+  msgTypeDiffs: {
+    spec1Only: string[]
+    spec2Only: string[]
+  }
+  tagDiffs: {
+    spec1Missing: { msgType: string; msgName: string; tags: string[] }[]
+    spec2Missing: { msgType: string; msgName: string; tags: string[] }[]
+  }
+  valueDiffs: { msgType: string; tag: string; tagName: string; spec1Values: string[]; spec2Values: string[] }[]
+  otherDiffs: { category: string; description: string; spec1: string; spec2: string }[]
+}
+
 export default function FixAIPortal() {
   const [currentScreen, setCurrentScreen] = useState<Screen>("home")
   const [showLoginModal, setShowLoginModal] = useState(false)
@@ -146,7 +160,7 @@ export default function FixAIPortal() {
   // Spec Compare state
   const [spec1File, setSpec1File] = useState<string | null>(null)
   const [spec2File, setSpec2File] = useState<string | null>(null)
-  const [specCompareResults, setSpecCompareResults] = useState<{differences: string[], compatible: boolean} | null>(null)
+  const [specCompareResults, setSpecCompareResults] = useState<SpecCompareResult | null>(null)
   const [selectedSpecMsgType, setSelectedSpecMsgType] = useState<string | null>(null)
 
   // Log Analysis state
@@ -329,18 +343,45 @@ export default function FixAIPortal() {
 
   const performSpecCompare = () => {
     if (spec1File && spec2File) {
-      // Simulated comparison results
-      const results = {
+      // Simulated comprehensive comparison results
+      const results: SpecCompareResult = {
         compatible: false,
-        differences: [
-          "Tag 9999 present in Spec 1 but not in Spec 2",
-          "MsgType 'AE' has different required fields",
-          "Value 'X' for tag 54 not supported in Spec 2",
-          "Repeating group 453 has different structure",
+        msgTypeDiffs: {
+          spec1Only: ["G4 - Custom Mass Quote", "G5 - Custom Quote Cancel", "AE - Trade Capture Report"],
+          spec2Only: ["A3 - Custom Logon Ext", "A9 - Custom Session Status", "BE - User Request"],
+        },
+        tagDiffs: {
+          spec1Missing: [
+            { msgType: "D", msgName: "New Order Single", tags: ["345", "457", "9656", "847"] },
+            { msgType: "G", msgName: "Order Cancel/Replace", tags: ["46", "67", "242", "9001"] },
+            { msgType: "8", msgName: "Execution Report", tags: ["1057", "1058", "9003"] },
+          ],
+          spec2Missing: [
+            { msgType: "D", msgName: "New Order Single", tags: ["89", "532", "843", "9999"] },
+            { msgType: "G", msgName: "Order Cancel/Replace", tags: ["89", "532", "138", "843", "9998"] },
+            { msgType: "F", msgName: "Order Cancel Request", tags: ["9997", "847"] },
+          ],
+        },
+        valueDiffs: [
+          { msgType: "D", tag: "54", tagName: "Side", spec1Values: ["1", "2", "5", "6"], spec2Values: ["1", "2", "3", "4", "5", "6"] },
+          { msgType: "D", tag: "40", tagName: "OrdType", spec1Values: ["1", "2", "3", "4"], spec2Values: ["1", "2", "P", "K"] },
+          { msgType: "8", tag: "39", tagName: "OrdStatus", spec1Values: ["0", "1", "2", "4", "8"], spec2Values: ["0", "1", "2", "4", "8", "C", "E"] },
+          { msgType: "8", tag: "150", tagName: "ExecType", spec1Values: ["0", "F", "4", "5"], spec2Values: ["0", "F", "4", "5", "H", "I"] },
+        ],
+        otherDiffs: [
+          { category: "Data Type", description: "Tag 44 (Price)", spec1: "Price (decimal)", spec2: "Float" },
+          { category: "Required/Optional", description: "Tag 11 (ClOrdID) in MsgType D", spec1: "Required", spec2: "Optional" },
+          { category: "Required/Optional", description: "Tag 60 (TransactTime) in MsgType 8", spec1: "Optional", spec2: "Required" },
+          { category: "Conditional", description: "Tag 99 (StopPx) in MsgType D", spec1: "Required when OrdType=3,4", spec2: "Required when OrdType=3" },
+          { category: "Group Structure", description: "Repeating Group 453 (NoPartyIDs)", spec1: "Max 4 parties", spec2: "Max 10 parties" },
+          { category: "Field Length", description: "Tag 11 (ClOrdID)", spec1: "Max 20 chars", spec2: "Max 32 chars" },
         ],
       }
       setSpecCompareResults(results)
-      addHistoryEntry("Spec Comparison", results.compatible ? "success" : "warning", `${results.differences.length} differences found`)
+      const totalDiffs = results.msgTypeDiffs.spec1Only.length + results.msgTypeDiffs.spec2Only.length + 
+                         results.tagDiffs.spec1Missing.length + results.tagDiffs.spec2Missing.length +
+                         results.valueDiffs.length + results.otherDiffs.length
+      addHistoryEntry("Spec Comparison", results.compatible ? "success" : "warning", `${totalDiffs} differences found`)
       if (!results.compatible) {
         addAlert("warning", "Spec compatibility issues detected")
       }
@@ -1634,104 +1675,273 @@ export default function FixAIPortal() {
             </Card>
             <Card className="p-4">
               <div className="flex items-center gap-3">
-                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#f44336]/20`}>
-                  <Minus className="h-6 w-6 text-[#f44336]" />
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#f57c00]/20`}>
+                  <MessageSquare className="h-6 w-6 text-[#f57c00]" />
                 </div>
                 <div>
                   <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                    {Math.floor(specCompareResults.differences.length / 3)}
+                    {specCompareResults.msgTypeDiffs.spec1Only.length + specCompareResults.msgTypeDiffs.spec2Only.length}
                   </p>
-                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Removed</p>
+                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>MsgType Diffs</p>
                 </div>
               </div>
             </Card>
             <Card className="p-4">
               <div className="flex items-center gap-3">
-                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#4caf50]/20`}>
-                  <Plus className="h-6 w-6 text-[#4caf50]" />
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#00e5ff]/20`}>
+                  <FileText className="h-6 w-6 text-[#00e5ff]" />
                 </div>
                 <div>
                   <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                    {Math.floor(specCompareResults.differences.length / 3)}
+                    {specCompareResults.tagDiffs.spec1Missing.length + specCompareResults.tagDiffs.spec2Missing.length}
                   </p>
-                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Added</p>
+                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Tag Diffs</p>
                 </div>
               </div>
             </Card>
             <Card className="p-4">
               <div className="flex items-center gap-3">
                 <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#ffc107]/20`}>
-                  <RefreshCw className="h-6 w-6 text-[#ffc107]" />
+                  <Settings className="h-6 w-6 text-[#ffc107]" />
                 </div>
                 <div>
                   <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                    {specCompareResults.differences.length - Math.floor(specCompareResults.differences.length / 3) * 2}
+                    {specCompareResults.valueDiffs.length + specCompareResults.otherDiffs.length}
                   </p>
-                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Modified</p>
+                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Other Diffs</p>
                 </div>
               </div>
             </Card>
           </div>
 
-          {/* Diff View with Filter */}
+          {/* Module 1: Message Type Differences */}
           <Card className="p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className={`flex items-center gap-2 font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                <GitCompare className="h-5 w-5" />
-                Differences ({specCompareResults.differences.length})
-              </h3>
-              <div className="flex items-center gap-3">
-                <select
-                  className={`rounded-xl border px-4 py-2 text-sm ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
-                  value={selectedSpecMsgType || ""}
-                  onChange={(e) => setSelectedSpecMsgType(e.target.value)}
-                >
-                  <option value="">All Changes</option>
-                  <option value="added">Added Only</option>
-                  <option value="removed">Removed Only</option>
-                  <option value="modified">Modified Only</option>
-                </select>
-                <select
-                  className={`rounded-xl border px-4 py-2 text-sm ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
-                >
-                  <option value="">All Message Types</option>
-                  {msgTypes.map((type) => (
-                    <option key={type.code} value={type.code}>MsgType {type.code} - {type.name}</option>
+            <h3 className={`mb-4 flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#f57c00]" : "text-[#e65100]"}`}>
+              <MessageSquare className="h-5 w-5" />
+              1. Message Type Differences
+            </h3>
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              {/* Spec 1 Only */}
+              <div className={`rounded-xl border p-4 ${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#fef2f2]"}`}>
+                <div className="mb-3 flex items-center justify-between">
+                  <span className={`text-sm font-semibold ${isDarkMode ? "text-[#f44336]" : "text-[#d32f2f]"}`}>
+                    In Spec 1, NOT in Spec 2
+                  </span>
+                  <span className="rounded-full bg-[#f44336]/20 px-2 py-0.5 text-xs font-medium text-[#f44336]">
+                    {specCompareResults.msgTypeDiffs.spec1Only.length}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {specCompareResults.msgTypeDiffs.spec1Only.map((msg, i) => (
+                    <div key={i} className={`flex items-center gap-2 rounded-lg px-3 py-2 ${isDarkMode ? "bg-[#f44336]/10" : "bg-white"}`}>
+                      <Minus className="h-4 w-4 text-[#f44336]" />
+                      <span className={`text-sm ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{msg}</span>
+                    </div>
                   ))}
-                </select>
+                </div>
+              </div>
+              {/* Spec 2 Only */}
+              <div className={`rounded-xl border p-4 ${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#f0fdf4]"}`}>
+                <div className="mb-3 flex items-center justify-between">
+                  <span className={`text-sm font-semibold ${isDarkMode ? "text-[#4caf50]" : "text-[#388e3c]"}`}>
+                    In Spec 2, NOT in Spec 1
+                  </span>
+                  <span className="rounded-full bg-[#4caf50]/20 px-2 py-0.5 text-xs font-medium text-[#4caf50]">
+                    {specCompareResults.msgTypeDiffs.spec2Only.length}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {specCompareResults.msgTypeDiffs.spec2Only.map((msg, i) => (
+                    <div key={i} className={`flex items-center gap-2 rounded-lg px-3 py-2 ${isDarkMode ? "bg-[#4caf50]/10" : "bg-white"}`}>
+                      <Plus className="h-4 w-4 text-[#4caf50]" />
+                      <span className={`text-sm ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{msg}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
+          </Card>
 
-            {/* Visual Diff List */}
-            <div className="space-y-2">
-              {specCompareResults.differences.map((diff, i) => {
-                const diffType = i % 3 === 0 ? "removed" : i % 3 === 1 ? "added" : "modified"
-                const colors = {
-                  removed: { bg: isDarkMode ? "bg-[#f44336]/10" : "bg-[#fef2f2]", border: "border-l-[#f44336]", icon: Minus, iconColor: "text-[#f44336]" },
-                  added: { bg: isDarkMode ? "bg-[#4caf50]/10" : "bg-[#f0fdf4]", border: "border-l-[#4caf50]", icon: Plus, iconColor: "text-[#4caf50]" },
-                  modified: { bg: isDarkMode ? "bg-[#ffc107]/10" : "bg-[#fffbeb]", border: "border-l-[#ffc107]", icon: RefreshCw, iconColor: "text-[#ffc107]" },
-                }
-                const style = colors[diffType]
-                const Icon = style.icon
-                
-                return (
-                  <div key={i} className={`flex items-start gap-3 rounded-lg border-l-4 px-4 py-3 ${style.bg} ${style.border}`}>
-                    <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded ${style.bg}`}>
-                      <Icon className={`h-4 w-4 ${style.iconColor}`} />
-                    </div>
-                    <div className="flex-1">
-                      <span className={isDarkMode ? "text-[#90caf9]" : "text-[#0a1628]"}>{diff}</span>
-                    </div>
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${
-                      diffType === "removed" ? "bg-[#f44336]/20 text-[#f44336]" :
-                      diffType === "added" ? "bg-[#4caf50]/20 text-[#4caf50]" :
-                      "bg-[#ffc107]/20 text-[#ffc107]"
-                    }`}>
-                      {diffType}
-                    </span>
-                  </div>
-                )
-              })}
+          {/* Module 2: Message Tag Differences */}
+          <Card className="p-5">
+            <h3 className={`mb-4 flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#00e5ff]" : "text-[#0097a7]"}`}>
+              <FileText className="h-5 w-5" />
+              2. Message Tag Differences
+            </h3>
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              {/* Tags in Spec 1 missing from Spec 2 */}
+              <div className={`rounded-xl border p-4 ${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#fef2f2]"}`}>
+                <div className="mb-3">
+                  <span className={`text-sm font-semibold ${isDarkMode ? "text-[#f44336]" : "text-[#d32f2f]"}`}>
+                    Tags in Spec 1, missing from Spec 2
+                  </span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className={`border-b ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
+                        <th className={`px-3 py-2 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Message Type</th>
+                        <th className={`px-3 py-2 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Missing Tags</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {specCompareResults.tagDiffs.spec2Missing.map((item, i) => (
+                        <tr key={i} className={`border-b ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
+                          <td className={`px-3 py-2 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                            <span className={`rounded px-2 py-0.5 text-xs font-medium ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                              {item.msgType}
+                            </span>
+                            <span className={`ml-2 text-xs ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>{item.msgName}</span>
+                          </td>
+                          <td className="px-3 py-2">
+                            <div className="flex flex-wrap gap-1">
+                              {item.tags.map((tag, j) => (
+                                <span key={j} className="rounded bg-[#f44336]/20 px-2 py-0.5 text-xs font-mono text-[#f44336]">{tag}</span>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {/* Tags in Spec 2 missing from Spec 1 */}
+              <div className={`rounded-xl border p-4 ${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#f0fdf4]"}`}>
+                <div className="mb-3">
+                  <span className={`text-sm font-semibold ${isDarkMode ? "text-[#4caf50]" : "text-[#388e3c]"}`}>
+                    Tags in Spec 2, missing from Spec 1
+                  </span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className={`border-b ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
+                        <th className={`px-3 py-2 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Message Type</th>
+                        <th className={`px-3 py-2 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Missing Tags</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {specCompareResults.tagDiffs.spec1Missing.map((item, i) => (
+                        <tr key={i} className={`border-b ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
+                          <td className={`px-3 py-2 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                            <span className={`rounded px-2 py-0.5 text-xs font-medium ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                              {item.msgType}
+                            </span>
+                            <span className={`ml-2 text-xs ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>{item.msgName}</span>
+                          </td>
+                          <td className="px-3 py-2">
+                            <div className="flex flex-wrap gap-1">
+                              {item.tags.map((tag, j) => (
+                                <span key={j} className="rounded bg-[#4caf50]/20 px-2 py-0.5 text-xs font-mono text-[#4caf50]">{tag}</span>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Module 3: Supported Values Differences */}
+          <Card className="p-5">
+            <h3 className={`mb-4 flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]"}`}>
+              <RefreshCw className="h-5 w-5" />
+              3. Supported Values Differences
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className={isDarkMode ? "bg-[#0d1f3c]" : "bg-[#f8fafc]"}>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>MsgType</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Tag</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Field Name</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Spec 1 Values</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Spec 2 Values</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {specCompareResults.valueDiffs.map((item, i) => (
+                    <tr key={i} className={`border-t ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"} ${i % 2 === 0 ? (isDarkMode ? "bg-[#0f2847]" : "bg-white") : (isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]")}`}>
+                      <td className={`px-4 py-3 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                        <span className={`rounded px-2 py-0.5 text-xs font-medium ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>{item.msgType}</span>
+                      </td>
+                      <td className={`px-4 py-3 font-mono text-sm ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`}>{item.tag}</td>
+                      <td className={`px-4 py-3 text-sm ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{item.tagName}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap gap-1">
+                          {item.spec1Values.map((v, j) => (
+                            <span key={j} className={`rounded px-2 py-0.5 text-xs font-mono ${
+                              item.spec2Values.includes(v) 
+                                ? isDarkMode ? "bg-[#1e4976] text-[#90caf9]" : "bg-[#e2e8f0] text-[#64748b]"
+                                : "bg-[#f44336]/20 text-[#f44336]"
+                            }`}>{v}</span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap gap-1">
+                          {item.spec2Values.map((v, j) => (
+                            <span key={j} className={`rounded px-2 py-0.5 text-xs font-mono ${
+                              item.spec1Values.includes(v) 
+                                ? isDarkMode ? "bg-[#1e4976] text-[#90caf9]" : "bg-[#e2e8f0] text-[#64748b]"
+                                : "bg-[#4caf50]/20 text-[#4caf50]"
+                            }`}>{v}</span>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className={`mt-3 text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+              Red = Only in Spec 1 | Green = Only in Spec 2 | Gray = Common to both
+            </p>
+          </Card>
+
+          {/* Module 4: Other Differences */}
+          <Card className="p-5">
+            <h3 className={`mb-4 flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#ce93d8]" : "text-[#7b1fa2]"}`}>
+              <Settings className="h-5 w-5" />
+              4. Other Differences (Data Type, Required/Optional, Conditional, Structure)
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className={isDarkMode ? "bg-[#0d1f3c]" : "bg-[#f8fafc]"}>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Category</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Description</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Spec 1</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Spec 2</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {specCompareResults.otherDiffs.map((item, i) => (
+                    <tr key={i} className={`border-t ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"} ${i % 2 === 0 ? (isDarkMode ? "bg-[#0f2847]" : "bg-white") : (isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]")}`}>
+                      <td className="px-4 py-3">
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                          item.category === "Data Type" ? "bg-[#9c27b0]/20 text-[#9c27b0]" :
+                          item.category === "Required/Optional" ? "bg-[#ff5722]/20 text-[#ff5722]" :
+                          item.category === "Conditional" ? "bg-[#00bcd4]/20 text-[#00bcd4]" :
+                          item.category === "Group Structure" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                          "bg-[#ffc107]/20 text-[#ffc107]"
+                        }`}>{item.category}</span>
+                      </td>
+                      <td className={`px-4 py-3 text-sm ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{item.description}</td>
+                      <td className={`px-4 py-3 text-sm ${isDarkMode ? "text-[#f44336]" : "text-[#d32f2f]"}`}>
+                        <span className={`rounded px-2 py-0.5 ${isDarkMode ? "bg-[#f44336]/10" : "bg-[#fef2f2]"}`}>{item.spec1}</span>
+                      </td>
+                      <td className={`px-4 py-3 text-sm ${isDarkMode ? "text-[#4caf50]" : "text-[#388e3c]"}`}>
+                        <span className={`rounded px-2 py-0.5 ${isDarkMode ? "bg-[#4caf50]/10" : "bg-[#f0fdf4]"}`}>{item.spec2}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </Card>
         </div>
@@ -2336,11 +2546,23 @@ export default function FixAIPortal() {
       )}
 
       {/* Continue Button for Step 1 */}
-      {msgGenStep === 1 && (msgGenSpecFile || msgGenLogFile) && (
-        <div className="mt-6 flex justify-center">
-          <Button variant="primary" onClick={() => setMsgGenStep(2)}>
-            Continue to Message Selection
-            <ChevronRight className="ml-2 h-4 w-4" />
+      {msgGenStep === 1 && (
+        <div className="mt-6 flex justify-center gap-4">
+          {(msgGenSpecFile || msgGenLogFile) && (
+            <Button variant="primary" onClick={() => setMsgGenStep(2)}>
+              Continue to Message Selection
+              <ChevronRight className="ml-2 h-4 w-4" />
+            </Button>
+          )}
+          <Button 
+            variant="ghost" 
+            onClick={() => {
+              setMsgGenSpecFile("FIX44_Sample.xml")
+              setMsgGenStep(2)
+            }}
+          >
+            <Play className="mr-1 h-4 w-4" />
+            Try Sample
           </Button>
         </div>
       )}
@@ -2504,7 +2726,7 @@ export default function FixAIPortal() {
 
   // Admin Sidebar Items - with accent colors from Broadridge palette
   const adminSidebarItems: SidebarItem[] = [
-  { icon: LayoutDashboard, label: "Dashboard", id: "dashboard", iconColor: isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]" },
+  { icon: LayoutDashboard, label: "FIX Dashboard", id: "dashboard", iconColor: isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]" },
   { icon: GitCompare, label: "Spec Compare", id: "spec-compare", iconColor: isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]" },
   { icon: FileCheck, label: "Log Analysis", id: "log-analysis", iconColor: isDarkMode ? "text-[#4caf50]" : "text-[#388e3c]" },
   { icon: MessageSquare, label: "Message Generator", id: "msg-generator", iconColor: isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]" },
@@ -2518,7 +2740,7 @@ export default function FixAIPortal() {
 
   // Client Sidebar Items - with accent colors
   const clientSidebarItems: SidebarItem[] = [
-  { icon: LayoutDashboard, label: "Dashboard", id: "dashboard", iconColor: isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]" },
+  { icon: LayoutDashboard, label: "FIX Dashboard", id: "dashboard", iconColor: isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]" },
   { icon: Upload, label: "Upload Specs", id: "upload", iconColor: isDarkMode ? "text-[#4caf50]" : "text-[#388e3c]" },
   { icon: Download, label: "Download Specs", id: "download", iconColor: isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]" },
   { icon: MessageSquare, label: "Generate Message", id: "msg-generator", iconColor: isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]" },
@@ -2777,8 +2999,18 @@ export default function FixAIPortal() {
           }`}
         >
           <div>
-<h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>FIX Protocol Dashboard</h1>
-  <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Manage, Test & Analyze FIX Messages</p>
+<h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+    {activeSidebarItem === "dashboard" ? "FIX Dashboard" :
+     activeSidebarItem === "spec-compare" ? "Spec Compare" :
+     activeSidebarItem === "log-analysis" ? "Log Analysis" :
+     activeSidebarItem === "msg-generator" ? "Message Generator" :
+     activeSidebarItem === "test-cases" ? "Test Cases" :
+     activeSidebarItem === "clients" ? "Clients" :
+     activeSidebarItem === "history" ? "History" :
+     activeSidebarItem === "alerts" ? "Alerts" :
+     activeSidebarItem === "settings" ? "Settings" :
+     activeSidebarItem === "help" ? "Help" : "FIX Dashboard"}
+  </h1>
           </div>
           <div className="flex items-center gap-3">
             <TabBar />
