@@ -33,6 +33,7 @@ import {
   Plus,
   Minus,
   LayoutDashboard,
+  FileUp,
 } from "lucide-react"
 
 type Screen = "home" | "admin-tools" | "client-tools"
