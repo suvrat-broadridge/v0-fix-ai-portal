@@ -84,10 +84,10 @@ interface Client {
     specComparison: "done" | "progress" | "pending" | "error"
     logComparison: "done" | "progress" | "pending" | "error"
     testCaseGeneration: "done" | "progress" | "pending" | "error"
-    conductorConnectivity: "connected" | "not-connected" | "error"
-    verifixConnectivity: "licensed" | "not-licensed" | "pending"
-    ulTestCases: "generated" | "pending" | "error"
-    ulTestCasesCount?: number
+    certificationCaseGeneration: "done" | "progress" | "pending" | "error"
+    configurationGeneration: "done" | "progress" | "pending" | "error"
+    alerts: "generated" | "pending" | "error"
+    alertsCount?: number
   }
 }
 
@@ -222,13 +222,13 @@ export default function FixAIPortal() {
 
   // Clients state
   const [clients, setClients] = useState<Client[]>([
-    { id: "C001", name: "BlackRock", specs: 12, lastActivity: "2025-03-02 10:30", status: "active", progress: { specComparison: "done", logComparison: "progress", testCaseGeneration: "done", conductorConnectivity: "connected", verifixConnectivity: "licensed", ulTestCases: "generated", ulTestCasesCount: 45 } },
-    { id: "C002", name: "Goldman Sachs", specs: 8, lastActivity: "2025-03-02 09:45", status: "active", progress: { specComparison: "done", logComparison: "done", testCaseGeneration: "progress", conductorConnectivity: "connected", verifixConnectivity: "not-licensed", ulTestCases: "pending" } },
-    { id: "C003", name: "JP Morgan", specs: 15, lastActivity: "2025-03-02 10:15", status: "active", progress: { specComparison: "progress", logComparison: "pending", testCaseGeneration: "pending", conductorConnectivity: "not-connected", verifixConnectivity: "pending", ulTestCases: "pending" } },
-    { id: "C004", name: "UBS", specs: 6, lastActivity: "2025-03-01 16:30", status: "inactive", progress: { specComparison: "done", logComparison: "done", testCaseGeneration: "done", conductorConnectivity: "connected", verifixConnectivity: "licensed", ulTestCases: "generated", ulTestCasesCount: 32 } },
-    { id: "C005", name: "Raymond James", specs: 4, lastActivity: "2025-03-02 08:00", status: "active", progress: { specComparison: "done", logComparison: "error", testCaseGeneration: "pending", conductorConnectivity: "error", verifixConnectivity: "not-licensed", ulTestCases: "error" } },
-    { id: "C006", name: "HSBC", specs: 9, lastActivity: "2025-03-02 10:00", status: "active", progress: { specComparison: "done", logComparison: "done", testCaseGeneration: "progress", conductorConnectivity: "connected", verifixConnectivity: "licensed", ulTestCases: "generated", ulTestCasesCount: 28 } },
-    { id: "C007", name: "Bank of America", specs: 11, lastActivity: "2025-03-01 14:20", status: "inactive", progress: { specComparison: "error", logComparison: "pending", testCaseGeneration: "pending", conductorConnectivity: "not-connected", verifixConnectivity: "pending", ulTestCases: "pending" } },
+    { id: "C001", name: "BlackRock", specs: 12, lastActivity: "2025-03-02 10:30", status: "active", progress: { specComparison: "done", logComparison: "progress", testCaseGeneration: "done", certificationCaseGeneration: "done", configurationGeneration: "done", alerts: "generated", alertsCount: 45 } },
+    { id: "C002", name: "Goldman Sachs", specs: 8, lastActivity: "2025-03-02 09:45", status: "active", progress: { specComparison: "done", logComparison: "done", testCaseGeneration: "progress", certificationCaseGeneration: "progress", configurationGeneration: "pending", alerts: "pending" } },
+    { id: "C003", name: "JP Morgan", specs: 15, lastActivity: "2025-03-02 10:15", status: "active", progress: { specComparison: "progress", logComparison: "pending", testCaseGeneration: "pending", certificationCaseGeneration: "pending", configurationGeneration: "pending", alerts: "pending" } },
+    { id: "C004", name: "UBS", specs: 6, lastActivity: "2025-03-01 16:30", status: "inactive", progress: { specComparison: "done", logComparison: "done", testCaseGeneration: "done", certificationCaseGeneration: "done", configurationGeneration: "done", alerts: "generated", alertsCount: 32 } },
+    { id: "C005", name: "Raymond James", specs: 4, lastActivity: "2025-03-02 08:00", status: "active", progress: { specComparison: "done", logComparison: "error", testCaseGeneration: "pending", certificationCaseGeneration: "error", configurationGeneration: "error", alerts: "error" } },
+    { id: "C006", name: "HSBC", specs: 9, lastActivity: "2025-03-02 10:00", status: "active", progress: { specComparison: "done", logComparison: "done", testCaseGeneration: "progress", certificationCaseGeneration: "done", configurationGeneration: "progress", alerts: "generated", alertsCount: 28 } },
+    { id: "C007", name: "Bank of America", specs: 11, lastActivity: "2025-03-01 14:20", status: "inactive", progress: { specComparison: "error", logComparison: "pending", testCaseGeneration: "pending", certificationCaseGeneration: "pending", configurationGeneration: "pending", alerts: "pending" } },
   ])
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const [clientSortBy, setClientSortBy] = useState<"name" | "progress" | "status">("name")
@@ -833,9 +833,9 @@ export default function FixAIPortal() {
     if (client.progress.specComparison === "done") count++
     if (client.progress.logComparison === "done") count++
     if (client.progress.testCaseGeneration === "done") count++
-    if (client.progress.conductorConnectivity === "connected") count++
-    if (client.progress.verifixConnectivity === "licensed") count++
-    if (client.progress.ulTestCases === "generated") count++
+    if (client.progress.certificationCaseGeneration === "done") count++
+    if (client.progress.configurationGeneration === "done") count++
+    if (client.progress.alerts === "generated") count++
     return count
   }
 
@@ -865,7 +865,7 @@ export default function FixAIPortal() {
         specs: 0,
         lastActivity: new Date().toISOString().replace("T", " ").substring(0, 16),
         status: "active",
-        progress: { specComparison: "pending", logComparison: "pending", testCaseGeneration: "pending", conductorConnectivity: "not-connected", verifixConnectivity: "pending", ulTestCases: "pending" }
+        progress: { specComparison: "pending", logComparison: "pending", testCaseGeneration: "pending", certificationCaseGeneration: "pending", configurationGeneration: "pending", alerts: "pending" }
       }
       setClients(prev => [...prev, newClient])
       setNewClientName("")
@@ -1110,18 +1110,18 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                     <ProgressBadge status={selectedClient.progress.testCaseGeneration} />
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Conductor Connectivity</span>
-                    <ConnectivityBadge status={selectedClient.progress.conductorConnectivity} />
+<span className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Certification Case Generation</span>
+  <ProgressBadge status={selectedClient.progress.certificationCaseGeneration} />
+  </div>
+  <div className="flex items-center justify-between">
+  <span className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Configuration Generation</span>
+  <ProgressBadge status={selectedClient.progress.configurationGeneration} />
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Verifix Connectivity</span>
-                    <LicenseBadge status={selectedClient.progress.verifixConnectivity} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>UL Test Cases</span>
-                    <ULTestCasesBadge 
-                      status={selectedClient.progress.ulTestCases} 
-                      count={selectedClient.progress.ulTestCasesCount}
+<span className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Alerts</span>
+  <ULTestCasesBadge
+  status={selectedClient.progress.alerts}
+  count={selectedClient.progress.alertsCount}
                       onClick={() => { setSelectedClient(null); setShowULTestCasesModal(selectedClient); }}
                     />
                   </div>
@@ -2340,9 +2340,9 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
     if (client.progress.specComparison === "done") count++
     if (client.progress.logComparison === "done") count++
     if (client.progress.testCaseGeneration === "done") count++
-    if (client.progress.conductorConnectivity === "connected") count++
-    if (client.progress.verifixConnectivity === "licensed") count++
-    if (client.progress.ulTestCases === "generated") count++
+    if (client.progress.certificationCaseGeneration === "done") count++
+    if (client.progress.configurationGeneration === "done") count++
+    if (client.progress.alerts === "generated") count++
     return count
   }
 
@@ -2411,9 +2411,9 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                   <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>FIX Spec Comparison</th>
                   <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Log Comparison</th>
                   <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Test Case Generation</th>
-                  <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Conductor Connectivity</th>
-                  <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Verifix Connectivity</th>
-                  <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>UL Test Cases</th>
+<th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Certification Case Generation</th>
+  <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Configuration Generation</th>
+  <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Alerts</th>
                 </tr>
               </thead>
               <tbody>
@@ -2440,12 +2440,12 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                     <td className="px-4 py-3"><ProgressBadge status={client.progress.specComparison} /></td>
                     <td className="px-4 py-3"><ProgressBadge status={client.progress.logComparison} /></td>
                     <td className="px-4 py-3"><ProgressBadge status={client.progress.testCaseGeneration} /></td>
-                    <td className="px-4 py-3"><ConnectivityBadge status={client.progress.conductorConnectivity} /></td>
-                    <td className="px-4 py-3"><LicenseBadge status={client.progress.verifixConnectivity} /></td>
+                    <td className="px-4 py-3"><ProgressBadge status={client.progress.certificationCaseGeneration} /></td>
+                    <td className="px-4 py-3"><ProgressBadge status={client.progress.configurationGeneration} /></td>
                     <td className="px-4 py-3">
                       <ULTestCasesBadge 
-                        status={client.progress.ulTestCases} 
-                        count={client.progress.ulTestCasesCount}
+                        status={client.progress.alerts} 
+                        count={client.progress.alertsCount}
                         onClick={() => setShowULTestCasesModal(client)}
                       />
                     </td>
@@ -2471,10 +2471,10 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
             </div>
             <div className={`rounded-xl p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
               <p className={`mb-3 text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
-                Total Test Cases: <span className="font-semibold text-[#4caf50]">{showULTestCasesModal.progress.ulTestCasesCount || 0}</span>
+                Total Alerts: <span className="font-semibold text-[#4caf50]">{showULTestCasesModal.progress.alertsCount || 0}</span>
               </p>
               <div className="space-y-2 max-h-64 overflow-y-auto">
-                {Array.from({ length: Math.min(showULTestCasesModal.progress.ulTestCasesCount || 0, 10) }).map((_, i) => (
+                {Array.from({ length: Math.min(showULTestCasesModal.progress.alertsCount || 0, 10) }).map((_, i) => (
                   <div key={i} className={`flex items-center justify-between rounded-lg p-3 ${isDarkMode ? "bg-[#0d1f3c]" : "bg-white border border-[#e2e8f0]"}`}>
                     <div className="flex items-center gap-3">
                       <TestTube className={`h-4 w-4 ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`} />
@@ -2484,9 +2484,9 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                   </div>
                 ))}
               </div>
-              {(showULTestCasesModal.progress.ulTestCasesCount || 0) > 10 && (
+              {(showULTestCasesModal.progress.alertsCount || 0) > 10 && (
                 <p className={`mt-3 text-center text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
-                  Showing 10 of {showULTestCasesModal.progress.ulTestCasesCount} test cases
+                  Showing 10 of {showULTestCasesModal.progress.alertsCount} alerts
                 </p>
               )}
             </div>
