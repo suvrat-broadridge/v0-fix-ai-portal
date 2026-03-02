@@ -35,6 +35,9 @@ import {
   LayoutDashboard,
   FileUp,
   LogOut,
+  Send,
+  Wifi,
+  Copy,
 } from "lucide-react"
 
 type Screen = "home" | "admin-tools" | "client-tools"
@@ -96,11 +99,7 @@ interface TestCase {
   status: "passed" | "failed" | "pending"
 }
 
-interface AnalysisResult {
-  unsupportedMessages: string[]
-  unsupportedTags: { msgType: string; tags: string[] }[]
-  unsupportedValues: { msgType: string; tag: string; value: string }[]
-}
+
 
 interface SpecCompareResult {
   compatible: boolean
@@ -114,6 +113,19 @@ interface SpecCompareResult {
   }
   valueDiffs: { msgType: string; tag: string; tagName: string; spec1Values: string[]; spec2Values: string[] }[]
   otherDiffs: { category: string; description: string; spec1: string; spec2: string }[]
+}
+
+interface LogAnalysisResult {
+  msgTypeDiffs: {
+    logOnly: string[]
+    specOnly: string[]
+  }
+  tagDiffs: {
+    logOnly: { msgType: string; msgName: string; tags: string[] }[]
+    specOnly: { msgType: string; msgName: string; tags: string[] }[]
+  }
+  valueDiffs: { msgType: string; tag: string; tagName: string; logValue: string; specValues: string[] }[]
+  otherIssues: { category: string; description: string; logValue: string; specExpected: string }[]
 }
 
 export default function FixAIPortal() {
@@ -157,6 +169,16 @@ export default function FixAIPortal() {
   const [msgGenFields, setMsgGenFields] = useState<{tag: string; name: string; value: string; editable: boolean}[]>([])
   const [msgGenOutput, setMsgGenOutput] = useState<string | null>(null)
 
+  // Quick Sender state
+  const [quickSenderHost, setQuickSenderHost] = useState("")
+  const [quickSenderPort, setQuickSenderPort] = useState("")
+  const [quickSenderCompID, setQuickSenderCompID] = useState("")
+  const [quickTargetCompID, setQuickTargetCompID] = useState("")
+  const [quickSenderCustomTags, setQuickSenderCustomTags] = useState<{tag: string; value: string}[]>([{tag: "", value: ""}])
+  const [quickSenderConnected, setQuickSenderConnected] = useState(false)
+  const [quickSenderStatus, setQuickSenderStatus] = useState<"disconnected" | "connecting" | "connected">("disconnected")
+  const [quickSenderLogs, setQuickSenderLogs] = useState<{time: string; direction: "out" | "in"; message: string}[]>([])
+
   // Spec Compare state
   const [spec1File, setSpec1File] = useState<string | null>(null)
   const [spec2File, setSpec2File] = useState<string | null>(null)
@@ -166,7 +188,7 @@ export default function FixAIPortal() {
   // Log Analysis state
   const [logFile, setLogFile] = useState<string | null>(null)
   const [logSpecFile, setLogSpecFile] = useState<string | null>(null)
-  const [analysisResults, setAnalysisResults] = useState<AnalysisResult | null>(null)
+  const [analysisResults, setAnalysisResults] = useState<LogAnalysisResult | null>(null)
   const [selectedAnalysisMsgType, setSelectedAnalysisMsgType] = useState<string | null>(null)
 
   // Test Cases state
@@ -390,22 +412,40 @@ export default function FixAIPortal() {
 
   const performLogAnalysis = () => {
     if (logFile && logSpecFile) {
-      // Simulated analysis results
-      const results: AnalysisResult = {
-        unsupportedMessages: ["AE - Trade Capture Report", "AJ - Quote Request Reject"],
-        unsupportedTags: [
-          { msgType: "D", tags: ["9999", "9998"] },
-          { msgType: "8", tags: ["10001"] },
-          { msgType: "F", tags: ["9997"] },
+      // Simulated comprehensive analysis results
+      const results: LogAnalysisResult = {
+        msgTypeDiffs: {
+          logOnly: ["AE - Trade Capture Report", "AJ - Quote Request Reject", "BG - Trading Session Status"],
+          specOnly: ["V - Market Data Request", "W - Market Data Snapshot", "X - Market Data Incremental"],
+        },
+        tagDiffs: {
+          logOnly: [
+            { msgType: "D", msgName: "New Order Single", tags: ["9999", "9998", "5001", "5002"] },
+            { msgType: "8", msgName: "Execution Report", tags: ["10001", "10002"] },
+            { msgType: "F", msgName: "Order Cancel Request", tags: ["9997"] },
+          ],
+          specOnly: [
+            { msgType: "D", msgName: "New Order Single", tags: ["528", "529", "582"] },
+            { msgType: "8", msgName: "Execution Report", tags: ["1057", "1058", "1059"] },
+            { msgType: "G", msgName: "Order Cancel/Replace", tags: ["586", "587"] },
+          ],
+        },
+        valueDiffs: [
+          { msgType: "D", tag: "54", tagName: "Side", logValue: "X", specValues: ["1", "2", "5", "6"] },
+          { msgType: "8", tag: "39", tagName: "OrdStatus", logValue: "Z", specValues: ["0", "1", "2", "4", "8"] },
+          { msgType: "D", tag: "40", tagName: "OrdType", logValue: "9", specValues: ["1", "2", "3", "4"] },
+          { msgType: "8", tag: "150", tagName: "ExecType", logValue: "Q", specValues: ["0", "F", "4", "5"] },
         ],
-        unsupportedValues: [
-          { msgType: "D", tag: "54", value: "X" },
-          { msgType: "8", tag: "39", value: "Z" },
-          { msgType: "D", tag: "40", value: "9" },
+        otherIssues: [
+          { category: "Data Type", description: "Tag 44 (Price) in MsgType D", logValue: "INVALID", specExpected: "Decimal" },
+          { category: "Field Length", description: "Tag 11 (ClOrdID) in MsgType D", logValue: "35 chars", specExpected: "Max 20 chars" },
+          { category: "Missing Required", description: "Tag 60 (TransactTime) in MsgType D", logValue: "Not Present", specExpected: "Required" },
+          { category: "Format", description: "Tag 52 (SendingTime)", logValue: "2025-03-02", specExpected: "YYYYMMDD-HH:MM:SS.sss" },
         ],
       }
       setAnalysisResults(results)
-      addHistoryEntry("Log Analysis Completed", "success", `Found ${results.unsupportedMessages.length} unsupported messages`)
+      const totalIssues = results.msgTypeDiffs.logOnly.length + results.tagDiffs.logOnly.length + results.valueDiffs.length + results.otherIssues.length
+      addHistoryEntry("Log Analysis Completed", "success", `Found ${totalIssues} discrepancies`)
     }
   }
 
@@ -721,38 +761,46 @@ export default function FixAIPortal() {
     </button>
   )
 
-  // Tab Bar Component
-  const TabBar = () => {
-    const tabs = [
-      { id: "home" as Tab, label: "Home", icon: Home },
-      { id: "projects" as Tab, label: "Projects", icon: FolderOpen },
-      { id: "uploads" as Tab, label: "Uploads", icon: FileUp },
-      { id: "testcase" as Tab, label: "TestCase", icon: TestTube },
-      { id: "settings" as Tab, label: "Settings", icon: Settings },
-    ]
-
-    return (
-      <div className={`flex items-center gap-1 rounded-xl p-1.5 ${isDarkMode ? "bg-[#0d1f3c]" : "bg-[#e2e8f0]"}`}>
-        {tabs.map((tab) => {
-          const Icon = tab.icon
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                activeTab === tab.id
-                  ? isDarkMode
-                    ? "bg-[#00e5ff] text-[#0a1628] shadow-md"
-                    : "bg-white text-[#0a1628] shadow-md"
-                  : isDarkMode
-                    ? "text-[#90caf9] hover:bg-[#1e4976]/50 hover:text-white"
-                    : "text-[#64748b] hover:bg-white/50 hover:text-[#0a1628]"
-              }`}
-            >
-              <Icon className="h-4 w-4" />
-              {tab.label}
-            </button>
-          )
+// Tab Bar Component
+> const TabBar = () => {
+  const tabs = [
+  { id: "home" as Tab, label: "Home", icon: Home, iconColor: isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]" },
+  { id: "projects" as Tab, label: "Projects", icon: FolderOpen, iconColor: isDarkMode ? "text-[#00e5ff]" : "text-[#0097a7]" },
+  { id: "uploads" as Tab, label: "Uploads", icon: FileUp, iconColor: isDarkMode ? "text-[#4caf50]" : "text-[#388e3c]" },
+  { id: "testcase" as Tab, label: "TestCase", icon: TestTube, iconColor: isDarkMode ? "text-[#ce93d8]" : "text-[#7b1fa2]" },
+  { id: "settings" as Tab, label: "Settings", icon: Settings, iconColor: isDarkMode ? "text-[#90a4ae]" : "text-[#546e7a]" },
+  ]
+  
+  const handleTabClick = (tabId: Tab) => {
+  setActiveTab(tabId)
+  // Home tab should navigate to FIX Dashboard
+  if (tabId === "home") {
+  setActiveSidebarItem("dashboard")
+  }
+  }
+  
+  return (
+  <div className={`flex items-center gap-1 rounded-xl p-1.5 ${isDarkMode ? "bg-[#0d1f3c]" : "bg-[#e2e8f0]"}`}>
+  {tabs.map((tab) => {
+  const Icon = tab.icon
+  return (
+  <button
+  key={tab.id}
+  onClick={() => handleTabClick(tab.id)}
+  className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+  activeTab === tab.id
+  ? isDarkMode
+  ? "bg-[#00e5ff] text-[#0a1628] shadow-md"
+  : "bg-white text-[#0a1628] shadow-md"
+  : isDarkMode
+  ? "text-[#90caf9] hover:bg-[#1e4976]/50 hover:text-white"
+  : "text-[#64748b] hover:bg-white/50 hover:text-[#0a1628]"
+  }`}
+  >
+  <Icon className={`h-4 w-4 ${activeTab === tab.id ? "" : tab.iconColor}`} />
+  {tab.label}
+  </button>
+  )
         })}
       </div>
     )
@@ -837,44 +885,44 @@ export default function FixAIPortal() {
     addHistoryEntry("Removed Client", "warning", `Client "${client?.name}" removed`)
   }
 
-  const ProgressBadge = ({ status }: { status: "done" | "progress" | "pending" | "error" }) => {
-    const styles = {
-      done: "bg-[#4caf50]/20 text-[#4caf50]",
-      progress: "bg-[#2196f3]/20 text-[#2196f3]",
-      pending: "bg-[#9e9e9e]/20 text-[#9e9e9e]",
-      error: "bg-[#f44336]/20 text-[#f44336]"
-    }
-    const labels = { done: "Done", progress: "In Progress", pending: "Not Started", error: "Error" }
-    return (
-      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${styles[status]}`}>
-        {labels[status]}
+const ProgressBadge = ({ status }: { status: "done" | "progress" | "pending" | "error" }) => {
+  const styles = {
+  done: isDarkMode ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#e8f5e9] text-[#2e7d32]",
+  progress: isDarkMode ? "bg-[#2196f3]/20 text-[#2196f3]" : "bg-[#e3f2fd] text-[#1565c0]",
+  pending: isDarkMode ? "bg-[#9e9e9e]/20 text-[#9e9e9e]" : "bg-[#f5f5f5] text-[#616161]",
+  error: isDarkMode ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ffebee] text-[#c62828]"
+  }
+  const labels = { done: "Done", progress: "In Progress", pending: "Not Started", error: "Error" }
+  return (
+  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${styles[status]}`}>
+  {labels[status]}
       </span>
     )
   }
 
-  const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" | "error" }) => {
-    const styles = {
-      connected: "bg-[#4caf50]/20 text-[#4caf50]",
-      "not-connected": "bg-[#f57c00]/20 text-[#f57c00]",
-      error: "bg-[#f44336]/20 text-[#f44336]"
-    }
-    const labels = { connected: "Connected", "not-connected": "Not Connected", error: "Error" }
-    return (
-      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${styles[status]}`}>
-        {labels[status]}
-      </span>
+const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" | "error" }) => {
+  const styles = {
+  connected: isDarkMode ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#e8f5e9] text-[#2e7d32]",
+  "not-connected": isDarkMode ? "bg-[#f57c00]/20 text-[#f57c00]" : "bg-[#fff3e0] text-[#e65100]",
+  error: isDarkMode ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ffebee] text-[#c62828]"
+  }
+  const labels = { connected: "Connected", "not-connected": "Not Connected", error: "Error" }
+  return (
+  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${styles[status]}`}>
+  {labels[status]}
+  </span>
     )
   }
 
   const LicenseBadge = ({ status }: { status: "licensed" | "not-licensed" | "pending" }) => {
     const styles = {
-      licensed: "bg-[#4caf50]/20 text-[#4caf50]",
-      "not-licensed": "bg-[#f44336]/20 text-[#f44336]",
-      pending: "bg-[#9e9e9e]/20 text-[#9e9e9e]"
+      licensed: isDarkMode ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#e8f5e9] text-[#2e7d32]",
+      "not-licensed": isDarkMode ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ffebee] text-[#c62828]",
+      pending: isDarkMode ? "bg-[#9e9e9e]/20 text-[#9e9e9e]" : "bg-[#f5f5f5] text-[#616161]"
     }
     const labels = { licensed: "Licensed", "not-licensed": "Not Licensed", pending: "Pending" }
     return (
-      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${styles[status]}`}>
+      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${styles[status]}`}>
         {labels[status]}
       </span>
     )
@@ -882,14 +930,14 @@ export default function FixAIPortal() {
 
   const ULTestCasesBadge = ({ status, count, onClick }: { status: "generated" | "pending" | "error"; count?: number; onClick?: () => void }) => {
     const styles = {
-      generated: "bg-[#4caf50]/20 text-[#4caf50] cursor-pointer hover:bg-[#4caf50]/30",
-      pending: "bg-[#9e9e9e]/20 text-[#9e9e9e]",
-      error: "bg-[#f44336]/20 text-[#f44336]"
+      generated: isDarkMode ? "bg-[#4caf50]/20 text-[#4caf50] cursor-pointer hover:bg-[#4caf50]/30" : "bg-[#e8f5e9] text-[#2e7d32] cursor-pointer hover:bg-[#c8e6c9]",
+      pending: isDarkMode ? "bg-[#9e9e9e]/20 text-[#9e9e9e]" : "bg-[#f5f5f5] text-[#616161]",
+      error: isDarkMode ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ffebee] text-[#c62828]"
     }
     const labels = { generated: `Generated${count ? ` (${count})` : ""}`, pending: "Pending", error: "Error" }
     return (
       <span 
-        className={`rounded-full px-2 py-0.5 text-xs font-medium ${styles[status]}`}
+        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${styles[status]}`}
         onClick={status === "generated" ? onClick : undefined}
       >
         {labels[status]}
@@ -1309,157 +1357,268 @@ export default function FixAIPortal() {
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             <Card className="p-4">
               <div className="flex items-center gap-3">
-                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#f44336]/20`}>
-                  <AlertTriangle className="h-6 w-6 text-[#f44336]" />
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#f57c00]/20`}>
+                  <MessageSquare className="h-6 w-6 text-[#f57c00]" />
                 </div>
                 <div>
                   <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                    {analysisResults.unsupportedMessages.length}
+                    {analysisResults.msgTypeDiffs.logOnly.length + analysisResults.msgTypeDiffs.specOnly.length}
                   </p>
-                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Unsupported Messages</p>
+                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>MsgType Diffs</p>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#00e5ff]/20`}>
+                  <FileText className="h-6 w-6 text-[#00e5ff]" />
+                </div>
+                <div>
+                  <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                    {analysisResults.tagDiffs.logOnly.length + analysisResults.tagDiffs.specOnly.length}
+                  </p>
+                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Tag Diffs</p>
                 </div>
               </div>
             </Card>
             <Card className="p-4">
               <div className="flex items-center gap-3">
                 <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#ffc107]/20`}>
-                  <FileText className="h-6 w-6 text-[#ffc107]" />
+                  <AlertTriangle className="h-6 w-6 text-[#ffc107]" />
                 </div>
                 <div>
                   <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                    {analysisResults.unsupportedTags.reduce((acc, t) => acc + t.tags.length, 0)}
+                    {analysisResults.valueDiffs.length}
                   </p>
-                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Unsupported Tags</p>
+                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Value Diffs</p>
                 </div>
               </div>
             </Card>
             <Card className="p-4">
               <div className="flex items-center gap-3">
-                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#f57c00]/20`}>
-                  <AlertTriangle className="h-6 w-6 text-[#f57c00]" />
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#f44336]/20`}>
+                  <Settings className="h-6 w-6 text-[#f44336]" />
                 </div>
                 <div>
                   <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                    {analysisResults.unsupportedValues.length}
+                    {analysisResults.otherIssues.length}
                   </p>
-                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Invalid Values</p>
-                </div>
-              </div>
-            </Card>
-            <Card className="p-4">
-              <div className="flex items-center gap-3">
-                <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#4caf50]/20`}>
-                  <CheckCircle className="h-6 w-6 text-[#4caf50]" />
-                </div>
-                <div>
-                  <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                    {analysisResults.unsupportedTags.length}
-                  </p>
-                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Message Types Checked</p>
+                  <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Other Issues</p>
                 </div>
               </div>
             </Card>
           </div>
 
-          {/* Unsupported Messages */}
+          {/* Module 1: Message Type Differences */}
           <Card className="p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className={`flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#f44336]" : "text-[#d32f2f]"}`}>
-                <AlertTriangle className="h-5 w-5" />
-                Unsupported Messages
-              </h3>
-              <span className={`rounded-full px-3 py-1 text-xs font-medium ${isDarkMode ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#fef2f2] text-[#d32f2f]"}`}>
-                {analysisResults.unsupportedMessages.length} found
-              </span>
-            </div>
-            <div className="space-y-2">
-              {analysisResults.unsupportedMessages.map((msg, i) => (
-                <div key={i} className={`flex items-center gap-3 rounded-lg px-4 py-3 ${isDarkMode ? "bg-[#f44336]/10" : "bg-[#fef2f2]"}`}>
-                  <div className="flex h-6 w-6 items-center justify-center rounded bg-[#f44336]/20">
-                    <X className="h-4 w-4 text-[#f44336]" />
-                  </div>
-                  <span className={isDarkMode ? "text-[#90caf9]" : "text-[#0a1628]"}>{msg}</span>
+            <h3 className={`mb-4 flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#f57c00]" : "text-[#e65100]"}`}>
+              <MessageSquare className="h-5 w-5" />
+              1. Message Type Differences
+            </h3>
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              {/* In Log, NOT in Spec */}
+              <div className={`rounded-xl border p-4 ${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#fef2f2]"}`}>
+                <div className="mb-3 flex items-center justify-between">
+                  <span className={`text-sm font-semibold ${isDarkMode ? "text-[#f44336]" : "text-[#d32f2f]"}`}>
+                    In Log, NOT in Spec
+                  </span>
+                  <span className="rounded-full bg-[#f44336]/20 px-2 py-0.5 text-xs font-medium text-[#f44336]">
+                    {analysisResults.msgTypeDiffs.logOnly.length}
+                  </span>
                 </div>
-              ))}
+                <div className="space-y-2">
+                  {analysisResults.msgTypeDiffs.logOnly.map((msg, i) => (
+                    <div key={i} className={`flex items-center gap-2 rounded-lg px-3 py-2 ${isDarkMode ? "bg-[#f44336]/10" : "bg-white"}`}>
+                      <Minus className="h-4 w-4 text-[#f44336]" />
+                      <span className={`text-sm ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{msg}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* In Spec, NOT in Log */}
+              <div className={`rounded-xl border p-4 ${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#f0fdf4]"}`}>
+                <div className="mb-3 flex items-center justify-between">
+                  <span className={`text-sm font-semibold ${isDarkMode ? "text-[#4caf50]" : "text-[#388e3c]"}`}>
+                    In Spec, NOT in Log
+                  </span>
+                  <span className="rounded-full bg-[#4caf50]/20 px-2 py-0.5 text-xs font-medium text-[#4caf50]">
+                    {analysisResults.msgTypeDiffs.specOnly.length}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {analysisResults.msgTypeDiffs.specOnly.map((msg, i) => (
+                    <div key={i} className={`flex items-center gap-2 rounded-lg px-3 py-2 ${isDarkMode ? "bg-[#4caf50]/10" : "bg-white"}`}>
+                      <Plus className="h-4 w-4 text-[#4caf50]" />
+                      <span className={`text-sm ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{msg}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </Card>
 
-          {/* Unsupported Tags - Side by Side View */}
+          {/* Module 2: Tag Differences */}
           <Card className="p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className={`flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]"}`}>
-                <AlertTriangle className="h-5 w-5" />
-                Unsupported Tags by Message Type
-              </h3>
-              <select
-                className={`rounded-xl border px-4 py-2 text-sm ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
-                value={selectedAnalysisMsgType || ""}
-                onChange={(e) => setSelectedAnalysisMsgType(e.target.value)}
-              >
-                <option value="">All Message Types</option>
-                {analysisResults.unsupportedTags.map((item) => (
-                  <option key={item.msgType} value={item.msgType}>MsgType {item.msgType}</option>
-                ))}
-              </select>
-            </div>
-            <div className="grid gap-4 lg:grid-cols-2">
-              {analysisResults.unsupportedTags
-                .filter((item) => !selectedAnalysisMsgType || item.msgType === selectedAnalysisMsgType)
-                .map((item, i) => (
-                  <div key={i} className={`rounded-xl border p-4 ${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#fffbeb]"}`}>
-                    <div className="mb-3 flex items-center justify-between">
-                      <span className={`rounded-lg px-3 py-1 text-sm font-semibold ${isDarkMode ? "bg-[#00e5ff]/20 text-[#00e5ff]" : "bg-[#1976d2]/10 text-[#1976d2]"}`}>
-                        MsgType {item.msgType}
-                      </span>
-                      <span className={`text-xs ${isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]"}`}>
-                        {item.tags.length} tags
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {item.tags.map((tag, j) => (
-                        <span key={j} className={`rounded-lg px-2 py-1 text-xs font-medium ${isDarkMode ? "bg-[#ffc107]/20 text-[#ffc107]" : "bg-[#ffc107]/30 text-[#e65100]"}`}>
-                          Tag {tag}
-                        </span>
+            <h3 className={`mb-4 flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#00e5ff]" : "text-[#0097a7]"}`}>
+              <FileText className="h-5 w-5" />
+              2. Tag Differences
+            </h3>
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              {/* Tags in Log, NOT in Spec */}
+              <div className={`rounded-xl border p-4 ${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#fef2f2]"}`}>
+                <div className="mb-3">
+                  <span className={`text-sm font-semibold ${isDarkMode ? "text-[#f44336]" : "text-[#d32f2f]"}`}>
+                    Tags in Log, NOT in Spec
+                  </span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className={`border-b ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
+                        <th className={`px-3 py-2 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Message Type</th>
+                        <th className={`px-3 py-2 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Unknown Tags</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {analysisResults.tagDiffs.logOnly.map((item, i) => (
+                        <tr key={i} className={`border-b ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
+                          <td className={`px-3 py-2 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                            <span className={`rounded px-2 py-0.5 text-xs font-medium ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                              {item.msgType}
+                            </span>
+                            <span className={`ml-2 text-xs ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>{item.msgName}</span>
+                          </td>
+                          <td className="px-3 py-2">
+                            <div className="flex flex-wrap gap-1">
+                              {item.tags.map((tag, j) => (
+                                <span key={j} className="rounded bg-[#f44336]/20 px-2 py-0.5 text-xs font-mono text-[#f44336]">{tag}</span>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
                       ))}
-                    </div>
-                  </div>
-                ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {/* Tags in Spec, NOT in Log */}
+              <div className={`rounded-xl border p-4 ${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#f0fdf4]"}`}>
+                <div className="mb-3">
+                  <span className={`text-sm font-semibold ${isDarkMode ? "text-[#4caf50]" : "text-[#388e3c]"}`}>
+                    Tags in Spec, NOT in Log (Unused)
+                  </span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className={`border-b ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
+                        <th className={`px-3 py-2 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Message Type</th>
+                        <th className={`px-3 py-2 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Unused Tags</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {analysisResults.tagDiffs.specOnly.map((item, i) => (
+                        <tr key={i} className={`border-b ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
+                          <td className={`px-3 py-2 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                            <span className={`rounded px-2 py-0.5 text-xs font-medium ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                              {item.msgType}
+                            </span>
+                            <span className={`ml-2 text-xs ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>{item.msgName}</span>
+                          </td>
+                          <td className="px-3 py-2">
+                            <div className="flex flex-wrap gap-1">
+                              {item.tags.map((tag, j) => (
+                                <span key={j} className="rounded bg-[#4caf50]/20 px-2 py-0.5 text-xs font-mono text-[#4caf50]">{tag}</span>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </Card>
 
-          {/* Unsupported Values - Enhanced Table */}
+          {/* Module 3: Invalid Values */}
           <Card className="p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className={`flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#f57c00]" : "text-[#e65100]"}`}>
-                <AlertTriangle className="h-5 w-5" />
-                Unsupported Values
-              </h3>
-              <span className={`rounded-full px-3 py-1 text-xs font-medium ${isDarkMode ? "bg-[#f57c00]/20 text-[#f57c00]" : "bg-[#fff3e0] text-[#e65100]"}`}>
-                {analysisResults.unsupportedValues.length} found
-              </span>
-            </div>
-            <div className="overflow-hidden rounded-xl border ${isDarkMode ? 'border-[#1e4976]' : 'border-[#e2e8f0]'}">
+            <h3 className={`mb-4 flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]"}`}>
+              <AlertTriangle className="h-5 w-5" />
+              3. Invalid Values (Log vs Spec)
+            </h3>
+            <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className={isDarkMode ? "bg-[#0d1f3c]" : "bg-[#f8fafc]"}>
                     <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>MsgType</th>
                     <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Tag</th>
-                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Invalid Value</th>
-                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Severity</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Field Name</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Log Value</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Spec Allowed Values</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {analysisResults.unsupportedValues.map((item, i) => (
+                  {analysisResults.valueDiffs.map((item, i) => (
                     <tr key={i} className={`border-t ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"} ${i % 2 === 0 ? (isDarkMode ? "bg-[#0f2847]" : "bg-white") : (isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]")}`}>
                       <td className={`px-4 py-3 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
                         <span className={`rounded px-2 py-0.5 text-xs font-medium ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>{item.msgType}</span>
                       </td>
                       <td className={`px-4 py-3 font-mono text-sm ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`}>{item.tag}</td>
-                      <td className={`px-4 py-3 font-mono text-sm ${isDarkMode ? "text-[#f44336]" : "text-[#d32f2f]"}`}>
-                        <span className={`rounded px-2 py-0.5 ${isDarkMode ? "bg-[#f44336]/20" : "bg-[#fef2f2]"}`}>{item.value}</span>
+                      <td className={`px-4 py-3 text-sm ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{item.tagName}</td>
+                      <td className={`px-4 py-3 font-mono text-sm`}>
+                        <span className="rounded bg-[#f44336]/20 px-2 py-0.5 text-[#f44336]">{item.logValue}</span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="rounded-full bg-[#f44336]/20 px-2 py-0.5 text-xs font-medium text-[#f44336]">High</span>
+                        <div className="flex flex-wrap gap-1">
+                          {item.specValues.map((v, j) => (
+                            <span key={j} className={`rounded px-2 py-0.5 text-xs font-mono ${isDarkMode ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#e8f5e9] text-[#2e7d32]"}`}>{v}</span>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className={`mt-3 text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+              Red = Value found in log | Green = Allowed values per spec
+            </p>
+          </Card>
+
+          {/* Module 4: Other Issues */}
+          <Card className="p-5">
+            <h3 className={`mb-4 flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#ce93d8]" : "text-[#7b1fa2]"}`}>
+              <Settings className="h-5 w-5" />
+              4. Other Issues (Data Type, Format, Required Fields)
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className={isDarkMode ? "bg-[#0d1f3c]" : "bg-[#f8fafc]"}>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Category</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Description</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Log Value</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Spec Expected</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {analysisResults.otherIssues.map((item, i) => (
+                    <tr key={i} className={`border-t ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"} ${i % 2 === 0 ? (isDarkMode ? "bg-[#0f2847]" : "bg-white") : (isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]")}`}>
+                      <td className="px-4 py-3">
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                          item.category === "Data Type" ? "bg-[#9c27b0]/20 text-[#9c27b0]" :
+                          item.category === "Field Length" ? "bg-[#ff5722]/20 text-[#ff5722]" :
+                          item.category === "Missing Required" ? "bg-[#f44336]/20 text-[#f44336]" :
+                          "bg-[#00bcd4]/20 text-[#00bcd4]"
+                        }`}>{item.category}</span>
+                      </td>
+                      <td className={`px-4 py-3 text-sm ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{item.description}</td>
+                      <td className={`px-4 py-3 text-sm`}>
+                        <span className={`rounded px-2 py-0.5 ${isDarkMode ? "bg-[#f44336]/10 text-[#f44336]" : "bg-[#ffebee] text-[#c62828]"}`}>{item.logValue}</span>
+                      </td>
+                      <td className={`px-4 py-3 text-sm`}>
+                        <span className={`rounded px-2 py-0.5 ${isDarkMode ? "bg-[#4caf50]/10 text-[#4caf50]" : "bg-[#e8f5e9] text-[#2e7d32]"}`}>{item.specExpected}</span>
                       </td>
                     </tr>
                   ))}
@@ -2437,13 +2596,73 @@ export default function FixAIPortal() {
     </Card>
   )
 
+  // Quick Sender helper functions
+  const addCustomTag = () => {
+    setQuickSenderCustomTags([...quickSenderCustomTags, {tag: "", value: ""}])
+  }
+  
+  const removeCustomTag = (index: number) => {
+    setQuickSenderCustomTags(quickSenderCustomTags.filter((_, i) => i !== index))
+  }
+  
+  const updateCustomTag = (index: number, field: "tag" | "value", newValue: string) => {
+    const updated = [...quickSenderCustomTags]
+    updated[index][field] = newValue
+    setQuickSenderCustomTags(updated)
+  }
+  
+  const connectQuickSender = () => {
+    if (quickSenderHost && quickSenderPort) {
+      setQuickSenderStatus("connecting")
+      // Simulate connection
+      setTimeout(() => {
+        setQuickSenderStatus("connected")
+        setQuickSenderConnected(true)
+        setQuickSenderLogs([
+          ...quickSenderLogs,
+          { time: new Date().toLocaleTimeString(), direction: "out", message: `Connecting to ${quickSenderHost}:${quickSenderPort}...` },
+          { time: new Date().toLocaleTimeString(), direction: "in", message: "Connection established" }
+        ])
+        addHistoryEntry("Quick Sender Connected", "success", `Connected to ${quickSenderHost}:${quickSenderPort}`)
+      }, 1500)
+    }
+  }
+  
+  const disconnectQuickSender = () => {
+    setQuickSenderStatus("disconnected")
+    setQuickSenderConnected(false)
+    setQuickSenderLogs([
+      ...quickSenderLogs,
+      { time: new Date().toLocaleTimeString(), direction: "out", message: "Disconnecting..." },
+      { time: new Date().toLocaleTimeString(), direction: "in", message: "Connection closed" }
+    ])
+  }
+  
+  const sendQuickMessage = () => {
+    if (msgGenOutput && quickSenderConnected) {
+      const timestamp = new Date().toLocaleTimeString()
+      setQuickSenderLogs([
+        ...quickSenderLogs,
+        { time: timestamp, direction: "out", message: msgGenOutput }
+      ])
+      // Simulate response
+      setTimeout(() => {
+        setQuickSenderLogs(prev => [
+          ...prev,
+          { time: new Date().toLocaleTimeString(), direction: "in", message: "8=FIX.4.4|9=65|35=0|49=TARGET|56=SENDER|34=2|52=20250302-10:30:00|112=TEST|10=173|" }
+        ])
+      }, 500)
+      addHistoryEntry("FIX Message Sent", "success", `Message sent to ${quickSenderHost}:${quickSenderPort}`)
+    }
+  }
+
   // Message Generator Panel
   const MessageGeneratorPanel = () => (
     <div className="p-6">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>FIX Message Generator</h2>
-          <p className={`text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Build FIX messages from spec or log files</p>
+          <p className={`text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Build FIX messages from spec or log files and send via TCP/IP</p>
         </div>
         {msgGenStep > 1 && (
           <Button variant="ghost" size="sm" onClick={resetMsgGenerator}>
@@ -2453,28 +2672,31 @@ export default function FixAIPortal() {
         )}
       </div>
 
-      {/* Progress Steps */}
-      <div className="mb-6 flex items-center justify-center gap-4">
-        {[1, 2, 3].map((step) => (
-          <div key={step} className="flex items-center gap-2">
-            <div className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-all ${
-              msgGenStep >= step 
-                ? isDarkMode ? "bg-[#00e5ff] text-[#0a1628]" : "bg-[#0a1628] text-white"
-                : isDarkMode ? "bg-[#1e4976] text-[#64b5f6]" : "bg-[#e2e8f0] text-[#64748b]"
-            }`}>
-              {step}
-            </div>
-            <span className={`text-sm font-medium ${
-              msgGenStep >= step 
-                ? isDarkMode ? "text-white" : "text-[#0a1628]"
-                : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"
-            }`}>
-              {step === 1 ? "Upload File" : step === 2 ? "Select Message" : "Edit Fields"}
-            </span>
-            {step < 3 && <ChevronRight className={`h-4 w-4 ${isDarkMode ? "text-[#1e4976]" : "text-[#cbd5e1]"}`} />}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Left Side - Message Builder */}
+        <div className="lg:col-span-2">
+          {/* Progress Steps */}
+          <div className="mb-6 flex items-center justify-center gap-4">
+            {[1, 2, 3].map((step) => (
+              <div key={step} className="flex items-center gap-2">
+                <div className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-all ${
+                  msgGenStep >= step 
+                    ? isDarkMode ? "bg-[#00e5ff] text-[#0a1628]" : "bg-[#0a1628] text-white"
+                    : isDarkMode ? "bg-[#1e4976] text-[#64b5f6]" : "bg-[#e2e8f0] text-[#64748b]"
+                }`}>
+                  {step}
+                </div>
+                <span className={`text-sm font-medium ${
+                  msgGenStep >= step 
+                    ? isDarkMode ? "text-white" : "text-[#0a1628]"
+                    : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"
+                }`}>
+                  {step === 1 ? "Upload File" : step === 2 ? "Select Message" : "Edit Fields"}
+                </span>
+                {step < 3 && <ChevronRight className={`h-4 w-4 ${isDarkMode ? "text-[#1e4976]" : "text-[#cbd5e1]"}`} />}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
       {/* Step 1: Upload File */}
       {msgGenStep === 1 && (
@@ -2698,7 +2920,7 @@ export default function FixAIPortal() {
                     size="sm" 
                     onClick={() => navigator.clipboard.writeText(msgGenOutput.replace(/\|/g, String.fromCharCode(1)))}
                   >
-                    <FileText className="mr-1 h-4 w-4" />
+                    <Copy className="mr-1 h-4 w-4" />
                     Copy (SOH)
                   </Button>
                   <Button 
@@ -2706,9 +2928,19 @@ export default function FixAIPortal() {
                     size="sm" 
                     onClick={() => navigator.clipboard.writeText(msgGenOutput)}
                   >
-                    <FileText className="mr-1 h-4 w-4" />
+                    <Copy className="mr-1 h-4 w-4" />
                     Copy (Pipe)
                   </Button>
+                  {quickSenderConnected && (
+                    <Button 
+                      variant="primary" 
+                      size="sm" 
+                      onClick={sendQuickMessage}
+                    >
+                      <Send className="mr-1 h-4 w-4" />
+                      Send Now
+                    </Button>
+                  )}
                 </div>
               </div>
               <div className={`rounded-xl p-4 font-mono text-sm break-all ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
@@ -2721,6 +2953,188 @@ export default function FixAIPortal() {
           )}
         </div>
       )}
+        </div>
+
+        {/* Right Side - Quick Sender Tool */}
+        <div className="space-y-4">
+          {/* Quick Sender Connection */}
+          <Card className="p-5">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className={`flex items-center gap-2 font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                <Wifi className={`h-5 w-5 ${quickSenderConnected ? "text-[#4caf50]" : isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`} />
+                Quick Sender
+              </h3>
+              <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                quickSenderStatus === "connected" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                quickSenderStatus === "connecting" ? "bg-[#ffc107]/20 text-[#ffc107]" :
+                isDarkMode ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ffebee] text-[#c62828]"
+              }`}>
+                {quickSenderStatus === "connected" ? "Connected" : quickSenderStatus === "connecting" ? "Connecting..." : "Disconnected"}
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              {/* Host & Port */}
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className={`mb-1 block text-xs font-medium ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Host</label>
+                  <input
+                    type="text"
+                    value={quickSenderHost}
+                    onChange={(e) => setQuickSenderHost(e.target.value)}
+                    placeholder="192.168.1.100"
+                    disabled={quickSenderConnected}
+                    className={`w-full rounded-lg border px-3 py-2 text-sm ${
+                      isDarkMode 
+                        ? "border-[#1e4976] bg-[#0a1628] text-white placeholder-[#64748b]" 
+                        : "border-[#e2e8f0] bg-white text-[#0a1628] placeholder-[#94a3b8]"
+                    } ${quickSenderConnected ? "opacity-50" : ""}`}
+                  />
+                </div>
+                <div>
+                  <label className={`mb-1 block text-xs font-medium ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Port</label>
+                  <input
+                    type="text"
+                    value={quickSenderPort}
+                    onChange={(e) => setQuickSenderPort(e.target.value)}
+                    placeholder="9878"
+                    disabled={quickSenderConnected}
+                    className={`w-full rounded-lg border px-3 py-2 text-sm ${
+                      isDarkMode 
+                        ? "border-[#1e4976] bg-[#0a1628] text-white placeholder-[#64748b]" 
+                        : "border-[#e2e8f0] bg-white text-[#0a1628] placeholder-[#94a3b8]"
+                    } ${quickSenderConnected ? "opacity-50" : ""}`}
+                  />
+                </div>
+              </div>
+
+              {/* SenderCompID (49) & TargetCompID (56) */}
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className={`mb-1 block text-xs font-medium ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>SenderCompID (49)</label>
+                  <input
+                    type="text"
+                    value={quickSenderCompID}
+                    onChange={(e) => setQuickSenderCompID(e.target.value)}
+                    placeholder="SENDER"
+                    disabled={quickSenderConnected}
+                    className={`w-full rounded-lg border px-3 py-2 text-sm ${
+                      isDarkMode 
+                        ? "border-[#1e4976] bg-[#0a1628] text-white placeholder-[#64748b]" 
+                        : "border-[#e2e8f0] bg-white text-[#0a1628] placeholder-[#94a3b8]"
+                    } ${quickSenderConnected ? "opacity-50" : ""}`}
+                  />
+                </div>
+                <div>
+                  <label className={`mb-1 block text-xs font-medium ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>TargetCompID (56)</label>
+                  <input
+                    type="text"
+                    value={quickTargetCompID}
+                    onChange={(e) => setQuickTargetCompID(e.target.value)}
+                    placeholder="TARGET"
+                    disabled={quickSenderConnected}
+                    className={`w-full rounded-lg border px-3 py-2 text-sm ${
+                      isDarkMode 
+                        ? "border-[#1e4976] bg-[#0a1628] text-white placeholder-[#64748b]" 
+                        : "border-[#e2e8f0] bg-white text-[#0a1628] placeholder-[#94a3b8]"
+                    } ${quickSenderConnected ? "opacity-50" : ""}`}
+                  />
+                </div>
+              </div>
+
+              {/* Connect/Disconnect Button */}
+              <div className="pt-2">
+                {!quickSenderConnected ? (
+                  <Button 
+                    variant="primary" 
+                    className="w-full"
+                    onClick={connectQuickSender}
+                    disabled={!quickSenderHost || !quickSenderPort || quickSenderStatus === "connecting"}
+                  >
+                    <Wifi className="mr-2 h-4 w-4" />
+                    {quickSenderStatus === "connecting" ? "Connecting..." : "Connect"}
+                  </Button>
+                ) : (
+                  <Button 
+                    variant="secondary" 
+                    className="w-full"
+                    onClick={disconnectQuickSender}
+                  >
+                    <X className="mr-2 h-4 w-4" />
+                    Disconnect
+                  </Button>
+                )}
+              </div>
+            </div>
+          </Card>
+
+          {/* Custom Tags */}
+          <Card className="p-5">
+            <div className="mb-3 flex items-center justify-between">
+              <h4 className={`text-sm font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Custom Tags</h4>
+              <button 
+                onClick={addCustomTag}
+                className={`rounded-lg p-1 transition-colors ${isDarkMode ? "hover:bg-[#1e4976]" : "hover:bg-[#e2e8f0]"}`}
+              >
+                <Plus className={`h-4 w-4 ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`} />
+              </button>
+            </div>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {quickSenderCustomTags.map((item, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={item.tag}
+                    onChange={(e) => updateCustomTag(i, "tag", e.target.value)}
+                    placeholder="Tag"
+                    className={`w-16 rounded-lg border px-2 py-1.5 text-xs font-mono ${
+                      isDarkMode 
+                        ? "border-[#1e4976] bg-[#0a1628] text-[#00e5ff] placeholder-[#64748b]" 
+                        : "border-[#e2e8f0] bg-white text-[#1976d2] placeholder-[#94a3b8]"
+                    }`}
+                  />
+                  <span className={isDarkMode ? "text-[#64b5f6]" : "text-[#94a3b8]"}>=</span>
+                  <input
+                    type="text"
+                    value={item.value}
+                    onChange={(e) => updateCustomTag(i, "value", e.target.value)}
+                    placeholder="Value"
+                    className={`flex-1 rounded-lg border px-2 py-1.5 text-xs ${
+                      isDarkMode 
+                        ? "border-[#1e4976] bg-[#0a1628] text-white placeholder-[#64748b]" 
+                        : "border-[#e2e8f0] bg-white text-[#0a1628] placeholder-[#94a3b8]"
+                    }`}
+                  />
+                  <button 
+                    onClick={() => removeCustomTag(i)}
+                    className={`rounded p-1 transition-colors ${isDarkMode ? "hover:bg-[#f44336]/20" : "hover:bg-[#ffebee]"}`}
+                  >
+                    <X className="h-3 w-3 text-[#f44336]" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Send Log */}
+          {quickSenderLogs.length > 0 && (
+            <Card className="p-5">
+              <h4 className={`mb-3 text-sm font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Activity Log</h4>
+              <div className={`max-h-48 overflow-y-auto rounded-lg p-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+                {quickSenderLogs.map((log, i) => (
+                  <div key={i} className={`mb-2 flex items-start gap-2 text-xs`}>
+                    <span className={`shrink-0 ${isDarkMode ? "text-[#64b5f6]" : "text-[#94a3b8]"}`}>{log.time}</span>
+                    <span className={`shrink-0 font-semibold ${log.direction === "out" ? "text-[#4caf50]" : "text-[#00e5ff]"}`}>
+                      {log.direction === "out" ? "OUT" : "IN"}
+                    </span>
+                    <span className={`font-mono break-all ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{log.message}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+        </div>
+      </div>
     </div>
   )
 
