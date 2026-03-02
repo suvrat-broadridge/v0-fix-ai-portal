@@ -52,6 +52,7 @@ interface SidebarItem {
   label: string
   id: string
   badge?: number
+  iconColor?: string
 }
 
 interface HistoryEntry {
@@ -497,7 +498,7 @@ export default function FixAIPortal() {
                     : "text-[#64748b] hover:bg-[#e2e8f0] hover:text-[#0a1628]"
               }`}
             >
-              <Icon className={`h-5 w-5 ${isActive ? (isDarkMode ? "text-[#ff9800]" : "text-[#f57c00]") : ""}`} />
+              <Icon className={`h-5 w-5 ${isActive ? (isDarkMode ? "text-[#ff9800]" : "text-[#f57c00]") : item.iconColor || ""}`} />
               <span>{item.label}</span>
               {item.badge && (
                 <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-[#f57c00] px-1.5 text-xs font-semibold text-white">
@@ -2098,29 +2099,29 @@ export default function FixAIPortal() {
     </Card>
   )
 
-  // Admin Sidebar Items
+  // Admin Sidebar Items - with accent colors from Broadridge palette
   const adminSidebarItems: SidebarItem[] = [
-    { icon: LayoutDashboard, label: "Dashboard", id: "dashboard" },
-    { icon: GitCompare, label: "Spec Compare", id: "spec-compare" },
-    { icon: FileCheck, label: "Log Analysis", id: "log-analysis" },
-    { icon: MessageSquare, label: "Message Generator", id: "msg-generator" },
-    { icon: TestTube, label: "Test Cases", id: "test-cases" },
-    { icon: Users, label: "Clients", id: "clients" },
-    { icon: History, label: "History", id: "history" },
-    { icon: Bell, label: "Alerts", id: "alerts", badge: alerts.filter((a) => !a.resolved).length },
-    { icon: Settings, label: "Settings", id: "settings" },
-    { icon: HelpCircle, label: "Help", id: "help" },
+  { icon: LayoutDashboard, label: "Dashboard", id: "dashboard", iconColor: isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]" },
+  { icon: GitCompare, label: "Spec Compare", id: "spec-compare", iconColor: isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]" },
+  { icon: FileCheck, label: "Log Analysis", id: "log-analysis", iconColor: isDarkMode ? "text-[#4caf50]" : "text-[#388e3c]" },
+  { icon: MessageSquare, label: "Message Generator", id: "msg-generator", iconColor: isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]" },
+  { icon: TestTube, label: "Test Cases", id: "test-cases", iconColor: isDarkMode ? "text-[#ce93d8]" : "text-[#7b1fa2]" },
+  { icon: Users, label: "Clients", id: "clients", iconColor: isDarkMode ? "text-[#64b5f6]" : "text-[#1565c0]" },
+  { icon: History, label: "History", id: "history", iconColor: isDarkMode ? "text-[#90caf9]" : "text-[#64748b]" },
+  { icon: Bell, label: "Alerts", id: "alerts", badge: alerts.filter((a) => !a.resolved).length, iconColor: isDarkMode ? "text-[#ffb74d]" : "text-[#f57c00]" },
+  { icon: Settings, label: "Settings", id: "settings", iconColor: isDarkMode ? "text-[#90a4ae]" : "text-[#607d8b]" },
+  { icon: HelpCircle, label: "Help", id: "help", iconColor: isDarkMode ? "text-[#81d4fa]" : "text-[#0288d1]" },
   ]
 
-  // Client Sidebar Items
+  // Client Sidebar Items - with accent colors
   const clientSidebarItems: SidebarItem[] = [
-    { icon: LayoutDashboard, label: "Dashboard", id: "dashboard" },
-    { icon: Upload, label: "Upload Specs", id: "upload" },
-    { icon: Download, label: "Download Specs", id: "download" },
-    { icon: MessageSquare, label: "Generate Message", id: "msg-generator" },
-    { icon: History, label: "History", id: "history" },
-    { icon: Settings, label: "Settings", id: "settings" },
-    { icon: HelpCircle, label: "Help", id: "help" },
+  { icon: LayoutDashboard, label: "Dashboard", id: "dashboard", iconColor: isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]" },
+  { icon: Upload, label: "Upload Specs", id: "upload", iconColor: isDarkMode ? "text-[#4caf50]" : "text-[#388e3c]" },
+  { icon: Download, label: "Download Specs", id: "download", iconColor: isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]" },
+  { icon: MessageSquare, label: "Generate Message", id: "msg-generator", iconColor: isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]" },
+  { icon: History, label: "History", id: "history", iconColor: isDarkMode ? "text-[#90caf9]" : "text-[#64748b]" },
+  { icon: Settings, label: "Settings", id: "settings", iconColor: isDarkMode ? "text-[#90a4ae]" : "text-[#607d8b]" },
+  { icon: HelpCircle, label: "Help", id: "help", iconColor: isDarkMode ? "text-[#81d4fa]" : "text-[#0288d1]" },
   ]
 
   // Render Active Panel
