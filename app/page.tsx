@@ -23,11 +23,22 @@ import {
   Bell,
   HelpCircle,
   LogOut,
+  Building2,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  Filter,
+  Search,
+  ChevronDown,
+  Eye,
+  Trash2,
+  RefreshCw,
 } from "lucide-react"
 
 type Screen = "home" | "admin-tools" | "client-tools"
 type UserType = "admin" | "client" | null
 type Tab = "home" | "projects" | "uploads" | "testcase" | "settings"
+type ActivePanel = "dashboard" | "spec-compare" | "log-analysis" | "msg-generator" | "test-cases" | "clients" | "history" | "alerts" | "settings" | "help" | "upload" | "download"
 
 interface TagValue {
   tag: string
@@ -41,6 +52,44 @@ interface SidebarItem {
   badge?: number
 }
 
+interface HistoryEntry {
+  id: string
+  action: string
+  timestamp: string
+  status: "success" | "error" | "warning"
+  details: string
+}
+
+interface AlertEntry {
+  id: string
+  type: "error" | "warning" | "info"
+  message: string
+  timestamp: string
+  resolved: boolean
+}
+
+interface Client {
+  id: string
+  name: string
+  specs: number
+  lastActivity: string
+  status: "active" | "inactive"
+}
+
+interface TestCase {
+  id: string
+  name: string
+  msgType: string
+  tags: string[]
+  status: "passed" | "failed" | "pending"
+}
+
+interface AnalysisResult {
+  unsupportedMessages: string[]
+  unsupportedTags: { msgType: string; tags: string[] }[]
+  unsupportedValues: { msgType: string; tag: string; value: string }[]
+}
+
 export default function FixAIPortal() {
   const [currentScreen, setCurrentScreen] = useState<Screen>("home")
   const [showLoginModal, setShowLoginModal] = useState(false)
@@ -50,7 +99,7 @@ export default function FixAIPortal() {
   const [password, setPassword] = useState("")
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [activeTab, setActiveTab] = useState<Tab>("home")
-  const [activeSidebarItem, setActiveSidebarItem] = useState("dashboard")
+  const [activeSidebarItem, setActiveSidebarItem] = useState<ActivePanel>("dashboard")
 
   // Test it out section state
   const [uploadedSpec, setUploadedSpec] = useState<string | null>(null)
@@ -73,6 +122,59 @@ export default function FixAIPortal() {
     { tag: "44", value: "90.00" },
     { tag: "15", value: "USD" },
   ])
+
+  // Spec Compare state
+  const [spec1File, setSpec1File] = useState<string | null>(null)
+  const [spec2File, setSpec2File] = useState<string | null>(null)
+  const [specCompareResults, setSpecCompareResults] = useState<{differences: string[], compatible: boolean} | null>(null)
+  const [selectedSpecMsgType, setSelectedSpecMsgType] = useState<string | null>(null)
+
+  // Log Analysis state
+  const [logFile, setLogFile] = useState<string | null>(null)
+  const [logSpecFile, setLogSpecFile] = useState<string | null>(null)
+  const [analysisResults, setAnalysisResults] = useState<AnalysisResult | null>(null)
+  const [selectedAnalysisMsgType, setSelectedAnalysisMsgType] = useState<string | null>(null)
+
+  // Test Cases state
+  const [testCases, setTestCases] = useState<TestCase[]>([
+    { id: "TC001", name: "New Order Single - Basic", msgType: "D", tags: ["49", "56", "11", "55"], status: "passed" },
+    { id: "TC002", name: "Execution Report - Fill", msgType: "8", tags: ["17", "20", "39", "150"], status: "passed" },
+    { id: "TC003", name: "Order Cancel Request", msgType: "F", tags: ["41", "11", "55"], status: "failed" },
+    { id: "TC004", name: "Heartbeat Response", msgType: "0", tags: ["112"], status: "pending" },
+    { id: "TC005", name: "Logon with Reset", msgType: "A", tags: ["98", "108", "141"], status: "passed" },
+  ])
+  const [testCaseFilter, setTestCaseFilter] = useState<string>("")
+  const [testCaseMsgTypeFilter, setTestCaseMsgTypeFilter] = useState<string>("")
+
+  // History state
+  const [history, setHistory] = useState<HistoryEntry[]>([
+    { id: "H001", action: "Uploaded FIX Spec", timestamp: "2025-03-02 10:30:15", status: "success", details: "FIX44_Custom.xml uploaded successfully" },
+    { id: "H002", action: "Generated Test Cases", timestamp: "2025-03-02 10:25:00", status: "success", details: "15 test cases generated from spec" },
+    { id: "H003", action: "Spec Comparison", timestamp: "2025-03-02 10:20:30", status: "warning", details: "3 incompatibilities found" },
+    { id: "H004", action: "Log Analysis", timestamp: "2025-03-02 10:15:00", status: "error", details: "Analysis failed: Invalid log format" },
+    { id: "H005", action: "FIX Message Generated", timestamp: "2025-03-02 10:10:00", status: "success", details: "NewOrderSingle (35=D) generated" },
+  ])
+
+  // Alerts state
+  const [alerts, setAlerts] = useState<AlertEntry[]>([
+    { id: "A001", type: "error", message: "Log analysis failed for client BlackRock", timestamp: "2025-03-02 10:15:00", resolved: false },
+    { id: "A002", type: "warning", message: "Spec compatibility issues detected", timestamp: "2025-03-02 10:20:30", resolved: false },
+    { id: "A003", type: "warning", message: "Unsupported tag 9999 in message type D", timestamp: "2025-03-02 09:45:00", resolved: true },
+    { id: "A004", type: "error", message: "Connection timeout to validation server", timestamp: "2025-03-02 09:30:00", resolved: true },
+    { id: "A005", type: "info", message: "New FIX 5.0 SP2 spec available", timestamp: "2025-03-02 08:00:00", resolved: false },
+  ])
+
+  // Clients state
+  const [clients] = useState<Client[]>([
+    { id: "C001", name: "BlackRock", specs: 12, lastActivity: "2025-03-02 10:30", status: "active" },
+    { id: "C002", name: "Goldman Sachs", specs: 8, lastActivity: "2025-03-02 09:45", status: "active" },
+    { id: "C003", name: "JP Morgan", specs: 15, lastActivity: "2025-03-02 10:15", status: "active" },
+    { id: "C004", name: "UBS", specs: 6, lastActivity: "2025-03-01 16:30", status: "inactive" },
+    { id: "C005", name: "Raymond James", specs: 4, lastActivity: "2025-03-02 08:00", status: "active" },
+    { id: "C006", name: "HSBC", specs: 9, lastActivity: "2025-03-02 10:00", status: "active" },
+    { id: "C007", name: "Bank of America", specs: 11, lastActivity: "2025-03-01 14:20", status: "inactive" },
+  ])
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null)
 
   const msgTypes = [
     { code: "D", name: "New Order Single" },
@@ -121,6 +223,39 @@ export default function FixAIPortal() {
     const file = e.target.files?.[0]
     if (file) {
       setUploadedSpec(file.name)
+      addHistoryEntry("Uploaded FIX Spec", "success", `${file.name} uploaded successfully`)
+    }
+  }
+
+  const handleSpec1Upload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setSpec1File(file.name)
+      addHistoryEntry("Selected Spec 1", "success", file.name)
+    }
+  }
+
+  const handleSpec2Upload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setSpec2File(file.name)
+      addHistoryEntry("Selected Spec 2", "success", file.name)
+    }
+  }
+
+  const handleLogFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setLogFile(file.name)
+      addHistoryEntry("Uploaded Log File", "success", file.name)
+    }
+  }
+
+  const handleLogSpecUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setLogSpecFile(file.name)
+      addHistoryEntry("Selected FIX Spec for Analysis", "success", file.name)
     }
   }
 
@@ -134,6 +269,7 @@ export default function FixAIPortal() {
       const tags = tagValues.map((t) => `${t.tag}=${t.value}`).join("|")
       const msg = `8=FIX.4.2|9=159|35=${selectedMsgType}|${tags}|59=0|10=176|`
       setGeneratedMessage(msg)
+      addHistoryEntry("FIX Message Generated", "success", `MsgType=${selectedMsgType}`)
     }
   }
 
@@ -141,6 +277,78 @@ export default function FixAIPortal() {
     const newTags = [...tagValues]
     newTags[index].value = newValue
     setTagValues(newTags)
+  }
+
+  const addHistoryEntry = (action: string, status: "success" | "error" | "warning", details: string) => {
+    const newEntry: HistoryEntry = {
+      id: `H${Date.now()}`,
+      action,
+      timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+      status,
+      details,
+    }
+    setHistory((prev) => [newEntry, ...prev])
+  }
+
+  const addAlert = (type: "error" | "warning" | "info", message: string) => {
+    const newAlert: AlertEntry = {
+      id: `A${Date.now()}`,
+      type,
+      message,
+      timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+      resolved: false,
+    }
+    setAlerts((prev) => [newAlert, ...prev])
+  }
+
+  const performSpecCompare = () => {
+    if (spec1File && spec2File) {
+      // Simulated comparison results
+      const results = {
+        compatible: false,
+        differences: [
+          "Tag 9999 present in Spec 1 but not in Spec 2",
+          "MsgType 'AE' has different required fields",
+          "Value 'X' for tag 54 not supported in Spec 2",
+          "Repeating group 453 has different structure",
+        ],
+      }
+      setSpecCompareResults(results)
+      addHistoryEntry("Spec Comparison", results.compatible ? "success" : "warning", `${results.differences.length} differences found`)
+      if (!results.compatible) {
+        addAlert("warning", "Spec compatibility issues detected")
+      }
+    }
+  }
+
+  const performLogAnalysis = () => {
+    if (logFile && logSpecFile) {
+      // Simulated analysis results
+      const results: AnalysisResult = {
+        unsupportedMessages: ["AE - Trade Capture Report", "AJ - Quote Request Reject"],
+        unsupportedTags: [
+          { msgType: "D", tags: ["9999", "9998"] },
+          { msgType: "8", tags: ["10001"] },
+          { msgType: "F", tags: ["9997"] },
+        ],
+        unsupportedValues: [
+          { msgType: "D", tag: "54", value: "X" },
+          { msgType: "8", tag: "39", value: "Z" },
+          { msgType: "D", tag: "40", value: "9" },
+        ],
+      }
+      setAnalysisResults(results)
+      addHistoryEntry("Log Analysis Completed", "success", `Found ${results.unsupportedMessages.length} unsupported messages`)
+    }
+  }
+
+  const generateTestCases = () => {
+    const newTestCases: TestCase[] = [
+      { id: `TC${Date.now()}`, name: "Generated - Order Flow Test", msgType: "D", tags: ["11", "55", "54", "38"], status: "pending" },
+      { id: `TC${Date.now() + 1}`, name: "Generated - Cancel Flow Test", msgType: "F", tags: ["41", "11"], status: "pending" },
+    ]
+    setTestCases((prev) => [...newTestCases, ...prev])
+    addHistoryEntry("Generated Test Cases", "success", `${newTestCases.length} test cases created`)
   }
 
   // Status message state
@@ -156,14 +364,16 @@ export default function FixAIPortal() {
       const data = await response.json()
       if (data.success) {
         setStatusMessage({ type: "success", message: `Success: ${data.output}` })
+        addHistoryEntry(`Executed: ${tool}`, "success", data.output)
       } else {
         setStatusMessage({ type: "error", message: `Error: ${data.error}` })
+        addHistoryEntry(`Failed: ${tool}`, "error", data.error)
+        addAlert("error", `${tool} execution failed`)
       }
     } catch {
-      console.log(`[v0] Tool triggered: ${tool} (server not running)`)
       setStatusMessage({ type: "warning", message: `Tool "${tool}" triggered (connect server to execute)` })
+      addHistoryEntry(`Triggered: ${tool}`, "warning", "Server not connected")
     }
-    // Auto-hide status after 4 seconds
     setTimeout(() => setStatusMessage(null), 4000)
   }
 
@@ -191,16 +401,18 @@ export default function FixAIPortal() {
     variant = "primary",
     size = "md",
     className = "",
+    disabled = false,
     ...props
   }: {
     children: React.ReactNode
-    variant?: "primary" | "secondary" | "outline" | "ghost"
+    variant?: "primary" | "secondary" | "outline" | "ghost" | "danger"
     size?: "sm" | "md" | "lg"
     className?: string
+    disabled?: boolean
     onClick?: () => void
   }) => {
     const baseStyles =
-      "inline-flex items-center justify-center font-medium transition-all duration-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2"
+      "inline-flex items-center justify-center font-medium transition-all duration-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
     const sizeStyles = {
       sm: "px-3 py-1.5 text-xs",
       md: "px-4 py-2.5 text-sm",
@@ -219,10 +431,11 @@ export default function FixAIPortal() {
       ghost: isDarkMode
         ? "text-[#90caf9] hover:bg-[#1e4976]/50 focus:ring-[#1e4976]"
         : "text-[#0a1628] hover:bg-[#e2e8f0] focus:ring-[#e2e8f0]",
+      danger: "bg-[#f44336] text-white hover:bg-[#d32f2f] shadow-md focus:ring-[#f44336]",
     }
 
     return (
-      <button className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`} {...props}>
+      <button className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`} disabled={disabled} {...props}>
         {children}
       </button>
     )
@@ -235,7 +448,6 @@ export default function FixAIPortal() {
         isDarkMode ? "border-[#1e4976] bg-[#0d1f3c]" : "border-[#e2e8f0] bg-[#f8fafc]"
       }`}
     >
-      {/* Logo/Brand */}
       <div className={`flex items-center gap-3 border-b px-4 py-5 ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
         <div
           className={`flex h-9 w-9 items-center justify-center rounded-lg ${
@@ -247,7 +459,6 @@ export default function FixAIPortal() {
         <span className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{title}</span>
       </div>
 
-      {/* Navigation Items */}
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         <div className={`mb-2 px-3 text-xs font-semibold uppercase tracking-wider ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
           Navigation
@@ -258,7 +469,7 @@ export default function FixAIPortal() {
           return (
             <button
               key={item.id}
-              onClick={() => setActiveSidebarItem(item.id)}
+              onClick={() => setActiveSidebarItem(item.id as ActivePanel)}
               className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                 isActive
                   ? isDarkMode
@@ -272,9 +483,7 @@ export default function FixAIPortal() {
               <Icon className={`h-5 w-5 ${isActive ? (isDarkMode ? "text-[#ff9800]" : "text-[#f57c00]") : ""}`} />
               <span>{item.label}</span>
               {item.badge && (
-                <span
-                  className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-[#f57c00] px-1.5 text-xs font-semibold text-white"
-                >
+                <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-[#f57c00] px-1.5 text-xs font-semibold text-white">
                   {item.badge}
                 </span>
               )}
@@ -283,7 +492,6 @@ export default function FixAIPortal() {
         })}
       </nav>
 
-      {/* Theme Toggle & Logout */}
       <div className={`border-t px-3 py-4 ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
         <button
           onClick={() => setIsDarkMode(!isDarkMode)}
@@ -303,9 +511,7 @@ export default function FixAIPortal() {
             setActiveTab("home")
           }}
           className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
-            isDarkMode
-              ? "text-[#f44336] hover:bg-[#f44336]/10"
-              : "text-[#ef4444] hover:bg-[#fef2f2]"
+            isDarkMode ? "text-[#f44336] hover:bg-[#f44336]/10" : "text-[#ef4444] hover:bg-[#fef2f2]"
           }`}
         >
           <LogOut className="h-5 w-5" />
@@ -315,14 +521,12 @@ export default function FixAIPortal() {
     </div>
   )
 
-  // Theme Toggle Button (for home screen)
+  // Theme Toggle Button
   const ThemeToggle = () => (
     <button
       onClick={() => setIsDarkMode(!isDarkMode)}
       className={`fixed right-4 top-4 z-50 rounded-xl p-3 shadow-lg transition-all ${
-        isDarkMode
-          ? "bg-[#1e4976] text-[#00e5ff] hover:bg-[#2a5f8f]"
-          : "bg-white text-[#0a1628] hover:bg-[#f1f5f9] shadow-md"
+        isDarkMode ? "bg-[#1e4976] text-[#00e5ff] hover:bg-[#2a5f8f]" : "bg-white text-[#0a1628] hover:bg-[#f1f5f9] shadow-md"
       }`}
       aria-label="Toggle theme"
     >
@@ -341,11 +545,7 @@ export default function FixAIPortal() {
     ]
 
     return (
-      <div
-        className={`flex items-center gap-1 rounded-xl p-1.5 ${
-          isDarkMode ? "bg-[#0d1f3c]" : "bg-[#e2e8f0]"
-        }`}
-      >
+      <div className={`flex items-center gap-1 rounded-xl p-1.5 ${isDarkMode ? "bg-[#0d1f3c]" : "bg-[#e2e8f0]"}`}>
         {tabs.map((tab) => {
           const Icon = tab.icon
           return (
@@ -392,13 +592,635 @@ export default function FixAIPortal() {
     </div>
   )
 
+  // Clients Panel Component
+  const ClientsPanel = () => (
+    <div className="p-6">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Clients</h2>
+        <div className="flex items-center gap-3">
+          <div className={`flex items-center gap-2 rounded-xl border px-3 py-2 ${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-white"}`}>
+            <Search className={`h-4 w-4 ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`} />
+            <input
+              type="text"
+              placeholder="Search clients..."
+              className={`bg-transparent text-sm outline-none ${isDarkMode ? "text-white placeholder-[#64748b]" : "text-[#0a1628] placeholder-[#94a3b8]"}`}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-4">
+        {clients.map((client) => (
+          <Card key={client.id} hover className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                  <Building2 className={`h-6 w-6 ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`} />
+                </div>
+                <div>
+                  <h3 className={`font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{client.name}</h3>
+                  <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
+                    {client.specs} specs | Last active: {client.lastActivity}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-medium ${
+                    client.status === "active"
+                      ? "bg-[#4caf50]/20 text-[#4caf50]"
+                      : "bg-[#f57c00]/20 text-[#f57c00]"
+                  }`}
+                >
+                  {client.status}
+                </span>
+                <Button variant="secondary" size="sm" onClick={() => setSelectedClient(client)}>
+                  <Eye className="mr-1 h-4 w-4" />
+                  View
+                </Button>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {/* Client Detail Modal */}
+      {selectedClient && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <Card className="w-full max-w-lg p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className={`text-xl font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                {selectedClient.name}
+              </h3>
+              <button onClick={() => setSelectedClient(null)} className={`rounded-lg p-2 ${isDarkMode ? "hover:bg-[#1e4976]" : "hover:bg-[#f1f5f9]"}`}>
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div className={`rounded-xl p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+                <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Total Specs</p>
+                <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{selectedClient.specs}</p>
+              </div>
+              <div className={`rounded-xl p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+                <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Last Activity</p>
+                <p className={`font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{selectedClient.lastActivity}</p>
+              </div>
+              <div className="flex gap-3">
+                <Button variant="primary" className="flex-1">View Specs</Button>
+                <Button variant="secondary" className="flex-1">View History</Button>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
+    </div>
+  )
+
+  // Log Analysis Panel Component
+  const LogAnalysisPanel = () => (
+    <div className="p-6">
+      <h2 className={`mb-6 text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Log Analysis</h2>
+
+      {/* Upload Section */}
+      <Card className="mb-6 p-5">
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <Button variant="secondary" className="w-full" onClick={() => handleFileUpload("log-upload")}>
+              <Upload className="mr-2 h-4 w-4" />
+              Upload Log File
+            </Button>
+            <input type="file" id="log-upload" className="hidden" accept=".log,.txt" onChange={handleLogFileUpload} />
+            {logFile && <p className="mt-2 text-xs text-[#4caf50]">{logFile}</p>}
+          </div>
+          <div>
+            <Button variant="secondary" className="w-full" onClick={() => handleFileUpload("log-spec-upload")}>
+              <FileText className="mr-2 h-4 w-4" />
+              Upload FIX Spec
+            </Button>
+            <input type="file" id="log-spec-upload" className="hidden" accept=".xml,.txt" onChange={handleLogSpecUpload} />
+            {logSpecFile && <p className="mt-2 text-xs text-[#4caf50]">{logSpecFile}</p>}
+          </div>
+          <div>
+            <Button variant="primary" className="w-full" onClick={performLogAnalysis} disabled={!logFile || !logSpecFile}>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Perform Analysis
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      {/* Results Section */}
+      {analysisResults && (
+        <div className="space-y-6">
+          {/* Unsupported Messages */}
+          <Card className="p-5">
+            <h3 className={`mb-4 flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#f44336]" : "text-[#d32f2f]"}`}>
+              <AlertTriangle className="h-5 w-5" />
+              Unsupported Messages
+            </h3>
+            <div className="space-y-2">
+              {analysisResults.unsupportedMessages.map((msg, i) => (
+                <div key={i} className={`rounded-lg px-4 py-2 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#fef2f2]"}`}>
+                  <span className={isDarkMode ? "text-[#90caf9]" : "text-[#0a1628]"}>{msg}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Unsupported Tags */}
+          <Card className="p-5">
+            <h3 className={`mb-4 flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]"}`}>
+              <AlertTriangle className="h-5 w-5" />
+              Unsupported Tags by Message Type
+            </h3>
+            <div className="mb-4">
+              <select
+                className={`rounded-xl border px-4 py-2 text-sm ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
+                value={selectedAnalysisMsgType || ""}
+                onChange={(e) => setSelectedAnalysisMsgType(e.target.value)}
+              >
+                <option value="">All Message Types</option>
+                {analysisResults.unsupportedTags.map((item) => (
+                  <option key={item.msgType} value={item.msgType}>MsgType {item.msgType}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              {analysisResults.unsupportedTags
+                .filter((item) => !selectedAnalysisMsgType || item.msgType === selectedAnalysisMsgType)
+                .map((item, i) => (
+                  <div key={i} className={`rounded-lg px-4 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#fffbeb]"}`}>
+                    <span className={`font-medium ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`}>MsgType {item.msgType}: </span>
+                    <span className={isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}>Tags {item.tags.join(", ")}</span>
+                  </div>
+                ))}
+            </div>
+          </Card>
+
+          {/* Unsupported Values */}
+          <Card className="p-5">
+            <h3 className={`mb-4 flex items-center gap-2 font-semibold ${isDarkMode ? "text-[#f57c00]" : "text-[#e65100]"}`}>
+              <AlertTriangle className="h-5 w-5" />
+              Unsupported Values
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className={isDarkMode ? "border-b border-[#1e4976]" : "border-b border-[#e2e8f0]"}>
+                    <th className={`px-4 py-2 text-left text-sm font-medium ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>MsgType</th>
+                    <th className={`px-4 py-2 text-left text-sm font-medium ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Tag</th>
+                    <th className={`px-4 py-2 text-left text-sm font-medium ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Invalid Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {analysisResults.unsupportedValues.map((item, i) => (
+                    <tr key={i} className={isDarkMode ? "border-b border-[#1e4976]" : "border-b border-[#e2e8f0]"}>
+                      <td className={`px-4 py-3 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{item.msgType}</td>
+                      <td className={`px-4 py-3 ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`}>{item.tag}</td>
+                      <td className={`px-4 py-3 ${isDarkMode ? "text-[#f44336]" : "text-[#d32f2f]"}`}>{item.value}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </div>
+      )}
+    </div>
+  )
+
+  // Spec Compare Panel Component
+  const SpecComparePanel = () => (
+    <div className="p-6">
+      <h2 className={`mb-6 text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Spec Compare</h2>
+
+      {/* Upload Section */}
+      <Card className="mb-6 p-5">
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <Button variant="secondary" className="w-full" onClick={() => handleFileUpload("spec1-upload")}>
+              <FileText className="mr-2 h-4 w-4" />
+              Upload Spec 1
+            </Button>
+            <input type="file" id="spec1-upload" className="hidden" accept=".xml,.txt" onChange={handleSpec1Upload} />
+            {spec1File && <p className="mt-2 text-xs text-[#4caf50]">{spec1File}</p>}
+          </div>
+          <div>
+            <Button variant="secondary" className="w-full" onClick={() => handleFileUpload("spec2-upload")}>
+              <FileText className="mr-2 h-4 w-4" />
+              Upload Spec 2
+            </Button>
+            <input type="file" id="spec2-upload" className="hidden" accept=".xml,.txt" onChange={handleSpec2Upload} />
+            {spec2File && <p className="mt-2 text-xs text-[#4caf50]">{spec2File}</p>}
+          </div>
+          <div>
+            <Button variant="primary" className="w-full" onClick={performSpecCompare} disabled={!spec1File || !spec2File}>
+              <GitCompare className="mr-2 h-4 w-4" />
+              Compare Specs
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      {/* Results Section */}
+      {specCompareResults && (
+        <Card className="p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className={`flex items-center gap-2 font-semibold ${specCompareResults.compatible ? "text-[#4caf50]" : "text-[#f44336]"}`}>
+              {specCompareResults.compatible ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
+              {specCompareResults.compatible ? "Specs are Compatible" : "Compatibility Issues Found"}
+            </h3>
+            <select
+              className={`rounded-xl border px-4 py-2 text-sm ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
+              value={selectedSpecMsgType || ""}
+              onChange={(e) => setSelectedSpecMsgType(e.target.value)}
+            >
+              <option value="">All Differences</option>
+              {msgTypes.map((type) => (
+                <option key={type.code} value={type.code}>MsgType {type.code} - {type.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-2">
+            {specCompareResults.differences.map((diff, i) => (
+              <div key={i} className={`flex items-start gap-3 rounded-lg px-4 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#fef2f2]"}`}>
+                <AlertTriangle className="mt-0.5 h-4 w-4 text-[#f57c00]" />
+                <span className={isDarkMode ? "text-[#90caf9]" : "text-[#0a1628]"}>{diff}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+    </div>
+  )
+
+  // Test Cases Panel Component
+  const TestCasesPanel = () => {
+    const filteredTestCases = testCases.filter((tc) => {
+      const matchesSearch = tc.name.toLowerCase().includes(testCaseFilter.toLowerCase()) || tc.id.toLowerCase().includes(testCaseFilter.toLowerCase())
+      const matchesMsgType = !testCaseMsgTypeFilter || tc.msgType === testCaseMsgTypeFilter
+      return matchesSearch && matchesMsgType
+    })
+
+    return (
+      <div className="p-6">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Test Cases</h2>
+          <Button variant="primary" onClick={generateTestCases}>
+            <TestTube className="mr-2 h-4 w-4" />
+            Generate New Test Cases
+          </Button>
+        </div>
+
+        {/* Upload Section */}
+        <Card className="mb-6 p-5">
+          <h3 className={`mb-4 font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Generate Test Cases From:</h3>
+          <div className="flex gap-4">
+            <Button variant="secondary" onClick={() => handleFileUpload("tc-spec-upload")}>
+              <FileText className="mr-2 h-4 w-4" />
+              Upload FIX Spec
+            </Button>
+            <input type="file" id="tc-spec-upload" className="hidden" accept=".xml,.txt" />
+            <Button variant="secondary" onClick={() => handleFileUpload("tc-log-upload")}>
+              <Upload className="mr-2 h-4 w-4" />
+              Upload Log File
+            </Button>
+            <input type="file" id="tc-log-upload" className="hidden" accept=".log,.txt" />
+          </div>
+        </Card>
+
+        {/* Filters */}
+        <Card className="mb-6 p-5">
+          <div className="flex items-center gap-4">
+            <div className={`flex flex-1 items-center gap-2 rounded-xl border px-3 py-2 ${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-white"}`}>
+              <Search className={`h-4 w-4 ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`} />
+              <input
+                type="text"
+                placeholder="Search test cases..."
+                value={testCaseFilter}
+                onChange={(e) => setTestCaseFilter(e.target.value)}
+                className={`flex-1 bg-transparent text-sm outline-none ${isDarkMode ? "text-white placeholder-[#64748b]" : "text-[#0a1628] placeholder-[#94a3b8]"}`}
+              />
+            </div>
+            <select
+              className={`rounded-xl border px-4 py-2.5 text-sm ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
+              value={testCaseMsgTypeFilter}
+              onChange={(e) => setTestCaseMsgTypeFilter(e.target.value)}
+            >
+              <option value="">All Message Types</option>
+              {msgTypes.map((type) => (
+                <option key={type.code} value={type.code}>{type.code} - {type.name}</option>
+              ))}
+            </select>
+            <Button variant="ghost">
+              <Filter className="mr-2 h-4 w-4" />
+              More Filters
+            </Button>
+          </div>
+        </Card>
+
+        {/* Test Cases List */}
+        <div className="space-y-3">
+          {filteredTestCases.map((tc) => (
+            <Card key={tc.id} hover className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                      tc.status === "passed" ? "bg-[#4caf50]/20" : tc.status === "failed" ? "bg-[#f44336]/20" : "bg-[#ffc107]/20"
+                    }`}
+                  >
+                    {tc.status === "passed" ? (
+                      <CheckCircle className="h-5 w-5 text-[#4caf50]" />
+                    ) : tc.status === "failed" ? (
+                      <X className="h-5 w-5 text-[#f44336]" />
+                    ) : (
+                      <Clock className="h-5 w-5 text-[#ffc107]" />
+                    )}
+                  </div>
+                  <div>
+                    <h4 className={`font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{tc.name}</h4>
+                    <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
+                      {tc.id} | MsgType: {tc.msgType} | Tags: {tc.tags.join(", ")}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="sm">
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  // History Panel Component
+  const HistoryPanel = () => (
+    <div className="p-6">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>History</h2>
+        <Button variant="outline" size="sm" onClick={() => setHistory([])}>
+          Clear History
+        </Button>
+      </div>
+
+      <div className="space-y-3">
+        {history.map((entry) => (
+          <Card key={entry.id} className="p-4">
+            <div className="flex items-start gap-4">
+              <div
+                className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                  entry.status === "success" ? "bg-[#4caf50]/20" : entry.status === "error" ? "bg-[#f44336]/20" : "bg-[#ffc107]/20"
+                }`}
+              >
+                {entry.status === "success" ? (
+                  <CheckCircle className="h-5 w-5 text-[#4caf50]" />
+                ) : entry.status === "error" ? (
+                  <X className="h-5 w-5 text-[#f44336]" />
+                ) : (
+                  <AlertTriangle className="h-5 w-5 text-[#ffc107]" />
+                )}
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h4 className={`font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{entry.action}</h4>
+                  <span className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>{entry.timestamp}</span>
+                </div>
+                <p className={`mt-1 text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>{entry.details}</p>
+              </div>
+            </div>
+          </Card>
+        ))}
+        {history.length === 0 && (
+          <div className={`py-12 text-center ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+            <History className="mx-auto mb-4 h-12 w-12 opacity-50" />
+            <p>No history yet</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+
+  // Alerts Panel Component
+  const AlertsPanel = () => (
+    <div className="p-6">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Alerts</h2>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setAlerts(alerts.map((a) => ({ ...a, resolved: true })))}>
+            Mark All Resolved
+          </Button>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        {alerts.filter((a) => !a.resolved).map((alert) => (
+          <Card key={alert.id} className="p-4">
+            <div className="flex items-start justify-between">
+              <div className="flex items-start gap-4">
+                <div
+                  className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                    alert.type === "error" ? "bg-[#f44336]/20" : alert.type === "warning" ? "bg-[#ffc107]/20" : "bg-[#2196f3]/20"
+                  }`}
+                >
+                  <AlertTriangle className={`h-5 w-5 ${alert.type === "error" ? "text-[#f44336]" : alert.type === "warning" ? "text-[#ffc107]" : "text-[#2196f3]"}`} />
+                </div>
+                <div>
+                  <p className={`font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{alert.message}</p>
+                  <p className={`mt-1 text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>{alert.timestamp}</p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setAlerts(alerts.map((a) => (a.id === alert.id ? { ...a, resolved: true } : a)))}
+              >
+                Resolve
+              </Button>
+            </div>
+          </Card>
+        ))}
+        {alerts.filter((a) => !a.resolved).length === 0 && (
+          <div className={`py-12 text-center ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+            <Bell className="mx-auto mb-4 h-12 w-12 opacity-50" />
+            <p>No active alerts</p>
+          </div>
+        )}
+
+        {alerts.filter((a) => a.resolved).length > 0 && (
+          <>
+            <h3 className={`mt-8 mb-4 text-sm font-semibold ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Resolved Alerts</h3>
+            {alerts.filter((a) => a.resolved).map((alert) => (
+              <Card key={alert.id} className="p-4 opacity-60">
+                <div className="flex items-start gap-4">
+                  <CheckCircle className="h-5 w-5 text-[#4caf50]" />
+                  <div>
+                    <p className={`font-medium line-through ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{alert.message}</p>
+                    <p className={`mt-1 text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>{alert.timestamp}</p>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </>
+        )}
+      </div>
+    </div>
+  )
+
+  // Dashboard Panel (default)
+  const DashboardPanel = () => (
+    <div className="grid grid-cols-1 gap-6 p-6 lg:grid-cols-2">
+      <ToolPanel
+        title="FIX Spec Compare"
+        icon={GitCompare}
+        buttons={[
+          { label: "Select Spec 1", action: () => handleFileUpload("spec1"), icon: FileText },
+          { label: "Select Spec 2", action: () => handleFileUpload("spec2"), icon: FileText },
+          { label: "Check Compatibility", action: () => callServerEndpoint("check-compatibility"), icon: FileCheck },
+          { label: "Compare Specs", action: () => { setActiveSidebarItem("spec-compare"); performSpecCompare(); }, primary: true, icon: GitCompare },
+        ]}
+      />
+      <input type="file" id="spec1" className="hidden" accept=".xml,.txt" onChange={handleSpec1Upload} />
+      <input type="file" id="spec2" className="hidden" accept=".xml,.txt" onChange={handleSpec2Upload} />
+
+      <ToolPanel
+        title="FIX Logs & Spec Compare"
+        icon={FileCheck}
+        buttons={[
+          { label: "Select FIX Spec", action: () => handleFileUpload("fix-spec"), icon: FileText },
+          { label: "Select Log File", action: () => handleFileUpload("log-file"), icon: FileText },
+          { label: "Check Compatibility", action: () => callServerEndpoint("check-log-compatibility"), icon: FileCheck },
+          { label: "Find Differences", action: () => { setActiveSidebarItem("log-analysis"); performLogAnalysis(); }, primary: true, icon: GitCompare },
+        ]}
+      />
+      <input type="file" id="fix-spec" className="hidden" accept=".xml,.txt" onChange={handleLogSpecUpload} />
+      <input type="file" id="log-file" className="hidden" accept=".log,.txt" onChange={handleLogFileUpload} />
+
+      <ToolPanel
+        title="FIX Message Generator"
+        icon={MessageSquare}
+        buttons={[
+          { label: "Select FIX Spec", action: () => handleFileUpload("gen-spec"), icon: FileText },
+          { label: "Change Tag Values", action: () => setShowTagEditor(true), icon: Settings },
+          { label: "Select MsgType", action: () => setShowMsgTypeDropdown(true), icon: FileText },
+          { label: "Generate FIX Msg", action: () => callServerEndpoint("generate-fix-msg"), primary: true, icon: MessageSquare },
+        ]}
+      />
+      <input type="file" id="gen-spec" className="hidden" accept=".xml,.txt" />
+
+      <ToolPanel
+        title="Generate Test Cases"
+        icon={TestTube}
+        buttons={[
+          { label: "Select FIX Spec", action: () => handleFileUpload("test-spec"), icon: FileText },
+          { label: "Select Log File", action: () => handleFileUpload("test-log"), icon: FileText },
+          { label: "Select Coverage", action: () => alert("Coverage options: Full, Partial, Minimal"), icon: FileCheck },
+          { label: "Generate Tests", action: () => { setActiveSidebarItem("test-cases"); generateTestCases(); }, primary: true, icon: TestTube },
+        ]}
+      />
+      <input type="file" id="test-spec" className="hidden" accept=".xml,.txt" />
+      <input type="file" id="test-log" className="hidden" accept=".log,.txt" />
+    </div>
+  )
+
+  // Modern Tool Panel Component
+  const ToolPanel = ({
+    title,
+    icon: Icon,
+    buttons,
+  }: {
+    title: string
+    icon: React.ElementType
+    buttons: { label: string; action: () => void; primary?: boolean; icon?: React.ElementType }[]
+  }) => (
+    <Card hover className="overflow-hidden">
+      <div
+        className={`flex items-center gap-3 border-b px-5 py-4 ${
+          isDarkMode ? "border-[#1e4976] bg-[#0d1f3c]" : "border-[#e2e8f0] bg-[#f8fafc]"
+        }`}
+      >
+        <div
+          className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+            isDarkMode ? "bg-[#00e5ff]/20 text-[#00e5ff]" : "bg-[#0a1628]/10 text-[#0a1628]"
+          }`}
+        >
+          <Icon className="h-5 w-5" />
+        </div>
+        <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{title}</h3>
+      </div>
+      <div className="p-5">
+        <div className="grid grid-cols-2 gap-3">
+          {buttons.map((btn, index) => {
+            const BtnIcon = btn.icon
+            return (
+              <Button key={index} variant={btn.primary ? "primary" : "secondary"} size="sm" onClick={btn.action} className="justify-start">
+                {BtnIcon && <BtnIcon className="mr-2 h-4 w-4" />}
+                {btn.label}
+              </Button>
+            )
+          })}
+        </div>
+      </div>
+    </Card>
+  )
+
+  // Admin Sidebar Items
+  const adminSidebarItems: SidebarItem[] = [
+    { icon: LayoutDashboard, label: "Dashboard", id: "dashboard" },
+    { icon: GitCompare, label: "Spec Compare", id: "spec-compare" },
+    { icon: FileCheck, label: "Log Analysis", id: "log-analysis" },
+    { icon: MessageSquare, label: "Message Generator", id: "msg-generator" },
+    { icon: TestTube, label: "Test Cases", id: "test-cases" },
+    { icon: Users, label: "Clients", id: "clients" },
+    { icon: History, label: "History", id: "history" },
+    { icon: Bell, label: "Alerts", id: "alerts", badge: alerts.filter((a) => !a.resolved).length },
+    { icon: Settings, label: "Settings", id: "settings" },
+    { icon: HelpCircle, label: "Help", id: "help" },
+  ]
+
+  // Client Sidebar Items
+  const clientSidebarItems: SidebarItem[] = [
+    { icon: LayoutDashboard, label: "Dashboard", id: "dashboard" },
+    { icon: Upload, label: "Upload Specs", id: "upload" },
+    { icon: Download, label: "Download Specs", id: "download" },
+    { icon: MessageSquare, label: "Generate Message", id: "msg-generator" },
+    { icon: History, label: "History", id: "history" },
+    { icon: Settings, label: "Settings", id: "settings" },
+    { icon: HelpCircle, label: "Help", id: "help" },
+  ]
+
+  // Render Active Panel
+  const renderActivePanel = () => {
+    switch (activeSidebarItem) {
+      case "dashboard":
+        return <DashboardPanel />
+      case "spec-compare":
+        return <SpecComparePanel />
+      case "log-analysis":
+        return <LogAnalysisPanel />
+      case "test-cases":
+        return <TestCasesPanel />
+      case "clients":
+        return <ClientsPanel />
+      case "history":
+        return <HistoryPanel />
+      case "alerts":
+        return <AlertsPanel />
+      default:
+        return <DashboardPanel />
+    }
+  }
+
   // Home Screen
   const HomeScreen = () => (
-    <div
-      className={`min-h-screen p-6 transition-colors ${
-        isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"
-      }`}
-    >
+    <div className={`min-h-screen p-6 transition-colors ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
       <ThemeToggle />
 
       {/* Header */}
@@ -410,9 +1232,7 @@ export default function FixAIPortal() {
               : "bg-gradient-to-r from-[#0a1628] via-[#1976d2] to-[#0a1628] shadow-[#0a1628]/20"
           }`}
         >
-          <h1 className="text-4xl font-bold tracking-wide text-white drop-shadow-lg">
-            BTCS AI Interface
-          </h1>
+          <h1 className="text-4xl font-bold tracking-wide text-white drop-shadow-lg">BTCS AI Interface</h1>
           <p className="mt-2 text-sm text-white/80">FIX Protocol Management & Testing Portal</p>
         </div>
       </div>
@@ -424,54 +1244,30 @@ export default function FixAIPortal() {
 
       {/* Login Cards */}
       <div className="mx-auto mb-8 grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2">
-        {/* Admin Login Card */}
         <Card hover className="p-6">
-          <Button
-            variant="primary"
-            size="lg"
-            className="mb-6 w-full"
-            onClick={() => handleLogin("admin")}
-          >
+          <Button variant="primary" size="lg" className="mb-6 w-full" onClick={() => handleLogin("admin")}>
             Admin Login
           </Button>
           <ul className="space-y-3">
-            {[
-              "Compare between FIX Specs",
-              "Compare FIX SPECS vs Log Files",
-              "Create FIX message from Log File",
-              "Create Test Cases from Fix Specs",
-              "Create Test Cases from Log Files",
-            ].map((item, i) => (
-              <li key={i} className="flex items-center gap-3">
-                <ChevronRight
-                  className={`h-4 w-4 ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`}
-                />
-                <span className={isDarkMode ? "text-[#90caf9]" : "text-[#475569]"}>{item}</span>
-              </li>
-            ))}
+            {["Compare between FIX Specs", "Compare FIX SPECS vs Log Files", "Create FIX message from Log File", "Create Test Cases from Fix Specs", "Create Test Cases from Log Files"].map(
+              (item, i) => (
+                <li key={i} className="flex items-center gap-3">
+                  <ChevronRight className={`h-4 w-4 ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`} />
+                  <span className={isDarkMode ? "text-[#90caf9]" : "text-[#475569]"}>{item}</span>
+                </li>
+              )
+            )}
           </ul>
         </Card>
 
-        {/* Client Login Card */}
         <Card hover className="p-6">
-          <Button
-            variant="primary"
-            size="lg"
-            className="mb-6 w-full"
-            onClick={() => handleLogin("client")}
-          >
+          <Button variant="primary" size="lg" className="mb-6 w-full" onClick={() => handleLogin("client")}>
             Client Login
           </Button>
           <ul className="space-y-3">
-            {[
-              "Upload FIX specs",
-              "Download FIX Spec",
-              "Generate FIX message from Spec",
-            ].map((item, i) => (
+            {["Upload FIX specs", "Download FIX Spec", "Generate FIX message from Spec"].map((item, i) => (
               <li key={i} className="flex items-center gap-3">
-                <ChevronRight
-                  className={`h-4 w-4 ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`}
-                />
+                <ChevronRight className={`h-4 w-4 ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`} />
                 <span className={isDarkMode ? "text-[#90caf9]" : "text-[#475569]"}>{item}</span>
               </li>
             ))}
@@ -483,34 +1279,21 @@ export default function FixAIPortal() {
       <Card className="mx-auto max-w-5xl p-6">
         <div
           className={`mb-6 rounded-xl px-6 py-3 text-center ${
-            isDarkMode
-              ? "bg-gradient-to-r from-[#0d47a1] to-[#00bcd4]"
-              : "bg-gradient-to-r from-[#0a1628] to-[#1976d2]"
+            isDarkMode ? "bg-gradient-to-r from-[#0d47a1] to-[#00bcd4]" : "bg-gradient-to-r from-[#0a1628] to-[#1976d2]"
           }`}
         >
           <h2 className="text-xl font-semibold text-white">Test it Out!</h2>
         </div>
 
         <div className="flex flex-col gap-6 md:flex-row">
-          {/* Controls */}
-          <div
-            className={`flex-1 rounded-xl border p-5 ${
-              isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#f8fafc]"
-            }`}
-          >
+          <div className={`flex-1 rounded-xl border p-5 ${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#f8fafc]"}`}>
             <div className="grid grid-cols-2 gap-4">
               <div className="relative">
                 <Button variant="secondary" className="w-full" onClick={() => handleFileUpload("spec-upload")}>
                   <Upload className="mr-2 h-4 w-4" />
                   Upload FIX Spec
                 </Button>
-                <input
-                  type="file"
-                  id="spec-upload"
-                  className="hidden"
-                  accept=".xml,.txt"
-                  onChange={handleSpecUpload}
-                />
+                <input type="file" id="spec-upload" className="hidden" accept=".xml,.txt" onChange={handleSpecUpload} />
                 {uploadedSpec && (
                   <span className="mt-2 flex items-center gap-1 text-xs text-[#4caf50]">
                     <span className="inline-block h-2 w-2 rounded-full bg-[#4caf50]"></span>
@@ -540,9 +1323,7 @@ export default function FixAIPortal() {
                         key={type.code}
                         onClick={() => selectMsgType(type.code)}
                         className={`block w-full px-4 py-2.5 text-left text-sm transition-colors ${
-                          isDarkMode
-                            ? "text-[#90caf9] hover:bg-[#1e4976] hover:text-white"
-                            : "text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0a1628]"
+                          isDarkMode ? "text-[#90caf9] hover:bg-[#1e4976] hover:text-white" : "text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0a1628]"
                         }`}
                       >
                         {type.code} - {type.name}
@@ -558,23 +1339,13 @@ export default function FixAIPortal() {
             </div>
           </div>
 
-          {/* Arrow */}
           <div className="flex items-center justify-center">
-            <div
-              className={`rounded-full p-3 ${
-                isDarkMode ? "bg-[#00e5ff]/20 text-[#00e5ff]" : "bg-[#0a1628]/10 text-[#0a1628]"
-              }`}
-            >
+            <div className={`rounded-full p-3 ${isDarkMode ? "bg-[#00e5ff]/20 text-[#00e5ff]" : "bg-[#0a1628]/10 text-[#0a1628]"}`}>
               <ChevronRight className="h-6 w-6" />
             </div>
           </div>
 
-          {/* Output */}
-          <div
-            className={`flex-1 rounded-xl border p-5 ${
-              isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#f8fafc]"
-            }`}
-          >
+          <div className={`flex-1 rounded-xl border p-5 ${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#f8fafc]"}`}>
             <div
               className={`min-h-32 rounded-lg p-4 font-mono text-xs leading-relaxed ${
                 isDarkMode ? "bg-[#0d1f3c] text-[#00e5ff]" : "bg-white text-[#0a1628] border border-[#e2e8f0]"
@@ -587,7 +1358,6 @@ export default function FixAIPortal() {
         </div>
       </Card>
 
-      {/* Tag Editor Modal */}
       {showTagEditor && <TagEditorModal />}
     </div>
   )
@@ -597,14 +1367,10 @@ export default function FixAIPortal() {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <Card className="w-full max-w-md p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-            Edit Tag Values
-          </h3>
+          <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Edit Tag Values</h3>
           <button
             onClick={() => setShowTagEditor(false)}
-            className={`rounded-lg p-2 transition-colors ${
-              isDarkMode ? "hover:bg-[#1e4976] text-[#90caf9]" : "hover:bg-[#f1f5f9] text-[#64748b]"
-            }`}
+            className={`rounded-lg p-2 transition-colors ${isDarkMode ? "hover:bg-[#1e4976] text-[#90caf9]" : "hover:bg-[#f1f5f9] text-[#64748b]"}`}
           >
             <X className="h-5 w-5" />
           </button>
@@ -612,11 +1378,7 @@ export default function FixAIPortal() {
         <div className="max-h-80 space-y-3 overflow-y-auto pr-2">
           {tagValues.map((tag, index) => (
             <div key={index} className="flex items-center gap-3">
-              <span
-                className={`w-16 text-sm font-medium ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`}
-              >
-                Tag {tag.tag}
-              </span>
+              <span className={`w-16 text-sm font-medium ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`}>Tag {tag.tag}</span>
               <input
                 type="text"
                 value={tag.value}
@@ -642,14 +1404,10 @@ export default function FixAIPortal() {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <Card className="w-full max-w-sm p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-            Select Message Type
-          </h3>
+          <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Select Message Type</h3>
           <button
             onClick={() => setShowMsgTypeDropdown(false)}
-            className={`rounded-lg p-2 transition-colors ${
-              isDarkMode ? "hover:bg-[#1e4976] text-[#90caf9]" : "hover:bg-[#f1f5f9] text-[#64748b]"
-            }`}
+            className={`rounded-lg p-2 transition-colors ${isDarkMode ? "hover:bg-[#1e4976] text-[#90caf9]" : "hover:bg-[#f1f5f9] text-[#64748b]"}`}
           >
             <X className="h-5 w-5" />
           </button>
@@ -663,9 +1421,7 @@ export default function FixAIPortal() {
                 setShowMsgTypeDropdown(false)
               }}
               className={`block w-full rounded-lg px-4 py-2.5 text-left text-sm transition-colors ${
-                isDarkMode
-                  ? "text-[#90caf9] hover:bg-[#1e4976] hover:text-white"
-                  : "text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0a1628]"
+                isDarkMode ? "text-[#90caf9] hover:bg-[#1e4976] hover:text-white" : "text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0a1628]"
               }`}
             >
               {type.code} - {type.name}
@@ -676,162 +1432,29 @@ export default function FixAIPortal() {
     </div>
   )
 
-  // Modern Tool Panel Component
-  const ToolPanel = ({
-    title,
-    icon: Icon,
-    buttons,
-  }: {
-    title: string
-    icon: React.ElementType
-    buttons: { label: string; action: () => void; primary?: boolean; icon?: React.ElementType }[]
-  }) => (
-    <Card hover className="overflow-hidden">
-      <div
-        className={`flex items-center gap-3 border-b px-5 py-4 ${
-          isDarkMode ? "border-[#1e4976] bg-[#0d1f3c]" : "border-[#e2e8f0] bg-[#f8fafc]"
-        }`}
-      >
-        <div
-          className={`flex h-10 w-10 items-center justify-center rounded-xl ${
-            isDarkMode ? "bg-[#00e5ff]/20 text-[#00e5ff]" : "bg-[#0a1628]/10 text-[#0a1628]"
-          }`}
-        >
-          <Icon className="h-5 w-5" />
-        </div>
-        <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-          {title}
-        </h3>
-      </div>
-      <div className="p-5">
-        <div className="grid grid-cols-2 gap-3">
-          {buttons.map((btn, index) => {
-            const BtnIcon = btn.icon
-            return (
-              <Button
-                key={index}
-                variant={btn.primary ? "primary" : "secondary"}
-                size="sm"
-                onClick={btn.action}
-                className="justify-start"
-              >
-                {BtnIcon && <BtnIcon className="mr-2 h-4 w-4" />}
-                {btn.label}
-              </Button>
-            )
-          })}
-        </div>
-      </div>
-    </Card>
-  )
-
-  // Admin Sidebar Items
-  const adminSidebarItems: SidebarItem[] = [
-    { icon: LayoutDashboard, label: "Dashboard", id: "dashboard" },
-    { icon: GitCompare, label: "Spec Compare", id: "spec-compare" },
-    { icon: FileCheck, label: "Log Analysis", id: "log-analysis" },
-    { icon: MessageSquare, label: "Message Generator", id: "msg-generator" },
-    { icon: TestTube, label: "Test Cases", id: "test-cases" },
-    { icon: Users, label: "Clients", id: "clients" },
-    { icon: History, label: "History", id: "history" },
-    { icon: Bell, label: "Alerts", id: "alerts", badge: 5 },
-    { icon: Settings, label: "Settings", id: "settings" },
-    { icon: HelpCircle, label: "Help", id: "help" },
-  ]
-
-  // Client Sidebar Items
-  const clientSidebarItems: SidebarItem[] = [
-    { icon: LayoutDashboard, label: "Dashboard", id: "dashboard" },
-    { icon: Upload, label: "Upload Specs", id: "upload" },
-    { icon: Download, label: "Download Specs", id: "download" },
-    { icon: MessageSquare, label: "Generate Message", id: "msg-generator" },
-    { icon: History, label: "History", id: "history" },
-    { icon: Settings, label: "Settings", id: "settings" },
-    { icon: HelpCircle, label: "Help", id: "help" },
-  ]
-
   // Admin Tools Screen
   const AdminToolsScreen = () => (
     <div className={`flex min-h-screen transition-colors ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
       <Sidebar items={adminSidebarItems} title="FIX Admin" />
 
-      {/* Main Content */}
       <div className="flex-1 overflow-auto">
-        {/* Top Bar */}
         <div
           className={`sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4 ${
             isDarkMode ? "border-[#1e4976] bg-[#0a1628]/95 backdrop-blur" : "border-[#e2e8f0] bg-white/95 backdrop-blur"
           }`}
         >
           <div>
-            <h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-              Admin Tools
-            </h1>
-            <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
-              FIX Protocol Management Dashboard
-            </p>
+            <h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Admin Tools</h1>
+            <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>FIX Protocol Management Dashboard</p>
           </div>
           <div className="flex items-center gap-3">
             <TabBar />
           </div>
         </div>
 
-        {/* Tool Panels */}
-        <div className="grid grid-cols-1 gap-6 p-6 lg:grid-cols-2">
-          <ToolPanel
-            title="FIX Spec Compare"
-            icon={GitCompare}
-            buttons={[
-              { label: "Select Spec 1", action: () => handleFileUpload("spec1"), icon: FileText },
-              { label: "Select Spec 2", action: () => handleFileUpload("spec2"), icon: FileText },
-              { label: "Check Compatibility", action: () => callServerEndpoint("check-compatibility"), icon: FileCheck },
-              { label: "Compare Specs", action: () => callServerEndpoint("compare-specs"), primary: true, icon: GitCompare },
-            ]}
-          />
-          <input type="file" id="spec1" className="hidden" accept=".xml,.txt" />
-          <input type="file" id="spec2" className="hidden" accept=".xml,.txt" />
-
-          <ToolPanel
-            title="FIX Logs & Spec Compare"
-            icon={FileCheck}
-            buttons={[
-              { label: "Select FIX Spec", action: () => handleFileUpload("fix-spec"), icon: FileText },
-              { label: "Select Log File", action: () => handleFileUpload("log-file"), icon: FileText },
-              { label: "Check Compatibility", action: () => callServerEndpoint("check-log-compatibility"), icon: FileCheck },
-              { label: "Find Differences", action: () => callServerEndpoint("find-differences"), primary: true, icon: GitCompare },
-            ]}
-          />
-          <input type="file" id="fix-spec" className="hidden" accept=".xml,.txt" />
-          <input type="file" id="log-file" className="hidden" accept=".log,.txt" />
-
-          <ToolPanel
-            title="FIX Message Generator"
-            icon={MessageSquare}
-            buttons={[
-              { label: "Select FIX Spec", action: () => handleFileUpload("gen-spec"), icon: FileText },
-              { label: "Change Tag Values", action: () => setShowTagEditor(true), icon: Settings },
-              { label: "Select MsgType", action: () => setShowMsgTypeDropdown(true), icon: FileText },
-              { label: "Generate FIX Msg", action: () => callServerEndpoint("generate-fix-msg"), primary: true, icon: MessageSquare },
-            ]}
-          />
-          <input type="file" id="gen-spec" className="hidden" accept=".xml,.txt" />
-
-          <ToolPanel
-            title="Generate Test Cases"
-            icon={TestTube}
-            buttons={[
-              { label: "Select FIX Spec", action: () => handleFileUpload("test-spec"), icon: FileText },
-              { label: "Select Log File", action: () => handleFileUpload("test-log"), icon: FileText },
-              { label: "Select Coverage", action: () => alert("Coverage options: Full, Partial, Minimal"), icon: FileCheck },
-              { label: "Generate Tests", action: () => callServerEndpoint("generate-tests"), primary: true, icon: TestTube },
-            ]}
-          />
-          <input type="file" id="test-spec" className="hidden" accept=".xml,.txt" />
-          <input type="file" id="test-log" className="hidden" accept=".log,.txt" />
-        </div>
+        {renderActivePanel()}
       </div>
 
-      {/* Modals */}
       {showTagEditor && <TagEditorModal />}
       {showMsgTypeDropdown && <MsgTypeModal />}
     </div>
@@ -842,63 +1465,24 @@ export default function FixAIPortal() {
     <div className={`flex min-h-screen transition-colors ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
       <Sidebar items={clientSidebarItems} title="FIX Client" />
 
-      {/* Main Content */}
       <div className="flex-1 overflow-auto">
-        {/* Top Bar */}
         <div
           className={`sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4 ${
             isDarkMode ? "border-[#1e4976] bg-[#0a1628]/95 backdrop-blur" : "border-[#e2e8f0] bg-white/95 backdrop-blur"
           }`}
         >
           <div>
-            <h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-              Client Tools
-            </h1>
-            <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
-              FIX Specification Management
-            </p>
+            <h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Client Tools</h1>
+            <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>FIX Specification Management</p>
           </div>
           <div className="flex items-center gap-3">
             <TabBar />
           </div>
         </div>
 
-        {/* Tool Panels */}
-        <div className="grid grid-cols-1 gap-6 p-6 lg:grid-cols-2">
-          <ToolPanel
-            title="Upload FIX Specs"
-            icon={Upload}
-            buttons={[
-              { label: "Browse Files", action: () => handleFileUpload("client-upload"), icon: FolderOpen },
-              { label: "Upload to Server", action: () => callServerEndpoint("upload-specs"), primary: true, icon: Upload },
-            ]}
-          />
-          <input type="file" id="client-upload" className="hidden" accept=".xml,.txt" />
-
-          <ToolPanel
-            title="Download FIX Spec"
-            icon={Download}
-            buttons={[
-              { label: "Select Version", action: () => alert("Versions: FIX 4.0, 4.2, 4.4, 5.0"), icon: FileText },
-              { label: "Download", action: () => callServerEndpoint("download-spec"), primary: true, icon: Download },
-            ]}
-          />
-
-          <ToolPanel
-            title="Generate FIX Message"
-            icon={MessageSquare}
-            buttons={[
-              { label: "Select FIX Spec", action: () => handleFileUpload("client-gen-spec"), icon: FileText },
-              { label: "Select MsgType", action: () => setShowMsgTypeDropdown(true), icon: FileText },
-              { label: "Change Tag Values", action: () => setShowTagEditor(true), icon: Settings },
-              { label: "Generate Message", action: () => callServerEndpoint("generate-message"), primary: true, icon: MessageSquare },
-            ]}
-          />
-          <input type="file" id="client-gen-spec" className="hidden" accept=".xml,.txt" />
-        </div>
+        {renderActivePanel()}
       </div>
 
-      {/* Modals */}
       {showTagEditor && <TagEditorModal />}
       {showMsgTypeDropdown && <MsgTypeModal />}
     </div>
@@ -908,16 +1492,12 @@ export default function FixAIPortal() {
   const LoginModal = () => (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <Card className="w-full max-w-sm p-6">
-        <h3
-          className={`mb-6 text-center text-xl font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}
-        >
+        <h3 className={`mb-6 text-center text-xl font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
           Log in as {loginType === "admin" ? "Admin" : "Client"}
         </h3>
         <div className="space-y-4">
           <div>
-            <label className={`mb-2 block text-sm font-medium ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
-              Username
-            </label>
+            <label className={`mb-2 block text-sm font-medium ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Username</label>
             <input
               type="text"
               value={username}
@@ -931,9 +1511,7 @@ export default function FixAIPortal() {
             />
           </div>
           <div>
-            <label className={`mb-2 block text-sm font-medium ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
-              Password
-            </label>
+            <label className={`mb-2 block text-sm font-medium ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Password</label>
             <input
               type="password"
               value={password}
