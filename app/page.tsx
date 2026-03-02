@@ -3451,10 +3451,10 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
       
       <div className="grid md:grid-cols-3 gap-8">
         {[
-          { icon: GitCompare, title: "Spec Comparison", desc: "Compare FIX specifications side-by-side with intelligent diff analysis", color: "#1976d2" },
-          { icon: FileCheck, title: "Log Analysis", desc: "Analyze FIX logs against specifications to identify discrepancies", color: "#4caf50" },
+          { icon: GitCompare, title: "FIX Spec Comparison", desc: "Compare FIX specifications side-by-side with intelligent diff analysis", color: "#1976d2" },
+          { icon: FileCheck, title: "FIX Log Analysis", desc: "Analyze FIX logs against specifications to identify discrepancies", color: "#4caf50" },
           { icon: TestTube, title: "Test Generation", desc: "Auto-generate comprehensive test cases from your FIX specs", color: "#9c27b0" },
-          { icon: MessageSquare, title: "Message Builder", desc: "Create and validate FIX messages with our intuitive builder", color: "#f57c00" },
+          { icon: MessageSquare, title: "FIX Message Builder", desc: "Create and validate FIX messages with our intuitive builder", color: "#f57c00" },
           { icon: AlertTriangle, title: "Alerts & Monitoring", desc: "Real-time alerts for certification issues and failures", color: "#f44336" },
           { icon: Users, title: "Client Management", desc: "Manage multiple clients and track their certification progress", color: "#00bcd4" },
         ].map((feature, i) => (
