@@ -2698,9 +2698,9 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
             ))}
           </div>
 
-      {/* Step 1: Upload File */}
-      {msgGenStep === 1 && (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Step 1: Upload File */}
+          {msgGenStep === 1 && (
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Upload FIX Spec */}
           <Card 
             className={`cursor-pointer p-6 transition-all hover:shadow-lg ${
@@ -2787,56 +2787,56 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
             Try Sample
           </Button>
         </div>
-      )}
+          )}
 
-      {/* Step 2: Select Message Type */}
-      {msgGenStep === 2 && (
-        <Card className="p-6">
-          <h3 className={`mb-4 text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-            Select Message Type
-          </h3>
-          <p className={`mb-6 text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
-            Choose the FIX message type you want to generate
-          </p>
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-            {msgTypes.map((type) => (
-              <button
-                key={type.code}
-                onClick={() => selectMsgGenType(type.code)}
-                className={`flex flex-col items-center rounded-xl border-2 p-4 transition-all ${
-                  msgGenSelectedType === type.code
-                    ? isDarkMode 
-                      ? "border-[#00e5ff] bg-[#00e5ff]/10" 
-                      : "border-[#0a1628] bg-[#0a1628]/5"
-                    : isDarkMode 
-                      ? "border-[#1e4976] hover:border-[#00e5ff]/50 hover:bg-[#1e4976]/50" 
-                      : "border-[#e2e8f0] hover:border-[#0a1628]/30 hover:bg-[#f1f5f9]"
-                }`}
-              >
-                <span className={`mb-1 text-2xl font-bold ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`}>
-                  {type.code}
-                </span>
-                <span className={`text-center text-xs ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
-                  {type.name}
-                </span>
-              </button>
-            ))}
-          </div>
-        </Card>
-      )}
+          {/* Step 2: Select Message Type */}
+          {msgGenStep === 2 && (
+            <Card className="p-6">
+              <h3 className={`mb-4 text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                Select Message Type
+              </h3>
+              <p className={`mb-6 text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+                Choose the FIX message type you want to generate
+              </p>
+              <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+                {msgTypes.map((type) => (
+                  <button
+                    key={type.code}
+                    onClick={() => selectMsgGenType(type.code)}
+                    className={`flex flex-col items-center rounded-xl border-2 p-4 transition-all ${
+                      msgGenSelectedType === type.code
+                        ? isDarkMode 
+                          ? "border-[#00e5ff] bg-[#00e5ff]/10" 
+                          : "border-[#0a1628] bg-[#0a1628]/5"
+                        : isDarkMode 
+                          ? "border-[#1e4976] hover:border-[#00e5ff]/50 hover:bg-[#1e4976]/50" 
+                          : "border-[#e2e8f0] hover:border-[#0a1628]/30 hover:bg-[#f1f5f9]"
+                    }`}
+                  >
+                    <span className={`mb-1 text-2xl font-bold ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`}>
+                      {type.code}
+                    </span>
+                    <span className={`text-center text-xs ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
+                      {type.name}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </Card>
+          )}
 
-      {/* Step 3: Edit Fields */}
-      {msgGenStep === 3 && (
-        <div className="space-y-6">
-          {/* Field Editor */}
-          <Card className="p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                  Edit Message Fields
-                </h3>
-                <p className={`text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
-                  Customize the field values for your {msgTypes.find(t => t.code === msgGenSelectedType)?.name} message
+          {/* Step 3: Edit Fields */}
+          {msgGenStep === 3 && (
+            <div className="space-y-6">
+              {/* Field Editor */}
+              <Card className="p-6">
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                      Edit Message Fields
+                    </h3>
+                    <p className={`text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+                      Customize the field values for your {msgTypes.find(t => t.code === msgGenSelectedType)?.name} message
                 </p>
               </div>
               <span className={`rounded-lg px-3 py-1 text-sm font-semibold ${isDarkMode ? "bg-[#00e5ff]/20 text-[#00e5ff]" : "bg-[#0a1628]/10 text-[#0a1628]"}`}>
@@ -2951,8 +2951,8 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
               </p>
             </Card>
           )}
-        </div>
-      )}
+            </div>
+          )}
         </div>
 
         {/* Right Side - Quick Sender Tool */}
