@@ -23,6 +23,19 @@
   --fresh-blue: #42a5f5;
   --clear-blue: #90caf9;
   
+  /* Accent Colors from Broadridge Palette */
+  --accent-orange: #f57c00;
+  --accent-orange-bright: #ff9800;
+  --accent-orange-light: #ffb74d;
+  
+  /* Status Colors */
+  --status-success: #4caf50;
+  --status-success-light: #81c784;
+  --status-warning: #ffc107;
+  --status-warning-light: #ffecb3;
+  --status-error: #f44336;
+  --status-error-light: #ef9a9a;
+  
   /* Primary & Secondary - Deep Blue Buttons */
   --primary: #0a1628;
   --primary-foreground: #ffffff;

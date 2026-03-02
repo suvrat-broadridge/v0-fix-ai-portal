@@ -143,6 +143,9 @@ export default function FixAIPortal() {
     setTagValues(newTags)
   }
 
+  // Status message state
+  const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error" | "warning"; message: string } | null>(null)
+
   // API call helper
   const callServerEndpoint = async (tool: string) => {
     try {
@@ -152,13 +155,34 @@ export default function FixAIPortal() {
       })
       const data = await response.json()
       if (data.success) {
-        alert(`Success: ${data.output}`)
+        setStatusMessage({ type: "success", message: `Success: ${data.output}` })
       } else {
-        alert(`Error: ${data.error}`)
+        setStatusMessage({ type: "error", message: `Error: ${data.error}` })
       }
     } catch {
       console.log(`[v0] Tool triggered: ${tool} (server not running)`)
+      setStatusMessage({ type: "warning", message: `Tool "${tool}" triggered (connect server to execute)` })
     }
+    // Auto-hide status after 4 seconds
+    setTimeout(() => setStatusMessage(null), 4000)
+  }
+
+  // Status Toast Component
+  const StatusToast = () => {
+    if (!statusMessage) return null
+    const colors = {
+      success: "bg-[#4caf50] text-white",
+      error: "bg-[#f44336] text-white",
+      warning: "bg-[#ffc107] text-[#0a1628]",
+    }
+    return (
+      <div className={`fixed bottom-4 right-4 z-50 flex items-center gap-3 rounded-xl px-5 py-3 shadow-lg ${colors[statusMessage.type]}`}>
+        <span className="text-sm font-medium">{statusMessage.message}</span>
+        <button onClick={() => setStatusMessage(null)} className="ml-2 opacity-70 hover:opacity-100">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+    )
   }
 
   // Modern Button Component
@@ -238,20 +262,18 @@ export default function FixAIPortal() {
               className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                 isActive
                   ? isDarkMode
-                    ? "bg-[#00e5ff]/20 text-[#00e5ff]"
-                    : "bg-[#0a1628]/10 text-[#0a1628]"
+                    ? "bg-[#f57c00]/20 text-[#ff9800] border-l-2 border-[#ff9800]"
+                    : "bg-[#f57c00]/10 text-[#f57c00] border-l-2 border-[#f57c00]"
                   : isDarkMode
                     ? "text-[#90caf9] hover:bg-[#1e4976]/50 hover:text-white"
                     : "text-[#64748b] hover:bg-[#e2e8f0] hover:text-[#0a1628]"
               }`}
             >
-              <Icon className="h-5 w-5" />
+              <Icon className={`h-5 w-5 ${isActive ? (isDarkMode ? "text-[#ff9800]" : "text-[#f57c00]") : ""}`} />
               <span>{item.label}</span>
               {item.badge && (
                 <span
-                  className={`ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold ${
-                    isDarkMode ? "bg-[#f44336] text-white" : "bg-[#ef4444] text-white"
-                  }`}
+                  className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-[#f57c00] px-1.5 text-xs font-semibold text-white"
                 >
                   {item.badge}
                 </span>
@@ -490,7 +512,10 @@ export default function FixAIPortal() {
                   onChange={handleSpecUpload}
                 />
                 {uploadedSpec && (
-                  <span className="mt-2 block text-xs text-green-500">{uploadedSpec}</span>
+                  <span className="mt-2 flex items-center gap-1 text-xs text-[#4caf50]">
+                    <span className="inline-block h-2 w-2 rounded-full bg-[#4caf50]"></span>
+                    {uploadedSpec}
+                  </span>
                 )}
               </div>
 
@@ -940,6 +965,7 @@ export default function FixAIPortal() {
       {currentScreen === "admin-tools" && <AdminToolsScreen />}
       {currentScreen === "client-tools" && <ClientToolsScreen />}
       {showLoginModal && <LoginModal />}
+      <StatusToast />
     </>
   )
 }
