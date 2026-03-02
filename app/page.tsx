@@ -77,8 +77,11 @@ interface Client {
   progress: {
     specComparison: "done" | "progress" | "pending" | "error"
     logComparison: "done" | "progress" | "pending" | "error"
-    testCases: "done" | "progress" | "pending" | "error"
-    msgGeneration: "done" | "progress" | "pending" | "error"
+    testCaseGeneration: "done" | "progress" | "pending" | "error"
+    conductorConnectivity: "connected" | "not-connected" | "error"
+    verifixConnectivity: "licensed" | "not-licensed" | "pending"
+    ulTestCases: "generated" | "pending" | "error"
+    ulTestCasesCount?: number
   }
 }
 
@@ -172,13 +175,13 @@ export default function FixAIPortal() {
 
   // Clients state
   const [clients, setClients] = useState<Client[]>([
-    { id: "C001", name: "BlackRock", specs: 12, lastActivity: "2025-03-02 10:30", status: "active", progress: { specComparison: "done", logComparison: "progress", testCases: "done", msgGeneration: "done" } },
-    { id: "C002", name: "Goldman Sachs", specs: 8, lastActivity: "2025-03-02 09:45", status: "active", progress: { specComparison: "done", logComparison: "done", testCases: "progress", msgGeneration: "pending" } },
-    { id: "C003", name: "JP Morgan", specs: 15, lastActivity: "2025-03-02 10:15", status: "active", progress: { specComparison: "progress", logComparison: "pending", testCases: "pending", msgGeneration: "pending" } },
-    { id: "C004", name: "UBS", specs: 6, lastActivity: "2025-03-01 16:30", status: "inactive", progress: { specComparison: "done", logComparison: "done", testCases: "done", msgGeneration: "done" } },
-    { id: "C005", name: "Raymond James", specs: 4, lastActivity: "2025-03-02 08:00", status: "active", progress: { specComparison: "done", logComparison: "error", testCases: "pending", msgGeneration: "pending" } },
-    { id: "C006", name: "HSBC", specs: 9, lastActivity: "2025-03-02 10:00", status: "active", progress: { specComparison: "done", logComparison: "done", testCases: "progress", msgGeneration: "progress" } },
-    { id: "C007", name: "Bank of America", specs: 11, lastActivity: "2025-03-01 14:20", status: "inactive", progress: { specComparison: "error", logComparison: "pending", testCases: "pending", msgGeneration: "pending" } },
+    { id: "C001", name: "BlackRock", specs: 12, lastActivity: "2025-03-02 10:30", status: "active", progress: { specComparison: "done", logComparison: "progress", testCaseGeneration: "done", conductorConnectivity: "connected", verifixConnectivity: "licensed", ulTestCases: "generated", ulTestCasesCount: 45 } },
+    { id: "C002", name: "Goldman Sachs", specs: 8, lastActivity: "2025-03-02 09:45", status: "active", progress: { specComparison: "done", logComparison: "done", testCaseGeneration: "progress", conductorConnectivity: "connected", verifixConnectivity: "not-licensed", ulTestCases: "pending" } },
+    { id: "C003", name: "JP Morgan", specs: 15, lastActivity: "2025-03-02 10:15", status: "active", progress: { specComparison: "progress", logComparison: "pending", testCaseGeneration: "pending", conductorConnectivity: "not-connected", verifixConnectivity: "pending", ulTestCases: "pending" } },
+    { id: "C004", name: "UBS", specs: 6, lastActivity: "2025-03-01 16:30", status: "inactive", progress: { specComparison: "done", logComparison: "done", testCaseGeneration: "done", conductorConnectivity: "connected", verifixConnectivity: "licensed", ulTestCases: "generated", ulTestCasesCount: 32 } },
+    { id: "C005", name: "Raymond James", specs: 4, lastActivity: "2025-03-02 08:00", status: "active", progress: { specComparison: "done", logComparison: "error", testCaseGeneration: "pending", conductorConnectivity: "error", verifixConnectivity: "not-licensed", ulTestCases: "error" } },
+    { id: "C006", name: "HSBC", specs: 9, lastActivity: "2025-03-02 10:00", status: "active", progress: { specComparison: "done", logComparison: "done", testCaseGeneration: "progress", conductorConnectivity: "connected", verifixConnectivity: "licensed", ulTestCases: "generated", ulTestCasesCount: 28 } },
+    { id: "C007", name: "Bank of America", specs: 11, lastActivity: "2025-03-01 14:20", status: "inactive", progress: { specComparison: "error", logComparison: "pending", testCaseGeneration: "pending", conductorConnectivity: "not-connected", verifixConnectivity: "pending", ulTestCases: "pending" } },
   ])
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const [clientSortBy, setClientSortBy] = useState<"name" | "progress" | "status">("name")
@@ -606,12 +609,18 @@ export default function FixAIPortal() {
 
   // Client helper functions
   const getProgressCount = (client: Client) => {
-    const progressValues = Object.values(client.progress)
-    return progressValues.filter(p => p === "done").length
+    let count = 0
+    if (client.progress.specComparison === "done") count++
+    if (client.progress.logComparison === "done") count++
+    if (client.progress.testCaseGeneration === "done") count++
+    if (client.progress.conductorConnectivity === "connected") count++
+    if (client.progress.verifixConnectivity === "licensed") count++
+    if (client.progress.ulTestCases === "generated") count++
+    return count
   }
 
   const getProgressPercent = (client: Client) => {
-    return (getProgressCount(client) / 4) * 100
+    return (getProgressCount(client) / 6) * 100
   }
 
   const sortedClients = [...clients]
@@ -636,7 +645,7 @@ export default function FixAIPortal() {
         specs: 0,
         lastActivity: new Date().toISOString().replace("T", " ").substring(0, 16),
         status: "active",
-        progress: { specComparison: "pending", logComparison: "pending", testCases: "pending", msgGeneration: "pending" }
+        progress: { specComparison: "pending", logComparison: "pending", testCaseGeneration: "pending", conductorConnectivity: "not-connected", verifixConnectivity: "pending", ulTestCases: "pending" }
       }
       setClients(prev => [...prev, newClient])
       setNewClientName("")
@@ -663,10 +672,56 @@ export default function FixAIPortal() {
       pending: "bg-[#9e9e9e]/20 text-[#9e9e9e]",
       error: "bg-[#f44336]/20 text-[#f44336]"
     }
-    const labels = { done: "Done", progress: "In Progress", pending: "Pending", error: "Error" }
+    const labels = { done: "Done", progress: "In Progress", pending: "Not Started", error: "Error" }
     return (
       <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${styles[status]}`}>
         {labels[status]}
+      </span>
+    )
+  }
+
+  const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" | "error" }) => {
+    const styles = {
+      connected: "bg-[#4caf50]/20 text-[#4caf50]",
+      "not-connected": "bg-[#f57c00]/20 text-[#f57c00]",
+      error: "bg-[#f44336]/20 text-[#f44336]"
+    }
+    const labels = { connected: "Connected", "not-connected": "Not Connected", error: "Error" }
+    return (
+      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${styles[status]}`}>
+        {labels[status]}
+      </span>
+    )
+  }
+
+  const LicenseBadge = ({ status }: { status: "licensed" | "not-licensed" | "pending" }) => {
+    const styles = {
+      licensed: "bg-[#4caf50]/20 text-[#4caf50]",
+      "not-licensed": "bg-[#f44336]/20 text-[#f44336]",
+      pending: "bg-[#9e9e9e]/20 text-[#9e9e9e]"
+    }
+    const labels = { licensed: "Licensed", "not-licensed": "Not Licensed", pending: "Pending" }
+    return (
+      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${styles[status]}`}>
+        {labels[status]}
+      </span>
+    )
+  }
+
+  const ULTestCasesBadge = ({ status, count, onClick }: { status: "generated" | "pending" | "error"; count?: number; onClick?: () => void }) => {
+    const styles = {
+      generated: "bg-[#4caf50]/20 text-[#4caf50] cursor-pointer hover:bg-[#4caf50]/30",
+      pending: "bg-[#9e9e9e]/20 text-[#9e9e9e]",
+      error: "bg-[#f44336]/20 text-[#f44336]"
+    }
+    const labels = { generated: `Generated${count ? ` (${count})` : ""}`, pending: "Pending", error: "Error" }
+    return (
+      <span 
+        className={`rounded-full px-2 py-0.5 text-xs font-medium ${styles[status]}`}
+        onClick={status === "generated" ? onClick : undefined}
+      >
+        {labels[status]}
+        {status === "generated" && <span className="ml-1 text-[10px] underline">View</span>}
       </span>
     )
   }
@@ -744,7 +799,7 @@ export default function FixAIPortal() {
                       />
                     </div>
                     <span className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
-                      {getProgressCount(client)}/4 tasks
+                      {getProgressCount(client)}/6 tasks
                     </span>
                   </div>
                 </div>
@@ -831,12 +886,24 @@ export default function FixAIPortal() {
                     <ProgressBadge status={selectedClient.progress.logComparison} />
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Test Cases</span>
-                    <ProgressBadge status={selectedClient.progress.testCases} />
+                    <span className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Test Case Generation</span>
+                    <ProgressBadge status={selectedClient.progress.testCaseGeneration} />
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Message Generation</span>
-                    <ProgressBadge status={selectedClient.progress.msgGeneration} />
+                    <span className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Conductor Connectivity</span>
+                    <ConnectivityBadge status={selectedClient.progress.conductorConnectivity} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Verifix Connectivity</span>
+                    <LicenseBadge status={selectedClient.progress.verifixConnectivity} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>UL Test Cases</span>
+                    <ULTestCasesBadge 
+                      status={selectedClient.progress.ulTestCases} 
+                      count={selectedClient.progress.ulTestCasesCount}
+                      onClick={() => { setSelectedClient(null); setShowULTestCasesModal(selectedClient); }}
+                    />
                   </div>
                 </div>
               </div>
@@ -1294,6 +1361,38 @@ export default function FixAIPortal() {
     </div>
   )
 
+  // Dashboard sorting state
+  const [dashboardSortBy, setDashboardSortBy] = useState<"name" | "progress" | "status">("name")
+  const [dashboardSortOrder, setDashboardSortOrder] = useState<"asc" | "desc">("asc")
+  const [dashboardStatusFilter, setDashboardStatusFilter] = useState<"all" | "active" | "inactive">("all")
+  const [showULTestCasesModal, setShowULTestCasesModal] = useState<Client | null>(null)
+
+  // Sort and filter clients for dashboard
+  const getDashboardProgressCount = (client: Client) => {
+    let count = 0
+    if (client.progress.specComparison === "done") count++
+    if (client.progress.logComparison === "done") count++
+    if (client.progress.testCaseGeneration === "done") count++
+    if (client.progress.conductorConnectivity === "connected") count++
+    if (client.progress.verifixConnectivity === "licensed") count++
+    if (client.progress.ulTestCases === "generated") count++
+    return count
+  }
+
+  const sortedDashboardClients = [...clients]
+    .filter(c => dashboardStatusFilter === "all" || c.status === dashboardStatusFilter)
+    .sort((a, b) => {
+      let comparison = 0
+      if (dashboardSortBy === "name") {
+        comparison = a.name.localeCompare(b.name)
+      } else if (dashboardSortBy === "progress") {
+        comparison = getDashboardProgressCount(b) - getDashboardProgressCount(a)
+      } else if (dashboardSortBy === "status") {
+        comparison = a.status.localeCompare(b.status)
+      }
+      return dashboardSortOrder === "asc" ? comparison : -comparison
+    })
+
   // Dashboard Panel (default)
   const DashboardPanel = () => (
     <div className="p-6">
@@ -1301,47 +1400,136 @@ export default function FixAIPortal() {
       <div className="mb-8">
         <div className="mb-4 flex items-center justify-between">
           <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Client Work Progress</h2>
-          <Button variant="ghost" size="sm" onClick={() => setActiveSidebarItem("clients")}>
-            View All Clients
-            <ChevronRight className="ml-1 h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-3">
+            <select
+              value={dashboardSortBy}
+              onChange={(e) => setDashboardSortBy(e.target.value as "name" | "progress" | "status")}
+              className={`rounded-lg border px-3 py-1.5 text-xs ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
+            >
+              <option value="name">Sort by Name</option>
+              <option value="progress">Sort by Progress</option>
+              <option value="status">Sort by Status</option>
+            </select>
+            <select
+              value={dashboardSortOrder}
+              onChange={(e) => setDashboardSortOrder(e.target.value as "asc" | "desc")}
+              className={`rounded-lg border px-3 py-1.5 text-xs ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
+            >
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
+            </select>
+            <select
+              value={dashboardStatusFilter}
+              onChange={(e) => setDashboardStatusFilter(e.target.value as "all" | "active" | "inactive")}
+              className={`rounded-lg border px-3 py-1.5 text-xs ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
+            >
+              <option value="all">All Status</option>
+              <option value="active">Active Only</option>
+              <option value="inactive">Inactive Only</option>
+            </select>
+            <Button variant="ghost" size="sm" onClick={() => setActiveSidebarItem("clients")}>
+              View All Clients
+              <ChevronRight className="ml-1 h-4 w-4" />
+            </Button>
+          </div>
         </div>
-        <div className="grid gap-4">
-          {clients.slice(0, 5).map((client) => (
-            <Card key={client.id} className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
-                    <Building2 className={`h-5 w-5 ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`} />
-                  </div>
-                  <div>
-                    <h3 className={`font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{client.name}</h3>
-                    <span className={`text-xs ${client.status === "active" ? "text-[#4caf50]" : "text-[#f57c00]"}`}>{client.status}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Spec Compare:</span>
-                    <ProgressBadge status={client.progress.specComparison} />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Log Compare:</span>
-                    <ProgressBadge status={client.progress.logComparison} />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Test Cases:</span>
-                    <ProgressBadge status={client.progress.testCases} />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Msg Gen:</span>
-                    <ProgressBadge status={client.progress.msgGeneration} />
-                  </div>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
+        
+        {/* Progress Table */}
+        <Card className="overflow-hidden">
+          <div className={`overflow-x-auto`}>
+            <table className="w-full">
+              <thead>
+                <tr className={`border-b ${isDarkMode ? "border-[#1e4976] bg-[#0d1f3c]" : "border-[#e2e8f0] bg-[#f8fafc]"}`}>
+                  <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Client</th>
+                  <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>FIX Spec Comparison</th>
+                  <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Log Comparison</th>
+                  <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Test Case Generation</th>
+                  <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Conductor Connectivity</th>
+                  <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Verifix Connectivity</th>
+                  <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>UL Test Cases</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedDashboardClients.map((client, idx) => (
+                  <tr 
+                    key={client.id} 
+                    className={`border-b transition-colors ${
+                      isDarkMode 
+                        ? `border-[#1e4976] ${idx % 2 === 0 ? "bg-[#0f2847]" : "bg-[#0a1628]"} hover:bg-[#1e4976]/50` 
+                        : `border-[#e2e8f0] ${idx % 2 === 0 ? "bg-white" : "bg-[#f8fafc]"} hover:bg-[#e2e8f0]/50`
+                    }`}
+                  >
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                          <Building2 className={`h-4 w-4 ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`} />
+                        </div>
+                        <div>
+                          <p className={`font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{client.name}</p>
+                          <span className={`text-xs ${client.status === "active" ? "text-[#4caf50]" : "text-[#f57c00]"}`}>{client.status}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3"><ProgressBadge status={client.progress.specComparison} /></td>
+                    <td className="px-4 py-3"><ProgressBadge status={client.progress.logComparison} /></td>
+                    <td className="px-4 py-3"><ProgressBadge status={client.progress.testCaseGeneration} /></td>
+                    <td className="px-4 py-3"><ConnectivityBadge status={client.progress.conductorConnectivity} /></td>
+                    <td className="px-4 py-3"><LicenseBadge status={client.progress.verifixConnectivity} /></td>
+                    <td className="px-4 py-3">
+                      <ULTestCasesBadge 
+                        status={client.progress.ulTestCases} 
+                        count={client.progress.ulTestCasesCount}
+                        onClick={() => setShowULTestCasesModal(client)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       </div>
+
+      {/* UL Test Cases Modal */}
+      {showULTestCasesModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <Card className="w-full max-w-2xl p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                UL Test Cases - {showULTestCasesModal.name}
+              </h3>
+              <button onClick={() => setShowULTestCasesModal(null)} className={`rounded-lg p-2 ${isDarkMode ? "hover:bg-[#1e4976]" : "hover:bg-[#f1f5f9]"}`}>
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className={`rounded-xl p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+              <p className={`mb-3 text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
+                Total Test Cases: <span className="font-semibold text-[#4caf50]">{showULTestCasesModal.progress.ulTestCasesCount || 0}</span>
+              </p>
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {Array.from({ length: Math.min(showULTestCasesModal.progress.ulTestCasesCount || 0, 10) }).map((_, i) => (
+                  <div key={i} className={`flex items-center justify-between rounded-lg p-3 ${isDarkMode ? "bg-[#0d1f3c]" : "bg-white border border-[#e2e8f0]"}`}>
+                    <div className="flex items-center gap-3">
+                      <TestTube className={`h-4 w-4 ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`} />
+                      <span className={`text-sm ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Test Case #{i + 1} - Message Type {["D", "8", "F", "G", "A"][i % 5]}</span>
+                    </div>
+                    <span className="rounded-full bg-[#4caf50]/20 px-2 py-0.5 text-xs text-[#4caf50]">Passed</span>
+                  </div>
+                ))}
+              </div>
+              {(showULTestCasesModal.progress.ulTestCasesCount || 0) > 10 && (
+                <p className={`mt-3 text-center text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+                  Showing 10 of {showULTestCasesModal.progress.ulTestCasesCount} test cases
+                </p>
+              )}
+            </div>
+            <div className="mt-4 flex gap-3">
+              <Button variant="secondary" className="flex-1" onClick={() => setShowULTestCasesModal(null)}>Close</Button>
+              <Button variant="primary" className="flex-1">Export Test Cases</Button>
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* Tools Grid */}
       <h2 className={`mb-4 text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Quick Tools</h2>
