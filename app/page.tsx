@@ -1,5 +1,5 @@
 "use client"
-
+// BControl FIX AI - BTCS Certification Onboarding Network Testing Routing Operations Lifecycle
 import { useState, useEffect } from "react"
 
 import {
@@ -3256,46 +3256,73 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
     return () => clearInterval(interval)
   }, [])
 
-  // BControl Logo Component - BTCS Certification Onboarding Network Testing Routing Operations Lifecycle
-  const BControlLogo = ({ size = "md", showExpanded = false }: { size?: "sm" | "md" | "lg", showExpanded?: boolean }) => {
+  // BControl Logo Component - Styled like the reference image with swoosh B
+  const BControlLogo = ({ size = "md", showText = true }: { size?: "sm" | "md" | "lg", showText?: boolean }) => {
     const sizes = {
-      sm: { outer: "h-10 w-10", text: "text-sm", inner: "text-[5px]" },
-      md: { outer: "h-12 w-12", text: "text-lg", inner: "text-[6px]" },
-      lg: { outer: "h-20 w-20", text: "text-3xl", inner: "text-[8px]" },
+      sm: { outer: "h-10", bSize: "text-2xl", controlSize: "text-lg" },
+      md: { outer: "h-14", bSize: "text-4xl", controlSize: "text-2xl" },
+      lg: { outer: "h-20", bSize: "text-6xl", controlSize: "text-4xl" },
     }
     const s = sizes[size]
     
-    const acronymParts = [
-      { letter: "B", word: "BTCS", color: "#00e5ff" },
-      { letter: "C", word: "Certification", color: "#4caf50" },
-      { letter: "O", word: "Onboarding", color: "#ff9800" },
-      { letter: "N", word: "Network Monitoring", color: "#e91e63" },
-      { letter: "T", word: "Testing", color: "#9c27b0" },
-      { letter: "R", word: "Routing Config", color: "#2196f3" },
-      { letter: "O", word: "Operations", color: "#ff5722" },
-      { letter: "L", word: "Lifecycle Mgmt", color: "#00bcd4" },
+    return (
+      <div className={`flex items-center gap-1 ${s.outer}`}>
+        {/* B with swoosh */}
+        <div className="relative">
+          <span className={`font-black ${s.bSize} bg-gradient-to-r from-[#00e5ff] to-[#0091ea] bg-clip-text text-transparent`}>B</span>
+          {/* Swoosh arrow */}
+          <svg className="absolute -right-1 top-1/2 -translate-y-1/2 w-4 h-4" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12h14M13 6l6 6-6 6" stroke="url(#swoosh)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <defs>
+              <linearGradient id="swoosh" x1="5" y1="12" x2="19" y2="12">
+                <stop stopColor="#00e5ff"/>
+                <stop offset="1" stopColor="#0091ea"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        {showText && (
+          <span className={`font-bold ${s.controlSize} ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>CONTROL</span>
+        )}
+      </div>
+    )
+  }
+  
+  // Acronym display component
+  const AcronymDisplay = ({ compact = false }: { compact?: boolean }) => {
+    const items = [
+      { letter: "B", word: "TCS", desc: "BTCS" },
+      { letter: "C", word: "ertification", desc: "Certification" },
+      { letter: "O", word: "nboarding", desc: "Onboarding" },
+      { letter: "N", word: "etwork", desc: "Network Monitoring" },
+      { letter: "T", word: "esting", desc: "Testing" },
+      { letter: "R", word: "outing", desc: "Routing Config" },
+      { letter: "O", word: "perations", desc: "Operations" },
+      { letter: "L", word: "ifecycle", desc: "Lifecycle Mgmt" },
     ]
     
-    return (
-      <div className="flex flex-col items-center gap-2">
-        <div className={`relative ${s.outer} flex items-center justify-center rounded-2xl bg-gradient-to-br from-[#0a1628] via-[#1976d2] to-[#00bcd4] shadow-xl overflow-hidden`}>
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent" />
-          <span className={`font-bold text-white ${s.text} relative z-10`}>B</span>
-          <div className="absolute bottom-1 left-0 right-0 flex justify-center">
-            <span className={`font-semibold text-white/90 ${s.inner} tracking-wide uppercase`}>control</span>
-          </div>
+    if (compact) {
+      return (
+        <div className={`flex flex-wrap justify-center gap-x-2 gap-y-1 text-xs font-medium ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+          {items.map((item, i) => (
+            <span key={i}>
+              <span className="text-[#00e5ff] font-bold">{item.letter}</span>
+              <span>{item.word}</span>
+              {i < items.length - 1 && <span className="mx-1">·</span>}
+            </span>
+          ))}
         </div>
-        {showExpanded && (
-          <div className="flex flex-wrap justify-center gap-1 max-w-xs">
-            {acronymParts.map((part, i) => (
-              <span key={i} className="text-[10px] font-medium" style={{ color: part.color }}>
-                <span className="font-bold">{part.letter}</span>
-                <span className={isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}>{part.word.slice(1)}</span>
-                {i < acronymParts.length - 1 && <span className={isDarkMode ? "text-[#1e4976]" : "text-[#e2e8f0]"}> · </span>}
-              </span>
-            ))}
+      )
+    }
+    
+    return (
+      <div className="grid grid-cols-4 gap-3">
+        {items.map((item, i) => (
+          <div key={i} className={`text-center p-2 rounded-lg ${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"}`}>
+            <span className="text-2xl font-black text-[#00e5ff]">{item.letter}</span>
+            <p className={`text-xs mt-1 ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>{item.desc}</p>
           </div>
-        )}
+        ))}
       </div>
     )
   }
@@ -3315,9 +3342,10 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
           ? "bg-[#0a1628]/90 border-[#1e4976]" 
           : "bg-white/80 border-[#e2e8f0]"
       }`}>
-        <div className="flex items-center gap-3">
-          <BControlLogo size="sm" />
-          <span className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>BControl</span>
+        <div className="flex items-center gap-2">
+          <BControlLogo size="sm" showText={false} />
+          <span className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>CONTROL</span>
+          <span className={`text-xs font-medium px-2 py-0.5 rounded ${isDarkMode ? "bg-[#00e5ff]/20 text-[#00e5ff]" : "bg-[#0a1628]/10 text-[#0a1628]"}`}>FIX AI</span>
         </div>
         <div className="hidden md:flex items-center gap-8">
           <a href="#features" className={`text-sm font-medium transition-colors ${isDarkMode ? "text-[#90caf9] hover:text-white" : "text-[#64748b] hover:text-[#0a1628]"}`}>Features</a>
@@ -3344,18 +3372,24 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
             <div className="space-y-8">
               <div className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm ${isDarkMode ? "bg-[#00e5ff]/10" : "bg-[#0a1628]/5"}`}>
                 <span className="flex h-2 w-2 rounded-full bg-[#4caf50] animate-pulse" />
-                <span className={`font-medium ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`}>FIX Protocol Testing Platform</span>
+                <span className={`font-medium ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`}>BControl FIX AI Platform</span>
               </div>
               
-              <h1 className={`text-5xl lg:text-6xl font-bold leading-tight text-balance ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                Intelligent FIX Protocol
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#1976d2] to-[#00bcd4]">
-                  Certification Testing
-                </span>
+              <h1 className={`text-4xl lg:text-5xl font-bold leading-tight ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">B</span>TCS
+                <span className="mx-2 text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">C</span>ertification
+                <span className="mx-2 text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">O</span>nboarding
+                <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">N</span>etwork
+                <span className="mx-2 text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">T</span>esting
+                <span className="mx-2 text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">R</span>outing
+                <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">O</span>perations
+                <span className="mx-2 text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">L</span>ifecycle
               </h1>
               
               <p className={`text-lg max-w-lg leading-relaxed text-pretty ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
-                Streamline your FIX specification comparison, log analysis, and test case generation with AI-powered automation designed for trading firms.
+                AI-powered FIX protocol management for certification, testing, and operations. Designed for trading firms and financial institutions.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4">
@@ -3539,10 +3573,13 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
             isDarkMode ? "bg-[#0d1f3c] border border-[#1e4976]" : "bg-white"
           }`}>
             <div className="text-center mb-8">
-              <div className="inline-block mb-4">
-                <BControlLogo size="lg" showExpanded />
+              <div className="flex justify-center mb-4">
+                <BControlLogo size="lg" />
               </div>
-              <h2 className={`text-2xl font-bold mt-4 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Choose Your Portal</h2>
+              <div className="mb-4">
+                <AcronymDisplay compact />
+              </div>
+              <h2 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Choose Your Portal</h2>
               <p className={`mt-2 ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Select your role to continue</p>
             </div>
             
