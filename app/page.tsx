@@ -1768,7 +1768,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
   )
   }
 
-  // Recent spec comparisons for history
+  // Recent spec comparisons for history panel
   const [recentSpecComparisons] = useState([
     { id: 1, spec1: "FIX44_BuySide.xml", spec2: "FIX44_SellSide.xml", date: "2025-03-01 11:20", differences: 8 },
     { id: 2, spec1: "FIX42_v1.xml", spec2: "FIX42_v2.xml", date: "2025-02-28 14:45", differences: 3 },
