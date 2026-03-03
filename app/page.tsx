@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "fix-msg-creator">("home")
   const [settingsTab, setSettingsTab] = useState<"look-feel" | "general" | "security" | "mail" | "questionnaires" | "license">("general")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -29,6 +29,16 @@ export default function BCometPlatform() {
   const [certSuiteGenerated, setCertSuiteGenerated] = useState(false)
   const [showContactPanel, setShowContactPanel] = useState(false)
   const [showDemoForm, setShowDemoForm] = useState(false)
+  // FIX MSG Creator state
+  const [fixMsgSelectedSpec, setFixMsgSelectedSpec] = useState("")
+  const [fixMsgSelectedType, setFixMsgSelectedType] = useState("")
+  const [fixMsgIsConnected, setFixMsgIsConnected] = useState(false)
+  const [fixMsgConnectionConfig, setFixMsgConnectionConfig] = useState({ host: "", port: "", senderCompId: "", targetCompId: "" })
+  const [fixMsgFields, setFixMsgFields] = useState<Array<{ tag: string; name: string; value: string; editable: boolean }>>([])
+  const [fixMsgLog, setFixMsgLog] = useState<Array<{ direction: "send" | "recv"; msgType: string; msgTypeName: string; seqNum: number; clOrdId: string; ordStatus: string; ordStatusName: string; rawMessage: string; timestamp: string }>>([])
+  const [fixMsgLogExpanded, setFixMsgLogExpanded] = useState(false)
+  const [fixMsgSeqNum, setFixMsgSeqNum] = useState(1)
+  const [fixMsgSelectedRow, setFixMsgSelectedRow] = useState<number | null>(null)
   const [demoFormData, setDemoFormData] = useState({
     name: "",
     email: "",
@@ -373,6 +383,7 @@ export default function BCometPlatform() {
   {[
   { icon: GitCompare, label: "Spec Compare", screen: "spec-compare", roles: ["admin", "client"] },
   { icon: FileSearch, label: "Log Analysis", screen: "log-analysis", roles: ["admin", "client"] },
+  { icon: MessageSquare, label: "FIX MSG Creator", screen: "fix-msg-creator", roles: ["admin", "client"] },
   { icon: Activity, label: "Scenario Creation", screen: "scenario-creation", roles: ["admin"] },
   ].filter(item => item.roles.includes(selectedRole || "")).map((item) => (
   <button
@@ -2144,10 +2155,483 @@ export default function BCometPlatform() {
               )}
             </Card>
           </div>
+  </div>
+  </div>
+  )
+  }
+  
+  // FIX MSG Creator Screen
+  if (currentScreen === "fix-msg-creator") {
+    const messageTypes = [
+      { value: "D", label: "New Order Single (D)", fields: [
+        { tag: "35", name: "MsgType", value: "D", editable: false },
+        { tag: "49", name: "SenderCompID", value: "", editable: true },
+        { tag: "56", name: "TargetCompID", value: "", editable: true },
+        { tag: "34", name: "MsgSeqNum", value: "1", editable: true },
+        { tag: "52", name: "SendingTime", value: "", editable: false },
+        { tag: "11", name: "ClOrdID", value: "ORDER001", editable: true },
+        { tag: "21", name: "HandlInst", value: "1", editable: true },
+        { tag: "55", name: "Symbol", value: "AAPL", editable: true },
+        { tag: "54", name: "Side", value: "1", editable: true },
+        { tag: "60", name: "TransactTime", value: "", editable: true },
+        { tag: "38", name: "OrderQty", value: "100", editable: true },
+        { tag: "40", name: "OrdType", value: "2", editable: true },
+        { tag: "44", name: "Price", value: "150.00", editable: true },
+      ]},
+      { value: "F", label: "Order Cancel Request (F)", fields: [
+        { tag: "35", name: "MsgType", value: "F", editable: false },
+        { tag: "49", name: "SenderCompID", value: "", editable: true },
+        { tag: "56", name: "TargetCompID", value: "", editable: true },
+        { tag: "34", name: "MsgSeqNum", value: "1", editable: true },
+        { tag: "52", name: "SendingTime", value: "", editable: false },
+        { tag: "11", name: "ClOrdID", value: "CANCEL001", editable: true },
+        { tag: "41", name: "OrigClOrdID", value: "ORDER001", editable: true },
+        { tag: "55", name: "Symbol", value: "AAPL", editable: true },
+        { tag: "54", name: "Side", value: "1", editable: true },
+        { tag: "60", name: "TransactTime", value: "", editable: true },
+      ]},
+      { value: "G", label: "Order Cancel/Replace (G)", fields: [
+        { tag: "35", name: "MsgType", value: "G", editable: false },
+        { tag: "49", name: "SenderCompID", value: "", editable: true },
+        { tag: "56", name: "TargetCompID", value: "", editable: true },
+        { tag: "34", name: "MsgSeqNum", value: "1", editable: true },
+        { tag: "52", name: "SendingTime", value: "", editable: false },
+        { tag: "11", name: "ClOrdID", value: "REPLACE001", editable: true },
+        { tag: "41", name: "OrigClOrdID", value: "ORDER001", editable: true },
+        { tag: "55", name: "Symbol", value: "AAPL", editable: true },
+        { tag: "54", name: "Side", value: "1", editable: true },
+        { tag: "60", name: "TransactTime", value: "", editable: true },
+        { tag: "38", name: "OrderQty", value: "200", editable: true },
+        { tag: "40", name: "OrdType", value: "2", editable: true },
+        { tag: "44", name: "Price", value: "155.00", editable: true },
+      ]},
+      { value: "A", label: "Logon (A)", fields: [
+        { tag: "35", name: "MsgType", value: "A", editable: false },
+        { tag: "49", name: "SenderCompID", value: "", editable: true },
+        { tag: "56", name: "TargetCompID", value: "", editable: true },
+        { tag: "34", name: "MsgSeqNum", value: "1", editable: true },
+        { tag: "52", name: "SendingTime", value: "", editable: false },
+        { tag: "98", name: "EncryptMethod", value: "0", editable: true },
+        { tag: "108", name: "HeartBtInt", value: "30", editable: true },
+      ]},
+      { value: "5", label: "Logout (5)", fields: [
+        { tag: "35", name: "MsgType", value: "5", editable: false },
+        { tag: "49", name: "SenderCompID", value: "", editable: true },
+        { tag: "56", name: "TargetCompID", value: "", editable: true },
+        { tag: "34", name: "MsgSeqNum", value: "1", editable: true },
+        { tag: "52", name: "SendingTime", value: "", editable: false },
+      ]},
+      { value: "0", label: "Heartbeat (0)", fields: [
+        { tag: "35", name: "MsgType", value: "0", editable: false },
+        { tag: "49", name: "SenderCompID", value: "", editable: true },
+        { tag: "56", name: "TargetCompID", value: "", editable: true },
+        { tag: "34", name: "MsgSeqNum", value: "1", editable: true },
+        { tag: "52", name: "SendingTime", value: "", editable: false },
+      ]},
+    ]
+    
+    const handleMsgTypeChange = (msgType: string) => {
+      setFixMsgSelectedType(msgType)
+      const selectedMsg = messageTypes.find(m => m.value === msgType)
+      if (selectedMsg) {
+        setFixMsgFields(selectedMsg.fields.map(f => ({ ...f })))
+      } else {
+        setFixMsgFields([])
+      }
+    }
+    
+    const handleSpecChange = (spec: string) => {
+      setFixMsgSelectedSpec(spec)
+      // Clear fields if spec changes
+      if (!spec) {
+        setFixMsgSelectedType("")
+        setFixMsgFields([])
+      }
+    }
+    
+    const getMsgTypeName = (msgType: string) => {
+      const types: Record<string, string> = {
+        "D": "D - New Order", "F": "F - Cancel Req", "G": "G - Cancel/Replace",
+        "8": "8 - Exec Report", "0": "0 - Heartbeat", "A": "A - Logon", "5": "5 - Logout"
+      }
+      return types[msgType] || msgType
+    }
+    
+    const getOrdStatusName = (status: string) => {
+      const statuses: Record<string, string> = { "0": "New", "1": "Partially filled", "2": "Filled", "4": "Canceled", "8": "Rejected", "": "-" }
+      return statuses[status] || status
+    }
+    
+    const generateFixMessage = () => {
+      if (fixMsgFields.length === 0) return ""
+      const fields = fixMsgFields.map(f => `${f.tag}=${f.value}`).join("|")
+      return `8=FIX.4.4|9=XXX|${fields}|10=XXX|`
+    }
+    
+    const copyToClipboard = () => {
+      navigator.clipboard.writeText(generateFixMessage().replace(/\|/g, "\x01"))
+    }
+    
+    const handleConnect = () => {
+      if (!fixMsgIsConnected) {
+        const timestamp = new Date().toISOString().slice(0, 19).replace("T", " ")
+        const sender = fixMsgConnectionConfig.senderCompId || "CLIENT"
+        const target = fixMsgConnectionConfig.targetCompId || "SERVER"
+        setFixMsgLog([
+          { direction: "send", msgType: "A", msgTypeName: "A - Logon", seqNum: 1, clOrdId: "", ordStatus: "", ordStatusName: "-", rawMessage: `8=FIX.4.2|9=67|35=A|49=${sender}|56=${target}|34=1|52=${timestamp.replace(/[-: ]/g, "")}|98=0|108=30|10=193|`, timestamp },
+          { direction: "recv", msgType: "A", msgTypeName: "A - Logon", seqNum: 2, clOrdId: "", ordStatus: "", ordStatusName: "-", rawMessage: `8=FIX.4.2|9=67|35=A|49=${target}|56=${sender}|34=2|52=${timestamp.replace(/[-: ]/g, "")}|98=0|108=30|10=193|`, timestamp }
+        ])
+        setFixMsgSeqNum(3)
+        setFixMsgIsConnected(true)
+      } else {
+        setFixMsgIsConnected(false)
+        setFixMsgLog([])
+        setFixMsgSeqNum(1)
+      }
+    }
+    
+    const handleSendMessage = () => {
+      if (!fixMsgIsConnected || fixMsgFields.length === 0) return
+      const timestamp = new Date().toISOString().slice(0, 19).replace("T", " ")
+      const sender = fixMsgConnectionConfig.senderCompId || "CLIENT"
+      const target = fixMsgConnectionConfig.targetCompId || "SERVER"
+      const clOrdId = fixMsgFields.find(f => f.tag === "11")?.value || "Order" + fixMsgSeqNum
+      const symbol = fixMsgFields.find(f => f.tag === "55")?.value || "AAPL"
+      const qty = fixMsgFields.find(f => f.tag === "38")?.value || "100"
+      const price = fixMsgFields.find(f => f.tag === "44")?.value || "150.00"
+      const msgType = fixMsgFields.find(f => f.tag === "35")?.value || "D"
+      
+      const sentMsg = { direction: "send" as const, msgType, msgTypeName: getMsgTypeName(msgType), seqNum: fixMsgSeqNum, clOrdId, ordStatus: "", ordStatusName: "-", rawMessage: generateFixMessage(), timestamp }
+      
+      if (msgType === "D") {
+        // Simulate order flow responses
+        const newAck = { direction: "recv" as const, msgType: "8", msgTypeName: "8 - Exec Report", seqNum: fixMsgSeqNum + 1, clOrdId, ordStatus: "0", ordStatusName: "New", rawMessage: `8=FIX.4.2|9=215|35=8|49=${target}|56=${sender}|34=${fixMsgSeqNum + 1}|52=${timestamp.replace(/[-: ]/g, "")}|37=OrderID${fixMsgSeqNum}|11=${clOrdId}|17=ExecID${fixMsgSeqNum}|150=0|39=0|55=${symbol}|54=1|38=${qty}|44=${price}|14=0|151=${qty}|6=0|10=XXX|`, timestamp }
+        const partialFill = { direction: "recv" as const, msgType: "8", msgTypeName: "8 - Exec Report", seqNum: fixMsgSeqNum + 2, clOrdId, ordStatus: "1", ordStatusName: "Partially filled", rawMessage: `8=FIX.4.2|9=224|35=8|49=${target}|56=${sender}|34=${fixMsgSeqNum + 2}|52=${timestamp.replace(/[-: ]/g, "")}|37=OrderID${fixMsgSeqNum}|11=${clOrdId}|17=ExecID${fixMsgSeqNum + 1}|150=1|39=1|55=${symbol}|54=1|38=${qty}|44=${price}|32=50|31=${price}|14=50|151=50|6=${price}|10=XXX|`, timestamp }
+        const fill = { direction: "recv" as const, msgType: "8", msgTypeName: "8 - Exec Report", seqNum: fixMsgSeqNum + 3, clOrdId, ordStatus: "2", ordStatusName: "Filled", rawMessage: `8=FIX.4.2|9=225|35=8|49=${target}|56=${sender}|34=${fixMsgSeqNum + 3}|52=${timestamp.replace(/[-: ]/g, "")}|37=OrderID${fixMsgSeqNum}|11=${clOrdId}|17=ExecID${fixMsgSeqNum + 2}|150=2|39=2|55=${symbol}|54=1|38=${qty}|44=${price}|32=50|31=${price}|14=${qty}|151=0|6=${price}|10=XXX|`, timestamp }
+        setFixMsgLog(prev => [...prev, sentMsg, newAck, partialFill, fill])
+        setFixMsgSeqNum(prev => prev + 4)
+      } else {
+        setFixMsgLog(prev => [...prev, sentMsg])
+        setFixMsgSeqNum(prev => prev + 1)
+      }
+    }
+    
+    const getRowBgColor = (msg: typeof fixMsgLog[0]) => {
+      if (msg.direction === "send") return "bg-cyan-600 text-white"
+      if (msg.ordStatus === "2") return "bg-red-600 text-white"
+      if (msg.ordStatus === "1") return "bg-yellow-500 text-black"
+      if (msg.ordStatus === "0") return "bg-green-600 text-white"
+      if (msg.msgType === "A") return "bg-orange-500 text-black"
+      return "bg-gray-600 text-white"
+    }
+    
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto flex flex-col">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>FIX Message Creator</h1>
+            <p className={`${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>Create, edit, and send FIX protocol messages</p>
+          </header>
+
+          <div className="p-6 flex-1 flex flex-col">
+            <div className="grid grid-cols-3 gap-6 flex-1">
+              {/* Left Panel - Message Builder */}
+              <div className="col-span-2 space-y-6">
+                {/* Spec & Message Type Selection */}
+                <Card className={`${bgCard} p-6 border ${borderColor}`}>
+                  <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Message Configuration</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Select FIX Specification</label>
+                      <select 
+                        value={fixMsgSelectedSpec}
+                        onChange={(e) => handleSpecChange(e.target.value)}
+                        className={`w-full p-2 rounded border ${isDarkMode ? "bg-[#1e3a5f] border-[#3d5a80] text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                      >
+                        <option value="">Choose a spec...</option>
+                        <option value="eq-42">Equities - FIX 4.2</option>
+                        <option value="eq-44">Equities - FIX 4.4</option>
+                        <option value="opt-44">Options - FIX 4.4</option>
+                        <option value="fut-50">Futures - FIX 5.0 SP2</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Message Type</label>
+                      <select 
+                        value={fixMsgSelectedType}
+                        onChange={(e) => handleMsgTypeChange(e.target.value)}
+                        disabled={!fixMsgSelectedSpec}
+                        className={`w-full p-2 rounded border ${isDarkMode ? "bg-[#1e3a5f] border-[#3d5a80] text-white" : "bg-white border-gray-300 text-gray-900"} ${!fixMsgSelectedSpec ? "opacity-50 cursor-not-allowed" : ""}`}
+                      >
+                        <option value="">Choose message type...</option>
+                        {messageTypes.map(mt => (
+                          <option key={mt.value} value={mt.value}>{mt.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </Card>
+                
+                {/* Message Fields Editor */}
+                <Card className={`${bgCard} p-6 border ${borderColor}`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className={`text-lg font-bold ${textPrimary}`}>Message Fields</h3>
+                    <Button size="sm" className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-medium" disabled={!fixMsgSelectedType}>
+                      <Plus className="h-4 w-4 mr-1" /> Add Field
+                    </Button>
+                  </div>
+                  {fixMsgFields.length === 0 ? (
+                    <div className={`text-center py-10 ${textSecondary}`}>
+                      <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                      <p>Select a FIX Specification and Message Type to populate fields</p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className={`${isDarkMode ? "bg-[#1e3a5f]" : "bg-gray-100"}`}>
+                          <tr>
+                            <th className={`px-3 py-2 text-left text-sm font-medium ${textPrimary}`}>Tag</th>
+                            <th className={`px-3 py-2 text-left text-sm font-medium ${textPrimary}`}>Name</th>
+                            <th className={`px-3 py-2 text-left text-sm font-medium ${textPrimary}`}>Value</th>
+                            <th className={`px-3 py-2 text-center text-sm font-medium ${textPrimary}`}>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {fixMsgFields.map((field, idx) => (
+                            <tr key={idx} className={`border-t ${isDarkMode ? "border-[#3d5a80]" : "border-gray-200"}`}>
+                              <td className={`px-3 py-2 font-mono text-sm ${isDarkMode ? "text-cyan-400" : "text-blue-600"}`}>{field.tag}</td>
+                              <td className={`px-3 py-2 text-sm ${textPrimary}`}>{field.name}</td>
+                              <td className="px-3 py-2">
+                                <Input 
+                                  value={field.value}
+                                  onChange={(e) => {
+                                    const newFields = [...fixMsgFields]
+                                    newFields[idx].value = e.target.value
+                                    setFixMsgFields(newFields)
+                                  }}
+                                  disabled={!field.editable}
+                                  className={`h-8 text-sm font-mono ${isDarkMode ? "bg-[#1e3a5f] border-[#3d5a80] text-white" : "bg-white"} ${!field.editable ? "opacity-50" : ""}`}
+                                />
+                              </td>
+                              <td className="px-3 py-2 text-center">
+                                <button className={`p-1 rounded ${isDarkMode ? "hover:bg-[#1e3a5f] text-gray-400" : "hover:bg-gray-100 text-gray-500"}`}>
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </Card>
+                
+                {/* Generated Message Preview */}
+                <Card className={`${bgCard} p-6 border ${borderColor}`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className={`text-lg font-bold ${textPrimary}`}>Generated Message</h3>
+                    <Button size="sm" onClick={copyToClipboard} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-medium" disabled={!fixMsgFields.length}>
+                      <Copy className="h-4 w-4 mr-1" /> Copy
+                    </Button>
+                  </div>
+                  <div className={`p-4 rounded-lg ${isDarkMode ? "bg-[#1e3a5f] text-cyan-300" : "bg-gray-100 text-gray-800"} font-mono text-sm break-all min-h-[60px]`}>
+                    {fixMsgFields.length === 0 ? <span className={textSecondary}>No message generated yet</span> : generateFixMessage()}
+                  </div>
+                </Card>
+              </div>
+              
+              {/* Right Panel - Connection */}
+              <div className="space-y-6">
+                {/* Connection Panel */}
+                <Card className={`${bgCard} p-6 border ${borderColor}`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className={`text-lg font-bold ${textPrimary}`}>FIX Connection</h3>
+                    <div className={`flex items-center gap-2 px-2 py-1 rounded ${fixMsgIsConnected ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}>
+                      {fixMsgIsConnected ? <Wifi className="h-4 w-4" /> : <WifiOff className="h-4 w-4" />}
+                      <span className="text-xs font-medium">{fixMsgIsConnected ? "Connected" : "Disconnected"}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <label className={`block text-sm font-medium mb-1 ${textPrimary}`}>Host / IP</label>
+                      <Input value={fixMsgConnectionConfig.host} onChange={(e) => setFixMsgConnectionConfig({...fixMsgConnectionConfig, host: e.target.value})} placeholder="e.g., 192.168.1.100" className={`${isDarkMode ? "bg-[#1e3a5f] border-[#3d5a80] text-white placeholder:text-gray-400" : ""}`} />
+                    </div>
+                    <div>
+                      <label className={`block text-sm font-medium mb-1 ${textPrimary}`}>Port</label>
+                      <Input value={fixMsgConnectionConfig.port} onChange={(e) => setFixMsgConnectionConfig({...fixMsgConnectionConfig, port: e.target.value})} placeholder="e.g., 9876" className={`${isDarkMode ? "bg-[#1e3a5f] border-[#3d5a80] text-white placeholder:text-gray-400" : ""}`} />
+                    </div>
+                    <div>
+                      <label className={`block text-sm font-medium mb-1 ${textPrimary}`}>SenderCompID (49)</label>
+                      <Input value={fixMsgConnectionConfig.senderCompId} onChange={(e) => setFixMsgConnectionConfig({...fixMsgConnectionConfig, senderCompId: e.target.value})} placeholder="e.g., SENDER" className={`${isDarkMode ? "bg-[#1e3a5f] border-[#3d5a80] text-white placeholder:text-gray-400" : ""}`} />
+                    </div>
+                    <div>
+                      <label className={`block text-sm font-medium mb-1 ${textPrimary}`}>TargetCompID (56)</label>
+                      <Input value={fixMsgConnectionConfig.targetCompId} onChange={(e) => setFixMsgConnectionConfig({...fixMsgConnectionConfig, targetCompId: e.target.value})} placeholder="e.g., TARGET" className={`${isDarkMode ? "bg-[#1e3a5f] border-[#3d5a80] text-white placeholder:text-gray-400" : ""}`} />
+                    </div>
+                    <Button className={`w-full font-semibold ${fixMsgIsConnected ? "bg-red-500 hover:bg-red-600 text-white" : "bg-[#00e5ff] hover:bg-[#00e5ff]/80 text-[#0a1628]"}`} onClick={handleConnect}>
+                      {fixMsgIsConnected ? "Disconnect" : "Connect"}
+                    </Button>
+                  </div>
+                </Card>
+                
+                {/* Send Message Panel */}
+                <Card className={`${bgCard} p-6 border ${borderColor}`}>
+                  <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Send Message</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className={`block text-sm font-medium mb-1 ${textPrimary}`}>Paste Message (optional)</label>
+                      <textarea placeholder="Paste a FIX message here..." className={`w-full p-3 rounded-lg border resize-none font-mono text-sm ${isDarkMode ? "bg-[#1e3a5f] border-[#3d5a80] text-white placeholder:text-gray-400" : "bg-white border-gray-300"}`} rows={4} />
+                    </div>
+                    <Button className="w-full bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-semibold" disabled={!fixMsgIsConnected || !fixMsgFields.length} onClick={handleSendMessage}>
+                      <Send className="h-4 w-4 mr-2" /> Send Message
+                    </Button>
+                    {!fixMsgIsConnected && <p className={`text-xs text-center ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>Connect to a FIX session to send messages</p>}
+                  </div>
+                </Card>
+              </div>
+            </div>
+            
+            {/* Message Log */}
+            {fixMsgLogExpanded ? (
+              <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+                <Card className={`${bgCard} border ${borderColor} w-full h-full flex flex-col`}>
+                  <div className={`px-6 py-3 border-b ${borderColor} flex items-center justify-between shrink-0`}>
+                    <h3 className={`text-lg font-bold ${textPrimary}`}>Message Log</h3>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>{fixMsgLog.length} messages</span>
+                      <Button size="sm" onClick={() => setFixMsgLogExpanded(false)} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-medium">Exit Fullscreen</Button>
+                    </div>
+                  </div>
+                  <div className="flex-1 overflow-auto">
+                    {fixMsgLog.length === 0 ? (
+                      <div className={`flex items-center justify-center h-full ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                        <p className="text-sm">No messages yet. Connect and send a message to see the log.</p>
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto overflow-y-auto h-full">
+                        <table className="text-sm min-w-max w-full">
+                          <thead className={`sticky top-0 ${isDarkMode ? "bg-[#1e3a5f]" : "bg-gray-100"}`}>
+                            <tr>
+                              <th className={`px-3 py-2 text-left font-medium ${textPrimary}`}>Direction</th>
+                              <th className={`px-3 py-2 text-left font-medium ${textPrimary}`}>Message</th>
+                              <th className={`px-3 py-2 text-left font-medium ${textPrimary}`}>34-MsgSeqNum</th>
+                              <th className={`px-3 py-2 text-left font-medium ${textPrimary}`}>11-ClOrdID</th>
+                              <th className={`px-3 py-2 text-left font-medium ${textPrimary}`}>39-OrdStatus</th>
+                              <th className={`px-3 py-2 text-left font-medium ${textPrimary}`}>Messages</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {fixMsgLog.map((msg, idx) => (
+                              <tr key={idx} className={`${getRowBgColor(msg)} cursor-pointer hover:opacity-80`} onDoubleClick={() => setFixMsgSelectedRow(idx)}>
+                                <td className="px-3 py-1.5 font-mono whitespace-nowrap">{msg.direction === "send" ? "<-Send" : "Recv->"}</td>
+                                <td className="px-3 py-1.5 font-mono whitespace-nowrap">{msg.msgTypeName}</td>
+                                <td className="px-3 py-1.5 font-mono whitespace-nowrap">{msg.seqNum}</td>
+                                <td className="px-3 py-1.5 font-mono whitespace-nowrap">{msg.clOrdId || "-"}</td>
+                                <td className="px-3 py-1.5 font-mono whitespace-nowrap">{msg.ordStatusName}</td>
+                                <td className="px-3 py-1.5 font-mono text-xs whitespace-nowrap">{msg.rawMessage}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              </div>
+            ) : (
+              <Card className={`${bgCard} mt-6 border ${borderColor}`}>
+                <div className={`px-6 py-3 border-b ${borderColor} flex items-center justify-between shrink-0`}>
+                  <h3 className={`text-lg font-bold ${textPrimary}`}>Message Log</h3>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>{fixMsgLog.length} messages</span>
+                    <Button size="sm" onClick={() => setFixMsgLogExpanded(true)} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-medium">Fullscreen</Button>
+                  </div>
+                </div>
+                <div className="overflow-x-auto overflow-y-auto h-48">
+                  {fixMsgLog.length === 0 ? (
+                    <div className={`flex items-center justify-center h-full ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                      <p className="text-sm">No messages yet. Connect and send a message to see the log.</p>
+                    </div>
+                  ) : (
+                    <table className="text-sm min-w-max w-full">
+                      <thead className={`sticky top-0 ${isDarkMode ? "bg-[#1e3a5f]" : "bg-gray-100"}`}>
+                        <tr>
+                          <th className={`px-3 py-2 text-left font-medium ${textPrimary}`}>Direction</th>
+                          <th className={`px-3 py-2 text-left font-medium ${textPrimary}`}>Message</th>
+                          <th className={`px-3 py-2 text-left font-medium ${textPrimary}`}>34-MsgSeqNum</th>
+                          <th className={`px-3 py-2 text-left font-medium ${textPrimary}`}>11-ClOrdID</th>
+                          <th className={`px-3 py-2 text-left font-medium ${textPrimary}`}>39-OrdStatus</th>
+                          <th className={`px-3 py-2 text-left font-medium ${textPrimary}`}>Messages</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {fixMsgLog.map((msg, idx) => (
+                          <tr key={idx} className={`${getRowBgColor(msg)} cursor-pointer hover:opacity-80`} onDoubleClick={() => setFixMsgSelectedRow(idx)}>
+                            <td className="px-3 py-1.5 font-mono whitespace-nowrap">{msg.direction === "send" ? "<-Send" : "Recv->"}</td>
+                            <td className="px-3 py-1.5 font-mono whitespace-nowrap">{msg.msgTypeName}</td>
+                            <td className="px-3 py-1.5 font-mono whitespace-nowrap">{msg.seqNum}</td>
+                            <td className="px-3 py-1.5 font-mono whitespace-nowrap">{msg.clOrdId || "-"}</td>
+                            <td className="px-3 py-1.5 font-mono whitespace-nowrap">{msg.ordStatusName}</td>
+                            <td className="px-3 py-1.5 font-mono text-xs whitespace-nowrap">{msg.rawMessage}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              </Card>
+            )}
+            
+            {/* Message Detail Panel */}
+            {fixMsgSelectedRow !== null && fixMsgLog[fixMsgSelectedRow] && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
+                <Card className={`${bgCard} border ${borderColor} w-full max-w-2xl max-h-[80vh] flex flex-col`}>
+                  <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between shrink-0`}>
+                    <div>
+                      <h3 className={`text-lg font-bold ${textPrimary}`}>Message Details</h3>
+                      <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>{fixMsgLog[fixMsgSelectedRow].direction === "send" ? "Sent" : "Received"} - {fixMsgLog[fixMsgSelectedRow].msgTypeName}</p>
+                    </div>
+                    <Button size="sm" variant="outline" onClick={() => setFixMsgSelectedRow(null)} className={isDarkMode ? "border-[#3d5a80] text-white hover:bg-[#1e3a5f]" : ""}><X className="h-4 w-4" /></Button>
+                  </div>
+                  <div className="flex-1 overflow-auto p-4">
+                    <table className="w-full text-sm">
+                      <thead className={`sticky top-0 ${isDarkMode ? "bg-[#1e3a5f]" : "bg-gray-100"}`}>
+                        <tr>
+                          <th className={`px-3 py-2 text-left font-medium ${textPrimary} w-20`}>Tag</th>
+                          <th className={`px-3 py-2 text-left font-medium ${textPrimary} w-40`}>Name</th>
+                          <th className={`px-3 py-2 text-left font-medium ${textPrimary}`}>Value</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {fixMsgLog[fixMsgSelectedRow].rawMessage.split("|").filter(Boolean).map((field, i) => {
+                          const [tag, value] = field.split("=")
+                          const tagNames: Record<string, string> = { "8": "BeginString", "9": "BodyLength", "35": "MsgType", "49": "SenderCompID", "56": "TargetCompID", "34": "MsgSeqNum", "52": "SendingTime", "11": "ClOrdID", "21": "HandlInst", "55": "Symbol", "54": "Side", "60": "TransactTime", "38": "OrderQty", "40": "OrdType", "44": "Price", "10": "CheckSum", "37": "OrderID", "17": "ExecID", "150": "ExecType", "39": "OrdStatus", "14": "CumQty", "151": "LeavesQty", "6": "AvgPx", "32": "LastShares", "31": "LastPx", "98": "EncryptMethod", "108": "HeartBtInt" }
+                          return (
+                            <tr key={i} className={`border-t ${isDarkMode ? "border-[#3d5a80]" : "border-gray-200"}`}>
+                              <td className={`px-3 py-2 font-mono ${isDarkMode ? "text-cyan-400" : "text-blue-600"}`}>{tag}</td>
+                              <td className={`px-3 py-2 ${textPrimary}`}>{tagNames[tag] || `Tag${tag}`}</td>
+                              <td className={`px-3 py-2 font-mono ${textPrimary}`}>{value}</td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className={`px-6 py-3 border-t ${borderColor} shrink-0`}>
+                    <p className={`text-xs font-mono ${isDarkMode ? "text-gray-400" : "text-gray-500"} break-all`}>{fixMsgLog[fixMsgSelectedRow].rawMessage}</p>
+                  </div>
+                </Card>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     )
   }
-
+  
   return null
 }
