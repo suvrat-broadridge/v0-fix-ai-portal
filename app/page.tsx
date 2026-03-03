@@ -477,10 +477,10 @@ export default function BCometPlatform() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}>
+              <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 rounded-lg transition-colors ${isDarkMode ? "text-[#00e5ff] hover:bg-[#00e5ff]/20" : "text-[#0a1628] hover:bg-[#0a1628]/10"}`}>
                 {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </button>
-              <Button onClick={() => setCurrentScreen("role-select")}>Start Here</Button>
+              <Button onClick={() => setCurrentScreen("role-select")} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-semibold">Start Here</Button>
             </div>
           </div>
         </header>
@@ -508,7 +508,7 @@ export default function BCometPlatform() {
               </p>
 
               <div className="flex gap-4 mb-8">
-                <Button size="lg" onClick={() => setCurrentScreen("role-select")}>Start Here</Button>
+                <Button size="lg" onClick={() => setCurrentScreen("role-select")} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-semibold">Start Here</Button>
               </div>
 
               <div className="flex gap-8">
