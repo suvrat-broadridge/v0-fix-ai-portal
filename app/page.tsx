@@ -1702,8 +1702,8 @@ export default function BCometPlatform() {
         <Sidebar />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-            <h1 className={`text-2xl font-bold ${textPrimary}`}>Specifications Management</h1>
-            <p className={textSecondary}>View admin specs and manage client specs by asset class</p>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>{selectedRole === "admin" ? "Admin Specifications" : "Specifications Management"}</h1>
+            <p className={textSecondary}>{selectedRole === "admin" ? "Manage FIX protocol specifications by asset class" : "View admin specs and manage your specs by asset class"}</p>
           </header>
 
           <div className="p-6">
@@ -1714,11 +1714,13 @@ export default function BCometPlatform() {
                     <h2 className={`text-lg font-bold ${textPrimary}`}>{assetClass.asset}</h2>
                   </div>
                   
-                  {/* Table Header */}
-                  <div className={`grid grid-cols-3 gap-4 px-6 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} border-b ${borderColor}`}>
+                  {/* Table Header - 2 columns for admin, 3 for client */}
+                  <div className={`grid ${selectedRole === "admin" ? "grid-cols-2" : "grid-cols-3"} gap-4 px-6 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} border-b ${borderColor}`}>
                     <div className={`font-semibold text-sm ${textPrimary}`}>Protocol</div>
                     <div className={`font-semibold text-sm ${textPrimary}`}>Admin Spec</div>
-                    <div className={`font-semibold text-sm ${textPrimary}`}>{selectedRole === "client" ? "My Specs" : "Client Specs"}</div>
+                    {selectedRole === "client" && (
+                      <div className={`font-semibold text-sm ${textPrimary}`}>My Specs</div>
+                    )}
                   </div>
                   
                   {/* Table Rows */}
@@ -1726,7 +1728,7 @@ export default function BCometPlatform() {
                     {assetClass.versions.map((version) => (
                       <div 
                         key={`${assetClass.asset}-${version.protocol}`}
-                        className={`grid grid-cols-3 gap-4 px-6 py-4 hover:bg-[#1e4976]/10 transition-colors items-center`}
+                        className={`grid ${selectedRole === "admin" ? "grid-cols-2" : "grid-cols-3"} gap-4 px-6 py-4 hover:bg-[#1e4976]/10 transition-colors items-center`}
                       >
                         {/* Protocol Column */}
                         <div className={`font-medium ${textPrimary}`}>
@@ -1751,30 +1753,32 @@ export default function BCometPlatform() {
                           )}
                         </div>
                         
-                        {/* My Specs / Client Spec Column */}
-                        <div className="flex items-center gap-2">
-                          {version.clientSpec.uploaded ? (
-                            <>
-                              <div className={`flex items-center gap-2 px-3 py-1.5 rounded ${isDarkMode ? "bg-[#4caf50]/20" : "bg-[#4caf50]/10"} border border-[#4caf50]/30`}>
-                                <CheckCircle className="h-4 w-4 text-[#4caf50]" />
-                                <span className={`text-sm ${textPrimary}`}>{version.clientSpec.name}</span>
-                              </div>
-                              <button className={`p-1.5 rounded hover:bg-[#1e4976]/30 ${textSecondary}`} title="Download">
-                                <Download className="h-4 w-4" />
-                              </button>
-                              <label className={`cursor-pointer p-1.5 rounded hover:bg-[#1e4976]/30 ${textSecondary}`} title="Replace">
+                        {/* My Specs Column - Only for client role */}
+                        {selectedRole === "client" && (
+                          <div className="flex items-center gap-2">
+                            {version.clientSpec.uploaded ? (
+                              <>
+                                <div className={`flex items-center gap-2 px-3 py-1.5 rounded ${isDarkMode ? "bg-[#4caf50]/20" : "bg-[#4caf50]/10"} border border-[#4caf50]/30`}>
+                                  <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                  <span className={`text-sm ${textPrimary}`}>{version.clientSpec.name}</span>
+                                </div>
+                                <button className={`p-1.5 rounded hover:bg-[#1e4976]/30 ${textSecondary}`} title="Download">
+                                  <Download className="h-4 w-4" />
+                                </button>
+                                <label className={`cursor-pointer p-1.5 rounded hover:bg-[#1e4976]/30 ${textSecondary}`} title="Replace">
+                                  <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+                                  <Upload className="h-4 w-4" />
+                                </label>
+                              </>
+                            ) : (
+                              <label className={`cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded border-2 border-dashed ${borderColor} hover:border-[#00e5ff] hover:bg-[#00e5ff]/5 transition-colors`}>
                                 <input type="file" className="hidden" accept=".xml,.txt,.csv" />
-                                <Upload className="h-4 w-4" />
+                                <Upload className={`h-4 w-4 ${textSecondary}`} />
+                                <span className={`text-sm ${textSecondary}`}>Upload spec</span>
                               </label>
-                            </>
-                          ) : (
-                            <label className={`cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded border-2 border-dashed ${borderColor} hover:border-[#00e5ff] hover:bg-[#00e5ff]/5 transition-colors`}>
-                              <input type="file" className="hidden" accept=".xml,.txt,.csv" />
-                              <Upload className={`h-4 w-4 ${textSecondary}`} />
-                              <span className={`text-sm ${textSecondary}`}>Upload spec</span>
-                            </label>
-                          )}
-                        </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
