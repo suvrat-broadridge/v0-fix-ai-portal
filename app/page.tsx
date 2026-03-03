@@ -8,14 +8,16 @@ import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "login" | "dashboard" | "clients" | "client-detail" | "spec-compare" | "log-analysis">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "login" | "dashboard" | "clients" | "client-detail" | "spec-compare" | "log-analysis" | "scenario-creation">("home")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [selectedClient, setSelectedClient] = useState<any>(null)
   const [showSpecResults, setShowSpecResults] = useState(false)
   const [showLogResults, setShowLogResults] = useState(false)
+  const [showScenarioResults, setShowScenarioResults] = useState(false)
+  const [scenarioFilter, setScenarioFilter] = useState<string>("all")
   const [showAddClientModal, setShowAddClientModal] = useState(false)
-  const [newClient, setNewClient] = useState({ name: "", jira: "", accountManager: "", assetClass: "" })
+  const [newClient, setNewClient] = useState({ name: "", jira: "", accountManager: "", assetClasses: [] as string[] })
 
   // Theme colors
   const bgPrimary = isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"
@@ -63,13 +65,13 @@ export default function BCometPlatform() {
   }
 
   const handleAddClient = () => {
-    if (newClient.name && newClient.jira && newClient.accountManager && newClient.assetClass) {
+    if (newClient.name && newClient.jira && newClient.accountManager && newClient.assetClasses.length > 0) {
       const client = {
         id: clients.length + 1,
         name: newClient.name,
         jira: newClient.jira,
         accountManager: newClient.accountManager,
-        assetClass: newClient.assetClass,
+        assetClass: newClient.assetClasses.join(", "),
         specCompare: "not-started",
         logAnalysis: "not-started",
         scenario: "not-started",
@@ -79,9 +81,18 @@ export default function BCometPlatform() {
         alerts: 0,
       }
       setClients([...clients, client])
-      setNewClient({ name: "", jira: "", accountManager: "", assetClass: "" })
+      setNewClient({ name: "", jira: "", accountManager: "", assetClasses: [] })
       setShowAddClientModal(false)
     }
+  }
+
+  const toggleAssetClass = (assetClass: string) => {
+    setNewClient(prev => ({
+      ...prev,
+      assetClasses: prev.assetClasses.includes(assetClass)
+        ? prev.assetClasses.filter(ac => ac !== assetClass)
+        : [...prev.assetClasses, assetClass]
+    }))
   }
 
   // Comet Logo Component
@@ -122,7 +133,7 @@ export default function BCometPlatform() {
             <label className={`text-sm font-medium ${textPrimary}`}>Client Name</label>
             <Input 
               placeholder="Enter client name" 
-              className="mt-1" 
+              className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`}
               value={newClient.name}
               onChange={(e) => setNewClient({ ...newClient, name: e.target.value })}
             />
@@ -131,7 +142,7 @@ export default function BCometPlatform() {
             <label className={`text-sm font-medium ${textPrimary}`}>JIRA ID</label>
             <Input 
               placeholder="e.g., CLIENT-001" 
-              className="mt-1" 
+              className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`}
               value={newClient.jira}
               onChange={(e) => setNewClient({ ...newClient, jira: e.target.value })}
             />
@@ -140,23 +151,36 @@ export default function BCometPlatform() {
             <label className={`text-sm font-medium ${textPrimary}`}>Sales/Account Manager</label>
             <Input 
               placeholder="Enter manager name" 
-              className="mt-1" 
+              className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`}
               value={newClient.accountManager}
               onChange={(e) => setNewClient({ ...newClient, accountManager: e.target.value })}
             />
           </div>
           <div>
-            <label className={`text-sm font-medium ${textPrimary}`}>Asset Class</label>
-            <select 
-              className={`w-full mt-1 px-3 py-2 rounded-md border ${borderColor} ${bgSecondary} ${textPrimary}`}
-              value={newClient.assetClass}
-              onChange={(e) => setNewClient({ ...newClient, assetClass: e.target.value })}
-            >
-              <option value="">Select asset class</option>
+            <label className={`text-sm font-medium ${textPrimary}`}>Asset Classes (select multiple)</label>
+            <div className="mt-2 flex flex-wrap gap-2">
               {assetClasses.map((ac) => (
-                <option key={ac} value={ac}>{ac}</option>
+                <button
+                  key={ac}
+                  type="button"
+                  onClick={() => toggleAssetClass(ac)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    newClient.assetClasses.includes(ac)
+                      ? "bg-[#00e5ff] text-[#0a1628]"
+                      : isDarkMode 
+                        ? "bg-[#1e4976]/30 text-[#b0bec5] hover:bg-[#1e4976]/50" 
+                        : "bg-[#e2e8f0] text-[#64748b] hover:bg-[#cbd5e1]"
+                  }`}
+                >
+                  {ac}
+                </button>
               ))}
-            </select>
+            </div>
+            {newClient.assetClasses.length > 0 && (
+              <p className={`mt-2 text-xs ${textSecondary}`}>
+                Selected: {newClient.assetClasses.join(", ")}
+              </p>
+            )}
           </div>
           
           <div className="flex gap-3 pt-4">
@@ -540,7 +564,7 @@ export default function BCometPlatform() {
     const tools = [
       { key: "specCompare", title: "Spec Comparison", icon: GitCompare, status: selectedClient.specCompare, screen: "spec-compare" },
       { key: "logAnalysis", title: "Log Analysis", icon: FileSearch, status: selectedClient.logAnalysis, screen: "log-analysis" },
-      { key: "scenario", title: "Scenario Creation", icon: Activity, status: selectedClient.scenario, screen: "client-detail" },
+      { key: "scenario", title: "Scenario Creation", icon: Activity, status: selectedClient.scenario, screen: "scenario-creation" },
       { key: "testCase", title: "Test Case Generation", icon: TestTube, status: selectedClient.testCase, screen: "client-detail" },
       { key: "certification", title: "Certification", icon: Award, status: selectedClient.certification, screen: "client-detail" },
       { key: "config", title: "Configuration", icon: Cog, status: selectedClient.config, screen: "client-detail" },
@@ -807,6 +831,141 @@ export default function BCometPlatform() {
                       <p className="text-[#4caf50]">Side(54) is required</p>
                     </div>
                   </div>
+                </div>
+              </Card>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Scenario Creation Screen
+  if (currentScreen === "scenario-creation") {
+    const sampleScenarios = [
+      { id: 1, name: "New Order Single - Buy", type: "order", source: "log", status: "valid", msgType: "D" },
+      { id: 2, name: "New Order Single - Sell", type: "order", source: "log", status: "valid", msgType: "D" },
+      { id: 3, name: "Order Cancel Request", type: "cancel", source: "log", status: "valid", msgType: "F" },
+      { id: 4, name: "Execution Report - Fill", type: "execution", source: "spec", status: "valid", msgType: "8" },
+      { id: 5, name: "Execution Report - Partial", type: "execution", source: "spec", status: "warning", msgType: "8" },
+      { id: 6, name: "Order Cancel Reject", type: "cancel", source: "log", status: "error", msgType: "9" },
+      { id: 7, name: "Market Data Request", type: "market-data", source: "spec", status: "valid", msgType: "V" },
+      { id: 8, name: "Quote Request", type: "quote", source: "both", status: "valid", msgType: "R" },
+      { id: 9, name: "Trade Capture Report", type: "trade", source: "log", status: "warning", msgType: "AE" },
+      { id: 10, name: "Position Report", type: "position", source: "spec", status: "error", msgType: "AP" },
+    ]
+
+    const filteredScenarios = scenarioFilter === "all" 
+      ? sampleScenarios 
+      : sampleScenarios.filter(s => s.status === scenarioFilter)
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button 
+              onClick={() => setCurrentScreen("client-detail")} 
+              className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}
+            >
+              <ArrowLeft className="h-4 w-4" /> Back to {selectedClient?.name}
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Scenario Creation</h1>
+            <p className={textSecondary}>Generate test scenarios from log files or FIX specifications</p>
+          </header>
+
+          <div className="p-6">
+            {/* Upload Section */}
+            <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload Sources</h3>
+              <div className="grid grid-cols-3 gap-6">
+                <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] transition-colors cursor-pointer`}>
+                  <FileText className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                  <p className={`font-medium ${textPrimary}`}>Log File</p>
+                  <p className={`text-sm ${textSecondary}`}>Extract scenarios from logs</p>
+                </div>
+                <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] transition-colors cursor-pointer`}>
+                  <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                  <p className={`font-medium ${textPrimary}`}>FIX Specification</p>
+                  <p className={`text-sm ${textSecondary}`}>Generate from spec</p>
+                </div>
+                <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] transition-colors cursor-pointer`}>
+                  <GitCompare className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                  <p className={`font-medium ${textPrimary}`}>Both</p>
+                  <p className={`text-sm ${textSecondary}`}>Combine log + spec</p>
+                </div>
+              </div>
+              <div className="mt-6 flex justify-center">
+                <Button onClick={() => setShowScenarioResults(true)}>
+                  <Play className="h-4 w-4 mr-2" /> Run Sample Generation
+                </Button>
+              </div>
+            </Card>
+
+            {/* Results Section */}
+            {showScenarioResults && (
+              <Card className={`${bgCard} p-6 border ${borderColor}`}>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className={`text-xl font-bold ${textPrimary}`}>Generated Scenarios</h2>
+                  <div className="flex gap-2">
+                    {["all", "valid", "warning", "error"].map((filter) => (
+                      <button
+                        key={filter}
+                        onClick={() => setScenarioFilter(filter)}
+                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                          scenarioFilter === filter
+                            ? filter === "valid" ? "bg-[#4caf50] text-white"
+                              : filter === "warning" ? "bg-[#ff9800] text-white"
+                              : filter === "error" ? "bg-[#f44336] text-white"
+                              : "bg-[#00e5ff] text-[#0a1628]"
+                            : isDarkMode 
+                              ? "bg-[#1e4976]/30 text-[#b0bec5] hover:bg-[#1e4976]/50" 
+                              : "bg-[#e2e8f0] text-[#64748b] hover:bg-[#cbd5e1]"
+                        }`}
+                      >
+                        {filter === "all" ? "All" : filter.charAt(0).toUpperCase() + filter.slice(1)} 
+                        ({filter === "all" ? sampleScenarios.length : sampleScenarios.filter(s => s.status === filter).length})
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {filteredScenarios.map((scenario) => (
+                    <div 
+                      key={scenario.id}
+                      className={`flex items-center justify-between p-4 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"}`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <input 
+                          type="checkbox" 
+                          defaultChecked={scenario.status === "valid"}
+                          className="h-4 w-4 rounded border-[#1e4976]"
+                        />
+                        <div>
+                          <p className={`font-medium ${textPrimary}`}>{scenario.name}</p>
+                          <p className={`text-sm ${textSecondary}`}>
+                            MsgType: {scenario.msgType} | Source: {scenario.source}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                          scenario.status === "valid" ? "bg-[#4caf50]/20 text-[#4caf50]"
+                            : scenario.status === "warning" ? "bg-[#ff9800]/20 text-[#ff9800]"
+                            : "bg-[#f44336]/20 text-[#f44336]"
+                        }`}>
+                          {scenario.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-6 flex justify-end gap-3">
+                  <Button variant="outline">Export Selected</Button>
+                  <Button>Save Scenarios</Button>
                 </div>
               </Card>
             )}
