@@ -1093,41 +1093,145 @@ export default function BCometPlatform() {
 
   // Client Detail - Show Asset Classes
   if (currentScreen === "client-detail" && selectedClient) {
+    // Client progress data with multiple FIX versions per asset class
+    const clientProgressData = [
+      { 
+        name: "Equities", 
+        alerts: 2,
+        versions: [
+          { protocol: "FIX 4.2", specCompare: "complete", logAnalysis: "complete", adminSpec: "EQ_FIX42_v1.2.xml", clientSpec: "client_eq_42.xml" },
+          { protocol: "FIX 4.4", specCompare: "in-progress", logAnalysis: "pending", adminSpec: "EQ_FIX44_v2.1.xml", clientSpec: "client_eq_44.xml" },
+        ]
+      },
+      { 
+        name: "Options", 
+        alerts: 0,
+        versions: [
+          { protocol: "FIX 4.4", specCompare: "complete", logAnalysis: "complete", adminSpec: "OPT_FIX44_v2.0.xml", clientSpec: "client_opt_44.xml" },
+        ]
+      },
+      { 
+        name: "Futures", 
+        alerts: 1,
+        versions: [
+          { protocol: "FIX 4.2", specCompare: "pending", logAnalysis: "pending", adminSpec: "FUT_FIX42_v1.0.xml", clientSpec: null },
+          { protocol: "FIX 5.0 SP2", specCompare: "in-progress", logAnalysis: "in-progress", adminSpec: "FUT_FIX50SP2_v2.0.xml", clientSpec: "client_fut_50sp2.xml" },
+        ]
+      },
+    ]
+    
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
-          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
-              <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
+            <div>
+              <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+                <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+              </button>
+              <h1 className={`text-2xl font-bold ${textPrimary}`}>{selectedClient.name} - Progress</h1>
+              <p className={textSecondary}>JIRA: {selectedClient.jira} | Manager: {selectedClient.accountManager}</p>
+            </div>
+            <button className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 relative`}>
+              <Bell className="h-5 w-5" />
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#f44336] rounded-full text-[10px] text-white flex items-center justify-center">3</span>
             </button>
-            <h1 className={`text-2xl font-bold ${textPrimary}`}>{selectedClient.name}</h1>
-            <p className={textSecondary}>JIRA: {selectedClient.jira} | Manager: {selectedClient.accountManager}</p>
           </header>
 
           <div className="p-6">
-            <h2 className={`text-lg font-bold mb-4 ${textPrimary}`}>Asset Classes</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {selectedClient.assetClasses.map((ac: any, i: number) => (
-                <Card 
-                  key={i} 
-                  className={`${bgCard} p-6 border ${borderColor} cursor-pointer hover:border-[#00e5ff] transition-colors`}
-                  onClick={() => { setSelectedAssetClass(ac.name); setCurrentScreen("asset-tools"); }}
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className={`text-lg font-bold ${textPrimary}`}>{ac.name}</h3>
-                    {ac.alerts > 0 && (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336] text-xs">
-                        <Bell className="h-3 w-3" /> {ac.alerts}
+            <div className="grid gap-6">
+              {clientProgressData.map((asset) => (
+                <Card key={asset.name} className={`${bgCard} border ${borderColor} overflow-hidden`}>
+                  <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
+                    <div className="flex items-center gap-4">
+                      <h2 className={`text-lg font-bold ${textPrimary}`}>{asset.name}</h2>
+                      <span className={`text-sm ${textSecondary}`}>{asset.versions.length} FIX version(s)</span>
+                    </div>
+                    {asset.alerts > 0 && (
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336] text-xs font-medium">
+                        <Bell className="h-3 w-3" /> {asset.alerts} alerts
                       </span>
                     )}
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between"><span className={textSecondary}>Spec Compare</span>{getStatusBadge(ac.specCompare)}</div>
-                    <div className="flex justify-between"><span className={textSecondary}>Log Analysis</span>{getStatusBadge(ac.logAnalysis)}</div>
-                    <div className="flex justify-between"><span className={textSecondary}>Scenarios</span>{getStatusBadge(ac.scenario)}</div>
-                    <div className="flex justify-between"><span className={textSecondary}>Reg Test Cases</span>{getStatusBadge(ac.testCase)}</div>
-                    <div className="flex justify-between"><span className={textSecondary}>Cert Test Cases</span>{getStatusBadge(ac.certification)}</div>
+                  <div className="p-6">
+                    {/* FIX Versions Grid */}
+                    <div className={`grid gap-4 ${asset.versions.length > 1 ? "grid-cols-2" : "grid-cols-1 max-w-md"}`}>
+                      {asset.versions.map((version) => (
+                        <div key={version.protocol} className={`p-4 rounded-lg border ${borderColor}`}>
+                          <div className="flex items-center justify-between mb-4">
+                            <span className={`font-semibold ${textPrimary}`}>{version.protocol}</span>
+                            {version.clientSpec ? (
+                              <span className="text-xs text-[#4caf50] flex items-center gap-1">
+                                <CheckCircle className="h-3 w-3" /> Spec uploaded
+                              </span>
+                            ) : (
+                              <span className="text-xs text-[#ff9800] flex items-center gap-1">
+                                <AlertCircle className="h-3 w-3" /> No client spec
+                              </span>
+                            )}
+                          </div>
+                          
+                          {/* Spec Compare Progress */}
+                          <div className="mb-3">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className={`text-sm ${textSecondary}`}>Spec Compare</span>
+                              {getStatusBadge(version.specCompare)}
+                            </div>
+                            <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                              <div 
+                                className={`h-full rounded-full transition-all ${version.specCompare === "complete" ? "bg-[#4caf50]" : version.specCompare === "in-progress" ? "bg-[#2196f3]" : "bg-[#9e9e9e]"}`}
+                                style={{ width: version.specCompare === "complete" ? "100%" : version.specCompare === "in-progress" ? "60%" : "0%" }}
+                              />
+                            </div>
+                          </div>
+                          
+                          {/* Log Analysis Progress */}
+                          <div className="mb-4">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className={`text-sm ${textSecondary}`}>Log Analysis</span>
+                              {getStatusBadge(version.logAnalysis)}
+                            </div>
+                            <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                              <div 
+                                className={`h-full rounded-full transition-all ${version.logAnalysis === "complete" ? "bg-[#4caf50]" : version.logAnalysis === "in-progress" ? "bg-[#2196f3]" : "bg-[#9e9e9e]"}`}
+                                style={{ width: version.logAnalysis === "complete" ? "100%" : version.logAnalysis === "in-progress" ? "60%" : "0%" }}
+                              />
+                            </div>
+                          </div>
+                          
+                          {/* Action Buttons */}
+                          <div className="flex gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="flex-1"
+                              onClick={() => { setSelectedAssetClass(asset.name); setCurrentScreen("spec-compare"); setIsAdHocMode(false); }}
+                              disabled={!version.clientSpec}
+                            >
+                              <GitCompare className="h-3 w-3 mr-1" /> Compare
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="flex-1"
+                              onClick={() => { setSelectedAssetClass(asset.name); setCurrentScreen("log-analysis"); setIsAdHocMode(false); }}
+                            >
+                              <FileSearch className="h-3 w-3 mr-1" /> Analyze
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* All Tools Button */}
+                    <div className="mt-4 pt-4 border-t border-[#1e4976]/30">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => { setSelectedAssetClass(asset.name); setCurrentScreen("asset-tools"); }}
+                      >
+                        View All Tools for {asset.name}
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               ))}
