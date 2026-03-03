@@ -13,7 +13,7 @@ import {
   Check, XCircle, Info, ArrowRight, LogOut
 } from "lucide-react"
 
-export default function BControlPlatform() {
+export default function BCometPlatform() {
   // Theme
   const [isDarkMode, setIsDarkMode] = useState(true)
   
@@ -85,9 +85,32 @@ export default function BControlPlatform() {
       {/* Header */}
       <header className={`border-b ${borderColor} px-6 py-4`}>
         <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#00e5ff] to-[#0091ea]" />
-            <span className={`text-xl font-bold ${textPrimary}`}>BControl</span>
+          <div className="flex items-center gap-3">
+            {/* Comet Logo */}
+            <div className="relative h-10 w-10">
+              <svg viewBox="0 0 40 40" className="h-full w-full">
+                {/* Comet tail */}
+                <defs>
+                  <linearGradient id="cometTail" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#00e5ff" stopOpacity="0" />
+                    <stop offset="50%" stopColor="#00e5ff" stopOpacity="0.5" />
+                    <stop offset="100%" stopColor="#00e5ff" stopOpacity="1" />
+                  </linearGradient>
+                  <linearGradient id="cometHead" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#00e5ff" />
+                    <stop offset="100%" stopColor="#0091ea" />
+                  </linearGradient>
+                </defs>
+                {/* Tail streaks */}
+                <path d="M2 20 Q12 18, 22 20" stroke="url(#cometTail)" strokeWidth="2" fill="none" opacity="0.6" />
+                <path d="M5 24 Q14 22, 24 22" stroke="url(#cometTail)" strokeWidth="1.5" fill="none" opacity="0.4" />
+                <path d="M4 16 Q13 15, 22 17" stroke="url(#cometTail)" strokeWidth="1.5" fill="none" opacity="0.4" />
+                {/* Comet head */}
+                <circle cx="28" cy="20" r="8" fill="url(#cometHead)" />
+                <circle cx="26" cy="18" r="2" fill="white" opacity="0.6" />
+              </svg>
+            </div>
+            <span className={`text-xl font-bold ${textPrimary}`}>B-COMET</span>
           </div>
           <div className="flex items-center gap-4">
             <button
@@ -108,24 +131,21 @@ export default function BControlPlatform() {
             <div className="lg:col-span-3 space-y-8">
               <div className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm ${isDarkMode ? "bg-[#00e5ff]/10" : "bg-[#0a1628]/5"}`}>
                 <span className="flex h-2 w-2 rounded-full bg-[#4caf50] animate-pulse" />
-                <span className={`font-medium ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`}>BControl FIX AI Platform</span>
+                <span className={`font-medium ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`}>B-COMET FIX AI Platform</span>
               </div>
               
               <h1 className={`text-4xl lg:text-5xl font-bold leading-tight ${textPrimary}`}>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">B</span>TCS{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">C</span>ertification{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">C</span>onfiguration{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">O</span>nboarding
                 <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">N</span>etwork{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">T</span>esting{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">R</span>outing
-                <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">O</span>perations{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">L</span>ifecycle
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">M</span>onitoring{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">E</span>valuation{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">T</span>racking
               </h1>
               
               <p className={`text-lg max-w-xl leading-relaxed ${textSecondary}`}>
-                AI-powered FIX protocol management for certification, testing, and operations. Designed for trading firms and financial institutions.
+                AI-powered FIX protocol management for configuration, monitoring, evaluation, and tracking. Designed for trading firms and financial institutions.
               </p>
               
               <div className="flex flex-wrap gap-4">
@@ -273,7 +293,7 @@ export default function BControlPlatform() {
       <aside className={`w-64 ${bgSecondary} border-r ${borderColor} p-4 flex flex-col`}>
         <div className="flex items-center gap-2 mb-8">
           <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#00e5ff] to-[#0091ea]" />
-          <span className={`text-xl font-bold ${textPrimary}`}>BControl</span>
+          <span className={`text-xl font-bold ${textPrimary}`}>B-COMET</span>
         </div>
         
         <nav className="flex-1 space-y-1">
@@ -421,7 +441,7 @@ export default function BControlPlatform() {
       <aside className={`w-64 ${bgSecondary} border-r ${borderColor} p-4 flex flex-col`}>
         <div className="flex items-center gap-2 mb-8">
           <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#00e5ff] to-[#0091ea]" />
-          <span className={`text-xl font-bold ${textPrimary}`}>BControl</span>
+          <span className={`text-xl font-bold ${textPrimary}`}>B-COMET</span>
         </div>
         
         <nav className="flex-1 space-y-1">
@@ -529,7 +549,7 @@ export default function BControlPlatform() {
       <aside className={`w-64 ${bgSecondary} border-r ${borderColor} p-4 flex flex-col`}>
         <div className="flex items-center gap-2 mb-8">
           <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#00e5ff] to-[#0091ea]" />
-          <span className={`text-xl font-bold ${textPrimary}`}>BControl</span>
+          <span className={`text-xl font-bold ${textPrimary}`}>B-COMET</span>
         </div>
         
         <nav className="flex-1 space-y-1">
