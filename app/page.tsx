@@ -1342,44 +1342,44 @@ export default function BCometPlatform() {
     )
   }
 
-  // Admin Specs Screen
+  // Admin Specs Screen - Two column layout: Admin Specs | Client Specs
   if (currentScreen === "admin-specs") {
-    const adminSpecsData = [
+    const specsData = [
       { 
         asset: "Equities", 
         versions: [
-          { protocol: "FIX 4.2", variants: ["v1.0", "v1.1", "v1.2"] },
-          { protocol: "FIX 4.4", variants: ["v1.0", "v2.0", "v2.1"] },
-          { protocol: "FIX 5.0", variants: ["v1.0"] },
+          { protocol: "FIX 4.2", adminSpec: { name: "EQ_FIX42_v1.2.xml", uploaded: true }, clientSpec: { name: "client_eq_42.xml", uploaded: true } },
+          { protocol: "FIX 4.4", adminSpec: { name: "EQ_FIX44_v2.1.xml", uploaded: true }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 5.0", adminSpec: { name: "EQ_FIX50_v1.0.xml", uploaded: true }, clientSpec: { name: "client_eq_50.xml", uploaded: true } },
         ]
       },
       { 
         asset: "Options", 
         versions: [
-          { protocol: "FIX 4.2", variants: ["v1.0", "v1.1"] },
-          { protocol: "FIX 4.4", variants: ["v1.0", "v1.1", "v2.0"] },
+          { protocol: "FIX 4.2", adminSpec: { name: "OPT_FIX42_v1.1.xml", uploaded: true }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 4.4", adminSpec: { name: "OPT_FIX44_v2.0.xml", uploaded: true }, clientSpec: { name: "client_opt_44.xml", uploaded: true } },
         ]
       },
       { 
         asset: "Futures", 
         versions: [
-          { protocol: "FIX 4.2", variants: ["v1.0"] },
-          { protocol: "FIX 4.4", variants: ["v1.0", "v1.1"] },
-          { protocol: "FIX 5.0 SP2", variants: ["v1.0", "v2.0"] },
+          { protocol: "FIX 4.2", adminSpec: { name: "FUT_FIX42_v1.0.xml", uploaded: true }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 4.4", adminSpec: { name: "FUT_FIX44_v1.1.xml", uploaded: true }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "FUT_FIX50SP2_v2.0.xml", uploaded: true }, clientSpec: { name: "client_fut_50sp2.xml", uploaded: true } },
         ]
       },
       { 
         asset: "Fixed Income", 
         versions: [
-          { protocol: "FIX 4.4", variants: ["v1.0", "v1.1", "v1.2"] },
-          { protocol: "FIX 5.0", variants: ["v1.0"] },
+          { protocol: "FIX 4.4", adminSpec: { name: "FI_FIX44_v1.2.xml", uploaded: true }, clientSpec: { name: "client_fi_44.xml", uploaded: true } },
+          { protocol: "FIX 5.0", adminSpec: { name: "FI_FIX50_v1.0.xml", uploaded: true }, clientSpec: { name: null, uploaded: false } },
         ]
       },
       { 
         asset: "FX", 
         versions: [
-          { protocol: "FIX 4.4", variants: ["v1.0"] },
-          { protocol: "FIX 5.0 SP2", variants: ["v1.0", "v1.1"] },
+          { protocol: "FIX 4.4", adminSpec: { name: "FX_FIX44_v1.0.xml", uploaded: true }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "FX_FIX50SP2_v1.1.xml", uploaded: true }, clientSpec: { name: "client_fx_50sp2.xml", uploaded: true } },
         ]
       },
     ]
@@ -1389,65 +1389,91 @@ export default function BCometPlatform() {
         <Sidebar />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-            <h1 className={`text-2xl font-bold ${textPrimary}`}>Admin Specifications</h1>
-            <p className={textSecondary}>Manage FIX protocol specifications by asset class and version</p>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Specifications Management</h1>
+            <p className={textSecondary}>View admin specs and manage client specs by asset class</p>
           </header>
 
           <div className="p-6">
             <div className="grid gap-6">
-              {adminSpecsData.map((assetClass) => (
+              {specsData.map((assetClass) => (
                 <Card key={assetClass.asset} className={`${bgCard} border ${borderColor}`}>
-                  <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
+                  <div className={`px-6 py-4 border-b ${borderColor}`}>
                     <h2 className={`text-lg font-bold ${textPrimary}`}>{assetClass.asset}</h2>
-                    <span className={`text-sm ${textSecondary}`}>{assetClass.versions.length} protocols</span>
                   </div>
-                  <div className="p-4">
-                    <div className="space-y-4">
-                      {assetClass.versions.map((version) => (
-                        <div key={`${assetClass.asset}-${version.protocol}`} className={`rounded-lg border ${borderColor} overflow-hidden`}>
-                          <div className={`px-4 py-2 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} flex items-center justify-between`}>
-                            <span className={`font-semibold ${textPrimary}`}>{version.protocol}</span>
-                            <span className={`text-xs ${textSecondary}`}>{version.variants.length} version(s)</span>
-                          </div>
-                          <div className="divide-y divide-[#1e4976]/30">
-                            {version.variants.map((variant) => (
-                              <div 
-                                key={`${assetClass.asset}-${version.protocol}-${variant}`}
-                                className={`flex items-center justify-between px-4 py-3 hover:bg-[#1e4976]/10 transition-colors`}
-                              >
-                                <div className="flex items-center gap-3">
-                                  <FileText className={`h-4 w-4 ${textSecondary}`} />
-                                  <span className={textPrimary}>{version.protocol} - {variant}</span>
-                                </div>
-  <div className="flex items-center gap-2">
-  {/* Upload only for admin */}
-  {selectedRole === "admin" && (
-  <label className={`cursor-pointer px-3 py-1.5 rounded border ${borderColor} hover:bg-[#1e4976]/20 transition-colors flex items-center gap-2 text-sm ${textSecondary}`}>
-  <input type="file" className="hidden" accept=".xml,.txt,.csv" />
-  <Upload className="h-4 w-4" />
-  <span>Upload</span>
-  </label>
-  )}
-  <Button variant="outline" size="sm">
-                                    <Download className="h-4 w-4 mr-2" />
-                                    Download
-                                  </Button>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-  {/* Add new version button - Admin only */}
-  {selectedRole === "admin" && (
-  <div className={`px-4 py-2 border-t ${borderColor}`}>
-  <button className={`text-sm ${textSecondary} hover:text-[#00e5ff] flex items-center gap-1`}>
-  <Plus className="h-3 w-3" /> Add new version
-  </button>
-  </div>
-  )}
+                  
+                  {/* Table Header */}
+                  <div className={`grid grid-cols-3 gap-4 px-6 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} border-b ${borderColor}`}>
+                    <div className={`font-semibold text-sm ${textPrimary}`}>Protocol</div>
+                    <div className={`font-semibold text-sm ${textPrimary}`}>Admin Spec</div>
+                    <div className={`font-semibold text-sm ${textPrimary}`}>Client Spec</div>
+                  </div>
+                  
+                  {/* Table Rows */}
+                  <div className="divide-y divide-[#1e4976]/30">
+                    {assetClass.versions.map((version) => (
+                      <div 
+                        key={`${assetClass.asset}-${version.protocol}`}
+                        className={`grid grid-cols-3 gap-4 px-6 py-4 hover:bg-[#1e4976]/10 transition-colors items-center`}
+                      >
+                        {/* Protocol Column */}
+                        <div className={`font-medium ${textPrimary}`}>
+                          {version.protocol}
                         </div>
-                      ))}
-                    </div>
+                        
+                        {/* Admin Spec Column */}
+                        <div className="flex items-center gap-2">
+                          <button 
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor} hover:bg-[#00e5ff]/10 hover:border-[#00e5ff] transition-colors group`}
+                            title="Click to download"
+                          >
+                            <FileText className={`h-4 w-4 ${textSecondary} group-hover:text-[#00e5ff]`} />
+                            <span className={`text-sm ${textPrimary} group-hover:text-[#00e5ff]`}>{version.adminSpec.name}</span>
+                            <Download className={`h-3 w-3 ${textSecondary} group-hover:text-[#00e5ff]`} />
+                          </button>
+                          {selectedRole === "admin" && (
+                            <label className={`cursor-pointer p-1.5 rounded hover:bg-[#1e4976]/30 ${textSecondary}`} title="Replace">
+                              <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+                              <Upload className="h-4 w-4" />
+                            </label>
+                          )}
+                        </div>
+                        
+                        {/* Client Spec Column */}
+                        <div className="flex items-center gap-2">
+                          {version.clientSpec.uploaded ? (
+                            <>
+                              <div className={`flex items-center gap-2 px-3 py-1.5 rounded ${isDarkMode ? "bg-[#4caf50]/20" : "bg-[#4caf50]/10"} border border-[#4caf50]/30`}>
+                                <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                <span className={`text-sm ${textPrimary}`}>{version.clientSpec.name}</span>
+                              </div>
+                              <button className={`p-1.5 rounded hover:bg-[#1e4976]/30 ${textSecondary}`} title="Download">
+                                <Download className="h-4 w-4" />
+                              </button>
+                              <label className={`cursor-pointer p-1.5 rounded hover:bg-[#1e4976]/30 ${textSecondary}`} title="Replace">
+                                <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+                                <Upload className="h-4 w-4" />
+                              </label>
+                            </>
+                          ) : (
+                            <label className={`cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded border-2 border-dashed ${borderColor} hover:border-[#00e5ff] hover:bg-[#00e5ff]/5 transition-colors`}>
+                              <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+                              <Upload className={`h-4 w-4 ${textSecondary}`} />
+                              <span className={`text-sm ${textSecondary}`}>Upload spec</span>
+                            </label>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                  
+                  {/* Add new protocol - Admin only */}
+                  {selectedRole === "admin" && (
+                    <div className={`px-6 py-3 border-t ${borderColor}`}>
+                      <button className={`text-sm ${textSecondary} hover:text-[#00e5ff] flex items-center gap-1`}>
+                        <Plus className="h-3 w-3" /> Add new protocol version
+                      </button>
+                    </div>
+                  )}
                 </Card>
               ))}
             </div>
