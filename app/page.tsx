@@ -11,6 +11,7 @@ import {
   History,
   Bell,
   ChevronRight,
+  ChevronLeft,
   X,
   Moon,
   Sun,
