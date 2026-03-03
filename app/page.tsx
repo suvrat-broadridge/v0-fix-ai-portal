@@ -280,6 +280,16 @@ export default function FixAIPortal() {
   const [clientSortOrder, setClientSortOrder] = useState<"asc" | "desc">("asc")
   const [clientStatusFilter, setClientStatusFilter] = useState<"all" | "active" | "inactive">("all")
   const [showAddClientModal, setShowAddClientModal] = useState(false)
+  
+  // Column filter states for dashboard
+  const [selectedClientsFilter, setSelectedClientsFilter] = useState<string[]>([])
+  const [specComparisonFilter, setSpecComparisonFilter] = useState<string[]>([])
+  const [logComparisonFilter, setLogComparisonFilter] = useState<string[]>([])
+  const [testCaseFilter2, setTestCaseFilter2] = useState<string[]>([])
+  const [certCaseFilter, setCertCaseFilter] = useState<string[]>([])
+  const [configFilter, setConfigFilter] = useState<string[]>([])
+  const [alertsFilter, setAlertsFilter] = useState<string[]>([])
+  const [activeColumnFilter, setActiveColumnFilter] = useState<string | null>(null)
   const [editingClient, setEditingClient] = useState<Client | null>(null)
   const [newClientName, setNewClientName] = useState("")
 
@@ -2391,53 +2401,139 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
   }
 
   const sortedDashboardClients = [...clients]
-    .filter(c => dashboardStatusFilter === "all" || c.status === dashboardStatusFilter)
-    .sort((a, b) => {
-      let comparison = 0
-      if (dashboardSortBy === "name") {
-        comparison = a.name.localeCompare(b.name)
-      } else if (dashboardSortBy === "progress") {
-        comparison = getDashboardProgressCount(b) - getDashboardProgressCount(a)
-      } else if (dashboardSortBy === "status") {
-        comparison = a.status.localeCompare(b.status)
-      }
-      return dashboardSortOrder === "asc" ? comparison : -comparison
+    .filter(c => {
+      // Client name filter
+      if (selectedClientsFilter.length > 0 && !selectedClientsFilter.includes(c.id)) return false
+      // Status column filters
+      if (specComparisonFilter.length > 0 && !specComparisonFilter.includes(c.progress.specComparison)) return false
+      if (logComparisonFilter.length > 0 && !logComparisonFilter.includes(c.progress.logComparison)) return false
+      if (testCaseFilter2.length > 0 && !testCaseFilter2.includes(c.progress.testCaseGeneration)) return false
+      if (certCaseFilter.length > 0 && !certCaseFilter.includes(c.progress.certificationCaseGeneration)) return false
+      if (configFilter.length > 0 && !configFilter.includes(c.progress.configurationGeneration)) return false
+      if (alertsFilter.length > 0 && !alertsFilter.includes(c.progress.alerts)) return false
+      return true
     })
+    .sort((a, b) => a.name.localeCompare(b.name))
+
+  // Column Filter Dropdown Component
+  const ColumnFilterDropdown = ({ 
+    column, 
+    options, 
+    selectedValues, 
+    onToggle,
+    isClient = false 
+  }: { 
+    column: string
+    options: {value: string; label: string}[]
+    selectedValues: string[]
+    onToggle: (value: string) => void
+    isClient?: boolean
+  }) => {
+    const isOpen = activeColumnFilter === column
+    return (
+      <div className="relative">
+        <button
+          onClick={(e) => { e.stopPropagation(); setActiveColumnFilter(isOpen ? null : column); }}
+          className={`flex items-center gap-1 px-3 py-2 text-left text-xs font-semibold transition-colors rounded ${
+            selectedValues.length > 0 
+              ? isDarkMode ? "bg-[#1976d2]/30 text-[#00e5ff]" : "bg-[#1976d2]/20 text-[#1976d2]"
+              : isDarkMode ? "text-[#90caf9] hover:bg-[#1e4976]" : "text-[#64748b] hover:bg-[#e2e8f0]"
+          }`}
+        >
+          {column}
+          {selectedValues.length > 0 && (
+            <span className={`ml-1 px-1.5 py-0.5 text-[10px] rounded-full ${isDarkMode ? "bg-[#00e5ff] text-[#0a1628]" : "bg-[#1976d2] text-white"}`}>
+              {selectedValues.length}
+            </span>
+          )}
+          <Filter className="ml-1 h-3 w-3" />
+        </button>
+        {isOpen && (
+          <div 
+            className={`absolute top-full left-0 z-50 mt-1 min-w-[200px] rounded-lg border shadow-xl ${
+              isDarkMode ? "bg-[#0d1f3c] border-[#1e4976]" : "bg-white border-[#e2e8f0]"
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={`p-2 border-b ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
+              <button
+                onClick={() => options.forEach(o => { if (selectedValues.includes(o.value)) onToggle(o.value) })}
+                className={`text-xs ${isDarkMode ? "text-[#90caf9] hover:text-white" : "text-[#64748b] hover:text-[#0a1628]"}`}
+              >
+                Clear All
+              </button>
+            </div>
+            <div className="max-h-[250px] overflow-y-auto p-2">
+              {options.map(option => (
+                <label 
+                  key={option.value}
+                  className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer ${
+                    isDarkMode ? "hover:bg-[#1e4976]" : "hover:bg-[#f1f5f9]"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedValues.includes(option.value)}
+                    onChange={() => onToggle(option.value)}
+                    className="rounded border-gray-300"
+                  />
+                  <span className={`text-sm ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                    {option.label}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  const statusOptions = [
+    { value: "done", label: "Done" },
+    { value: "progress", label: "In Progress" },
+    { value: "pending", label: "Pending" },
+    { value: "error", label: "Error" },
+  ]
+  
+  const alertStatusOptions = [
+    { value: "generated", label: "Generated" },
+    { value: "pending", label: "Pending" },
+    { value: "error", label: "Error" },
+  ]
+
+  const clientOptions = clients.map(c => ({ value: c.id, label: c.name }))
+
+  const toggleFilter = (setter: React.Dispatch<React.SetStateAction<string[]>>, value: string) => {
+    setter(prev => prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value])
+  }
 
   // Dashboard Panel (default)
   const DashboardPanel = () => (
-    <div className="p-6">
+    <div className="p-6" onClick={() => setActiveColumnFilter(null)}>
       {/* Client Work Progress Section */}
       <div className="mb-8">
         <div className="mb-4 flex items-center justify-between">
           <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Client Work Progress</h2>
           <div className="flex items-center gap-3">
-            <select
-              value={dashboardSortBy}
-              onChange={(e) => setDashboardSortBy(e.target.value as "name" | "progress" | "status")}
-              className={`rounded-lg border px-3 py-1.5 text-xs ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
-            >
-              <option value="name">Sort by Name</option>
-              <option value="progress">Sort by Progress</option>
-              <option value="status">Sort by Status</option>
-            </select>
-            <select
-              value={dashboardSortOrder}
-              onChange={(e) => setDashboardSortOrder(e.target.value as "asc" | "desc")}
-              className={`rounded-lg border px-3 py-1.5 text-xs ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
-            >
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
-            </select>
-            <select
-              value={dashboardStatusFilter}
-              onChange={(e) => setDashboardStatusFilter(e.target.value as "all" | "active" | "inactive")}
-              className={`rounded-lg border px-3 py-1.5 text-xs ${isDarkMode ? "border-[#1e4976] bg-[#0a1628] text-white" : "border-[#e2e8f0] bg-white text-[#0a1628]"}`}
-            >
-              <option value="all">All Status</option>
-              <option value="active">Active Only</option>
-              <option value="inactive">Inactive Only</option>
-            </select>
+            {(selectedClientsFilter.length > 0 || specComparisonFilter.length > 0 || logComparisonFilter.length > 0 || testCaseFilter2.length > 0 || certCaseFilter.length > 0 || configFilter.length > 0 || alertsFilter.length > 0) && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => {
+                  setSelectedClientsFilter([])
+                  setSpecComparisonFilter([])
+                  setLogComparisonFilter([])
+                  setTestCaseFilter2([])
+                  setCertCaseFilter([])
+                  setConfigFilter([])
+                  setAlertsFilter([])
+                }}
+              >
+                <X className="mr-1 h-3 w-3" />
+                Clear All Filters
+              </Button>
+            )}
             <Button variant="ghost" size="sm" onClick={() => setActiveSidebarItem("clients")}>
               View All Clients
               <ChevronRight className="ml-1 h-4 w-4" />
@@ -2447,17 +2543,67 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
         
         {/* Progress Table */}
         <Card className="overflow-hidden">
-          <div className={`overflow-x-auto`}>
+          <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className={`border-b ${isDarkMode ? "border-[#1e4976] bg-[#0d1f3c]" : "border-[#e2e8f0] bg-[#f8fafc]"}`}>
-                  <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Client</th>
-                  <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>FIX Spec Comparison</th>
-                  <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Log Comparison</th>
-                  <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Test Case Generation</th>
-<th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Certification Case Generation</th>
-  <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Configuration Generation</th>
-  <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Alerts</th>
+                  <th className="px-2 py-2">
+                    <ColumnFilterDropdown 
+                      column="Client" 
+                      options={clientOptions} 
+                      selectedValues={selectedClientsFilter}
+                      onToggle={(v) => toggleFilter(setSelectedClientsFilter, v)}
+                      isClient
+                    />
+                  </th>
+                  <th className="px-2 py-2">
+                    <ColumnFilterDropdown 
+                      column="FIX Spec Comparison" 
+                      options={statusOptions} 
+                      selectedValues={specComparisonFilter}
+                      onToggle={(v) => toggleFilter(setSpecComparisonFilter, v)}
+                    />
+                  </th>
+                  <th className="px-2 py-2">
+                    <ColumnFilterDropdown 
+                      column="Log Comparison" 
+                      options={statusOptions} 
+                      selectedValues={logComparisonFilter}
+                      onToggle={(v) => toggleFilter(setLogComparisonFilter, v)}
+                    />
+                  </th>
+                  <th className="px-2 py-2">
+                    <ColumnFilterDropdown 
+                      column="Test Case Generation" 
+                      options={statusOptions} 
+                      selectedValues={testCaseFilter2}
+                      onToggle={(v) => toggleFilter(setTestCaseFilter2, v)}
+                    />
+                  </th>
+                  <th className="px-2 py-2">
+                    <ColumnFilterDropdown 
+                      column="Certification Case Gen" 
+                      options={statusOptions} 
+                      selectedValues={certCaseFilter}
+                      onToggle={(v) => toggleFilter(setCertCaseFilter, v)}
+                    />
+                  </th>
+                  <th className="px-2 py-2">
+                    <ColumnFilterDropdown 
+                      column="Configuration Gen" 
+                      options={statusOptions} 
+                      selectedValues={configFilter}
+                      onToggle={(v) => toggleFilter(setConfigFilter, v)}
+                    />
+                  </th>
+                  <th className="px-2 py-2">
+                    <ColumnFilterDropdown 
+                      column="Alerts" 
+                      options={alertStatusOptions} 
+                      selectedValues={alertsFilter}
+                      onToggle={(v) => toggleFilter(setAlertsFilter, v)}
+                    />
+                  </th>
                 </tr>
               </thead>
               <tbody>
