@@ -1,5 +1,5 @@
 "use client"
-
+// B-COMET FIX AI Platform - Fresh Build
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
