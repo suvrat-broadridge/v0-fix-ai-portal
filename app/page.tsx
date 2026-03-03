@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download } from "lucide-react"
+import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -1839,23 +1839,31 @@ export default function BCometPlatform() {
                           {version.protocol}
                         </div>
                         
-                        {/* Admin Spec Column */}
-                        <div className="flex items-center gap-2">
-                          <button 
-                            className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor} hover:bg-[#00e5ff]/10 hover:border-[#00e5ff] transition-colors group`}
-                            title="Click to download"
-                          >
-                            <FileText className={`h-4 w-4 ${textSecondary} group-hover:text-[#00e5ff]`} />
-                            <span className={`text-sm ${textPrimary} group-hover:text-[#00e5ff]`}>{version.adminSpec.name}</span>
-                            <Download className={`h-3 w-3 ${textSecondary} group-hover:text-[#00e5ff]`} />
-                          </button>
-                          {selectedRole === "admin" && (
-                            <label className={`cursor-pointer p-1.5 rounded hover:bg-[#1e4976]/30 ${textSecondary}`} title="Replace">
-                              <input type="file" className="hidden" accept=".xml,.txt,.csv" />
-                              <Upload className="h-4 w-4" />
-                            </label>
-                          )}
-                        </div>
+{/* Admin Spec Column */}
+  <div className="flex items-center gap-2">
+  <div className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor}`}>
+  <FileText className={`h-4 w-4 ${textSecondary}`} />
+  <span className={`text-sm ${textPrimary}`}>{version.adminSpec.name}</span>
+  </div>
+  <button
+  className={`p-1.5 rounded hover:bg-[#00e5ff]/20 ${textSecondary} hover:text-[#00e5ff] transition-colors`}
+  title="View spec"
+  >
+  <Eye className="h-4 w-4" />
+  </button>
+  <button
+  className={`p-1.5 rounded hover:bg-[#00e5ff]/20 ${textSecondary} hover:text-[#00e5ff] transition-colors`}
+  title="Download spec"
+  >
+  <Download className="h-4 w-4" />
+  </button>
+  {selectedRole === "admin" && (
+  <label className={`cursor-pointer p-1.5 rounded hover:bg-[#1e4976]/30 ${textSecondary} hover:text-[#00e5ff] transition-colors`} title="Replace">
+  <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+  <Upload className="h-4 w-4" />
+  </label>
+  )}
+  </div>
                         
                         {/* My Specs Column - Only for client role */}
                         {selectedRole === "client" && (
