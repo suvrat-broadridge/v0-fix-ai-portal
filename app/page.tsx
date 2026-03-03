@@ -448,30 +448,99 @@ export default function BCometPlatform() {
             </div>
 
             <div className="lg:col-span-2">
-              <Card className={`${bgCard}/80 backdrop-blur-md p-6 border ${borderColor}`}>
+              {/* Animated Process Grid */}
+              <div className={`${bgCard}/80 backdrop-blur-md p-4 border ${borderColor} rounded-xl`}>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className={`font-semibold ${textPrimary}`}>Live Activity</h3>
+                  <h3 className={`font-semibold ${textPrimary}`}>Live Platform Processes</h3>
                   <span className="flex h-2 w-2 rounded-full bg-[#4caf50] animate-pulse" />
                 </div>
-                <div className="space-y-3">
-                  {[
-                    { action: "Spec Comparison", client: "Goldman Sachs", status: "completed" },
-                    { action: "Log Analysis", client: "Morgan Stanley", status: "in-progress" },
-                    { action: "VeriFIX Export", client: "JP Morgan", status: "completed" },
-                    { action: "Conductor Cert", client: "Citadel", status: "in-progress" },
-                  ].map((item, i) => (
-                    <div key={i} className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f1f5f9]"}`}>
-                      <div className="flex items-center gap-3">
-                        <div className={`w-2 h-2 rounded-full ${item.status === "completed" ? "bg-[#4caf50]" : "bg-[#2196f3] animate-pulse"}`} />
-                        <div>
-                          <div className={`text-sm font-medium ${textPrimary}`}>{item.action}</div>
-                          <div className={`text-xs ${textSecondary}`}>{item.client}</div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Spec Compare Animation */}
+                  <div className={`p-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"} overflow-hidden relative`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <GitCompare className="h-4 w-4 text-[#00e5ff]" />
+                      <span className={`text-xs font-medium ${textPrimary}`}>Spec Compare</span>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <div className="h-1.5 flex-1 rounded bg-[#1e4976]/30 overflow-hidden">
+                          <div className="h-full bg-[#4caf50] rounded animate-[progressBar_3s_ease-in-out_infinite]" style={{ width: '75%' }} />
                         </div>
+                        <span className="text-[10px] text-[#4caf50]">75%</span>
+                      </div>
+                      <p className={`text-[10px] ${textSecondary}`}>Goldman Sachs - Equities</p>
+                    </div>
+                  </div>
+
+                  {/* Log Analysis Animation */}
+                  <div className={`p-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"} overflow-hidden relative`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <FileSearch className="h-4 w-4 text-[#ff9800]" />
+                      <span className={`text-xs font-medium ${textPrimary}`}>Log Analysis</span>
+                    </div>
+                    <div className="flex gap-1 mb-1">
+                      {[1,2,3,4,5].map(i => (
+                        <div key={i} className={`h-6 w-2 rounded-sm ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"} overflow-hidden`}>
+                          <div 
+                            className="w-full bg-[#ff9800] animate-[barGrow_1.5s_ease-in-out_infinite]" 
+                            style={{ animationDelay: `${i * 0.2}s`, height: `${20 + i * 15}%` }} 
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    <p className={`text-[10px] ${textSecondary}`}>Morgan Stanley - Options</p>
+                  </div>
+
+                  {/* Test Case Generation */}
+                  <div className={`p-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"} overflow-hidden relative`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <VerifixLogo size={16} />
+                      <span className={`text-xs font-medium ${textPrimary}`}>Reg Test Gen</span>
+                    </div>
+                    <div className="space-y-1">
+                      {["TC001", "TC002", "TC003"].map((tc, i) => (
+                        <div key={tc} className="flex items-center gap-2 animate-[slideIn_0.5s_ease-out_forwards]" style={{ animationDelay: `${i * 0.3}s`, opacity: 0 }}>
+                          <CheckCircle className="h-3 w-3 text-[#4caf50]" />
+                          <span className={`text-[10px] ${textSecondary}`}>{tc} Created</span>
+                        </div>
+                      ))}
+                    </div>
+                    <p className={`text-[10px] ${textSecondary} mt-1`}>JP Morgan - Futures</p>
+                  </div>
+
+                  {/* Status Changes */}
+                  <div className={`p-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"} overflow-hidden relative`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Activity className="h-4 w-4 text-[#2196f3]" />
+                      <span className={`text-xs font-medium ${textPrimary}`}>Status Updates</span>
+                    </div>
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-[#4caf50] animate-pulse" />
+                        <span className={`text-[10px] ${textSecondary}`}>Citadel certified</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-[#ff9800] animate-[blink_1s_ease-in-out_infinite]" />
+                        <span className={`text-[10px] ${textSecondary}`}>Two Sigma testing</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-[#2196f3] animate-pulse" />
+                        <span className={`text-[10px] ${textSecondary}`}>Bridgewater setup</span>
                       </div>
                     </div>
-                  ))}
+                  </div>
                 </div>
-              </Card>
+
+                {/* Bottom ticker */}
+                <div className={`mt-3 pt-3 border-t ${borderColor} overflow-hidden`}>
+                  <div className="flex animate-[ticker_20s_linear_infinite]">
+                    {["Spec uploaded - Blackrock", "Tests passed - Vanguard", "Certification complete - State Street", "Config exported - Fidelity", "Spec uploaded - Blackrock", "Tests passed - Vanguard"].map((msg, i) => (
+                      <span key={i} className={`text-[10px] ${textSecondary} whitespace-nowrap mr-8`}>{msg}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
