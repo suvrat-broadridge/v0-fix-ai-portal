@@ -1,4 +1,4 @@
-"use client";
+"use client"
 /* BControl FIX AI Platform - BTCS Certification Onboarding Network Testing Routing Operations Lifecycle */
 import { useState, useEffect } from "react"
 
@@ -1765,10 +1765,9 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
         </div>
       )}
     </div>
-  );
-};
+  )}
 
-  // Recent spec comparisons for history panel
+  // Recent spec comparisons for history
   const [recentSpecComparisons] = useState([
     { id: 1, spec1: "FIX44_BuySide.xml", spec2: "FIX44_SellSide.xml", date: "2025-03-01 11:20", differences: 8 },
     { id: 2, spec1: "FIX42_v1.xml", spec2: "FIX42_v2.xml", date: "2025-02-28 14:45", differences: 3 },
@@ -1842,7 +1841,6 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
             </Button>
           </div>
         )}
-      </div>
 
       {/* Upload Section with Side-by-Side */}
       <Card className="mb-6 p-5">
@@ -2300,10 +2298,9 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
         </div>
       )}
     </div>
-  );
-};
+  )}
 
-  // Test Cases Panel Component  
+  // Test Cases Panel Component
   const TestCasesPanel = () => {
     const filteredTestCases = testCases.filter((tc) => {
       const matchesSearch = tc.name.toLowerCase().includes(testCaseFilter.toLowerCase()) || tc.id.toLowerCase().includes(testCaseFilter.toLowerCase())
