@@ -538,6 +538,9 @@ export default function BCometPlatform() {
 
   <div className="flex gap-4 mb-8">
   <Button size="lg" onClick={() => setShowContactPanel(true)} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-semibold">Start Here</Button>
+  <Button size="lg" variant="outline" onClick={() => setCurrentScreen("fix-msg-creator")} className={`font-semibold ${isDarkMode ? "border-[#00e5ff] text-[#00e5ff] hover:bg-[#00e5ff]/10" : "border-[#0091ea] text-[#0091ea] hover:bg-[#0091ea]/10"}`}>
+    <MessageSquare className="h-5 w-5 mr-2" /> Try Message Creator Free
+  </Button>
   </div>
 
               <div className="flex gap-8">
@@ -2471,14 +2474,26 @@ export default function BCometPlatform() {
     
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
-        <Sidebar />
+        {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto flex flex-col">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
-              <ArrowLeft className="h-4 w-4" /> Back
-            </button>
-            <h1 className={`text-2xl font-bold ${textPrimary}`}>FIX Message Creator</h1>
-            <p className={`${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>Create, edit, and send FIX protocol messages</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <button onClick={() => setCurrentScreen(selectedRole ? "dashboard" : "home")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+                  <ArrowLeft className="h-4 w-4" /> {selectedRole ? "Back to Dashboard" : "Back to Home"}
+                </button>
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>FIX Message Creator</h1>
+                <p className={`${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>Create, edit, and send FIX protocol messages</p>
+              </div>
+              {!selectedRole && (
+                <div className="flex items-center gap-3">
+                  <span className={`text-sm ${textSecondary}`}>Want full access?</span>
+                  <Button onClick={() => setCurrentScreen("role-select")} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-semibold">
+                    Login / Register
+                  </Button>
+                </div>
+              )}
+            </div>
           </header>
 
           <div className="p-6 flex-1 flex flex-col">
