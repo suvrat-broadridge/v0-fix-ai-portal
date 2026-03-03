@@ -322,25 +322,25 @@ export default function BCometPlatform() {
         </button>
       </div>
       
-      <nav className="p-2 space-y-1">
-        {[
-          { icon: LayoutDashboard, label: "Dashboard", screen: "dashboard" },
-          { icon: Users, label: "Clients", screen: "clients" },
-        ].map((item) => (
-          <button
-            key={item.label}
-            onClick={() => { setCurrentScreen(item.screen as any); setIsAdHocMode(false); }}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-              currentScreen === item.screen && !isAdHocMode
-                ? "bg-[#00e5ff]/10 text-[#00e5ff]" 
-                : `${textSecondary} hover:bg-[#1e4976]/30`
-            }`}
-          >
-            <item.icon className="h-5 w-5" />
-            {!sidebarCollapsed && <span>{item.label}</span>}
-          </button>
-        ))}
-      </nav>
+  <nav className="p-2 space-y-1">
+  {[
+  { icon: LayoutDashboard, label: "Dashboard", screen: "dashboard", roles: ["admin", "client"] },
+  { icon: Users, label: "Clients", screen: "clients", roles: ["admin"] },
+  ].filter(item => item.roles.includes(selectedRole || "")).map((item) => (
+  <button
+  key={item.label}
+  onClick={() => { setCurrentScreen(item.screen as any); setIsAdHocMode(false); }}
+  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+  currentScreen === item.screen && !isAdHocMode
+  ? "bg-[#00e5ff]/10 text-[#00e5ff]"
+  : `${textSecondary} hover:bg-[#1e4976]/30`
+  }`}
+  >
+  <item.icon className="h-5 w-5" />
+  {!sidebarCollapsed && <span>{item.label}</span>}
+  </button>
+  ))}
+  </nav>
 
       {/* Tools Section - Collapsible */}
       <div className={`p-2 border-t ${borderColor}`}>
@@ -357,54 +357,58 @@ export default function BCometPlatform() {
           )}
         </button>
         
-        {toolsExpanded && !sidebarCollapsed && (
-          <div className="ml-4 mt-1 space-y-1 border-l border-[#1e4976]/50 pl-2">
-            {[
-              { icon: GitCompare, label: "Spec Compare", screen: "spec-compare" },
-              { icon: FileSearch, label: "Log Analysis", screen: "log-analysis" },
-              { icon: Activity, label: "Scenario Creation", screen: "scenario-creation" },
-            ].map((item) => (
-              <button
-                key={item.label}
-                onClick={() => { setCurrentScreen(item.screen as any); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
-                  currentScreen === item.screen && isAdHocMode
-                    ? "bg-[#00e5ff]/10 text-[#00e5ff]" 
-                    : `${textSecondary} hover:bg-[#1e4976]/30`
-                }`}
-              >
-                <item.icon className="h-4 w-4" />
-                <span>{item.label}</span>
-              </button>
-            ))}
-            
-            {/* VeriFIX */}
-            <button
-              onClick={() => { setCurrentScreen("test-case-gen"); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
-                currentScreen === "test-case-gen" && isAdHocMode
-                  ? "bg-[#00e5ff]/10 text-[#00e5ff]" 
-                  : `${textSecondary} hover:bg-[#1e4976]/30`
-              }`}
-            >
-              <VerifixLogo size={16} />
-              <span>Reg Test Cases</span>
-            </button>
-            
-            {/* Conductor */}
-            <button
-              onClick={() => { setCurrentScreen("certification-gen"); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
-                currentScreen === "certification-gen" && isAdHocMode
-                  ? "bg-[#00e5ff]/10 text-[#00e5ff]" 
-                  : `${textSecondary} hover:bg-[#1e4976]/30`
-              }`}
-            >
-              <ConductorLogo size={16} />
-              <span>Cert Test Cases</span>
-            </button>
-          </div>
-        )}
+  {toolsExpanded && !sidebarCollapsed && (
+  <div className="ml-4 mt-1 space-y-1 border-l border-[#1e4976]/50 pl-2">
+  {[
+  { icon: GitCompare, label: "Spec Compare", screen: "spec-compare", roles: ["admin", "client"] },
+  { icon: FileSearch, label: "Log Analysis", screen: "log-analysis", roles: ["admin", "client"] },
+  { icon: Activity, label: "Scenario Creation", screen: "scenario-creation", roles: ["admin"] },
+  ].filter(item => item.roles.includes(selectedRole || "")).map((item) => (
+  <button
+  key={item.label}
+  onClick={() => { setCurrentScreen(item.screen as any); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
+  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
+  currentScreen === item.screen && isAdHocMode
+  ? "bg-[#00e5ff]/10 text-[#00e5ff]"
+  : `${textSecondary} hover:bg-[#1e4976]/30`
+  }`}
+  >
+  <item.icon className="h-4 w-4" />
+  <span>{item.label}</span>
+  </button>
+  ))}
+  
+  {/* VeriFIX - Admin only */}
+  {selectedRole === "admin" && (
+  <button
+  onClick={() => { setCurrentScreen("test-case-gen"); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
+  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
+  currentScreen === "test-case-gen" && isAdHocMode
+  ? "bg-[#00e5ff]/10 text-[#00e5ff]"
+  : `${textSecondary} hover:bg-[#1e4976]/30`
+  }`}
+  >
+  <VerifixLogo size={16} />
+  <span>Reg Test Cases</span>
+  </button>
+  )}
+  
+  {/* Conductor - Admin only */}
+  {selectedRole === "admin" && (
+  <button
+  onClick={() => { setCurrentScreen("certification-gen"); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
+  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
+  currentScreen === "certification-gen" && isAdHocMode
+  ? "bg-[#00e5ff]/10 text-[#00e5ff]"
+  : `${textSecondary} hover:bg-[#1e4976]/30`
+  }`}
+  >
+  <ConductorLogo size={16} />
+  <span>Cert Test Cases</span>
+  </button>
+  )}
+  </div>
+  )}
       </div>
 
       {/* Admin Specs Navigation */}
@@ -883,27 +887,45 @@ export default function BCometPlatform() {
           </header>
 
           <div className="p-6">
-            <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
-              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload Specifications</h3>
-              <div className="grid grid-cols-2 gap-6">
-                <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
-                  <input type="file" className="hidden" accept=".xml,.txt,.csv" onChange={(e) => console.log("Client spec:", e.target.files?.[0]?.name)} />
-                  <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                  <p className={`font-medium ${textPrimary}`}>Client Spec</p>
-                  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
-                </label>
-                <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
-                  <input type="file" className="hidden" accept=".xml,.txt,.csv" onChange={(e) => console.log("Admin spec:", e.target.files?.[0]?.name)} />
-                  <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                  <p className={`font-medium ${textPrimary}`}>Admin Spec</p>
-                  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
-                </label>
-              </div>
-              <div className="mt-6 flex justify-center gap-4">
-                <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download Sample Spec</Button>
-                <Button onClick={() => setShowSpecResults(true)}><Play className="h-4 w-4 mr-2" /> Run Sample Comparison</Button>
-              </div>
-            </Card>
+  <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
+  <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload Specifications</h3>
+  <div className="grid grid-cols-2 gap-6">
+  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
+  <input type="file" className="hidden" accept=".xml,.txt,.csv" onChange={(e) => console.log("Client spec:", e.target.files?.[0]?.name)} />
+  <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+  <p className={`font-medium ${textPrimary}`}>Client Spec</p>
+  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+  </label>
+  
+  {/* Admin can upload, Client selects from existing */}
+  {selectedRole === "admin" ? (
+  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
+  <input type="file" className="hidden" accept=".xml,.txt,.csv" onChange={(e) => console.log("Admin spec:", e.target.files?.[0]?.name)} />
+  <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+  <p className={`font-medium ${textPrimary}`}>Admin Spec</p>
+  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+  </label>
+  ) : (
+  <div className={`border-2 ${borderColor} rounded-lg p-6`}>
+  <FileText className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+  <p className={`font-medium ${textPrimary} text-center mb-3`}>Select Admin Spec</p>
+  <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+  <option value="">Choose a spec...</option>
+  <option value="eq-42">Equities - FIX 4.2 v1.2</option>
+  <option value="eq-44">Equities - FIX 4.4 v2.1</option>
+  <option value="opt-44">Options - FIX 4.4 v2.0</option>
+  <option value="fut-50">Futures - FIX 5.0 SP2 v2.0</option>
+  <option value="fi-44">Fixed Income - FIX 4.4 v1.2</option>
+  <option value="fx-50">FX - FIX 5.0 SP2 v1.1</option>
+  </select>
+  </div>
+  )}
+  </div>
+  <div className="mt-6 flex justify-center gap-4">
+  <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download Sample Spec</Button>
+  <Button onClick={() => setShowSpecResults(true)}><Play className="h-4 w-4 mr-2" /> Run Sample Comparison</Button>
+  </div>
+  </Card>
 
             {showSpecResults && (
               <Card className={`${bgCard} p-6 border ${borderColor}`}>
@@ -961,27 +983,45 @@ export default function BCometPlatform() {
           </header>
 
           <div className="p-6">
-            <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
-              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload Files</h3>
-              <div className="grid grid-cols-2 gap-6">
-                <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
-                  <input type="file" className="hidden" accept=".log,.txt" onChange={(e) => console.log("Log file:", e.target.files?.[0]?.name)} />
-                  <FileText className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                  <p className={`font-medium ${textPrimary}`}>Log File</p>
-                  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
-                </label>
-                <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
-                  <input type="file" className="hidden" accept=".xml,.txt,.csv" onChange={(e) => console.log("FIX spec:", e.target.files?.[0]?.name)} />
-                  <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                  <p className={`font-medium ${textPrimary}`}>FIX Specification</p>
-                  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
-                </label>
-              </div>
-              <div className="mt-6 flex justify-center gap-4">
-                <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download Sample Spec</Button>
-                <Button onClick={() => setShowLogResults(true)}><Play className="h-4 w-4 mr-2" /> Run Sample Analysis</Button>
-              </div>
-            </Card>
+  <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
+  <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload Files</h3>
+  <div className="grid grid-cols-2 gap-6">
+  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
+  <input type="file" className="hidden" accept=".log,.txt" onChange={(e) => console.log("Log file:", e.target.files?.[0]?.name)} />
+  <FileText className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+  <p className={`font-medium ${textPrimary}`}>Log File</p>
+  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+  </label>
+  
+  {/* Admin can upload, Client selects from existing */}
+  {selectedRole === "admin" ? (
+  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
+  <input type="file" className="hidden" accept=".xml,.txt,.csv" onChange={(e) => console.log("FIX spec:", e.target.files?.[0]?.name)} />
+  <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+  <p className={`font-medium ${textPrimary}`}>FIX Specification</p>
+  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+  </label>
+  ) : (
+  <div className={`border-2 ${borderColor} rounded-lg p-6`}>
+  <FileText className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+  <p className={`font-medium ${textPrimary} text-center mb-3`}>Select FIX Specification</p>
+  <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+  <option value="">Choose a spec...</option>
+  <option value="eq-42">Equities - FIX 4.2 v1.2</option>
+  <option value="eq-44">Equities - FIX 4.4 v2.1</option>
+  <option value="opt-44">Options - FIX 4.4 v2.0</option>
+  <option value="fut-50">Futures - FIX 5.0 SP2 v2.0</option>
+  <option value="fi-44">Fixed Income - FIX 4.4 v1.2</option>
+  <option value="fx-50">FX - FIX 5.0 SP2 v1.1</option>
+  </select>
+  </div>
+  )}
+  </div>
+  <div className="mt-6 flex justify-center gap-4">
+  <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download Sample Spec</Button>
+  <Button onClick={() => setShowLogResults(true)}><Play className="h-4 w-4 mr-2" /> Run Sample Analysis</Button>
+  </div>
+  </Card>
 
             {showLogResults && (
               <Card className={`${bgCard} p-6 border ${borderColor}`}>
@@ -1379,13 +1419,16 @@ export default function BCometPlatform() {
                                   <FileText className={`h-4 w-4 ${textSecondary}`} />
                                   <span className={textPrimary}>{version.protocol} - {variant}</span>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                  <label className={`cursor-pointer px-3 py-1.5 rounded border ${borderColor} hover:bg-[#1e4976]/20 transition-colors flex items-center gap-2 text-sm ${textSecondary}`}>
-                                    <input type="file" className="hidden" accept=".xml,.txt,.csv" />
-                                    <Upload className="h-4 w-4" />
-                                    <span>Upload</span>
-                                  </label>
-                                  <Button variant="outline" size="sm">
+  <div className="flex items-center gap-2">
+  {/* Upload only for admin */}
+  {selectedRole === "admin" && (
+  <label className={`cursor-pointer px-3 py-1.5 rounded border ${borderColor} hover:bg-[#1e4976]/20 transition-colors flex items-center gap-2 text-sm ${textSecondary}`}>
+  <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+  <Upload className="h-4 w-4" />
+  <span>Upload</span>
+  </label>
+  )}
+  <Button variant="outline" size="sm">
                                     <Download className="h-4 w-4 mr-2" />
                                     Download
                                   </Button>
@@ -1393,12 +1436,14 @@ export default function BCometPlatform() {
                               </div>
                             ))}
                           </div>
-                          {/* Add new version button */}
-                          <div className={`px-4 py-2 border-t ${borderColor}`}>
-                            <button className={`text-sm ${textSecondary} hover:text-[#00e5ff] flex items-center gap-1`}>
-                              <Plus className="h-3 w-3" /> Add new version
-                            </button>
-                          </div>
+  {/* Add new version button - Admin only */}
+  {selectedRole === "admin" && (
+  <div className={`px-4 py-2 border-t ${borderColor}`}>
+  <button className={`text-sm ${textSecondary} hover:text-[#00e5ff] flex items-center gap-1`}>
+  <Plus className="h-3 w-3" /> Add new version
+  </button>
+  </div>
+  )}
                         </div>
                       ))}
                     </div>
