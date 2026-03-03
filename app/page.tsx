@@ -2144,8 +2144,9 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
               </table>
             </div>
           </Card>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   )
 
