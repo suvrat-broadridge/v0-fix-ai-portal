@@ -1842,6 +1842,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
             </Button>
           </div>
         )}
+      </div>
 
       {/* Upload Section with Side-by-Side */}
       <Card className="mb-6 p-5">
