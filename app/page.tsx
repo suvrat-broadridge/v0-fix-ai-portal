@@ -23,6 +23,8 @@ export default function BCometPlatform() {
   const [newClient, setNewClient] = useState({ name: "", jira: "", accountManager: "", assetClasses: [] as string[] })
   const [isAdHocMode, setIsAdHocMode] = useState(false)
   const [toolsExpanded, setToolsExpanded] = useState(false)
+  const [regTestSuiteGenerated, setRegTestSuiteGenerated] = useState(false)
+  const [certSuiteGenerated, setCertSuiteGenerated] = useState(false)
 
   // Theme colors
   const bgPrimary = isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"
@@ -956,8 +958,6 @@ export default function BCometPlatform() {
 
   // Reg Test Case Generation (VeriFIX)
   if (currentScreen === "test-case-gen") {
-    const [regTestSuiteGenerated, setRegTestSuiteGenerated] = useState(false)
-    
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
@@ -1044,8 +1044,6 @@ export default function BCometPlatform() {
 
   // Certification Case Generation (Conductor)
   if (currentScreen === "certification-gen") {
-    const [certSuiteGenerated, setCertSuiteGenerated] = useState(false)
-    
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
