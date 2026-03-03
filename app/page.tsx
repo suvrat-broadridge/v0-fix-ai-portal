@@ -148,46 +148,64 @@ export default function BCometPlatform() {
     }))
   }
 
-  // Logo Components - Realistic comet with bright glowing head
+  // Logo Components - Realistic bright comet like reference image
   const CometLogo = ({ size = 40 }: { size?: number }) => (
-    <svg viewBox="0 0 60 24" style={{ width: size * 1.5, height: size * 0.6 }}>
+    <svg viewBox="0 0 120 28" style={{ width: size * 3, height: size * 0.7 }}>
       <defs>
+        {/* Main tail gradient - long streaming effect */}
         <linearGradient id="cometTailMain" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stopColor="#00e5ff" stopOpacity="0" />
-          <stop offset="30%" stopColor="#00e5ff" stopOpacity="0.2" />
-          <stop offset="60%" stopColor="#00e5ff" stopOpacity="0.5" />
-          <stop offset="100%" stopColor="#00e5ff" stopOpacity="0.9" />
+          <stop offset="20%" stopColor="#00e5ff" stopOpacity="0.1" />
+          <stop offset="50%" stopColor="#00e5ff" stopOpacity="0.3" />
+          <stop offset="80%" stopColor="#00e5ff" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="#00e5ff" stopOpacity="1" />
         </linearGradient>
-        <radialGradient id="cometHeadGlow" cx="50%" cy="50%" r="50%">
+        {/* Bright white-hot core gradient */}
+        <radialGradient id="cometCore" cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#ffffff" />
-          <stop offset="40%" stopColor="#b3f5ff" />
-          <stop offset="70%" stopColor="#00e5ff" />
-          <stop offset="100%" stopColor="#0091ea" stopOpacity="0.5" />
+          <stop offset="50%" stopColor="#ffffff" />
+          <stop offset="100%" stopColor="#b3f5ff" />
         </radialGradient>
-        <filter id="glowBright" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="blur1"/>
-          <feGaussianBlur stdDeviation="1" result="blur2"/>
+        {/* Outer glow gradient */}
+        <radialGradient id="cometGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#00e5ff" stopOpacity="0.8" />
+          <stop offset="60%" stopColor="#00e5ff" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="#00e5ff" stopOpacity="0" />
+        </radialGradient>
+        {/* Intense glow filter */}
+        <filter id="intenseBrightGlow" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="4" result="blur1"/>
+          <feGaussianBlur stdDeviation="2" result="blur2"/>
+          <feGaussianBlur stdDeviation="1" result="blur3"/>
           <feMerge>
             <feMergeNode in="blur1"/>
             <feMergeNode in="blur2"/>
+            <feMergeNode in="blur3"/>
             <feMergeNode in="SourceGraphic"/>
           </feMerge>
         </filter>
       </defs>
-      {/* Multiple tail streams */}
-      <path d="M0 12 Q20 11, 42 12" stroke="url(#cometTailMain)" strokeWidth="6" fill="none" opacity="0.3" />
-      <path d="M5 12 Q22 11, 44 12" stroke="url(#cometTailMain)" strokeWidth="4" fill="none" opacity="0.5" />
-      <path d="M10 12 Q25 11, 46 12" stroke="url(#cometTailMain)" strokeWidth="2" fill="none" opacity="0.7" />
-      {/* Particle effects */}
-      <circle cx="15" cy="10" r="0.5" fill="#00e5ff" opacity="0.4" />
-      <circle cx="20" cy="14" r="0.5" fill="#00e5ff" opacity="0.3" />
-      <circle cx="25" cy="9" r="0.4" fill="#00e5ff" opacity="0.5" />
-      <circle cx="30" cy="15" r="0.4" fill="#00e5ff" opacity="0.4" />
-      <circle cx="35" cy="10" r="0.5" fill="#00e5ff" opacity="0.6" />
-      {/* Bright comet head */}
-      <ellipse cx="50" cy="12" rx="8" ry="7" fill="url(#cometHeadGlow)" filter="url(#glowBright)" />
-      <ellipse cx="50" cy="12" rx="4" ry="3.5" fill="white" opacity="0.9" />
-      <ellipse cx="48" cy="10" rx="1.5" ry="1" fill="white" />
+      {/* Long streaming tail - multiple layers */}
+      <path d="M0 14 Q40 13, 95 14" stroke="url(#cometTailMain)" strokeWidth="8" fill="none" opacity="0.2" strokeLinecap="round" />
+      <path d="M10 14 Q45 13, 98 14" stroke="url(#cometTailMain)" strokeWidth="5" fill="none" opacity="0.4" strokeLinecap="round" />
+      <path d="M20 14 Q50 13, 100 14" stroke="url(#cometTailMain)" strokeWidth="3" fill="none" opacity="0.6" strokeLinecap="round" />
+      <path d="M30 14 Q55 13, 102 14" stroke="url(#cometTailMain)" strokeWidth="2" fill="none" opacity="0.8" strokeLinecap="round" />
+      {/* Scattered particles along tail */}
+      <circle cx="25" cy="11" r="0.8" fill="#00e5ff" opacity="0.3" />
+      <circle cx="35" cy="17" r="0.6" fill="#00e5ff" opacity="0.4" />
+      <circle cx="45" cy="10" r="0.7" fill="#00e5ff" opacity="0.3" />
+      <circle cx="55" cy="18" r="0.5" fill="#00e5ff" opacity="0.5" />
+      <circle cx="65" cy="11" r="0.8" fill="#00e5ff" opacity="0.4" />
+      <circle cx="75" cy="16" r="0.6" fill="#00e5ff" opacity="0.5" />
+      <circle cx="85" cy="12" r="0.7" fill="#00e5ff" opacity="0.6" />
+      {/* Outer glow halo */}
+      <ellipse cx="108" cy="14" rx="12" ry="10" fill="url(#cometGlow)" />
+      {/* Bright comet head with intense glow */}
+      <ellipse cx="108" cy="14" rx="7" ry="6" fill="#00e5ff" filter="url(#intenseBrightGlow)" />
+      {/* White hot core */}
+      <ellipse cx="108" cy="14" rx="4" ry="3.5" fill="url(#cometCore)" filter="url(#intenseBrightGlow)" />
+      {/* Brightest center spot */}
+      <ellipse cx="107" cy="13" rx="2" ry="1.5" fill="white" />
     </svg>
   )
 
@@ -445,16 +463,17 @@ export default function BCometPlatform() {
 
         <header className={`${bgSecondary}/80 backdrop-blur-md border-b ${borderColor} sticky top-0 z-50`}>
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-2 overflow-visible">
-              {/* Animated Comet that travels across B-COMET text */}
-              <div className="relative">
-                <span className={`text-xl font-bold ${textPrimary} relative z-10`}>
-                  <span className="animate-[letterGlow_2.5s_ease-out_forwards]">B-COMET</span>
-                </span>
-                {/* Traveling comet overlay */}
-                <div className="absolute top-1/2 -translate-y-1/2 -left-12 animate-[cometTravel_2.5s_ease-in-out_forwards] opacity-0 z-20">
-                  <CometLogo size={28} />
+            <div className="flex items-center overflow-visible">
+              {/* Animated Comet that travels across and stops at end of B-COMET text */}
+              <div className="relative inline-flex items-center">
+                {/* The comet - starts left, travels to end of text, stays there */}
+                <div className="absolute top-1/2 -translate-y-1/2 left-[-80px] animate-[cometTravel_2s_ease-out_forwards] z-0">
+                  <CometLogo size={24} />
                 </div>
+                {/* Text on top */}
+                <span className={`text-xl font-bold ${textPrimary} relative z-10 animate-[letterGlow_2s_ease-out_forwards]`}>
+                  B-COMET
+                </span>
               </div>
             </div>
             <div className="flex items-center gap-4">
