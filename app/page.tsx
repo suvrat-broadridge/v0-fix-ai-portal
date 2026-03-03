@@ -14,8 +14,11 @@ export default function BCometPlatform() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [selectedClient, setSelectedClient] = useState<any>(null)
   const [selectedAssetClass, setSelectedAssetClass] = useState<string | null>(null)
+  const [selectedFixVersion, setSelectedFixVersion] = useState<string | null>(null)
   const [showSpecResults, setShowSpecResults] = useState(false)
   const [showLogResults, setShowLogResults] = useState(false)
+  const [comparisonFlags, setComparisonFlags] = useState<Record<string, { status: "ignore" | "customization" | "flag" | null; note: string }>>({})
+  const [logAnalysisFlags, setLogAnalysisFlags] = useState<Record<string, { status: "ignore" | "customization" | "flag" | null; note: string }>>({})
   const [showScenarioResults, setShowScenarioResults] = useState(false)
   const [showTestCaseResults, setShowTestCaseResults] = useState(false)
   const [showCertResults, setShowCertResults] = useState(false)
@@ -1216,7 +1219,7 @@ export default function BCometPlatform() {
                               variant="outline" 
                               size="sm" 
                               className="flex-1"
-                              onClick={() => { setSelectedAssetClass(asset.name); setCurrentScreen("spec-compare"); setIsAdHocMode(false); }}
+                              onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.version); setCurrentScreen("spec-compare"); setIsAdHocMode(false); }}
                               disabled={!version.clientSpec}
                             >
                               <GitCompare className="h-3 w-3 mr-1" /> Compare
@@ -1225,7 +1228,7 @@ export default function BCometPlatform() {
                               variant="outline" 
                               size="sm" 
                               className="flex-1"
-                              onClick={() => { setSelectedAssetClass(asset.name); setCurrentScreen("log-analysis"); setIsAdHocMode(false); }}
+                              onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.version); setCurrentScreen("log-analysis"); setIsAdHocMode(false); }}
                             >
                               <FileSearch className="h-3 w-3 mr-1" /> Analyze
                             </Button>
@@ -1303,81 +1306,165 @@ export default function BCometPlatform() {
 
   // Spec Compare Screen
   if (currentScreen === "spec-compare") {
+    const specCompareResults = [
+      { id: "diff-1", title: "Undefined Message Types", left: "35=K, 35=H undefined", right: "35=DF, 35=L undefined" },
+      { id: "diff-2", title: "Unsupported Tags", left: "35=D: tags 375, 943\n35=G: tags 524, 133", right: "35=D: tags 111, 6454\n35=8: tags 5124, 1331" },
+      { id: "diff-3", title: "Unsupported Tag Values", left: "123=4, 7, 9\n56=24, 56, gh", right: "123=12, 55, 78\n76=5, 8, 0" },
+      { id: "diff-4", title: "Datatype Mismatch", left: "Tag 46 is String", right: "Tag 98 is Char" },
+    ]
+    
+    const updateFlag = (id: string, status: "ignore" | "customization" | "flag" | null) => {
+      setComparisonFlags(prev => ({ ...prev, [id]: { ...prev[id], status, note: prev[id]?.note || "" } }))
+    }
+    
+    const updateNote = (id: string, note: string) => {
+      setComparisonFlags(prev => ({ ...prev, [id]: { ...prev[id], note, status: prev[id]?.status || null } }))
+    }
+    
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-            <button onClick={() => isAdHocMode ? setCurrentScreen("dashboard") : setCurrentScreen("asset-tools")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+            <button onClick={() => isAdHocMode ? setCurrentScreen("dashboard") : setCurrentScreen("client-detail")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> Back
             </button>
-            <h1 className={`text-2xl font-bold ${textPrimary}`}>Spec Comparison {isAdHocMode && "(Ad-hoc)"}</h1>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Spec Comparison</h1>
+            {!isAdHocMode && selectedClient && (
+              <p className={`text-sm ${textSecondary}`}>
+                Client: <span className="text-[#00e5ff] font-medium">{selectedClient.name}</span>
+                {selectedAssetClass && <> | Asset Class: <span className="text-[#00e5ff] font-medium">{selectedAssetClass}</span></>}
+                {selectedFixVersion && <> | FIX Version: <span className="text-[#00e5ff] font-medium">{selectedFixVersion}</span></>}
+              </p>
+            )}
           </header>
 
           <div className="p-6">
-  <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
-  <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload Specifications</h3>
-  <div className="grid grid-cols-2 gap-6">
-  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
-  <input type="file" className="hidden" accept=".xml,.txt,.csv" onChange={(e) => console.log("Client spec:", e.target.files?.[0]?.name)} />
-  <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-  <p className={`font-medium ${textPrimary}`}>Client Spec</p>
-  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
-  </label>
-  
-  {/* Admin can upload, Client selects from existing */}
-  {selectedRole === "admin" ? (
-  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
-  <input type="file" className="hidden" accept=".xml,.txt,.csv" onChange={(e) => console.log("Admin spec:", e.target.files?.[0]?.name)} />
-  <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-  <p className={`font-medium ${textPrimary}`}>Admin Spec</p>
-  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
-  </label>
-  ) : (
-  <div className={`border-2 ${borderColor} rounded-lg p-6`}>
-  <FileText className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-  <p className={`font-medium ${textPrimary} text-center mb-3`}>Select Admin Spec</p>
-  <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
-  <option value="">Choose a spec...</option>
-  <option value="eq-42">Equities - FIX 4.2 v1.2</option>
-  <option value="eq-44">Equities - FIX 4.4 v2.1</option>
-  <option value="opt-44">Options - FIX 4.4 v2.0</option>
-  <option value="fut-50">Futures - FIX 5.0 SP2 v2.0</option>
-  <option value="fi-44">Fixed Income - FIX 4.4 v1.2</option>
-  <option value="fx-50">FX - FIX 5.0 SP2 v1.1</option>
-  </select>
-  </div>
-  )}
-  </div>
-  <div className="mt-6 flex justify-center gap-4">
-  <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download Sample Spec</Button>
-  <Button onClick={() => setShowSpecResults(true)}><Play className="h-4 w-4 mr-2" /> Perform Comparison</Button>
-  </div>
-  </Card>
+            <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Specifications</h3>
+              <div className="grid grid-cols-2 gap-6">
+                {/* Client Spec */}
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Client Spec</label>
+                  {!isAdHocMode && selectedClient && selectedAssetClass ? (
+                    <div className={`border-2 ${borderColor} rounded-lg p-4`}>
+                      <div className="flex items-center gap-3 mb-3">
+                        <FileText className={`h-8 w-8 ${textSecondary}`} />
+                        <div>
+                          <p className={`font-medium ${textPrimary}`}>{selectedClient.name} - {selectedAssetClass}</p>
+                          <p className={`text-xs ${textSecondary}`}>{selectedFixVersion} Spec (Pre-loaded)</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <select className={`flex-1 p-2 rounded border ${borderColor} text-sm ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+                          <option value="current">Current Version (Pre-loaded)</option>
+                          <option value="v1">Previous Version v1.0</option>
+                          <option value="v2">Previous Version v0.9</option>
+                        </select>
+                        <label className={`cursor-pointer p-2 rounded border ${borderColor} hover:border-[#00e5ff] ${textSecondary} hover:text-[#00e5ff]`} title="Upload different spec">
+                          <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+                          <Upload className="h-4 w-4" />
+                        </label>
+                      </div>
+                    </div>
+                  ) : (
+                    <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
+                      <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+                      <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                      <p className={`font-medium ${textPrimary}`}>Client Spec</p>
+                      <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+                    </label>
+                  )}
+                </div>
+                
+                {/* Admin Spec - Always select from dropdown */}
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Admin Spec</label>
+                  <div className={`border-2 ${borderColor} rounded-lg p-4`}>
+                    <div className="flex items-center gap-3 mb-3">
+                      <FileText className={`h-8 w-8 ${textSecondary}`} />
+                      <div>
+                        <p className={`font-medium ${textPrimary}`}>Select from Admin Specs</p>
+                        <p className={`text-xs ${textSecondary}`}>Managed in Admin Specs section</p>
+                      </div>
+                    </div>
+                    <select 
+                      defaultValue={selectedAssetClass && selectedFixVersion ? `${selectedAssetClass?.toLowerCase().replace(" ", "-")}-${selectedFixVersion?.split(" ")[1]?.toLowerCase()}` : ""}
+                      className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}
+                    >
+                      <option value="">Choose a spec...</option>
+                      <option value="equities-4.2">Equities - FIX 4.2 v1.2</option>
+                      <option value="equities-4.4">Equities - FIX 4.4 v2.1</option>
+                      <option value="options-4.4">Options - FIX 4.4 v2.0</option>
+                      <option value="futures-5.0">Futures - FIX 5.0 SP2 v2.0</option>
+                      <option value="fixed income-4.4">Fixed Income - FIX 4.4 v1.2</option>
+                      <option value="fx-5.0">FX - FIX 5.0 SP2 v1.1</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 flex justify-center gap-4">
+                <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download Sample Spec</Button>
+                <Button onClick={() => setShowSpecResults(true)}><Play className="h-4 w-4 mr-2" /> Perform Comparison</Button>
+              </div>
+            </Card>
 
             {showSpecResults && (
               <Card className={`${bgCard} p-6 border ${borderColor}`}>
                 <h2 className={`text-xl font-bold mb-6 ${textPrimary}`}>Comparison Results</h2>
                 
-                <div className="grid grid-cols-2 gap-6">
-                  <div><h3 className={`font-bold text-[#00e5ff] mb-2`}>Client Spec</h3></div>
-                  <div><h3 className={`font-bold text-[#00e5ff] mb-2`}>Admin Spec</h3></div>
+                <div className="grid grid-cols-12 gap-4 mb-4">
+                  <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff]`}>Client Spec</h3></div>
+                  <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff]`}>Admin Spec</h3></div>
+                  <div className="col-span-2"><h3 className={`font-bold text-[#00e5ff]`}>Action</h3></div>
                 </div>
 
-                {[
-                  { title: "Undefined Message Types", left: "35=K, 35=H undefined", right: "35=DF, 35=L undefined" },
-                  { title: "Unsupported Tags", left: "35=D: tags 375, 943\n35=G: tags 524, 133", right: "35=D: tags 111, 6454\n35=8: tags 5124, 1331" },
-                  { title: "Unsupported Tag Values", left: "123=4, 7, 9\n56=24, 56, gh", right: "123=12, 55, 78\n76=5, 8, 0" },
-                  { title: "Datatype Mismatch", left: "Tag 46 is String", right: "Tag 98 is Char" },
-                ].map((section, i) => (
-                  <div key={i} className={`border-t ${borderColor} py-4`}>
+                {specCompareResults.map((section, i) => (
+                  <div key={section.id} className={`border-t ${borderColor} py-4`}>
                     <h4 className={`font-semibold mb-3 ${textPrimary}`}>{i + 1}. {section.title}</h4>
-                    <div className="grid grid-cols-2 gap-6">
-                      <div className={`p-3 rounded ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"}`}>
+                    <div className="grid grid-cols-12 gap-4">
+                      <div className={`col-span-5 p-3 rounded ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"}`}>
                         <pre className={`text-sm whitespace-pre-wrap ${textSecondary}`}>{section.left}</pre>
                       </div>
-                      <div className={`p-3 rounded ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"}`}>
+                      <div className={`col-span-5 p-3 rounded ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"}`}>
                         <pre className={`text-sm whitespace-pre-wrap ${textSecondary}`}>{section.right}</pre>
+                      </div>
+                      <div className="col-span-2 space-y-2">
+                        <div className="flex flex-col gap-1">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input 
+                              type="checkbox" 
+                              checked={comparisonFlags[section.id]?.status === "ignore"}
+                              onChange={() => updateFlag(section.id, comparisonFlags[section.id]?.status === "ignore" ? null : "ignore")}
+                              className="rounded"
+                            />
+                            <span className={`text-xs ${textSecondary}`}>Ignore</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input 
+                              type="checkbox" 
+                              checked={comparisonFlags[section.id]?.status === "customization"}
+                              onChange={() => updateFlag(section.id, comparisonFlags[section.id]?.status === "customization" ? null : "customization")}
+                              className="rounded"
+                            />
+                            <span className={`text-xs ${textSecondary}`}>Customization</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input 
+                              type="checkbox" 
+                              checked={comparisonFlags[section.id]?.status === "flag"}
+                              onChange={() => updateFlag(section.id, comparisonFlags[section.id]?.status === "flag" ? null : "flag")}
+                              className="rounded"
+                            />
+                            <span className={`text-xs ${textSecondary}`}>Flag</span>
+                          </label>
+                        </div>
+                        <Input
+                          placeholder="Add note..."
+                          value={comparisonFlags[section.id]?.note || ""}
+                          onChange={(e) => updateNote(section.id, e.target.value)}
+                          className={`h-7 text-xs ${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                        />
                       </div>
                     </div>
                   </div>
@@ -1399,80 +1486,137 @@ export default function BCometPlatform() {
 
   // Log Analysis Screen
   if (currentScreen === "log-analysis") {
+    const logAnalysisResults = [
+      { id: "log-1", title: "Unknown Message Types", left: "35=ZZ found 45 times\n35=XX found 12 times", right: "Only 35=D, 35=8, 35=F allowed" },
+      { id: "log-2", title: "Invalid Tags", left: "Tag 9999 in msg 35=D (23 occurrences)\nTag 8888 in msg 35=8 (15 occurrences)", right: "35=D allows: 1-50, 100-150\n35=8 allows: 1-50, 200-250" },
+      { id: "log-3", title: "Missing Required Tags", left: "35=D missing tag 11 (5 times)\n35=8 missing tag 17 (8 times)", right: "35=D requires: 11, 21, 55\n35=8 requires: 17, 20, 39" },
+    ]
+    
+    const updateLogFlag = (id: string, status: "ignore" | "customization" | "flag" | null) => {
+      setLogAnalysisFlags(prev => ({ ...prev, [id]: { ...prev[id], status, note: prev[id]?.note || "" } }))
+    }
+    
+    const updateLogNote = (id: string, note: string) => {
+      setLogAnalysisFlags(prev => ({ ...prev, [id]: { ...prev[id], note, status: prev[id]?.status || null } }))
+    }
+    
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-            <button onClick={() => isAdHocMode ? setCurrentScreen("dashboard") : setCurrentScreen("asset-tools")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+            <button onClick={() => isAdHocMode ? setCurrentScreen("dashboard") : setCurrentScreen("client-detail")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> Back
             </button>
-            <h1 className={`text-2xl font-bold ${textPrimary}`}>Log Analysis {isAdHocMode && "(Ad-hoc)"}</h1>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Log Analysis</h1>
+            {!isAdHocMode && selectedClient && (
+              <p className={`text-sm ${textSecondary}`}>
+                Client: <span className="text-[#00e5ff] font-medium">{selectedClient.name}</span>
+                {selectedAssetClass && <> | Asset Class: <span className="text-[#00e5ff] font-medium">{selectedAssetClass}</span></>}
+                {selectedFixVersion && <> | FIX Version: <span className="text-[#00e5ff] font-medium">{selectedFixVersion}</span></>}
+              </p>
+            )}
           </header>
 
           <div className="p-6">
-  <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
-  <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload Files</h3>
-  <div className="grid grid-cols-2 gap-6">
-  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
-  <input type="file" className="hidden" accept=".log,.txt" onChange={(e) => console.log("Log file:", e.target.files?.[0]?.name)} />
-  <FileText className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-  <p className={`font-medium ${textPrimary}`}>Log File</p>
-  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
-  </label>
-  
-  {/* Admin can upload, Client selects from existing */}
-  {selectedRole === "admin" ? (
-  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
-  <input type="file" className="hidden" accept=".xml,.txt,.csv" onChange={(e) => console.log("FIX spec:", e.target.files?.[0]?.name)} />
-  <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-  <p className={`font-medium ${textPrimary}`}>FIX Specification</p>
-  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
-  </label>
-  ) : (
-  <div className={`border-2 ${borderColor} rounded-lg p-6`}>
-  <FileText className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-  <p className={`font-medium ${textPrimary} text-center mb-3`}>Select FIX Specification</p>
-  <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
-  <option value="">Choose a spec...</option>
-  <option value="eq-42">Equities - FIX 4.2 v1.2</option>
-  <option value="eq-44">Equities - FIX 4.4 v2.1</option>
-  <option value="opt-44">Options - FIX 4.4 v2.0</option>
-  <option value="fut-50">Futures - FIX 5.0 SP2 v2.0</option>
-  <option value="fi-44">Fixed Income - FIX 4.4 v1.2</option>
-  <option value="fx-50">FX - FIX 5.0 SP2 v1.1</option>
-  </select>
-  </div>
-  )}
-  </div>
-  <div className="mt-6 flex justify-center gap-4">
-  <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download Sample Spec</Button>
-  <Button onClick={() => setShowLogResults(true)}><Play className="h-4 w-4 mr-2" /> Run Sample Analysis</Button>
-  </div>
-  </Card>
+            <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload Files</h3>
+              <div className="grid grid-cols-2 gap-6">
+                {/* Log File Upload */}
+                <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
+                  <input type="file" className="hidden" accept=".log,.txt" />
+                  <FileText className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                  <p className={`font-medium ${textPrimary}`}>Log File</p>
+                  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+                </label>
+                
+                {/* FIX Spec - Always select from dropdown */}
+                <div>
+                  <div className={`border-2 ${borderColor} rounded-lg p-4`}>
+                    <div className="flex items-center gap-3 mb-3">
+                      <FileText className={`h-8 w-8 ${textSecondary}`} />
+                      <div>
+                        <p className={`font-medium ${textPrimary}`}>Select FIX Specification</p>
+                        <p className={`text-xs ${textSecondary}`}>From Admin Specs</p>
+                      </div>
+                    </div>
+                    <select 
+                      defaultValue={selectedAssetClass && selectedFixVersion ? `${selectedAssetClass?.toLowerCase().replace(" ", "-")}-${selectedFixVersion?.split(" ")[1]?.toLowerCase()}` : ""}
+                      className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}
+                    >
+                      <option value="">Choose a spec...</option>
+                      <option value="equities-4.2">Equities - FIX 4.2 v1.2</option>
+                      <option value="equities-4.4">Equities - FIX 4.4 v2.1</option>
+                      <option value="options-4.4">Options - FIX 4.4 v2.0</option>
+                      <option value="futures-5.0">Futures - FIX 5.0 SP2 v2.0</option>
+                      <option value="fixed income-4.4">Fixed Income - FIX 4.4 v1.2</option>
+                      <option value="fx-5.0">FX - FIX 5.0 SP2 v1.1</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 flex justify-center gap-4">
+                <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download Sample Log</Button>
+                <Button onClick={() => setShowLogResults(true)}><Play className="h-4 w-4 mr-2" /> Run Analysis</Button>
+              </div>
+            </Card>
 
             {showLogResults && (
               <Card className={`${bgCard} p-6 border ${borderColor}`}>
                 <h2 className={`text-xl font-bold mb-6 ${textPrimary}`}>Spec Violations Found in Logs</h2>
                 
-                <div className="grid grid-cols-2 gap-6 mb-4">
-                  <div><h3 className={`font-bold text-[#f44336]`}>Log Issues</h3></div>
-                  <div><h3 className={`font-bold text-[#00e5ff]`}>Spec Requirements</h3></div>
+                <div className="grid grid-cols-12 gap-4 mb-4">
+                  <div className="col-span-5"><h3 className={`font-bold text-[#f44336]`}>Log Issues</h3></div>
+                  <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff]`}>Spec Requirements</h3></div>
+                  <div className="col-span-2"><h3 className={`font-bold text-[#00e5ff]`}>Action</h3></div>
                 </div>
 
-                {[
-                  { title: "Unknown Message Types", left: "35=ZZ found 45 times\n35=XX found 12 times", right: "Only 35=D, 35=8, 35=F allowed" },
-                  { title: "Invalid Tags", left: "Tag 9999 in msg 35=D (23 occurrences)\nTag 8888 in msg 35=8 (15 occurrences)", right: "35=D allows: 1-50, 100-150\n35=8 allows: 1-50, 200-250" },
-                  { title: "Missing Required Tags", left: "35=D missing tag 11 (5 times)\n35=8 missing tag 17 (8 times)", right: "35=D requires: 11, 21, 55\n35=8 requires: 17, 20, 39" },
-                ].map((section, i) => (
-                  <div key={i} className={`border-t ${borderColor} py-4`}>
-                    <h4 className={`font-semibold mb-3 ${textPrimary}`}>{section.title}</h4>
-                    <div className="grid grid-cols-2 gap-6">
-                      <div className={`p-3 rounded bg-[#f44336]/10 border border-[#f44336]/30`}>
+                {logAnalysisResults.map((section, i) => (
+                  <div key={section.id} className={`border-t ${borderColor} py-4`}>
+                    <h4 className={`font-semibold mb-3 ${textPrimary}`}>{i + 1}. {section.title}</h4>
+                    <div className="grid grid-cols-12 gap-4">
+                      <div className={`col-span-5 p-3 rounded bg-[#f44336]/10 border border-[#f44336]/30`}>
                         <pre className={`text-sm whitespace-pre-wrap text-[#f44336]`}>{section.left}</pre>
                       </div>
-                      <div className={`p-3 rounded ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"}`}>
+                      <div className={`col-span-5 p-3 rounded ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"}`}>
                         <pre className={`text-sm whitespace-pre-wrap ${textSecondary}`}>{section.right}</pre>
+                      </div>
+                      <div className="col-span-2 space-y-2">
+                        <div className="flex flex-col gap-1">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input 
+                              type="checkbox" 
+                              checked={logAnalysisFlags[section.id]?.status === "ignore"}
+                              onChange={() => updateLogFlag(section.id, logAnalysisFlags[section.id]?.status === "ignore" ? null : "ignore")}
+                              className="rounded"
+                            />
+                            <span className={`text-xs ${textSecondary}`}>Ignore</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input 
+                              type="checkbox" 
+                              checked={logAnalysisFlags[section.id]?.status === "customization"}
+                              onChange={() => updateLogFlag(section.id, logAnalysisFlags[section.id]?.status === "customization" ? null : "customization")}
+                              className="rounded"
+                            />
+                            <span className={`text-xs ${textSecondary}`}>Customization</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input 
+                              type="checkbox" 
+                              checked={logAnalysisFlags[section.id]?.status === "flag"}
+                              onChange={() => updateLogFlag(section.id, logAnalysisFlags[section.id]?.status === "flag" ? null : "flag")}
+                              className="rounded"
+                            />
+                            <span className={`text-xs ${textSecondary}`}>Flag</span>
+                          </label>
+                        </div>
+                        <Input
+                          placeholder="Add note..."
+                          value={logAnalysisFlags[section.id]?.note || ""}
+                          onChange={(e) => updateLogNote(section.id, e.target.value)}
+                          className={`h-7 text-xs ${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                        />
                       </div>
                     </div>
                   </div>
