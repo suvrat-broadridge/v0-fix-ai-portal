@@ -24,6 +24,7 @@ export default function BCometPlatform() {
   const [newClient, setNewClient] = useState({ name: "", jira: "", accountManager: "", assetClasses: [] as string[] })
   const [isAdHocMode, setIsAdHocMode] = useState(false)
   const [toolsExpanded, setToolsExpanded] = useState(false)
+  const [adminSpecsExpanded, setAdminSpecsExpanded] = useState(false)
   const [regTestSuiteGenerated, setRegTestSuiteGenerated] = useState(false)
   const [certSuiteGenerated, setCertSuiteGenerated] = useState(false)
 
@@ -376,6 +377,55 @@ export default function BCometPlatform() {
               <ConductorLogo size={16} />
               <span>Cert Test Cases</span>
             </button>
+          </div>
+        )}
+      </div>
+
+      {/* Admin Specs Section - Collapsible */}
+      <div className={`p-2 border-t ${borderColor}`}>
+        <button
+          onClick={() => setAdminSpecsExpanded(!adminSpecsExpanded)}
+          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${textSecondary} hover:bg-[#1e4976]/30`}
+        >
+          <div className="flex items-center gap-3">
+            <FileText className="h-5 w-5" />
+            {!sidebarCollapsed && <span>Admin Specs</span>}
+          </div>
+          {!sidebarCollapsed && (
+            <ChevronDown className={`h-4 w-4 transition-transform ${adminSpecsExpanded ? "rotate-180" : ""}`} />
+          )}
+        </button>
+        
+        {adminSpecsExpanded && !sidebarCollapsed && (
+          <div className="ml-4 mt-1 space-y-1 border-l border-[#1e4976]/50 pl-2">
+            {[
+              { asset: "Equities", versions: ["FIX 4.2", "FIX 4.4", "FIX 5.0"] },
+              { asset: "Options", versions: ["FIX 4.2", "FIX 4.4"] },
+              { asset: "Futures", versions: ["FIX 4.2", "FIX 4.4", "FIX 5.0 SP2"] },
+              { asset: "Fixed Income", versions: ["FIX 4.4", "FIX 5.0"] },
+              { asset: "FX", versions: ["FIX 4.4", "FIX 5.0 SP2"] },
+            ].map((item) => (
+              <div key={item.asset} className="mb-2">
+                <p className={`text-xs font-semibold px-2 py-1 ${textPrimary}`}>{item.asset}</p>
+                {item.versions.map((version) => (
+                  <div 
+                    key={`${item.asset}-${version}`}
+                    className={`flex items-center justify-between px-2 py-1.5 rounded text-xs ${textSecondary} hover:bg-[#1e4976]/20`}
+                  >
+                    <span>{version}</span>
+                    <div className="flex gap-1">
+                      <label className="cursor-pointer p-1 hover:bg-[#1e4976]/30 rounded" title="Upload">
+                        <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+                        <Upload className="h-3 w-3" />
+                      </label>
+                      <button className="p-1 hover:bg-[#1e4976]/30 rounded" title="Download">
+                        <Download className="h-3 w-3" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
         )}
       </div>
