@@ -57,9 +57,8 @@ export default function BControlPlatform() {
 
   // Roles
   const roles = [
-    { id: "cert-manager", name: "Certification Manager", icon: Shield, description: "Manage client certifications and compliance" },
-    { id: "ops-manager", name: "Operations Manager", icon: Activity, description: "Monitor operations and system health" },
-    { id: "developer", name: "Developer", icon: Zap, description: "Access technical tools and APIs" },
+    { id: "admin", name: "Admin", icon: Shield, description: "Full access to manage clients, certifications, and system settings" },
+    { id: "client", name: "Client", icon: Building2, description: "View and manage your organization's FIX specifications" },
   ]
 
   // Animate orders
