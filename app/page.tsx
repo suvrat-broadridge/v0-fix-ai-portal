@@ -438,7 +438,7 @@ export default function BCometPlatform() {
   { icon: FileSearch, label: "Log Analysis", screen: "log-analysis", roles: ["admin", "client"] },
   { icon: Activity, label: "Scenario Creation", screen: "scenario-creation", roles: ["admin"] },
   { icon: MessageSquare, label: "FIX MSG Creator", screen: "fix-msg-creator", roles: ["admin", "client"] },
-  ].filter(item => item.roles.includes(selectedRole || "")).map((item) => (
+  ].filter(item => selectedRole && item.roles.includes(selectedRole)).map((item) => (
   <button
   key={item.label}
   onClick={() => { setCurrentScreen(item.screen as any); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
