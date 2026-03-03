@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs">("home")
   const [settingsTab, setSettingsTab] = useState<"look-feel" | "general" | "security" | "mail" | "questionnaires" | "license">("general")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -389,53 +389,19 @@ export default function BCometPlatform() {
         )}
       </div>
 
-      {/* Admin Specs Section - Collapsible */}
+      {/* Admin Specs Navigation */}
       <div className={`p-2 border-t ${borderColor}`}>
         <button
-          onClick={() => setAdminSpecsExpanded(!adminSpecsExpanded)}
-          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${textSecondary} hover:bg-[#1e4976]/30`}
+          onClick={() => setCurrentScreen("admin-specs")}
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+            currentScreen === "admin-specs"
+              ? "bg-[#00e5ff]/10 text-[#00e5ff]" 
+              : `${textSecondary} hover:bg-[#1e4976]/30`
+          }`}
         >
-          <div className="flex items-center gap-3">
-            <FileText className="h-5 w-5" />
-            {!sidebarCollapsed && <span>Admin Specs</span>}
-          </div>
-          {!sidebarCollapsed && (
-            <ChevronDown className={`h-4 w-4 transition-transform ${adminSpecsExpanded ? "rotate-180" : ""}`} />
-          )}
+          <FileText className="h-5 w-5" />
+          {!sidebarCollapsed && <span>Admin Specs</span>}
         </button>
-        
-        {adminSpecsExpanded && !sidebarCollapsed && (
-          <div className="ml-4 mt-1 space-y-1 border-l border-[#1e4976]/50 pl-2">
-            {[
-              { asset: "Equities", versions: ["FIX 4.2", "FIX 4.4", "FIX 5.0"] },
-              { asset: "Options", versions: ["FIX 4.2", "FIX 4.4"] },
-              { asset: "Futures", versions: ["FIX 4.2", "FIX 4.4", "FIX 5.0 SP2"] },
-              { asset: "Fixed Income", versions: ["FIX 4.4", "FIX 5.0"] },
-              { asset: "FX", versions: ["FIX 4.4", "FIX 5.0 SP2"] },
-            ].map((item) => (
-              <div key={item.asset} className="mb-2">
-                <p className={`text-xs font-semibold px-2 py-1 ${textPrimary}`}>{item.asset}</p>
-                {item.versions.map((version) => (
-                  <div 
-                    key={`${item.asset}-${version}`}
-                    className={`flex items-center justify-between px-2 py-1.5 rounded text-xs ${textSecondary} hover:bg-[#1e4976]/20`}
-                  >
-                    <span>{version}</span>
-                    <div className="flex gap-1">
-                      <label className="cursor-pointer p-1 hover:bg-[#1e4976]/30 rounded" title="Upload">
-                        <input type="file" className="hidden" accept=".xml,.txt,.csv" />
-                        <Upload className="h-3 w-3" />
-                      </label>
-                      <button className="p-1 hover:bg-[#1e4976]/30 rounded" title="Download">
-                        <Download className="h-3 w-3" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
       <div className={`p-2 border-t ${borderColor} space-y-1 mt-auto`}>
@@ -1311,6 +1277,116 @@ export default function BCometPlatform() {
                 </div>
               </Card>
             )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Admin Specs Screen
+  if (currentScreen === "admin-specs") {
+    const adminSpecsData = [
+      { 
+        asset: "Equities", 
+        versions: [
+          { protocol: "FIX 4.2", variants: ["v1.0", "v1.1", "v1.2"] },
+          { protocol: "FIX 4.4", variants: ["v1.0", "v2.0", "v2.1"] },
+          { protocol: "FIX 5.0", variants: ["v1.0"] },
+        ]
+      },
+      { 
+        asset: "Options", 
+        versions: [
+          { protocol: "FIX 4.2", variants: ["v1.0", "v1.1"] },
+          { protocol: "FIX 4.4", variants: ["v1.0", "v1.1", "v2.0"] },
+        ]
+      },
+      { 
+        asset: "Futures", 
+        versions: [
+          { protocol: "FIX 4.2", variants: ["v1.0"] },
+          { protocol: "FIX 4.4", variants: ["v1.0", "v1.1"] },
+          { protocol: "FIX 5.0 SP2", variants: ["v1.0", "v2.0"] },
+        ]
+      },
+      { 
+        asset: "Fixed Income", 
+        versions: [
+          { protocol: "FIX 4.4", variants: ["v1.0", "v1.1", "v1.2"] },
+          { protocol: "FIX 5.0", variants: ["v1.0"] },
+        ]
+      },
+      { 
+        asset: "FX", 
+        versions: [
+          { protocol: "FIX 4.4", variants: ["v1.0"] },
+          { protocol: "FIX 5.0 SP2", variants: ["v1.0", "v1.1"] },
+        ]
+      },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Admin Specifications</h1>
+            <p className={textSecondary}>Manage FIX protocol specifications by asset class and version</p>
+          </header>
+
+          <div className="p-6">
+            <div className="grid gap-6">
+              {adminSpecsData.map((assetClass) => (
+                <Card key={assetClass.asset} className={`${bgCard} border ${borderColor}`}>
+                  <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
+                    <h2 className={`text-lg font-bold ${textPrimary}`}>{assetClass.asset}</h2>
+                    <span className={`text-sm ${textSecondary}`}>{assetClass.versions.length} protocols</span>
+                  </div>
+                  <div className="p-4">
+                    <div className="space-y-4">
+                      {assetClass.versions.map((version) => (
+                        <div key={`${assetClass.asset}-${version.protocol}`} className={`rounded-lg border ${borderColor} overflow-hidden`}>
+                          <div className={`px-4 py-2 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} flex items-center justify-between`}>
+                            <span className={`font-semibold ${textPrimary}`}>{version.protocol}</span>
+                            <span className={`text-xs ${textSecondary}`}>{version.variants.length} version(s)</span>
+                          </div>
+                          <div className="divide-y divide-[#1e4976]/30">
+                            {version.variants.map((variant) => (
+                              <div 
+                                key={`${assetClass.asset}-${version.protocol}-${variant}`}
+                                className={`flex items-center justify-between px-4 py-3 hover:bg-[#1e4976]/10 transition-colors`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <FileText className={`h-4 w-4 ${textSecondary}`} />
+                                  <span className={textPrimary}>{version.protocol} - {variant}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <label className={`cursor-pointer px-3 py-1.5 rounded border ${borderColor} hover:bg-[#1e4976]/20 transition-colors flex items-center gap-2 text-sm ${textSecondary}`}>
+                                    <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+                                    <Upload className="h-4 w-4" />
+                                    <span>Upload</span>
+                                  </label>
+                                  <Button variant="outline" size="sm">
+                                    <Download className="h-4 w-4 mr-2" />
+                                    Download
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          {/* Add new version button */}
+                          <div className={`px-4 py-2 border-t ${borderColor}`}>
+                            <button className={`text-sm ${textSecondary} hover:text-[#00e5ff] flex items-center gap-1`}>
+                              <Plus className="h-3 w-3" /> Add new version
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
       </div>
