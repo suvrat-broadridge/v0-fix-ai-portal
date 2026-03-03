@@ -1,5 +1,5 @@
 "use client"
-// BControl FIX AI - BTCS Certification Onboarding Network Testing Routing Operations Lifecycle
+/* BControl FIX AI Platform - BTCS Certification Onboarding Network Testing Routing Operations Lifecycle */
 import { useState, useEffect } from "react"
 
 import {
@@ -41,7 +41,7 @@ import {
   Copy,
 } from "lucide-react"
 
-type Screen = "home" | "admin-tools" | "client-tools"
+type Screen = "home" | "admin-tools" | "client-tools" | "client-detail"
 type UserType = "admin" | "client" | null
 type Tab = "home" | "projects" | "uploads" | "testcase" | "settings"
 type ActivePanel = "dashboard" | "spec-compare" | "log-analysis" | "msg-generator" | "test-cases" | "clients" | "history" | "alerts" | "settings" | "help" | "upload" | "download"
@@ -75,6 +75,22 @@ interface AlertEntry {
   resolved: boolean
 }
 
+interface ClientSpec {
+  id: string
+  name: string
+  assetClass: string
+  algoType?: string
+  version: string
+  lastUpdated: string
+  specComparison: "done" | "progress" | "pending" | "error"
+  logComparison: "done" | "progress" | "pending" | "error"
+  testCaseGeneration: "done" | "progress" | "pending" | "error"
+  certificationCaseGeneration: "done" | "progress" | "pending" | "error"
+  configurationGeneration: "done" | "progress" | "pending" | "error"
+  alerts: "generated" | "pending" | "error"
+  alertsCount?: number
+}
+
 interface Client {
   id: string
   name: string
@@ -90,6 +106,7 @@ interface Client {
     alerts: "generated" | "pending" | "error"
     alertsCount?: number
   }
+  clientSpecs?: ClientSpec[]
 }
 
 interface TestCase {
@@ -221,17 +238,44 @@ export default function FixAIPortal() {
     { id: "A005", type: "info", message: "New FIX 5.0 SP2 spec available", timestamp: "2025-03-02 08:00:00", resolved: false },
   ])
 
-  // Clients state
+  // Clients state with detailed specs per client
   const [clients, setClients] = useState<Client[]>([
-    { id: "C001", name: "BlackRock", specs: 12, lastActivity: "2025-03-02 10:30", status: "active", progress: { specComparison: "done", logComparison: "progress", testCaseGeneration: "done", certificationCaseGeneration: "done", configurationGeneration: "done", alerts: "generated", alertsCount: 45 } },
-    { id: "C002", name: "Goldman Sachs", specs: 8, lastActivity: "2025-03-02 09:45", status: "active", progress: { specComparison: "done", logComparison: "done", testCaseGeneration: "progress", certificationCaseGeneration: "progress", configurationGeneration: "pending", alerts: "pending" } },
-    { id: "C003", name: "JP Morgan", specs: 15, lastActivity: "2025-03-02 10:15", status: "active", progress: { specComparison: "progress", logComparison: "pending", testCaseGeneration: "pending", certificationCaseGeneration: "pending", configurationGeneration: "pending", alerts: "pending" } },
-    { id: "C004", name: "UBS", specs: 6, lastActivity: "2025-03-01 16:30", status: "inactive", progress: { specComparison: "done", logComparison: "done", testCaseGeneration: "done", certificationCaseGeneration: "done", configurationGeneration: "done", alerts: "generated", alertsCount: 32 } },
-    { id: "C005", name: "Raymond James", specs: 4, lastActivity: "2025-03-02 08:00", status: "active", progress: { specComparison: "done", logComparison: "error", testCaseGeneration: "pending", certificationCaseGeneration: "error", configurationGeneration: "error", alerts: "error" } },
-    { id: "C006", name: "HSBC", specs: 9, lastActivity: "2025-03-02 10:00", status: "active", progress: { specComparison: "done", logComparison: "done", testCaseGeneration: "progress", certificationCaseGeneration: "done", configurationGeneration: "progress", alerts: "generated", alertsCount: 28 } },
-    { id: "C007", name: "Bank of America", specs: 11, lastActivity: "2025-03-01 14:20", status: "inactive", progress: { specComparison: "error", logComparison: "pending", testCaseGeneration: "pending", certificationCaseGeneration: "pending", configurationGeneration: "pending", alerts: "pending" } },
+    { id: "C001", name: "BlackRock", specs: 12, lastActivity: "2025-03-02 10:30", status: "active", progress: { specComparison: "done", logComparison: "progress", testCaseGeneration: "done", certificationCaseGeneration: "done", configurationGeneration: "done", alerts: "generated", alertsCount: 45 }, clientSpecs: [
+      { id: "S001", name: "Equities DMA", assetClass: "Equities", algoType: "DMA", version: "FIX 4.4", lastUpdated: "2025-03-01", specComparison: "done", logComparison: "done", testCaseGeneration: "done", certificationCaseGeneration: "done", configurationGeneration: "done", alerts: "generated", alertsCount: 12 },
+      { id: "S002", name: "Equities VWAP Algo", assetClass: "Equities", algoType: "VWAP", version: "FIX 4.4", lastUpdated: "2025-03-01", specComparison: "done", logComparison: "progress", testCaseGeneration: "done", certificationCaseGeneration: "done", configurationGeneration: "done", alerts: "generated", alertsCount: 8 },
+      { id: "S003", name: "Fixed Income", assetClass: "Fixed Income", version: "FIX 5.0 SP2", lastUpdated: "2025-02-28", specComparison: "done", logComparison: "done", testCaseGeneration: "progress", certificationCaseGeneration: "pending", configurationGeneration: "pending", alerts: "pending" },
+      { id: "S004", name: "FX Spot", assetClass: "FX", version: "FIX 4.4", lastUpdated: "2025-02-25", specComparison: "done", logComparison: "done", testCaseGeneration: "done", certificationCaseGeneration: "done", configurationGeneration: "done", alerts: "generated", alertsCount: 15 },
+    ]},
+    { id: "C002", name: "Goldman Sachs", specs: 8, lastActivity: "2025-03-02 09:45", status: "active", progress: { specComparison: "done", logComparison: "done", testCaseGeneration: "progress", certificationCaseGeneration: "progress", configurationGeneration: "pending", alerts: "pending" }, clientSpecs: [
+      { id: "S005", name: "Equities TWAP", assetClass: "Equities", algoType: "TWAP", version: "FIX 4.4", lastUpdated: "2025-03-02", specComparison: "done", logComparison: "done", testCaseGeneration: "progress", certificationCaseGeneration: "progress", configurationGeneration: "pending", alerts: "pending" },
+      { id: "S006", name: "Options Trading", assetClass: "Options", version: "FIX 5.0", lastUpdated: "2025-03-01", specComparison: "done", logComparison: "done", testCaseGeneration: "done", certificationCaseGeneration: "done", configurationGeneration: "done", alerts: "generated", alertsCount: 6 },
+    ]},
+    { id: "C003", name: "JP Morgan", specs: 15, lastActivity: "2025-03-02 10:15", status: "active", progress: { specComparison: "progress", logComparison: "pending", testCaseGeneration: "pending", certificationCaseGeneration: "pending", configurationGeneration: "pending", alerts: "pending" }, clientSpecs: [
+      { id: "S007", name: "Prime Brokerage", assetClass: "Multi-Asset", version: "FIX 4.4", lastUpdated: "2025-03-02", specComparison: "progress", logComparison: "pending", testCaseGeneration: "pending", certificationCaseGeneration: "pending", configurationGeneration: "pending", alerts: "pending" },
+      { id: "S008", name: "Futures Trading", assetClass: "Futures", version: "FIX 5.0 SP2", lastUpdated: "2025-02-28", specComparison: "done", logComparison: "progress", testCaseGeneration: "pending", certificationCaseGeneration: "pending", configurationGeneration: "pending", alerts: "pending" },
+    ]},
+    { id: "C004", name: "UBS", specs: 6, lastActivity: "2025-03-01 16:30", status: "inactive", progress: { specComparison: "done", logComparison: "done", testCaseGeneration: "done", certificationCaseGeneration: "done", configurationGeneration: "done", alerts: "generated", alertsCount: 32 }, clientSpecs: [
+      { id: "S009", name: "Wealth Management", assetClass: "Multi-Asset", version: "FIX 4.2", lastUpdated: "2025-02-20", specComparison: "done", logComparison: "done", testCaseGeneration: "done", certificationCaseGeneration: "done", configurationGeneration: "done", alerts: "generated", alertsCount: 18 },
+      { id: "S010", name: "FX Options", assetClass: "FX", algoType: "Options", version: "FIX 4.4", lastUpdated: "2025-02-15", specComparison: "done", logComparison: "done", testCaseGeneration: "done", certificationCaseGeneration: "done", configurationGeneration: "done", alerts: "generated", alertsCount: 14 },
+    ]},
+    { id: "C005", name: "Raymond James", specs: 4, lastActivity: "2025-03-02 08:00", status: "active", progress: { specComparison: "done", logComparison: "error", testCaseGeneration: "pending", certificationCaseGeneration: "error", configurationGeneration: "error", alerts: "error" }, clientSpecs: [
+      { id: "S011", name: "Retail Equities", assetClass: "Equities", version: "FIX 4.2", lastUpdated: "2025-03-01", specComparison: "done", logComparison: "error", testCaseGeneration: "pending", certificationCaseGeneration: "error", configurationGeneration: "error", alerts: "error" },
+    ]},
+    { id: "C006", name: "HSBC", specs: 9, lastActivity: "2025-03-02 10:00", status: "active", progress: { specComparison: "done", logComparison: "done", testCaseGeneration: "progress", certificationCaseGeneration: "done", configurationGeneration: "progress", alerts: "generated", alertsCount: 28 }, clientSpecs: [
+      { id: "S012", name: "FX Spot APAC", assetClass: "FX", version: "FIX 4.4", lastUpdated: "2025-03-01", specComparison: "done", logComparison: "done", testCaseGeneration: "done", certificationCaseGeneration: "done", configurationGeneration: "done", alerts: "generated", alertsCount: 10 },
+      { id: "S013", name: "FX Forwards", assetClass: "FX", version: "FIX 4.4", lastUpdated: "2025-02-28", specComparison: "done", logComparison: "done", testCaseGeneration: "progress", certificationCaseGeneration: "done", configurationGeneration: "progress", alerts: "generated", alertsCount: 8 },
+      { id: "S014", name: "Commodities", assetClass: "Commodities", version: "FIX 5.0", lastUpdated: "2025-02-25", specComparison: "done", logComparison: "done", testCaseGeneration: "done", certificationCaseGeneration: "done", configurationGeneration: "done", alerts: "generated", alertsCount: 10 },
+    ]},
+    { id: "C007", name: "Bank of America", specs: 11, lastActivity: "2025-03-01 14:20", status: "inactive", progress: { specComparison: "error", logComparison: "pending", testCaseGeneration: "pending", certificationCaseGeneration: "pending", configurationGeneration: "pending", alerts: "pending" }, clientSpecs: [
+      { id: "S015", name: "Equities Flow", assetClass: "Equities", version: "FIX 4.4", lastUpdated: "2025-02-28", specComparison: "error", logComparison: "pending", testCaseGeneration: "pending", certificationCaseGeneration: "pending", configurationGeneration: "pending", alerts: "pending" },
+      { id: "S016", name: "Equities Program Trading", assetClass: "Equities", algoType: "Program", version: "FIX 4.4", lastUpdated: "2025-02-25", specComparison: "done", logComparison: "pending", testCaseGeneration: "pending", certificationCaseGeneration: "pending", configurationGeneration: "pending", alerts: "pending" },
+      { id: "S017", name: "Fixed Income Corp", assetClass: "Fixed Income", version: "FIX 5.0 SP2", lastUpdated: "2025-02-20", specComparison: "done", logComparison: "done", testCaseGeneration: "progress", certificationCaseGeneration: "pending", configurationGeneration: "pending", alerts: "pending" },
+      { id: "S018", name: "FX Prime", assetClass: "FX", version: "FIX 4.4", lastUpdated: "2025-02-15", specComparison: "done", logComparison: "done", testCaseGeneration: "done", certificationCaseGeneration: "done", configurationGeneration: "pending", alerts: "pending" },
+      { id: "S019", name: "Rates Trading", assetClass: "Rates", version: "FIX 5.0", lastUpdated: "2025-02-10", specComparison: "progress", logComparison: "pending", testCaseGeneration: "pending", certificationCaseGeneration: "pending", configurationGeneration: "pending", alerts: "pending" },
+    ]},
   ])
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
+  const [viewingClient, setViewingClient] = useState<Client | null>(null)
   const [clientSortBy, setClientSortBy] = useState<"name" | "progress" | "status">("name")
   const [clientSortOrder, setClientSortOrder] = useState<"asc" | "desc">("asc")
   const [clientStatusFilter, setClientStatusFilter] = useState<"all" | "active" | "inactive">("all")
@@ -1034,7 +1078,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                 >
                   {client.status}
                 </span>
-                <Button variant="secondary" size="sm" onClick={() => setSelectedClient(client)}>
+                <Button variant="secondary" size="sm" onClick={() => { setViewingClient(client); setCurrentScreen("client-detail"); }}>
                   <Eye className="mr-1 h-4 w-4" />
                   View
                 </Button>
@@ -2420,7 +2464,8 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                 {sortedDashboardClients.map((client, idx) => (
                   <tr 
                     key={client.id} 
-                    className={`border-b transition-colors ${
+                    onClick={() => { setViewingClient(client); setCurrentScreen("client-detail"); }}
+                    className={`border-b transition-colors cursor-pointer ${
                       isDarkMode 
                         ? `border-[#1e4976] ${idx % 2 === 0 ? "bg-[#0f2847]" : "bg-[#0a1628]"} hover:bg-[#1e4976]/50` 
                         : `border-[#e2e8f0] ${idx % 2 === 0 ? "bg-white" : "bg-[#f8fafc]"} hover:bg-[#e2e8f0]/50`
@@ -3826,11 +3871,125 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
     </div>
   )
 
+  // Client Detail Screen - shows all specs for a specific client
+  const ClientDetailScreen = () => {
+    if (!viewingClient) return null
+    
+    return (
+      <div className={`min-h-screen p-6 transition-colors ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+        <ThemeToggle />
+        
+        {/* Header */}
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-6 flex items-center gap-4">
+            <Button variant="outline" onClick={() => { setViewingClient(null); setCurrentScreen("admin-tools"); }}>
+              <ChevronLeft className="mr-1 h-4 w-4" />
+              Back to Dashboard
+            </Button>
+            <div className="flex items-center gap-3">
+              <BControlLogo size="sm" showText={false} />
+              <div>
+                <h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{viewingClient.name}</h1>
+                <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
+                  {viewingClient.clientSpecs?.length || 0} FIX Specifications · Last Activity: {viewingClient.lastActivity}
+                </p>
+              </div>
+            </div>
+            <span className={`ml-auto px-3 py-1 rounded-full text-sm font-medium ${
+              viewingClient.status === "active"
+                ? isDarkMode ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#4caf50]/20 text-[#2e7d32]"
+                : isDarkMode ? "bg-[#f57c00]/20 text-[#f57c00]" : "bg-[#f57c00]/20 text-[#e65100]"
+            }`}>
+              {viewingClient.status}
+            </span>
+          </div>
+          
+          {/* Stats Row */}
+          <div className="mb-6 grid grid-cols-6 gap-4">
+            {[
+              { label: "FIX Spec Comparison", count: viewingClient.clientSpecs?.filter(s => s.specComparison === "done").length || 0, total: viewingClient.clientSpecs?.length || 0, color: "#1976d2" },
+              { label: "Log Comparison", count: viewingClient.clientSpecs?.filter(s => s.logComparison === "done").length || 0, total: viewingClient.clientSpecs?.length || 0, color: "#4caf50" },
+              { label: "Test Case Generation", count: viewingClient.clientSpecs?.filter(s => s.testCaseGeneration === "done").length || 0, total: viewingClient.clientSpecs?.length || 0, color: "#9c27b0" },
+              { label: "Certification Case", count: viewingClient.clientSpecs?.filter(s => s.certificationCaseGeneration === "done").length || 0, total: viewingClient.clientSpecs?.length || 0, color: "#f57c00" },
+              { label: "Configuration", count: viewingClient.clientSpecs?.filter(s => s.configurationGeneration === "done").length || 0, total: viewingClient.clientSpecs?.length || 0, color: "#00bcd4" },
+              { label: "Alerts", count: viewingClient.clientSpecs?.filter(s => s.alerts === "generated").length || 0, total: viewingClient.clientSpecs?.length || 0, color: "#e91e63" },
+            ].map((stat, i) => (
+              <Card key={i} className="p-4 text-center">
+                <p className={`text-xs font-medium mb-1 ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>{stat.label}</p>
+                <p className="text-2xl font-bold" style={{ color: stat.color }}>{stat.count}<span className={`text-sm ${isDarkMode ? "text-[#64748b]" : "text-[#94a3b8]"}`}>/{stat.total}</span></p>
+              </Card>
+            ))}
+          </div>
+          
+          {/* Specs Table */}
+          <Card className="overflow-hidden">
+            <div className={`px-6 py-4 border-b ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
+              <h2 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>FIX Specifications</h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className={isDarkMode ? "bg-[#0d1f3c]" : "bg-[#f8fafc]"}>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Spec Name</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Asset Class</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Algo Type</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Version</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>FIX Spec Comparison</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Log Comparison</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Test Case Gen</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Cert Case Gen</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Config Gen</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Alerts</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {viewingClient.clientSpecs?.map((spec, i) => (
+                    <tr key={spec.id} className={`border-t ${isDarkMode ? "border-[#1e4976] hover:bg-[#0d1f3c]" : "border-[#e2e8f0] hover:bg-[#f8fafc]"}`}>
+                      <td className={`px-4 py-3 font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{spec.name}</td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${isDarkMode ? "bg-[#1e4976] text-[#90caf9]" : "bg-[#e2e8f0] text-[#64748b]"}`}>
+                          {spec.assetClass}
+                        </span>
+                      </td>
+                      <td className={`px-4 py-3 ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>{spec.algoType || "-"}</td>
+                      <td className={`px-4 py-3 font-mono text-sm ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`}>{spec.version}</td>
+                      <td className="px-4 py-3"><ProgressBadge status={spec.specComparison} /></td>
+                      <td className="px-4 py-3"><ProgressBadge status={spec.logComparison} /></td>
+                      <td className="px-4 py-3"><ProgressBadge status={spec.testCaseGeneration} /></td>
+                      <td className="px-4 py-3"><ProgressBadge status={spec.certificationCaseGeneration} /></td>
+                      <td className="px-4 py-3"><ProgressBadge status={spec.configurationGeneration} /></td>
+                      <td className="px-4 py-3">
+                        <ULTestCasesBadge status={spec.alerts} count={spec.alertsCount} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <Button variant="secondary" size="sm">
+                            <Eye className="mr-1 h-3 w-3" />
+                            View
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <Settings className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <>
       {currentScreen === "home" && <HomeScreen />}
       {currentScreen === "admin-tools" && <AdminToolsScreen />}
       {currentScreen === "client-tools" && <ClientToolsScreen />}
+      {currentScreen === "client-detail" && <ClientDetailScreen />}
       {showLoginModal && <LoginModal />}
       <StatusToast />
     </>
