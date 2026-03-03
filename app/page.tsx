@@ -1114,8 +1114,8 @@ export default function BCometPlatform() {
                       <th className={`px-4 py-3 text-center text-sm font-medium ${textPrimary}`}>Spec Compare</th>
                       <th className={`px-4 py-3 text-center text-sm font-medium ${textPrimary}`}>Log Analysis</th>
                       <th className={`px-4 py-3 text-center text-sm font-medium ${textPrimary}`}>Scenarios</th>
-                      <th className={`px-4 py-3 text-center text-sm font-medium ${textPrimary}`}>VeriFIX</th>
-                      <th className={`px-4 py-3 text-center text-sm font-medium ${textPrimary}`}>Conductor</th>
+                      <th className={`px-4 py-3 text-center text-sm font-medium ${textPrimary}`}>Reg Tests</th>
+                      <th className={`px-4 py-3 text-center text-sm font-medium ${textPrimary}`}>Cert Tests</th>
                       <th className={`px-4 py-3 text-center text-sm font-medium ${textPrimary}`}>Config</th>
                       <th className={`px-4 py-3 text-center text-sm font-medium ${textPrimary}`}>Alerts</th>
                     </tr>
