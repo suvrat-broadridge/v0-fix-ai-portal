@@ -174,7 +174,7 @@ export default function BCometPlatform() {
 
   // Sidebar Component
   const Sidebar = () => (
-    <div className={`${sidebarCollapsed ? "w-16" : "w-64"} ${bgSecondary} border-r ${borderColor} flex flex-col transition-all duration-300`}>
+    <div className={`${sidebarCollapsed ? "w-16" : "w-64"} h-screen ${bgSecondary} border-r ${borderColor} flex flex-col transition-all duration-300`}>
       <div className={`p-4 border-b ${borderColor} flex items-center ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
         {!sidebarCollapsed && (
           <div className="flex items-center gap-2">
@@ -188,7 +188,7 @@ export default function BCometPlatform() {
         </button>
       </div>
       
-      <nav className="flex-1 p-2 space-y-1">
+      <nav className="p-2 space-y-1">
         {[
           { icon: LayoutDashboard, label: "Dashboard", screen: "dashboard" },
           { icon: Users, label: "Clients", screen: "clients" },
@@ -210,7 +210,7 @@ export default function BCometPlatform() {
         ))}
       </nav>
 
-      <div className={`p-2 border-t ${borderColor} space-y-1`}>
+      <div className={`p-2 border-t ${borderColor} space-y-1 mt-2`}>
         <button
           onClick={() => setIsDarkMode(!isDarkMode)}
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}
@@ -232,16 +232,23 @@ export default function BCometPlatform() {
   // Home Screen with Landing Page
   if (currentScreen === "home") {
     return (
-      <div className={`min-h-screen ${bgPrimary} transition-colors`}>
+      <div className={`min-h-screen ${bgPrimary} transition-colors overflow-hidden`}>
+        {/* Animated Background */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className={`absolute top-20 left-10 w-72 h-72 ${isDarkMode ? "bg-[#00e5ff]/5" : "bg-[#00e5ff]/10"} rounded-full blur-3xl animate-pulse`} />
+          <div className={`absolute bottom-20 right-10 w-96 h-96 ${isDarkMode ? "bg-[#0091ea]/5" : "bg-[#0091ea]/10"} rounded-full blur-3xl animate-pulse`} style={{ animationDelay: "1s" }} />
+          <div className={`absolute top-1/2 left-1/2 w-64 h-64 ${isDarkMode ? "bg-[#4caf50]/5" : "bg-[#4caf50]/10"} rounded-full blur-3xl animate-pulse`} style={{ animationDelay: "2s" }} />
+        </div>
+
         {/* Header */}
-        <header className={`${bgSecondary} border-b ${borderColor}`}>
+        <header className={`${bgSecondary}/80 backdrop-blur-md border-b ${borderColor} sticky top-0 z-50`}>
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <CometLogo size={40} />
               <span className={`text-xl font-bold ${textPrimary}`}>B-COMET</span>
             </div>
             <div className="flex items-center gap-4">
-              <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}>
+              <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 transition-colors`}>
                 {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </button>
               <Button variant="outline" onClick={() => { setSelectedRole("client"); setCurrentScreen("login"); }}>Login</Button>
@@ -251,58 +258,129 @@ export default function BCometPlatform() {
         </header>
 
         {/* Hero Section */}
-        <section className="max-w-7xl mx-auto px-6 py-20">
-          <div className="text-center mb-16">
-            <div className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm mb-6 ${isDarkMode ? "bg-[#00e5ff]/10" : "bg-[#0a1628]/5"}`}>
-              <span className="flex h-2 w-2 rounded-full bg-[#4caf50] animate-pulse" />
-              <span className={`font-medium ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`}>B-COMET FIX AI Platform</span>
-            </div>
-            
-            <h1 className={`text-5xl lg:text-6xl font-bold leading-tight mb-6 ${textPrimary}`}>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">B</span>TCS{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">C</span>onfiguration{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">O</span>nboarding
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">M</span>onitoring{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">E</span>valuation{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">T</span>racking
-            </h1>
-            
-            <p className={`text-xl max-w-2xl mx-auto mb-10 ${textSecondary}`}>
-              AI-powered FIX protocol management for configuration, monitoring, evaluation, and tracking. Designed for trading firms and financial institutions.
-            </p>
+        <section className="relative max-w-7xl mx-auto px-6 py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
+            {/* Left Content - 3 columns */}
+            <div className="lg:col-span-3">
+              <div className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm mb-6 ${isDarkMode ? "bg-[#00e5ff]/10 border border-[#00e5ff]/20" : "bg-[#0a1628]/5 border border-[#0a1628]/10"}`}>
+                <span className="flex h-2 w-2 rounded-full bg-[#4caf50] animate-pulse" />
+                <span className={`font-medium ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`}>B-COMET FIX AI Platform</span>
+              </div>
+              
+              <h1 className={`text-4xl lg:text-5xl font-bold leading-tight mb-6 ${textPrimary}`}>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">B</span>TCS{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">C</span>onfiguration{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">O</span>nboarding
+                <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">M</span>onitoring{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">E</span>valuation{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]">T</span>racking
+              </h1>
+              
+              <p className={`text-lg max-w-xl mb-8 leading-relaxed ${textSecondary}`}>
+                AI-powered FIX protocol management for configuration, monitoring, evaluation, and tracking. Designed for trading firms and financial institutions.
+              </p>
 
-            {/* Role Selection */}
+              {/* CTA Buttons */}
+              <div className="flex gap-4 mb-8">
+                <Button size="lg" onClick={() => { setSelectedRole("admin"); setCurrentScreen("login"); }} className="px-8">
+                  Get Started
+                </Button>
+                <Button size="lg" variant="outline" onClick={() => { setSelectedRole("client"); setCurrentScreen("login"); }}>
+                  View Demo
+                </Button>
+              </div>
+
+              {/* Stats */}
+              <div className="flex gap-8">
+                <div>
+                  <div className={`text-3xl font-bold ${textPrimary}`}>500+</div>
+                  <div className={`text-sm ${textSecondary}`}>Clients Onboarded</div>
+                </div>
+                <div>
+                  <div className={`text-3xl font-bold ${textPrimary}`}>99.9%</div>
+                  <div className={`text-sm ${textSecondary}`}>Uptime</div>
+                </div>
+                <div>
+                  <div className={`text-3xl font-bold ${textPrimary}`}>50M+</div>
+                  <div className={`text-sm ${textSecondary}`}>Messages Processed</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Panel - Live Activity - 2 columns */}
+            <div className="lg:col-span-2">
+              <Card className={`${bgCard}/80 backdrop-blur-md p-6 border ${borderColor}`}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className={`font-semibold ${textPrimary}`}>Live Platform Activity</h3>
+                  <span className="flex h-2 w-2 rounded-full bg-[#4caf50] animate-pulse" />
+                </div>
+                <div className="space-y-3">
+                  {[
+                    { action: "Spec Comparison", client: "Goldman Sachs", status: "completed", time: "2m ago" },
+                    { action: "Log Analysis", client: "Morgan Stanley", status: "in-progress", time: "5m ago" },
+                    { action: "Test Case Gen", client: "JP Morgan", status: "completed", time: "8m ago" },
+                    { action: "Certification", client: "Citadel", status: "in-progress", time: "12m ago" },
+                    { action: "Config Update", client: "Two Sigma", status: "completed", time: "15m ago" },
+                  ].map((item, i) => (
+                    <div key={i} className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f1f5f9]"}`}>
+                      <div className="flex items-center gap-3">
+                        <div className={`w-2 h-2 rounded-full ${item.status === "completed" ? "bg-[#4caf50]" : "bg-[#2196f3] animate-pulse"}`} />
+                        <div>
+                          <div className={`text-sm font-medium ${textPrimary}`}>{item.action}</div>
+                          <div className={`text-xs ${textSecondary}`}>{item.client}</div>
+                        </div>
+                      </div>
+                      <span className={`text-xs ${textSecondary}`}>{item.time}</span>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </div>
+          </div>
+
+          {/* Role Selection Cards */}
+          <div className="mt-16">
+            <h2 className={`text-2xl font-bold text-center mb-8 ${textPrimary}`}>Choose Your Role</h2>
             <div className="flex justify-center gap-6">
               <Card 
-                className={`${bgCard} p-8 cursor-pointer transition-all hover:scale-105 hover:shadow-xl border-2 ${borderColor} hover:border-[#00e5ff]`}
+                className={`${bgCard} p-8 cursor-pointer transition-all hover:scale-105 hover:shadow-2xl border-2 ${borderColor} hover:border-[#00e5ff] group`}
                 onClick={() => { setSelectedRole("admin"); setCurrentScreen("login"); }}
               >
-                <Shield className="h-12 w-12 mx-auto mb-4 text-[#00e5ff]" />
-                <h3 className={`text-xl font-bold mb-2 ${textPrimary}`}>Admin</h3>
-                <p className={`text-sm ${textSecondary}`}>Full access to manage clients and system</p>
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#00e5ff]/20 to-[#0091ea]/20 flex items-center justify-center group-hover:from-[#00e5ff]/30 group-hover:to-[#0091ea]/30 transition-colors">
+                  <Shield className="h-8 w-8 text-[#00e5ff]" />
+                </div>
+                <h3 className={`text-xl font-bold mb-2 text-center ${textPrimary}`}>Admin</h3>
+                <p className={`text-sm text-center ${textSecondary}`}>Full access to manage clients, certifications, and system settings</p>
               </Card>
               
               <Card 
-                className={`${bgCard} p-8 cursor-pointer transition-all hover:scale-105 hover:shadow-xl border-2 ${borderColor} hover:border-[#00e5ff]`}
+                className={`${bgCard} p-8 cursor-pointer transition-all hover:scale-105 hover:shadow-2xl border-2 ${borderColor} hover:border-[#00e5ff] group`}
                 onClick={() => { setSelectedRole("client"); setCurrentScreen("login"); }}
               >
-                <Building2 className="h-12 w-12 mx-auto mb-4 text-[#00e5ff]" />
-                <h3 className={`text-xl font-bold mb-2 ${textPrimary}`}>Client</h3>
-                <p className={`text-sm ${textSecondary}`}>View and manage your FIX specifications</p>
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#00e5ff]/20 to-[#0091ea]/20 flex items-center justify-center group-hover:from-[#00e5ff]/30 group-hover:to-[#0091ea]/30 transition-colors">
+                  <Building2 className="h-8 w-8 text-[#00e5ff]" />
+                </div>
+                <h3 className={`text-xl font-bold mb-2 text-center ${textPrimary}`}>Client</h3>
+                <p className={`text-sm text-center ${textSecondary}`}>View and manage your organization's FIX specifications</p>
               </Card>
             </div>
           </div>
         </section>
 
         {/* Features Section */}
-        <section className={`${bgSecondary} py-20`}>
+        <section className={`${bgSecondary}/80 backdrop-blur-md py-20 relative`}>
           <div className="max-w-7xl mx-auto px-6">
-            <h2 className={`text-3xl font-bold text-center mb-12 ${textPrimary}`}>Platform Capabilities</h2>
+            <h2 className={`text-3xl font-bold text-center mb-4 ${textPrimary}`}>Platform Capabilities</h2>
+            <p className={`text-center mb-12 max-w-2xl mx-auto ${textSecondary}`}>
+              Comprehensive tools for FIX protocol management, testing, and certification
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {features.map((feature, i) => (
-                <Card key={i} className={`${bgCard} p-6 border ${borderColor}`}>
-                  <feature.icon className="h-10 w-10 mb-4 text-[#00e5ff]" />
+                <Card key={i} className={`${bgCard} p-6 border ${borderColor} hover:border-[#00e5ff]/50 transition-all hover:shadow-lg group`}>
+                  <div className="w-12 h-12 mb-4 rounded-lg bg-gradient-to-br from-[#00e5ff]/20 to-[#0091ea]/20 flex items-center justify-center group-hover:from-[#00e5ff]/30 group-hover:to-[#0091ea]/30 transition-colors">
+                    <feature.icon className="h-6 w-6 text-[#00e5ff]" />
+                  </div>
                   <h3 className={`text-lg font-bold mb-2 ${textPrimary}`}>{feature.title}</h3>
                   <p className={`text-sm ${textSecondary}`}>{feature.desc}</p>
                 </Card>
@@ -339,11 +417,19 @@ export default function BCometPlatform() {
           <div className="space-y-4">
             <div>
               <label className={`text-sm font-medium ${textPrimary}`}>Email</label>
-              <Input type="email" placeholder="Enter your email" className="mt-1" />
+              <Input 
+                type="email" 
+                placeholder="Enter your email" 
+                className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`}
+              />
             </div>
             <div>
               <label className={`text-sm font-medium ${textPrimary}`}>Password</label>
-              <Input type="password" placeholder="Enter your password" className="mt-1" />
+              <Input 
+                type="password" 
+                placeholder="Enter your password" 
+                className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`}
+              />
             </div>
             <Button className="w-full" onClick={() => setCurrentScreen("dashboard")}>
               Sign In
