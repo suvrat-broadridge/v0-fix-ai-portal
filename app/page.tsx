@@ -2302,7 +2302,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
   )
 }
 
-  // Test Cases Panel Component
+  // Test Cases Panel Component  
   const TestCasesPanel = () => {
     const filteredTestCases = testCases.filter((tc) => {
       const matchesSearch = tc.name.toLowerCase().includes(testCaseFilter.toLowerCase()) || tc.id.toLowerCase().includes(testCaseFilter.toLowerCase())
