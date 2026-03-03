@@ -42,7 +42,8 @@ import {
   Copy,
 } from "lucide-react"
 
-type Screen = "home" | "admin-tools" | "client-tools" | "client-detail"
+type Screen = "home" | "admin-tools" | "client-tools" | "client-detail" | "workflow-detail"
+type WorkflowType = "spec-comparison" | "log-analysis" | "test-case" | "cert-case" | "config-gen" | "alerts" | null
 type UserType = "admin" | "client" | null
 type Tab = "home" | "projects" | "uploads" | "testcase" | "settings"
 type ActivePanel = "dashboard" | "spec-compare" | "log-analysis" | "msg-generator" | "test-cases" | "clients" | "history" | "alerts" | "settings" | "help" | "upload" | "download"
@@ -277,6 +278,8 @@ export default function FixAIPortal() {
   ])
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const [viewingClient, setViewingClient] = useState<Client | null>(null)
+  const [selectedSpec, setSelectedSpec] = useState<ClientSpec | null>(null)
+  const [activeWorkflow, setActiveWorkflow] = useState<WorkflowType>(null)
   const [clientSortBy, setClientSortBy] = useState<"name" | "progress" | "status">("name")
   const [clientSortOrder, setClientSortOrder] = useState<"asc" | "desc">("asc")
   const [clientStatusFilter, setClientStatusFilter] = useState<"all" | "active" | "inactive">("all")
@@ -4018,12 +4021,80 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
     </div>
   )
 
+  // Clickable Status Button Component
+  const StatusButton = ({ 
+    status, 
+    spec, 
+    workflowType 
+  }: { 
+    status: "done" | "progress" | "pending" | "error"
+    spec: ClientSpec
+    workflowType: WorkflowType
+  }) => {
+    const styles = {
+      done: isDarkMode 
+        ? "bg-[#4caf50]/30 text-[#81c784] hover:bg-[#4caf50]/50 border-[#4caf50]/50" 
+        : "bg-[#e8f5e9] text-[#2e7d32] hover:bg-[#c8e6c9] border-[#4caf50]/30",
+      progress: isDarkMode 
+        ? "bg-[#2196f3]/30 text-[#90caf9] hover:bg-[#2196f3]/50 border-[#2196f3]/50" 
+        : "bg-[#e3f2fd] text-[#1565c0] hover:bg-[#bbdefb] border-[#2196f3]/30",
+      pending: isDarkMode 
+        ? "bg-[#455a64]/30 text-[#b0bec5] hover:bg-[#455a64]/50 border-[#607d8b]/50" 
+        : "bg-[#eceff1] text-[#546e7a] hover:bg-[#cfd8dc] border-[#607d8b]/30",
+      error: isDarkMode 
+        ? "bg-[#f44336]/30 text-[#ef9a9a] hover:bg-[#f44336]/50 border-[#f44336]/50" 
+        : "bg-[#ffebee] text-[#c62828] hover:bg-[#ffcdd2] border-[#f44336]/30"
+    }
+    const labels = { done: "Done", progress: "In Progress", pending: "Not Started", error: "Error" }
+    
+    return (
+      <button
+        onClick={() => { setSelectedSpec(spec); setActiveWorkflow(workflowType); setCurrentScreen("workflow-detail"); }}
+        className={`rounded-lg px-3 py-1.5 text-xs font-semibold border transition-all cursor-pointer ${styles[status]}`}
+      >
+        {labels[status]}
+      </button>
+    )
+  }
+
+  // Clickable Alerts Button Component
+  const AlertsButton = ({ 
+    status, 
+    count, 
+    spec 
+  }: { 
+    status: "generated" | "pending" | "error"
+    count?: number
+    spec: ClientSpec
+  }) => {
+    const styles = {
+      generated: isDarkMode 
+        ? "bg-[#e91e63]/30 text-[#f48fb1] hover:bg-[#e91e63]/50 border-[#e91e63]/50" 
+        : "bg-[#fce4ec] text-[#c2185b] hover:bg-[#f8bbd9] border-[#e91e63]/30",
+      pending: isDarkMode 
+        ? "bg-[#455a64]/30 text-[#b0bec5] hover:bg-[#455a64]/50 border-[#607d8b]/50" 
+        : "bg-[#eceff1] text-[#546e7a] hover:bg-[#cfd8dc] border-[#607d8b]/30",
+      error: isDarkMode 
+        ? "bg-[#f44336]/30 text-[#ef9a9a] hover:bg-[#f44336]/50 border-[#f44336]/50" 
+        : "bg-[#ffebee] text-[#c62828] hover:bg-[#ffcdd2] border-[#f44336]/30"
+    }
+    
+    return (
+      <button
+        onClick={() => { setSelectedSpec(spec); setActiveWorkflow("alerts"); setCurrentScreen("workflow-detail"); }}
+        className={`rounded-lg px-3 py-1.5 text-xs font-semibold border transition-all cursor-pointer ${styles[status]}`}
+      >
+        {status === "generated" ? `${count || 0} Alerts` : status === "pending" ? "Pending" : "Error"}
+      </button>
+    )
+  }
+
   // Client Detail Screen - shows all specs for a specific client
   const ClientDetailScreen = () => {
     if (!viewingClient) return null
     
     return (
-      <div className={`min-h-screen p-6 transition-colors ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+      <div className={`min-h-screen p-6 transition-colors ${isDarkMode ? "bg-[#050d1a]" : "bg-[#f8fafc]"}`}>
         <ThemeToggle />
         
         {/* Header */}
@@ -4037,15 +4108,15 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
               <BControlLogo size="sm" showText={false} />
               <div>
                 <h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{viewingClient.name}</h1>
-                <p className={`text-sm ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>
-                  {viewingClient.clientSpecs?.length || 0} FIX Specifications · Last Activity: {viewingClient.lastActivity}
+                <p className={`text-sm ${isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"}`}>
+                  {viewingClient.clientSpecs?.length || 0} Workflows · Last Activity: {viewingClient.lastActivity}
                 </p>
               </div>
             </div>
             <span className={`ml-auto px-3 py-1 rounded-full text-sm font-medium ${
               viewingClient.status === "active"
-                ? isDarkMode ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#4caf50]/20 text-[#2e7d32]"
-                : isDarkMode ? "bg-[#f57c00]/20 text-[#f57c00]" : "bg-[#f57c00]/20 text-[#e65100]"
+                ? isDarkMode ? "bg-[#4caf50]/30 text-[#81c784]" : "bg-[#4caf50]/20 text-[#2e7d32]"
+                : isDarkMode ? "bg-[#f57c00]/30 text-[#ffb74d]" : "bg-[#f57c00]/20 text-[#e65100]"
             }`}>
               {viewingClient.status}
             </span>
@@ -4054,78 +4125,322 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
           {/* Stats Row */}
           <div className="mb-6 grid grid-cols-6 gap-4">
             {[
-              { label: "FIX Spec Comparison", count: viewingClient.clientSpecs?.filter(s => s.specComparison === "done").length || 0, total: viewingClient.clientSpecs?.length || 0, color: "#1976d2" },
-              { label: "Log Comparison", count: viewingClient.clientSpecs?.filter(s => s.logComparison === "done").length || 0, total: viewingClient.clientSpecs?.length || 0, color: "#4caf50" },
-              { label: "Test Case Generation", count: viewingClient.clientSpecs?.filter(s => s.testCaseGeneration === "done").length || 0, total: viewingClient.clientSpecs?.length || 0, color: "#9c27b0" },
-              { label: "Certification Case", count: viewingClient.clientSpecs?.filter(s => s.certificationCaseGeneration === "done").length || 0, total: viewingClient.clientSpecs?.length || 0, color: "#f57c00" },
-              { label: "Configuration", count: viewingClient.clientSpecs?.filter(s => s.configurationGeneration === "done").length || 0, total: viewingClient.clientSpecs?.length || 0, color: "#00bcd4" },
+              { label: "Spec Comparison", count: viewingClient.clientSpecs?.filter(s => s.specComparison === "done").length || 0, total: viewingClient.clientSpecs?.length || 0, color: "#1976d2" },
+              { label: "Log Analysis", count: viewingClient.clientSpecs?.filter(s => s.logComparison === "done").length || 0, total: viewingClient.clientSpecs?.length || 0, color: "#4caf50" },
+              { label: "Test Cases", count: viewingClient.clientSpecs?.filter(s => s.testCaseGeneration === "done").length || 0, total: viewingClient.clientSpecs?.length || 0, color: "#9c27b0" },
+              { label: "Cert Cases", count: viewingClient.clientSpecs?.filter(s => s.certificationCaseGeneration === "done").length || 0, total: viewingClient.clientSpecs?.length || 0, color: "#f57c00" },
+              { label: "Config Gen", count: viewingClient.clientSpecs?.filter(s => s.configurationGeneration === "done").length || 0, total: viewingClient.clientSpecs?.length || 0, color: "#00bcd4" },
               { label: "Alerts", count: viewingClient.clientSpecs?.filter(s => s.alerts === "generated").length || 0, total: viewingClient.clientSpecs?.length || 0, color: "#e91e63" },
             ].map((stat, i) => (
-              <Card key={i} className="p-4 text-center">
-                <p className={`text-xs font-medium mb-1 ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>{stat.label}</p>
-                <p className="text-2xl font-bold" style={{ color: stat.color }}>{stat.count}<span className={`text-sm ${isDarkMode ? "text-[#64748b]" : "text-[#94a3b8]"}`}>/{stat.total}</span></p>
+              <Card key={i} className={`p-4 text-center ${isDarkMode ? "bg-[#0d1f3c] border-[#1e4976]" : ""}`}>
+                <p className={`text-xs font-medium mb-1 ${isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"}`}>{stat.label}</p>
+                <p className="text-2xl font-bold" style={{ color: stat.color }}>{stat.count}<span className={`text-sm ${isDarkMode ? "text-[#78909c]" : "text-[#94a3b8]"}`}>/{stat.total}</span></p>
               </Card>
             ))}
           </div>
           
           {/* Specs Table */}
-          <Card className="overflow-hidden">
+          <Card className={`overflow-hidden ${isDarkMode ? "bg-[#0d1f3c] border-[#1e4976]" : ""}`}>
             <div className={`px-6 py-4 border-b ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
-              <h2 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>FIX Specifications</h2>
+              <h2 className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Workflow</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className={isDarkMode ? "bg-[#0d1f3c]" : "bg-[#f8fafc]"}>
-                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Spec Name</th>
-                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Asset Class</th>
-                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Algo Type</th>
-                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Version</th>
-                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>FIX Spec Comparison</th>
-                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Log Comparison</th>
-                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Test Case Gen</th>
-                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Cert Case Gen</th>
-                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Config Gen</th>
-                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Alerts</th>
-                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>Actions</th>
+                  <tr className={isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"}`}>Spec Name</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold whitespace-nowrap ${isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"}`}>Asset Class</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"}`}>Algo Type</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"}`}>Version</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold whitespace-nowrap ${isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"}`}>Spec Comparison</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold whitespace-nowrap ${isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"}`}>Log Analysis</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold whitespace-nowrap ${isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"}`}>Test Case Gen</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold whitespace-nowrap ${isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"}`}>Cert Case Gen</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold whitespace-nowrap ${isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"}`}>Config Gen</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"}`}>Alerts</th>
                   </tr>
                 </thead>
                 <tbody>
                   {viewingClient.clientSpecs?.map((spec, i) => (
-                    <tr key={spec.id} className={`border-t ${isDarkMode ? "border-[#1e4976] hover:bg-[#0d1f3c]" : "border-[#e2e8f0] hover:bg-[#f8fafc]"}`}>
+                    <tr key={spec.id} className={`border-t ${isDarkMode ? "border-[#1e4976] hover:bg-[#162a4a]" : "border-[#e2e8f0] hover:bg-[#f8fafc]"}`}>
                       <td className={`px-4 py-3 font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{spec.name}</td>
                       <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${isDarkMode ? "bg-[#1e4976] text-[#90caf9]" : "bg-[#e2e8f0] text-[#64748b]"}`}>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${isDarkMode ? "bg-[#1e4976] text-[#b0bec5]" : "bg-[#e2e8f0] text-[#64748b]"}`}>
                           {spec.assetClass}
                         </span>
                       </td>
-                      <td className={`px-4 py-3 ${isDarkMode ? "text-[#90caf9]" : "text-[#64748b]"}`}>{spec.algoType || "-"}</td>
+                      <td className={`px-4 py-3 ${isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"}`}>{spec.algoType || "-"}</td>
                       <td className={`px-4 py-3 font-mono text-sm ${isDarkMode ? "text-[#00e5ff]" : "text-[#1976d2]"}`}>{spec.version}</td>
-                      <td className="px-4 py-3"><ProgressBadge status={spec.specComparison} /></td>
-                      <td className="px-4 py-3"><ProgressBadge status={spec.logComparison} /></td>
-                      <td className="px-4 py-3"><ProgressBadge status={spec.testCaseGeneration} /></td>
-                      <td className="px-4 py-3"><ProgressBadge status={spec.certificationCaseGeneration} /></td>
-                      <td className="px-4 py-3"><ProgressBadge status={spec.configurationGeneration} /></td>
-                      <td className="px-4 py-3">
-                        <ULTestCasesBadge status={spec.alerts} count={spec.alertsCount} />
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <Button variant="secondary" size="sm">
-                            <Eye className="mr-1 h-3 w-3" />
-                            View
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <Settings className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </td>
+                      <td className="px-4 py-3"><StatusButton status={spec.specComparison} spec={spec} workflowType="spec-comparison" /></td>
+                      <td className="px-4 py-3"><StatusButton status={spec.logComparison} spec={spec} workflowType="log-analysis" /></td>
+                      <td className="px-4 py-3"><StatusButton status={spec.testCaseGeneration} spec={spec} workflowType="test-case" /></td>
+                      <td className="px-4 py-3"><StatusButton status={spec.certificationCaseGeneration} spec={spec} workflowType="cert-case" /></td>
+                      <td className="px-4 py-3"><StatusButton status={spec.configurationGeneration} spec={spec} workflowType="config-gen" /></td>
+                      <td className="px-4 py-3"><AlertsButton status={spec.alerts} count={spec.alertsCount} spec={spec} /></td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           </Card>
+        </div>
+      </div>
+    )
+  }
+  
+  // Workflow Detail Screen - shows specific workflow for a spec
+  const WorkflowDetailScreen = () => {
+    if (!selectedSpec || !activeWorkflow || !viewingClient) return null
+    
+    const workflowTitles: Record<string, string> = {
+      "spec-comparison": "FIX Spec Comparison",
+      "log-analysis": "Log Analysis",
+      "test-case": "Test Case Generation",
+      "cert-case": "Certification Case Generation",
+      "config-gen": "Configuration Generation",
+      "alerts": "Alerts"
+    }
+    
+    const workflowColors: Record<string, string> = {
+      "spec-comparison": "#1976d2",
+      "log-analysis": "#4caf50",
+      "test-case": "#9c27b0",
+      "cert-case": "#f57c00",
+      "config-gen": "#00bcd4",
+      "alerts": "#e91e63"
+    }
+    
+    const getStatusForWorkflow = () => {
+      switch(activeWorkflow) {
+        case "spec-comparison": return selectedSpec.specComparison
+        case "log-analysis": return selectedSpec.logComparison
+        case "test-case": return selectedSpec.testCaseGeneration
+        case "cert-case": return selectedSpec.certificationCaseGeneration
+        case "config-gen": return selectedSpec.configurationGeneration
+        case "alerts": return selectedSpec.alerts
+        default: return "pending"
+      }
+    }
+    
+    const status = getStatusForWorkflow()
+    const color = workflowColors[activeWorkflow]
+    
+    return (
+      <div className={`min-h-screen p-6 transition-colors ${isDarkMode ? "bg-[#050d1a]" : "bg-[#f8fafc]"}`}>
+        <ThemeToggle />
+        
+        <div className="mx-auto max-w-7xl">
+          {/* Breadcrumb Header */}
+          <div className="mb-6 flex items-center gap-2 text-sm">
+            <button 
+              onClick={() => { setSelectedSpec(null); setActiveWorkflow(null); setCurrentScreen("admin-tools"); }}
+              className={`hover:underline ${isDarkMode ? "text-[#90caf9]" : "text-[#1976d2]"}`}
+            >
+              Dashboard
+            </button>
+            <ChevronRight className={`h-4 w-4 ${isDarkMode ? "text-[#607d8b]" : "text-[#94a3b8]"}`} />
+            <button 
+              onClick={() => { setSelectedSpec(null); setActiveWorkflow(null); setCurrentScreen("client-detail"); }}
+              className={`hover:underline ${isDarkMode ? "text-[#90caf9]" : "text-[#1976d2]"}`}
+            >
+              {viewingClient.name}
+            </button>
+            <ChevronRight className={`h-4 w-4 ${isDarkMode ? "text-[#607d8b]" : "text-[#94a3b8]"}`} />
+            <span className={isDarkMode ? "text-white" : "text-[#0a1628]"}>{selectedSpec.name}</span>
+            <ChevronRight className={`h-4 w-4 ${isDarkMode ? "text-[#607d8b]" : "text-[#94a3b8]"}`} />
+            <span className={isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"}>{workflowTitles[activeWorkflow]}</span>
+          </div>
+          
+          {/* Header */}
+          <div className="mb-6 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button variant="outline" onClick={() => { setSelectedSpec(null); setActiveWorkflow(null); setCurrentScreen("client-detail"); }}>
+                <ChevronLeft className="mr-1 h-4 w-4" />
+                Back
+              </Button>
+              <div>
+                <h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                  {workflowTitles[activeWorkflow]}
+                </h1>
+                <p className={`text-sm ${isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"}`}>
+                  {selectedSpec.name} · {selectedSpec.assetClass} · {selectedSpec.version}
+                </p>
+              </div>
+            </div>
+            <div className={`px-4 py-2 rounded-lg font-semibold ${
+              status === "done" || status === "generated" 
+                ? isDarkMode ? "bg-[#4caf50]/30 text-[#81c784]" : "bg-[#e8f5e9] text-[#2e7d32]"
+                : status === "progress" 
+                ? isDarkMode ? "bg-[#2196f3]/30 text-[#90caf9]" : "bg-[#e3f2fd] text-[#1565c0]"
+                : status === "error"
+                ? isDarkMode ? "bg-[#f44336]/30 text-[#ef9a9a]" : "bg-[#ffebee] text-[#c62828]"
+                : isDarkMode ? "bg-[#455a64]/30 text-[#b0bec5]" : "bg-[#eceff1] text-[#546e7a]"
+            }`}>
+              Status: {status === "done" ? "Completed" : status === "generated" ? "Generated" : status === "progress" ? "In Progress" : status === "error" ? "Error" : "Not Started"}
+            </div>
+          </div>
+          
+          {/* Workflow Content */}
+          <div className="grid grid-cols-3 gap-6">
+            {/* Left Panel - Source/Input */}
+            <Card className={`col-span-1 ${isDarkMode ? "bg-[#0d1f3c] border-[#1e4976]" : ""}`}>
+              <div className={`px-4 py-3 border-b ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
+                <h3 className={`font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                  {activeWorkflow === "spec-comparison" ? "Source Spec" : 
+                   activeWorkflow === "log-analysis" ? "Log File" :
+                   activeWorkflow === "alerts" ? "Alert Sources" : "Input"}
+                </h3>
+              </div>
+              <div className="p-4">
+                <div className={`rounded-lg p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <FileText className="h-5 w-5" style={{ color }} />
+                    <span className={`font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                      {viewingClient.name}_{selectedSpec.name.replace(/\s/g, "_")}.xml
+                    </span>
+                  </div>
+                  <div className={`text-xs font-mono p-3 rounded ${isDarkMode ? "bg-[#050d1a] text-[#b0bec5]" : "bg-white text-[#64748b]"}`}>
+                    {activeWorkflow === "spec-comparison" && (
+                      <>
+                        {"<FIX version=\"" + selectedSpec.version + "\">"}
+                        <br />{"  <header>"}
+                        <br />{"    <field name=\"BeginString\"/>"}
+                        <br />{"    <field name=\"BodyLength\"/>"}
+                        <br />{"    <field name=\"MsgType\"/>"}
+                        <br />{"  </header>"}
+                        <br />{"  ..."}
+                        <br />{"</FIX>"}
+                      </>
+                    )}
+                    {activeWorkflow === "log-analysis" && (
+                      <>
+                        {"8=FIX.4.4|9=148|35=D|49=CLIENT|56=SERVER"}
+                        <br />{"8=FIX.4.4|9=112|35=8|49=SERVER|56=CLIENT"}
+                        <br />{"8=FIX.4.4|9=95|35=0|49=CLIENT|56=SERVER"}
+                        <br />{"..."}
+                      </>
+                    )}
+                    {(activeWorkflow === "test-case" || activeWorkflow === "cert-case") && (
+                      <>
+                        {"Test scenarios loaded from spec..."}
+                        <br />{"• NewOrderSingle validation"}
+                        <br />{"• ExecutionReport handling"}
+                        <br />{"• OrderCancelRequest flow"}
+                        <br />{"..."}
+                      </>
+                    )}
+                    {activeWorkflow === "config-gen" && (
+                      <>
+                        {"Configuration template:"}
+                        <br />{"• Session settings"}
+                        <br />{"• Connection parameters"}
+                        <br />{"• Message validation rules"}
+                        <br />{"..."}
+                      </>
+                    )}
+                    {activeWorkflow === "alerts" && (
+                      <>
+                        {"Alert rules configured:"}
+                        <br />{"• Missing required fields"}
+                        <br />{"• Sequence number gaps"}
+                        <br />{"• Session disconnects"}
+                        <br />{"..."}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </Card>
+            
+            {/* Middle Panel - Comparison/Processing */}
+            <Card className={`col-span-1 ${isDarkMode ? "bg-[#0d1f3c] border-[#1e4976]" : ""}`}>
+              <div className={`px-4 py-3 border-b ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
+                <h3 className={`font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                  {activeWorkflow === "spec-comparison" ? "Target Spec" : 
+                   activeWorkflow === "log-analysis" ? "Analysis" :
+                   "Processing"}
+                </h3>
+              </div>
+              <div className="p-4">
+                {status === "error" ? (
+                  <div className={`rounded-lg p-4 ${isDarkMode ? "bg-[#f44336]/10 border border-[#f44336]/30" : "bg-[#ffebee] border border-[#f44336]/20"}`}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <AlertTriangle className="h-5 w-5 text-[#f44336]" />
+                      <span className={`font-medium ${isDarkMode ? "text-[#ef9a9a]" : "text-[#c62828]"}`}>Error Detected</span>
+                    </div>
+                    <div className={`text-sm ${isDarkMode ? "text-[#ef9a9a]" : "text-[#c62828]"}`}>
+                      {activeWorkflow === "spec-comparison" && "Field mismatch detected at Tag 49 (SenderCompID). Expected: CLIENT, Found: WRONG_ID"}
+                      {activeWorkflow === "log-analysis" && "Sequence number gap detected. Missing messages 145-148."}
+                      {activeWorkflow === "test-case" && "Test case generation failed: Invalid message type definition."}
+                      {activeWorkflow === "cert-case" && "Certification requirements not met: Missing mandatory fields."}
+                      {activeWorkflow === "config-gen" && "Configuration conflict: Duplicate session definitions."}
+                      {activeWorkflow === "alerts" && "Alert processing failed: Invalid rule configuration."}
+                    </div>
+                  </div>
+                ) : (
+                  <div className={`rounded-lg p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <GitCompare className="h-5 w-5" style={{ color }} />
+                      <span className={`font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
+                        {status === "done" || status === "generated" ? "Completed" : status === "progress" ? "Processing..." : "Ready to start"}
+                      </span>
+                    </div>
+                    <div className={`text-xs font-mono p-3 rounded ${isDarkMode ? "bg-[#050d1a] text-[#b0bec5]" : "bg-white text-[#64748b]"}`}>
+                      {activeWorkflow === "spec-comparison" && "BTCS_Standard_" + selectedSpec.version.replace(/\./g, "_") + ".xml"}
+                      {activeWorkflow === "log-analysis" && "Analyzing message patterns..."}
+                      {activeWorkflow === "test-case" && "Generating test scenarios..."}
+                      {activeWorkflow === "cert-case" && "Validating certification criteria..."}
+                      {activeWorkflow === "config-gen" && "Building configuration..."}
+                      {activeWorkflow === "alerts" && "Monitoring active alerts..."}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Card>
+            
+            {/* Right Panel - Results */}
+            <Card className={`col-span-1 ${isDarkMode ? "bg-[#0d1f3c] border-[#1e4976]" : ""}`}>
+              <div className={`px-4 py-3 border-b ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
+                <h3 className={`font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Results</h3>
+              </div>
+              <div className="p-4">
+                {(status === "done" || status === "generated") ? (
+                  <div className="space-y-3">
+                    <div className={`rounded-lg p-3 ${isDarkMode ? "bg-[#4caf50]/10 border border-[#4caf50]/30" : "bg-[#e8f5e9] border border-[#4caf50]/20"}`}>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                        <span className={`text-sm font-medium ${isDarkMode ? "text-[#81c784]" : "text-[#2e7d32]"}`}>
+                          {activeWorkflow === "alerts" ? `${selectedSpec.alertsCount || 0} alerts generated` : "Successfully completed"}
+                        </span>
+                      </div>
+                    </div>
+                    <Button variant="primary" size="sm" className="w-full">
+                      <Download className="mr-2 h-4 w-4" />
+                      Download Report
+                    </Button>
+                  </div>
+                ) : status === "error" ? (
+                  <div className="space-y-3">
+                    <Button variant="primary" size="sm" className="w-full" style={{ backgroundColor: color }}>
+                      Retry
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full">
+                      View Error Details
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <p className={`text-sm ${isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"}`}>
+                      {status === "progress" ? "Processing in progress..." : "Click start to begin processing"}
+                    </p>
+                    <Button variant="primary" size="sm" className="w-full" style={{ backgroundColor: color }} disabled={status === "progress"}>
+                      {status === "progress" ? "Processing..." : "Start"}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </Card>
+          </div>
         </div>
       </div>
     )
@@ -4137,6 +4452,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
       {currentScreen === "admin-tools" && <AdminToolsScreen />}
       {currentScreen === "client-tools" && <ClientToolsScreen />}
       {currentScreen === "client-detail" && <ClientDetailScreen />}
+      {currentScreen === "workflow-detail" && <WorkflowDetailScreen />}
       {showLoginModal && <LoginModal />}
       <StatusToast />
     </>
