@@ -1340,7 +1340,7 @@ export default function BCometPlatform() {
   </div>
   <div className="mt-6 flex justify-center gap-4">
   <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download Sample Spec</Button>
-  <Button onClick={() => setShowSpecResults(true)}><Play className="h-4 w-4 mr-2" /> Run Sample Comparison</Button>
+  <Button onClick={() => setShowSpecResults(true)}><Play className="h-4 w-4 mr-2" /> Perform Comparison</Button>
   </div>
   </Card>
 
