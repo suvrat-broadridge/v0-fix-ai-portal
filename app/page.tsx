@@ -43,6 +43,8 @@ export default function BCometPlatform() {
   const [fixMsgLogExpanded, setFixMsgLogExpanded] = useState(false)
   const [fixMsgSeqNum, setFixMsgSeqNum] = useState(1)
   const [fixMsgSelectedRow, setFixMsgSelectedRow] = useState<number | null>(null)
+  const [fixMsgCopied, setFixMsgCopied] = useState(false)
+  const [fixMsgSent, setFixMsgSent] = useState(false)
   const [demoFormData, setDemoFormData] = useState({
     name: "",
     email: "",
@@ -2463,9 +2465,11 @@ export default function BCometPlatform() {
       return `8=FIX.4.4|9=XXX|${fields}|10=XXX|`
     }
     
-    const copyToClipboard = () => {
-      navigator.clipboard.writeText(generateFixMessage().replace(/\|/g, "\x01"))
-    }
+const copyToClipboard = () => {
+  navigator.clipboard.writeText(generateFixMessage().replace(/\|/g, "\x01"))
+  setFixMsgCopied(true)
+  setTimeout(() => setFixMsgCopied(false), 2000)
+  }
     
     const handleConnect = () => {
       if (!fixMsgIsConnected) {
@@ -2505,11 +2509,13 @@ export default function BCometPlatform() {
         const fill = { direction: "recv" as const, msgType: "8", msgTypeName: "8 - Exec Report", seqNum: fixMsgSeqNum + 3, clOrdId, ordStatus: "2", ordStatusName: "Filled", rawMessage: `8=FIX.4.2|9=225|35=8|49=${target}|56=${sender}|34=${fixMsgSeqNum + 3}|52=${timestamp.replace(/[-: ]/g, "")}|37=OrderID${fixMsgSeqNum}|11=${clOrdId}|17=ExecID${fixMsgSeqNum + 2}|150=2|39=2|55=${symbol}|54=1|38=${qty}|44=${price}|32=50|31=${price}|14=${qty}|151=0|6=${price}|10=XXX|`, timestamp }
         setFixMsgLog(prev => [...prev, sentMsg, newAck, partialFill, fill])
         setFixMsgSeqNum(prev => prev + 4)
-      } else {
-        setFixMsgLog(prev => [...prev, sentMsg])
-        setFixMsgSeqNum(prev => prev + 1)
-      }
-    }
+} else {
+  setFixMsgLog(prev => [...prev, sentMsg])
+  setFixMsgSeqNum(prev => prev + 1)
+  }
+  setFixMsgSent(true)
+  setTimeout(() => setFixMsgSent(false), 2000)
+  }
     
     const getRowBgColor = (msg: typeof fixMsgLog[0]) => {
       if (msg.direction === "send") return "bg-cyan-600 text-white"
@@ -2641,9 +2647,9 @@ export default function BCometPlatform() {
                 <Card className={`${bgCard} p-6 border ${borderColor}`}>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className={`text-lg font-bold ${textPrimary}`}>Generated Message</h3>
-                    <Button size="sm" onClick={copyToClipboard} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-medium" disabled={!fixMsgFields.length}>
-                      <Copy className="h-4 w-4 mr-1" /> Copy
-                    </Button>
+<Button size="sm" onClick={copyToClipboard} className={`font-medium ${fixMsgCopied ? "bg-green-500 text-white" : "bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80"}`} disabled={!fixMsgFields.length}>
+  {fixMsgCopied ? <><CheckCircle className="h-4 w-4 mr-1" /> Copied!</> : <><Copy className="h-4 w-4 mr-1" /> Copy</>}
+  </Button>
                   </div>
                   <div className={`p-4 rounded-lg ${isDarkMode ? "bg-[#1e3a5f] text-cyan-300" : "bg-gray-100 text-gray-800"} font-mono text-sm break-all min-h-[60px]`}>
                     {fixMsgFields.length === 0 ? <span className={textSecondary}>No message generated yet</span> : generateFixMessage()}
@@ -2693,9 +2699,9 @@ export default function BCometPlatform() {
                       <label className={`block text-sm font-medium mb-1 ${textPrimary}`}>Paste Message (optional)</label>
                       <textarea placeholder="Paste a FIX message here..." className={`w-full p-3 rounded-lg border resize-none font-mono text-sm ${isDarkMode ? "bg-[#1e3a5f] border-[#3d5a80] text-white placeholder:text-gray-400" : "bg-white border-gray-300"}`} rows={4} />
                     </div>
-                    <Button className="w-full bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-semibold" disabled={!fixMsgIsConnected || !fixMsgFields.length} onClick={handleSendMessage}>
-                      <Send className="h-4 w-4 mr-2" /> Send Message
-                    </Button>
+<Button className={`w-full font-semibold ${fixMsgSent ? "bg-green-500 text-white" : "bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80"}`} disabled={!fixMsgIsConnected || !fixMsgFields.length} onClick={handleSendMessage}>
+  {fixMsgSent ? <><CheckCircle className="h-4 w-4 mr-2" /> Message Sent!</> : <><Send className="h-4 w-4 mr-2" /> Send Message</>}
+  </Button>
                     {!fixMsgIsConnected && <p className={`text-xs text-center ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>Connect to a FIX session to send messages</p>}
                   </div>
                 </Card>
