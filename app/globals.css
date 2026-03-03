@@ -168,18 +168,35 @@
   }
 }
 
-/* Comet Animation */
-@keyframes cometFly {
+/* Comet Animation - travels across text and brightens */
+@keyframes cometTravel {
   0% {
-    transform: translateX(-100px);
+    transform: translateX(0);
     opacity: 0;
+    filter: brightness(0.5);
   }
-  20% {
+  10% {
+    opacity: 0.7;
+    filter: brightness(0.8);
+  }
+  30% {
     opacity: 1;
+    filter: brightness(1.2) drop-shadow(0 0 8px #00e5ff);
+  }
+  50% {
+    filter: brightness(2) drop-shadow(0 0 15px #00e5ff) drop-shadow(0 0 30px #00e5ff);
+  }
+  70% {
+    filter: brightness(1.8) drop-shadow(0 0 12px #00e5ff) drop-shadow(0 0 25px #00e5ff);
+  }
+  90% {
+    opacity: 1;
+    filter: brightness(1.3) drop-shadow(0 0 6px #00e5ff);
   }
   100% {
-    transform: translateX(0);
-    opacity: 1;
+    transform: translateX(160px);
+    opacity: 0;
+    filter: brightness(0.8);
   }
 }
 
@@ -239,42 +256,31 @@
   }
 }
 
-@keyframes textGlow {
+/* Text glows as comet passes over it */
+@keyframes letterGlow {
   0% {
-    opacity: 0;
+    opacity: 0.3;
     text-shadow: none;
   }
-  30% {
-    opacity: 0.5;
+  20% {
+    opacity: 0.6;
     text-shadow: none;
-  }
-  50% {
-    opacity: 1;
-    text-shadow: 0 0 20px #00e5ff, 0 0 40px #00e5ff, 0 0 60px #00e5ff;
-  }
-  70% {
-    text-shadow: 0 0 10px #00e5ff, 0 0 20px #00e5ff;
-  }
-  100% {
-    opacity: 1;
-    text-shadow: none;
-  }
-}
-
-@keyframes cometGlow {
-  0% {
-    filter: brightness(0.8);
   }
   40% {
-    filter: brightness(1.5) drop-shadow(0 0 10px #00e5ff);
+    opacity: 1;
+    text-shadow: 0 0 10px #00e5ff, 0 0 20px #00e5ff;
+  }
+  50% {
+    text-shadow: 0 0 20px #00e5ff, 0 0 40px #00e5ff, 0 0 60px #00e5ff;
   }
   60% {
-    filter: brightness(2) drop-shadow(0 0 20px #00e5ff);
+    text-shadow: 0 0 15px #00e5ff, 0 0 30px #00e5ff;
   }
   80% {
-    filter: brightness(1.3) drop-shadow(0 0 8px #00e5ff);
+    text-shadow: 0 0 5px #00e5ff;
   }
   100% {
-    filter: brightness(1);
+    opacity: 1;
+    text-shadow: none;
   }
 }
