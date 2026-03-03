@@ -1249,74 +1249,16 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
   ])
 
   // Log Analysis Panel Component
-  const LogAnalysisPanel = () => {
-    // Auto-load client data when coming from client detail page
-    const isLogClientContext = selectedSpec && viewingClient && activeWorkflow === "log-analysis"
-    
-    // Simulate pre-loaded analysis results for client context
-    const clientLogResults = isLogClientContext ? {
-      msgTypeDiffs: {
-        logOnly: selectedSpec.logComparison === "error" ? [
-          { code: "AE", name: "Trade Capture Report" },
-          { code: "AJ", name: "Quote Request Reject" },
-          { code: "BG", name: "Trading Session Status" },
-        ] : [],
-        specOnly: selectedSpec.logComparison === "error" ? [
-          { code: "V", name: "Market Data Request" },
-          { code: "W", name: "Market Data Snapshot" },
-          { code: "X", name: "Market Data Incremental" },
-        ] : [],
-      },
-      tagDiffs: {
-        logOnly: selectedSpec.logComparison === "error" ? [
-          { msgType: "D", msgName: "New Order Single", tags: ["9999", "9998", "5001", "5002"] },
-          { msgType: "8", msgName: "Execution Report", tags: ["10001", "10002"] },
-          { msgType: "F", msgName: "Order Cancel Request", tags: ["9997"] },
-        ] : [],
-        specOnly: selectedSpec.logComparison === "error" ? [
-          { msgType: "D", msgName: "New Order Single", tags: ["528", "529", "582"] },
-          { msgType: "8", msgName: "Execution Report", tags: ["1057", "1058", "1059"] },
-          { msgType: "G", msgName: "Order Cancel/Replace", tags: ["586", "587"] },
-        ] : [],
-      },
-      valueDiffs: selectedSpec.logComparison === "error" ? [
-        { msgType: "D", tag: 54, field: "Side", logValue: "X", specValues: ["1", "2", "5", "6"] }
-      ] : [],
-      otherIssues: selectedSpec.logComparison === "error" ? [
-        { type: "sequence", desc: "Sequence gap detected: 145-148" },
-        { type: "timestamp", desc: "Invalid timestamp format in message 201" },
-      ] : [],
-    } : null
-    
-    const logDisplayResults = isLogClientContext ? clientLogResults : analysisResults
-    const logFileName = isLogClientContext ? `${viewingClient.name}_${selectedSpec.name}_trading.log` : logFile
-    const specFileName = isLogClientContext ? `${viewingClient.name}_${selectedSpec.name}.xml` : logSpecFile
-    
-    return (
+  const LogAnalysisPanel = () => (
     <div className="p-6">
-      {/* Client Context Banner */}
-      {isLogClientContext && (
-        <div className={`mb-4 flex items-center justify-between rounded-lg p-3 ${isDarkMode ? "bg-[#1e4976]/50" : "bg-[#e3f2fd]"}`}>
-          <div className="flex items-center gap-2">
-            <ChevronLeft className={`h-4 w-4 ${isDarkMode ? "text-[#90caf9]" : "text-[#1976d2]"}`} />
-            <button 
-              onClick={() => { setSelectedSpec(null); setActiveWorkflow(null); setCurrentScreen("client-detail"); }}
-              className={`text-sm font-medium hover:underline ${isDarkMode ? "text-[#90caf9]" : "text-[#1976d2]"}`}
-            >
-              Back to {viewingClient.name}
-            </button>
-          </div>
-          <span className={`text-sm ${isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"}`}>
-            Analyzing: {selectedSpec.name} ({selectedSpec.version})
-          </span>
-        </div>
-      )}
-      
       <div className="mb-6 flex items-center justify-between">
-        <div />
-        {logDisplayResults && (
+        <div>
+          <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Log Analysis</h2>
+          <p className={`text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Compare FIX log files against specifications to find discrepancies</p>
+        </div>
+        {analysisResults && (
           <div className="flex gap-2">
-            <Button variant="secondary" size="sm" onClick={() => navigator.clipboard.writeText(JSON.stringify(logDisplayResults, null, 2))}>
+            <Button variant="secondary" size="sm" onClick={() => navigator.clipboard.writeText(JSON.stringify(analysisResults, null, 2))}>
               <FileText className="mr-1 h-4 w-4" />
               Copy Results
             </Button>
@@ -1328,97 +1270,51 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
         )}
       </div>
 
-      {/* Upload Section with Drag & Drop Style */}
+      {/* Upload Section */}
       <Card className="mb-6 p-5">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Log File Upload */}
-          <div 
-            className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-all ${
-              (isLogClientContext || logFile)
-                ? isDarkMode ? "border-[#4caf50] bg-[#4caf50]/10" : "border-[#4caf50] bg-[#4caf50]/5"
-                : isDarkMode ? "border-[#1e4976] hover:border-[#00e5ff] hover:bg-[#1e4976]/30" : "border-[#cbd5e1] hover:border-[#1976d2] hover:bg-[#e2e8f0]"
-            }`}
-          >
-            <Upload className={`mb-3 h-10 w-10 ${(isLogClientContext || logFile) ? "text-[#4caf50]" : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`} />
+          <div className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-all ${
+            logFile 
+              ? isDarkMode ? "border-[#4caf50] bg-[#4caf50]/10" : "border-[#4caf50] bg-[#4caf50]/5"
+              : isDarkMode ? "border-[#1e4976] hover:border-[#00e5ff] hover:bg-[#1e4976]/30" : "border-[#cbd5e1] hover:border-[#1976d2] hover:bg-[#e2e8f0]"
+          }`}>
+            <Upload className={`mb-3 h-10 w-10 ${logFile ? "text-[#4caf50]" : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`} />
             <p className={`mb-2 text-sm font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-              {logFileName || "Drop Log File Here"}
+              {logFile || "Drop Log File Here"}
             </p>
-            <p className={`mb-3 text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>{isLogClientContext ? "Client log file" : "or click to browse"}</p>
-            {!isLogClientContext && (
-              <>
-                <Button variant="secondary" size="sm" onClick={() => handleFileUpload("log-upload")}>
-                  Select File
-                </Button>
-                <input type="file" id="log-upload" className="hidden" accept=".log,.txt" onChange={handleLogFileUpload} />
-              </>
-            )}
+            <p className={`mb-3 text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>or click to browse</p>
+            <Button variant="secondary" size="sm" onClick={() => handleFileUpload("log-upload")}>Select File</Button>
+            <input type="file" id="log-upload" className="hidden" accept=".log,.txt" onChange={handleLogFileUpload} />
           </div>
 
-          {/* Spec File Upload */}
-          <div 
-            className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-all ${
-              (isLogClientContext || logSpecFile)
-                ? isDarkMode ? "border-[#4caf50] bg-[#4caf50]/10" : "border-[#4caf50] bg-[#4caf50]/5"
-                : isDarkMode ? "border-[#1e4976] hover:border-[#00e5ff] hover:bg-[#1e4976]/30" : "border-[#cbd5e1] hover:border-[#1976d2] hover:bg-[#e2e8f0]"
-            }`}
-          >
-            <FileText className={`mb-3 h-10 w-10 ${(isLogClientContext || logSpecFile) ? "text-[#4caf50]" : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`} />
+          <div className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-all ${
+            logSpecFile 
+              ? isDarkMode ? "border-[#4caf50] bg-[#4caf50]/10" : "border-[#4caf50] bg-[#4caf50]/5"
+              : isDarkMode ? "border-[#1e4976] hover:border-[#00e5ff] hover:bg-[#1e4976]/30" : "border-[#cbd5e1] hover:border-[#1976d2] hover:bg-[#e2e8f0]"
+          }`}>
+            <FileText className={`mb-3 h-10 w-10 ${logSpecFile ? "text-[#4caf50]" : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`} />
             <p className={`mb-2 text-sm font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-              {specFileName || "Drop FIX Spec Here"}
+              {logSpecFile || "Drop FIX Spec Here"}
             </p>
-            <p className={`mb-3 text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>{isLogClientContext ? "Client FIX spec" : "XML or TXT format"}</p>
-            {!isLogClientContext && (
-              <>
-                <Button variant="secondary" size="sm" onClick={() => handleFileUpload("log-spec-upload")}>
-                  Select File
-                </Button>
-                <input type="file" id="log-spec-upload" className="hidden" accept=".xml,.txt" onChange={handleLogSpecUpload} />
-              </>
-            )}
+            <p className={`mb-3 text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>XML or TXT format</p>
+            <Button variant="secondary" size="sm" onClick={() => handleFileUpload("log-spec-upload")}>Select File</Button>
+            <input type="file" id="log-spec-upload" className="hidden" accept=".xml,.txt" onChange={handleLogSpecUpload} />
           </div>
 
-          {/* Action Panel - only show when not in client context */}
-          {!isLogClientContext ? (
-            <div className={`flex flex-col items-center justify-center rounded-xl p-6 ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
-              <Button 
-                variant="primary" 
-                className="mb-4 w-full" 
-                onClick={performLogAnalysis} 
-                disabled={!logFile || !logSpecFile}
-              >
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Perform Analysis
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="w-full"
-                onClick={() => {
-                  setLogFile("sample_trading.log")
-                  setLogSpecFile("FIX44_Standard.xml")
-                  performLogAnalysis()
-                }}
-              >
-                <Play className="mr-1 h-4 w-4" />
-                Try Sample Data
-              </Button>
-            </div>
-          ) : (
-            <div className={`flex flex-col items-center justify-center rounded-xl p-6 ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
-              <CheckCircle className={`mb-2 h-10 w-10 ${selectedSpec.logComparison === "done" ? "text-[#4caf50]" : "text-[#f57c00]"}`} />
-              <p className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                {selectedSpec.logComparison === "done" ? "Analysis Complete" : selectedSpec.logComparison === "error" ? "Issues Found" : "Pending Analysis"}
-              </p>
-              <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
-                {selectedSpec.logComparison === "done" ? "No discrepancies" : selectedSpec.logComparison === "error" ? "Review differences below" : "Run analysis"}
-              </p>
-            </div>
-          )}
+          <div className={`flex flex-col items-center justify-center rounded-xl p-6 ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
+            <Button variant="primary" className="mb-4 w-full" onClick={performLogAnalysis} disabled={!logFile || !logSpecFile}>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Perform Analysis
+            </Button>
+            <Button variant="ghost" size="sm" className="w-full" onClick={() => { setLogFile("sample_trading.log"); setLogSpecFile("FIX44_Standard.xml"); performLogAnalysis(); }}>
+              <Play className="mr-1 h-4 w-4" />
+              Try Sample Data
+            </Button>
+          </div>
         </div>
       </Card>
 
-      {/* Empty State - Before Analysis - only when not in client context */}
-      {!isLogClientContext && !analysisResults && (
+      {!analysisResults && (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Recent Comparisons */}
           <Card className="p-5">
@@ -1487,7 +1383,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
       )}
 
       {/* Results Section */}
-      {logDisplayResults && (
+      {analysisResults && (
         <div className="space-y-6">
           {/* Summary Stats */}
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -1498,7 +1394,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                 </div>
                 <div>
                   <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                    {logDisplayResults.msgTypeDiffs.logOnly.length + logDisplayResults.msgTypeDiffs.specOnly.length}
+                    {analysisResults.msgTypeDiffs.logOnly.length + analysisResults.msgTypeDiffs.specOnly.length}
                   </p>
                   <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>MsgType Diffs</p>
                 </div>
@@ -1511,7 +1407,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                 </div>
                 <div>
                   <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                    {logDisplayResults.tagDiffs.logOnly.length + logDisplayResults.tagDiffs.specOnly.length}
+                    {analysisResults.tagDiffs.logOnly.length + analysisResults.tagDiffs.specOnly.length}
                   </p>
                   <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Tag Diffs</p>
                 </div>
@@ -1524,7 +1420,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                 </div>
                 <div>
                   <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                    {logDisplayResults.valueDiffs.length}
+                    {analysisResults.valueDiffs.length}
                   </p>
                   <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Value Diffs</p>
                 </div>
@@ -1537,7 +1433,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                 </div>
                 <div>
                   <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                    {logDisplayResults.otherIssues.length}
+                    {analysisResults.otherIssues.length}
                   </p>
                   <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Other Issues</p>
                 </div>
@@ -1559,11 +1455,11 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                     In Log, NOT in Spec
                   </span>
                   <span className="rounded-full bg-[#f44336]/20 px-2 py-0.5 text-xs font-medium text-[#f44336]">
-                    {logDisplayResults.msgTypeDiffs.logOnly.length}
+                    {analysisResults.msgTypeDiffs.logOnly.length}
                   </span>
                 </div>
                 <div className="space-y-2">
-                  {logDisplayResults.msgTypeDiffs.logOnly.map((msg, i) => (
+                  {analysisResults.msgTypeDiffs.logOnly.map((msg, i) => (
                     <div key={i} className={`flex items-center gap-2 rounded-lg px-3 py-2 ${isDarkMode ? "bg-[#f44336]/10" : "bg-white"}`}>
                       <Minus className="h-4 w-4 text-[#f44336]" />
                       <span className={`text-sm ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{msg}</span>
@@ -1578,11 +1474,11 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                     In Spec, NOT in Log
                   </span>
                   <span className="rounded-full bg-[#4caf50]/20 px-2 py-0.5 text-xs font-medium text-[#4caf50]">
-                    {logDisplayResults.msgTypeDiffs.specOnly.length}
+                    {analysisResults.msgTypeDiffs.specOnly.length}
                   </span>
                 </div>
                 <div className="space-y-2">
-                  {logDisplayResults.msgTypeDiffs.specOnly.map((msg, i) => (
+                  {analysisResults.msgTypeDiffs.specOnly.map((msg, i) => (
                     <div key={i} className={`flex items-center gap-2 rounded-lg px-3 py-2 ${isDarkMode ? "bg-[#4caf50]/10" : "bg-white"}`}>
                       <Plus className="h-4 w-4 text-[#4caf50]" />
                       <span className={`text-sm ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{msg}</span>
@@ -1616,7 +1512,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                       </tr>
                     </thead>
                     <tbody>
-                      {logDisplayResults.tagDiffs.logOnly.map((item, i) => (
+                      {analysisResults.tagDiffs.logOnly.map((item, i) => (
                         <tr key={i} className={`border-b ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
                           <td className={`px-3 py-2 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
                             <span className={`rounded px-2 py-0.5 text-xs font-medium ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
@@ -1653,7 +1549,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                       </tr>
                     </thead>
                     <tbody>
-                      {logDisplayResults.tagDiffs.specOnly.map((item, i) => (
+                      {analysisResults.tagDiffs.specOnly.map((item, i) => (
                         <tr key={i} className={`border-b ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
                           <td className={`px-3 py-2 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
                             <span className={`rounded px-2 py-0.5 text-xs font-medium ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
@@ -1695,7 +1591,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                   </tr>
                 </thead>
                 <tbody>
-                  {logDisplayResults.valueDiffs.map((item, i) => (
+                  {analysisResults.valueDiffs.map((item, i) => (
                     <tr key={i} className={`border-t ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"} ${i % 2 === 0 ? (isDarkMode ? "bg-[#0f2847]" : "bg-white") : (isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]")}`}>
                       <td className={`px-4 py-3 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
                         <span className={`rounded px-2 py-0.5 text-xs font-medium ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>{item.msgType}</span>
@@ -1739,7 +1635,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                   </tr>
                 </thead>
                 <tbody>
-                  {logDisplayResults.otherIssues.map((item, i) => (
+                  {analysisResults.otherIssues.map((item, i) => (
                     <tr key={i} className={`border-t ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"} ${i % 2 === 0 ? (isDarkMode ? "bg-[#0f2847]" : "bg-white") : (isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]")}`}>
                       <td className="px-4 py-3">
                         <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -1766,7 +1662,6 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
       )}
     </div>
   )
-  }
 
   // Recent spec comparisons for history
   const [recentSpecComparisons] = useState([
@@ -1776,63 +1671,16 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
   ])
 
   // Spec Compare Panel Component
-  const SpecComparePanel = () => {
-    // Auto-load client specs when coming from client detail page
-    const isClientContext = selectedSpec && viewingClient
-    
-    // Simulate pre-loaded comparison results for client context
-    const clientSpecCompareResults = isClientContext ? {
-      compatible: selectedSpec.specComparison === "done",
-      msgTypeDiffs: {
-        spec1Only: selectedSpec.specComparison === "error" ? [
-          { code: "AE", name: "Trade Capture Report" },
-          { code: "AJ", name: "Quote Request Reject" },
-        ] : [],
-        spec2Only: selectedSpec.specComparison === "error" ? [
-          { code: "V", name: "Market Data Request" },
-        ] : [],
-      },
-      tagDiffs: {
-        spec1Missing: selectedSpec.specComparison === "error" ? [
-          { msgType: "D", tags: ["9999", "9998"] },
-        ] : [],
-        spec2Missing: [],
-      },
-      valueDiffs: selectedSpec.specComparison === "error" ? [
-        { msgType: "D", tag: 54, field: "Side", logValue: "X", specValues: ["1", "2", "5", "6"] }
-      ] : [],
-      otherDiffs: [],
-    } : null
-    
-    const displayResults = isClientContext ? clientSpecCompareResults : specCompareResults
-    const spec1Name = isClientContext ? `${viewingClient.name}_${selectedSpec.name}.xml` : spec1File
-    const spec2Name = isClientContext ? "BTCS_Standard_FIX44.xml" : spec2File
-    
-    return (
+  const SpecComparePanel = () => (
     <div className="p-6">
-      {/* Client Context Banner */}
-      {isClientContext && (
-        <div className={`mb-4 flex items-center justify-between rounded-lg p-3 ${isDarkMode ? "bg-[#1e4976]/50" : "bg-[#e3f2fd]"}`}>
-          <div className="flex items-center gap-2">
-            <ChevronLeft className={`h-4 w-4 ${isDarkMode ? "text-[#90caf9]" : "text-[#1976d2]"}`} />
-            <button 
-              onClick={() => { setSelectedSpec(null); setCurrentScreen("client-detail"); }}
-              className={`text-sm font-medium hover:underline ${isDarkMode ? "text-[#90caf9]" : "text-[#1976d2]"}`}
-            >
-              Back to {viewingClient.name}
-            </button>
-          </div>
-          <span className={`text-sm ${isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"}`}>
-            Comparing: {selectedSpec.name} ({selectedSpec.version})
-          </span>
-        </div>
-      )}
-      
       <div className="mb-6 flex items-center justify-between">
-        <div />
-        {displayResults && (
+        <div>
+          <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>Spec Compare</h2>
+          <p className={`text-sm ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Compare two FIX specifications to identify differences</p>
+        </div>
+        {specCompareResults && (
           <div className="flex gap-2">
-            <Button variant="secondary" size="sm" onClick={() => navigator.clipboard.writeText(JSON.stringify(displayResults, null, 2))}>
+            <Button variant="secondary" size="sm" onClick={() => navigator.clipboard.writeText(JSON.stringify(specCompareResults, null, 2))}>
               <FileText className="mr-1 h-4 w-4" />
               Copy Results
             </Button>
@@ -1849,21 +1697,21 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
           {/* Spec 1 Upload - Client Spec */}
           <div 
             className={`col-span-3 relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-all ${
-              (isClientContext || spec1File)
+              spec1File
                 ? isDarkMode ? "border-[#4caf50] bg-[#4caf50]/10" : "border-[#4caf50] bg-[#4caf50]/5"
                 : isDarkMode ? "border-[#1e4976] hover:border-[#00e5ff] hover:bg-[#1e4976]/30" : "border-[#cbd5e1] hover:border-[#1976d2] hover:bg-[#e2e8f0]"
             }`}
           >
-            <div className={`mb-3 rounded-full p-3 ${(isClientContext || spec1File) ? "bg-[#4caf50]/20" : isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
-              <Upload className={`h-8 w-8 ${(isClientContext || spec1File) ? "text-[#4caf50]" : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`} />
+            <div className={`mb-3 rounded-full p-3 ${spec1File ? "bg-[#4caf50]/20" : isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+              <Upload className={`h-8 w-8 ${spec1File ? "text-[#4caf50]" : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`} />
             </div>
             <p className={`mb-1 text-sm font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-              {isClientContext ? "Client Spec" : "Specification 1"}
+              Specification 1
             </p>
-            <p className={`mb-3 text-xs text-center ${(isClientContext || spec1File) ? "text-[#4caf50]" : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
-              {spec1Name || "Drop file or click to browse"}
+            <p className={`mb-3 text-xs text-center ${spec1File ? "text-[#4caf50]" : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+              {spec1File || "Drop file or click to browse"}
             </p>
-            {!isClientContext && (
+            {(
               <>
                 <Button variant="secondary" size="sm" onClick={() => handleFileUpload("spec1-upload")}>
                   {spec1File ? "Change File" : "Select File"}
@@ -1884,21 +1732,21 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
           {/* Spec 2 Upload - BTCS Standard */}
           <div 
             className={`col-span-3 relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition-all ${
-              (isClientContext || spec2File)
+              spec2File
                 ? isDarkMode ? "border-[#4caf50] bg-[#4caf50]/10" : "border-[#4caf50] bg-[#4caf50]/5"
                 : isDarkMode ? "border-[#1e4976] hover:border-[#00e5ff] hover:bg-[#1e4976]/30" : "border-[#cbd5e1] hover:border-[#1976d2] hover:bg-[#e2e8f0]"
             }`}
           >
-            <div className={`mb-3 rounded-full p-3 ${(isClientContext || spec2File) ? "bg-[#4caf50]/20" : isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
-              <FileText className={`h-8 w-8 ${(isClientContext || spec2File) ? "text-[#4caf50]" : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`} />
+            <div className={`mb-3 rounded-full p-3 ${spec2File ? "bg-[#4caf50]/20" : isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+              <FileText className={`h-8 w-8 ${spec2File ? "text-[#4caf50]" : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`} />
             </div>
             <p className={`mb-1 text-sm font-semibold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-              {isClientContext ? "BTCS Standard" : "Specification 2"}
+              Specification 2
             </p>
-            <p className={`mb-3 text-xs text-center ${(isClientContext || spec2File) ? "text-[#4caf50]" : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
-              {spec2Name || "Drop file or click to browse"}
+            <p className={`mb-3 text-xs text-center ${spec2File ? "text-[#4caf50]" : isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>
+              {spec2File || "Drop file or click to browse"}
             </p>
-            {!isClientContext && (
+            {(
               <>
                 <Button variant="secondary" size="sm" onClick={() => handleFileUpload("spec2-upload")}>
                   {spec2File ? "Change File" : "Select File"}
@@ -1910,7 +1758,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
         </div>
 
         {/* Action Buttons - only show when not in client context */}
-        {!isClientContext && (
+        {(
           <div className="mt-6 flex items-center justify-center gap-4">
             <Button 
               variant="primary" 
@@ -1936,7 +1784,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
       </Card>
 
       {/* Empty State - only show when not in client context and no results */}
-      {!isClientContext && !specCompareResults && (
+      {!specCompareResults && (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Recent Comparisons */}
           <Card className="p-5">
@@ -2005,21 +1853,21 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
       )}
 
       {/* Results Section */}
-      {displayResults && (
+      {specCompareResults && (
         <div className="space-y-6">
           {/* Summary Stats */}
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <Card className={`p-4 ${displayResults.compatible ? "" : "border-l-4 border-l-[#f44336]"}`}>
+            <Card className={`p-4 ${specCompareResults.compatible ? "" : "border-l-4 border-l-[#f44336]"}`}>
               <div className="flex items-center gap-3">
-                <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${displayResults.compatible ? "bg-[#4caf50]/20" : "bg-[#f44336]/20"}`}>
-                  {displayResults.compatible 
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${specCompareResults.compatible ? "bg-[#4caf50]/20" : "bg-[#f44336]/20"}`}>
+                  {specCompareResults.compatible 
                     ? <CheckCircle className="h-6 w-6 text-[#4caf50]" />
                     : <AlertTriangle className="h-6 w-6 text-[#f44336]" />
                   }
                 </div>
                 <div>
-                  <p className={`text-sm font-bold ${displayResults.compatible ? "text-[#4caf50]" : "text-[#f44336]"}`}>
-                    {displayResults.compatible ? "Compatible" : "Incompatible"}
+                  <p className={`text-sm font-bold ${specCompareResults.compatible ? "text-[#4caf50]" : "text-[#f44336]"}`}>
+                    {specCompareResults.compatible ? "Compatible" : "Incompatible"}
                   </p>
                   <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Overall Status</p>
                 </div>
@@ -2032,7 +1880,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                 </div>
                 <div>
                   <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                    {displayResults.msgTypeDiffs.spec1Only.length + displayResults.msgTypeDiffs.spec2Only.length}
+                    {specCompareResults.msgTypeDiffs.spec1Only.length + specCompareResults.msgTypeDiffs.spec2Only.length}
                   </p>
                   <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>MsgType Diffs</p>
                 </div>
@@ -2045,7 +1893,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                 </div>
                 <div>
                   <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                    {displayResults.tagDiffs.spec1Missing.length + displayResults.tagDiffs.spec2Missing.length}
+                    {specCompareResults.tagDiffs.spec1Missing.length + specCompareResults.tagDiffs.spec2Missing.length}
                   </p>
                   <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Tag Diffs</p>
                 </div>
@@ -2058,7 +1906,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                 </div>
                 <div>
                   <p className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
-                    {displayResults.valueDiffs.length + displayResults.otherDiffs.length}
+                    {specCompareResults.valueDiffs.length + specCompareResults.otherDiffs.length}
                   </p>
                   <p className={`text-xs ${isDarkMode ? "text-[#64b5f6]" : "text-[#64748b]"}`}>Other Diffs</p>
                 </div>
@@ -2077,14 +1925,14 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
               <div className={`rounded-xl border p-4 ${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-[#e2e8f0] bg-[#fef2f2]"}`}>
                 <div className="mb-3 flex items-center justify-between">
                   <span className={`text-sm font-semibold ${isDarkMode ? "text-[#f44336]" : "text-[#d32f2f]"}`}>
-                    {isClientContext ? "In Client Spec, NOT in BTCS" : "In Spec 1, NOT in Spec 2"}
+                    In Spec 1, NOT in Spec 2
                   </span>
                   <span className="rounded-full bg-[#f44336]/20 px-2 py-0.5 text-xs font-medium text-[#f44336]">
-                    {displayResults.msgTypeDiffs.spec1Only.length}
+                    {specCompareResults.msgTypeDiffs.spec1Only.length}
                   </span>
                 </div>
                 <div className="space-y-2">
-                  {displayResults.msgTypeDiffs.spec1Only.map((msg: any, i: number) => (
+                  {specCompareResults.msgTypeDiffs.spec1Only.map((msg: any, i: number) => (
                     <div key={i} className={`flex items-center gap-2 rounded-lg px-3 py-2 ${isDarkMode ? "bg-[#f44336]/10" : "bg-white"}`}>
                       <Minus className="h-4 w-4 text-[#f44336]" />
                       <span className={`text-sm ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{typeof msg === 'string' ? msg : `${msg.code} - ${msg.name}`}</span>
@@ -2099,11 +1947,11 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                     In Spec 2, NOT in Spec 1
                   </span>
                   <span className="rounded-full bg-[#4caf50]/20 px-2 py-0.5 text-xs font-medium text-[#4caf50]">
-                    {displayResults.msgTypeDiffs.spec2Only.length}
+                    {specCompareResults.msgTypeDiffs.spec2Only.length}
                   </span>
                 </div>
                 <div className="space-y-2">
-                  {displayResults.msgTypeDiffs.spec2Only.map((msg, i) => (
+                  {specCompareResults.msgTypeDiffs.spec2Only.map((msg, i) => (
                     <div key={i} className={`flex items-center gap-2 rounded-lg px-3 py-2 ${isDarkMode ? "bg-[#4caf50]/10" : "bg-white"}`}>
                       <Plus className="h-4 w-4 text-[#4caf50]" />
                       <span className={`text-sm ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>{msg}</span>
@@ -2137,7 +1985,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                       </tr>
                     </thead>
                     <tbody>
-                      {displayResults.tagDiffs.spec2Missing.map((item, i) => (
+                      {specCompareResults.tagDiffs.spec2Missing.map((item, i) => (
                         <tr key={i} className={`border-b ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
                           <td className={`px-3 py-2 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
                             <span className={`rounded px-2 py-0.5 text-xs font-medium ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
@@ -2174,7 +2022,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                       </tr>
                     </thead>
                     <tbody>
-                      {displayResults.tagDiffs.spec1Missing.map((item, i) => (
+                      {specCompareResults.tagDiffs.spec1Missing.map((item, i) => (
                         <tr key={i} className={`border-b ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"}`}>
                           <td className={`px-3 py-2 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
                             <span className={`rounded px-2 py-0.5 text-xs font-medium ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
@@ -2216,7 +2064,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                   </tr>
                 </thead>
                 <tbody>
-                  {displayResults.valueDiffs.map((item, i) => (
+                  {specCompareResults.valueDiffs.map((item, i) => (
                     <tr key={i} className={`border-t ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"} ${i % 2 === 0 ? (isDarkMode ? "bg-[#0f2847]" : "bg-white") : (isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]")}`}>
                       <td className={`px-4 py-3 ${isDarkMode ? "text-white" : "text-[#0a1628]"}`}>
                         <span className={`rounded px-2 py-0.5 text-xs font-medium ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>{item.msgType}</span>
@@ -2272,7 +2120,7 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
                   </tr>
                 </thead>
                 <tbody>
-                  {displayResults.otherDiffs.map((item, i) => (
+                  {specCompareResults.otherDiffs.map((item, i) => (
                     <tr key={i} className={`border-t ${isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"} ${i % 2 === 0 ? (isDarkMode ? "bg-[#0f2847]" : "bg-white") : (isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]")}`}>
                       <td className="px-4 py-3">
                         <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -2300,7 +2148,6 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
       )}
     </div>
   )
-  }
 
   // Test Cases Panel Component
   const TestCasesPanel = () => {
