@@ -816,7 +816,7 @@ export default function FixAIPortal() {
     </button>
   )
 
-  // TabBar component for navigation
+// TabBar component for navigation
   const TabBar = () => {
     const tabs = [
       { id: "home" as Tab, label: "Home", icon: Home, iconColor: isDarkMode ? "text-[#ffc107]" : "text-[#f57c00]" },
@@ -831,30 +831,30 @@ export default function FixAIPortal() {
       if (tabId === "home") {
         setActiveSidebarItem("dashboard")
       }
-  }
-  
-  return (
-  <div className={`flex items-center gap-1 rounded-xl p-1.5 ${isDarkMode ? "bg-[#0d1f3c]" : "bg-[#e2e8f0]"}`}>
-  {tabs.map((tab) => {
-  const Icon = tab.icon
-  return (
-  <button
-  key={tab.id}
-  onClick={() => handleTabClick(tab.id)}
-  className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-  activeTab === tab.id
-  ? isDarkMode
-  ? "bg-[#00e5ff] text-[#0a1628] shadow-md"
-  : "bg-white text-[#0a1628] shadow-md"
-  : isDarkMode
-  ? "text-[#90caf9] hover:bg-[#1e4976]/50 hover:text-white"
-  : "text-[#64748b] hover:bg-white/50 hover:text-[#0a1628]"
-  }`}
-  >
-  <Icon className={`h-4 w-4 ${activeTab === tab.id ? "" : tab.iconColor}`} />
-  {tab.label}
-  </button>
-  )
+    }
+    
+    return (
+      <div className={`flex items-center gap-1 rounded-xl p-1.5 ${isDarkMode ? "bg-[#0d1f3c]" : "bg-[#e2e8f0]"}`}>
+        {tabs.map((tab) => {
+          const Icon = tab.icon
+          return (
+            <button
+              key={tab.id}
+              onClick={() => handleTabClick(tab.id)}
+              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                activeTab === tab.id
+                  ? isDarkMode
+                    ? "bg-[#00e5ff] text-[#0a1628] shadow-md"
+                    : "bg-white text-[#0a1628] shadow-md"
+                  : isDarkMode
+                    ? "text-[#90caf9] hover:bg-[#1e4976]/50 hover:text-white"
+                    : "text-[#64748b] hover:bg-white/50 hover:text-[#0a1628]"
+              }`}
+            >
+              <Icon className={`h-4 w-4 ${activeTab === tab.id ? "" : tab.iconColor}`} />
+              {tab.label}
+            </button>
+          )
         })}
       </div>
     )
