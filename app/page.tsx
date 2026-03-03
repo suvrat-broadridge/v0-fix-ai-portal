@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings">("home")
+  const [settingsTab, setSettingsTab] = useState<"look-feel" | "general" | "security" | "mail" | "questionnaires" | "license">("general")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [selectedClient, setSelectedClient] = useState<any>(null)
@@ -380,6 +381,17 @@ export default function BCometPlatform() {
       </div>
 
       <div className={`p-2 border-t ${borderColor} space-y-1 mt-auto`}>
+        <button
+          onClick={() => setCurrentScreen("settings")}
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+            currentScreen === "settings"
+              ? "bg-[#00e5ff]/10 text-[#00e5ff]" 
+              : `${textSecondary} hover:bg-[#1e4976]/30`
+          }`}
+        >
+          <Settings className="h-5 w-5" />
+          {!sidebarCollapsed && <span>Settings</span>}
+        </button>
         <button
           onClick={() => setIsDarkMode(!isDarkMode)}
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}
@@ -1238,6 +1250,243 @@ export default function BCometPlatform() {
                 </div>
               </Card>
             )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Settings Screen
+  if (currentScreen === "settings") {
+    const settingsTabs = [
+      { key: "look-feel", label: "Look and Feel", icon: Sun },
+      { key: "general", label: "General", icon: Settings },
+      { key: "security", label: "Security", icon: Shield },
+      { key: "mail", label: "Mail", icon: Bell },
+      { key: "questionnaires", label: "Questionnaires", icon: HelpCircle },
+      { key: "license", label: "License", icon: Award },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Settings</h1>
+            <p className={textSecondary}>Configure your B-COMET preferences</p>
+          </header>
+
+          <div className="p-6">
+            {/* Tabs */}
+            <div className={`flex gap-1 border-b ${borderColor} mb-6`}>
+              {settingsTabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setSettingsTab(tab.key as any)}
+                  className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors ${
+                    settingsTab === tab.key
+                      ? "border-[#00e5ff] text-[#00e5ff]"
+                      : `border-transparent ${textSecondary} hover:text-[#00e5ff]`
+                  }`}
+                >
+                  <tab.icon className="h-4 w-4" />
+                  <span className="text-sm font-medium">{tab.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Tab Content */}
+            <Card className={`${bgCard} p-6 border ${borderColor}`}>
+              {settingsTab === "look-feel" && (
+                <div className="space-y-6">
+                  <h3 className={`text-lg font-bold ${textPrimary}`}>Look and Feel Settings</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className={`font-medium ${textPrimary}`}>Theme</p>
+                        <p className={`text-sm ${textSecondary}`}>Choose between dark and light mode</p>
+                      </div>
+                      <Button variant="outline" onClick={() => setIsDarkMode(!isDarkMode)}>
+                        {isDarkMode ? <><Sun className="h-4 w-4 mr-2" /> Light Mode</> : <><Moon className="h-4 w-4 mr-2" /> Dark Mode</>}
+                      </Button>
+                    </div>
+                    <div className={`border-t ${borderColor} pt-4`}>
+                      <p className={`font-medium ${textPrimary} mb-2`}>Accent Color</p>
+                      <div className="flex gap-2">
+                        {["#00e5ff", "#4caf50", "#ff9800", "#9c27b0", "#f44336"].map((color) => (
+                          <button
+                            key={color}
+                            className="w-8 h-8 rounded-full border-2 border-white/20"
+                            style={{ backgroundColor: color }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {settingsTab === "general" && (
+                <div className="space-y-6">
+                  <h3 className={`text-lg font-bold ${textPrimary}`}>General Settings</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                      <span className={textSecondary}>Refresh Script Enabled:</span>
+                      <input type="checkbox" className="h-5 w-5 rounded" />
+                    </div>
+                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                      <span className={textSecondary}>Path to Script/Executable:</span>
+                      <Input className={`w-96 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} placeholder="/path/to/script" />
+                    </div>
+                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                      <span className={textSecondary}>Send Conductor Logs to Support Team:</span>
+                      <div className="flex gap-2">
+                        <Button size="sm">Send Conductor Logs</Button>
+                        <Button size="sm" variant="outline">Download Conductor Logs</Button>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                      <div>
+                        <span className={textSecondary}>Test Runner Inactivity Timeout (in minutes):</span>
+                        <p className={`text-xs ${textSecondary}`}>(Leave blank for no timeout)</p>
+                      </div>
+                      <Input className={`w-48 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} placeholder="" />
+                    </div>
+                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                      <div>
+                        <span className={textSecondary}>Autonomous Test Timeout (in minutes):</span>
+                        <p className={`text-xs ${textSecondary}`}>(Must be greater than 0)</p>
+                      </div>
+                      <Input className={`w-48 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} defaultValue="5" />
+                    </div>
+                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                      <div>
+                        <span className={textSecondary}>Admin Dashboard Certification Filter (in days):</span>
+                        <p className={`text-xs ${textSecondary}`}>(Leave blank for no filter)</p>
+                      </div>
+                      <Input className={`w-48 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} placeholder="" />
+                    </div>
+                    <div className="flex items-center justify-between py-3">
+                      <span className={textSecondary}>Automated Test Case Limit:</span>
+                      <Input className={`w-48 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} defaultValue="10" />
+                    </div>
+                  </div>
+                  <div className="flex justify-center pt-4">
+                    <Button><CheckCircle className="h-4 w-4 mr-2" /> Save</Button>
+                  </div>
+                </div>
+              )}
+
+              {settingsTab === "security" && (
+                <div className="space-y-6">
+                  <h3 className={`text-lg font-bold ${textPrimary}`}>Security Settings</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                      <span className={textSecondary}>Password Expiry (days):</span>
+                      <Input className={`w-48 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} defaultValue="90" />
+                    </div>
+                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                      <span className={textSecondary}>Session Timeout (minutes):</span>
+                      <Input className={`w-48 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} defaultValue="30" />
+                    </div>
+                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                      <span className={textSecondary}>Two-Factor Authentication:</span>
+                      <input type="checkbox" className="h-5 w-5 rounded" />
+                    </div>
+                    <div className="flex items-center justify-between py-3">
+                      <span className={textSecondary}>IP Whitelist Enabled:</span>
+                      <input type="checkbox" className="h-5 w-5 rounded" />
+                    </div>
+                  </div>
+                  <div className="flex justify-center pt-4">
+                    <Button><CheckCircle className="h-4 w-4 mr-2" /> Save</Button>
+                  </div>
+                </div>
+              )}
+
+              {settingsTab === "mail" && (
+                <div className="space-y-6">
+                  <h3 className={`text-lg font-bold ${textPrimary}`}>Mail Settings</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                      <span className={textSecondary}>SMTP Server:</span>
+                      <Input className={`w-64 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} placeholder="smtp.example.com" />
+                    </div>
+                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                      <span className={textSecondary}>SMTP Port:</span>
+                      <Input className={`w-48 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} defaultValue="587" />
+                    </div>
+                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                      <span className={textSecondary}>From Email:</span>
+                      <Input className={`w-64 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} placeholder="noreply@bcomet.com" />
+                    </div>
+                    <div className="flex items-center justify-between py-3">
+                      <span className={textSecondary}>Email Notifications Enabled:</span>
+                      <input type="checkbox" defaultChecked className="h-5 w-5 rounded" />
+                    </div>
+                  </div>
+                  <div className="flex justify-center pt-4">
+                    <Button><CheckCircle className="h-4 w-4 mr-2" /> Save</Button>
+                  </div>
+                </div>
+              )}
+
+              {settingsTab === "questionnaires" && (
+                <div className="space-y-6">
+                  <h3 className={`text-lg font-bold ${textPrimary}`}>Questionnaires Settings</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                      <span className={textSecondary}>Enable Client Questionnaires:</span>
+                      <input type="checkbox" defaultChecked className="h-5 w-5 rounded" />
+                    </div>
+                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                      <span className={textSecondary}>Questionnaire Reminder Interval (days):</span>
+                      <Input className={`w-48 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} defaultValue="7" />
+                    </div>
+                    <div className="flex items-center justify-between py-3">
+                      <span className={textSecondary}>Auto-Archive Completed (days):</span>
+                      <Input className={`w-48 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} defaultValue="30" />
+                    </div>
+                  </div>
+                  <div className="flex justify-center pt-4">
+                    <Button><CheckCircle className="h-4 w-4 mr-2" /> Save</Button>
+                  </div>
+                </div>
+              )}
+
+              {settingsTab === "license" && (
+                <div className="space-y-6">
+                  <h3 className={`text-lg font-bold ${textPrimary}`}>License Information</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                      <span className={textSecondary}>License Type:</span>
+                      <span className={`font-medium ${textPrimary}`}>Enterprise</span>
+                    </div>
+                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                      <span className={textSecondary}>License Key:</span>
+                      <span className={`font-mono text-sm ${textPrimary}`}>BCOMET-ENT-2024-XXXX-XXXX</span>
+                    </div>
+                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                      <span className={textSecondary}>Expiry Date:</span>
+                      <span className={`font-medium ${textPrimary}`}>December 31, 2026</span>
+                    </div>
+                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                      <span className={textSecondary}>Max Users:</span>
+                      <span className={`font-medium ${textPrimary}`}>Unlimited</span>
+                    </div>
+                    <div className="flex items-center justify-between py-3">
+                      <span className={textSecondary}>Max Clients:</span>
+                      <span className={`font-medium ${textPrimary}`}>Unlimited</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-center gap-3 pt-4">
+                    <Button variant="outline">Update License</Button>
+                    <Button>Contact Support</Button>
+                  </div>
+                </div>
+              )}
+            </Card>
           </div>
         </div>
       </div>
