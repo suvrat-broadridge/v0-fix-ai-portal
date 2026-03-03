@@ -1,5 +1,5 @@
 "use client"
-/* BControl FIX AI Platform - BTCS CONTROL */
+/* BControl FIX AI Platform */
 import { useState, useEffect } from "react"
 
 import {
