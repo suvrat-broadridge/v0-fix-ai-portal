@@ -940,6 +940,90 @@ export default function BCometPlatform() {
 
   // Dashboard
   if (currentScreen === "dashboard" || currentScreen === "clients") {
+    // For client role, show "My Progress" with their own asset classes
+    if (selectedRole === "client") {
+      const myAssetClasses = [
+        { name: "Equities", protocol: "FIX 4.4", specCompare: "complete", logAnalysis: "in-progress", alerts: 2 },
+        { name: "Options", protocol: "FIX 4.4", specCompare: "complete", logAnalysis: "complete", alerts: 0 },
+        { name: "Futures", protocol: "FIX 5.0 SP2", specCompare: "in-progress", logAnalysis: "pending", alerts: 1 },
+      ]
+      
+      return (
+        <div className={`min-h-screen ${bgPrimary} flex`}>
+          <Sidebar />
+          <div className="flex-1 overflow-auto">
+            <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
+              <div>
+                <h1 className={`text-xl font-bold ${textPrimary}`}>My Progress</h1>
+                <p className={textSecondary}>Track your certification progress across asset classes</p>
+              </div>
+              <button className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 relative`}>
+                <Bell className="h-5 w-5" />
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#f44336] rounded-full text-[10px] text-white flex items-center justify-center">3</span>
+              </button>
+            </header>
+
+            <div className="p-6">
+              <div className="grid gap-6">
+                {myAssetClasses.map((asset) => (
+                  <Card key={asset.name} className={`${bgCard} border ${borderColor} overflow-hidden`}>
+                    <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
+                      <div>
+                        <h2 className={`text-lg font-bold ${textPrimary}`}>{asset.name}</h2>
+                        <p className={`text-sm ${textSecondary}`}>{asset.protocol}</p>
+                      </div>
+                      {asset.alerts > 0 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336] text-xs font-medium">
+                          <Bell className="h-3 w-3" /> {asset.alerts} alerts
+                        </span>
+                      )}
+                    </div>
+                    <div className="p-6">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className={`p-4 rounded-lg border ${borderColor}`}>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className={`text-sm font-medium ${textPrimary}`}>Spec Compare</span>
+                            {getStatusBadge(asset.specCompare)}
+                          </div>
+                          <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                            <div 
+                              className={`h-full rounded-full ${asset.specCompare === "complete" ? "bg-[#4caf50]" : asset.specCompare === "in-progress" ? "bg-[#2196f3]" : "bg-[#9e9e9e]"}`}
+                              style={{ width: asset.specCompare === "complete" ? "100%" : asset.specCompare === "in-progress" ? "60%" : "0%" }}
+                            />
+                          </div>
+                        </div>
+                        <div className={`p-4 rounded-lg border ${borderColor}`}>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className={`text-sm font-medium ${textPrimary}`}>Log Analysis</span>
+                            {getStatusBadge(asset.logAnalysis)}
+                          </div>
+                          <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                            <div 
+                              className={`h-full rounded-full ${asset.logAnalysis === "complete" ? "bg-[#4caf50]" : asset.logAnalysis === "in-progress" ? "bg-[#2196f3]" : "bg-[#9e9e9e]"}`}
+                              style={{ width: asset.logAnalysis === "complete" ? "100%" : asset.logAnalysis === "in-progress" ? "60%" : "0%" }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-4 flex gap-3">
+                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("spec-compare")}>
+                          <GitCompare className="h-4 w-4 mr-2" /> Run Spec Compare
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("log-analysis")}>
+                          <FileSearch className="h-4 w-4 mr-2" /> Run Log Analysis
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
+    
+    // Admin dashboard - show all clients
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
@@ -1572,7 +1656,7 @@ export default function BCometPlatform() {
     )
   }
 
-  // Admin Specs Screen - Two column layout: Admin Specs | Client Specs
+  // Admin Specs Screen - Two column layout: Admin Specs | My Specs (or Client Specs for admin)
   if (currentScreen === "admin-specs") {
     const specsData = [
       { 
@@ -1635,7 +1719,7 @@ export default function BCometPlatform() {
                   <div className={`grid grid-cols-3 gap-4 px-6 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} border-b ${borderColor}`}>
                     <div className={`font-semibold text-sm ${textPrimary}`}>Protocol</div>
                     <div className={`font-semibold text-sm ${textPrimary}`}>Admin Spec</div>
-                    <div className={`font-semibold text-sm ${textPrimary}`}>Client Spec</div>
+                    <div className={`font-semibold text-sm ${textPrimary}`}>{selectedRole === "client" ? "My Specs" : "Client Specs"}</div>
                   </div>
                   
                   {/* Table Rows */}
@@ -1668,7 +1752,7 @@ export default function BCometPlatform() {
                           )}
                         </div>
                         
-                        {/* Client Spec Column */}
+                        {/* My Specs / Client Spec Column */}
                         <div className="flex items-center gap-2">
                           {version.clientSpec.uploaded ? (
                             <>
