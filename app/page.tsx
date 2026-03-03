@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench } from "lucide-react"
+import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -716,16 +716,21 @@ export default function BCometPlatform() {
             <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
               <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload Specifications</h3>
               <div className="grid grid-cols-2 gap-6">
-                <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer`}>
+                <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
+                  <input type="file" className="hidden" accept=".xml,.txt,.csv" onChange={(e) => console.log("Client spec:", e.target.files?.[0]?.name)} />
                   <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
                   <p className={`font-medium ${textPrimary}`}>Client Spec</p>
-                </div>
-                <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer`}>
+                  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+                </label>
+                <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
+                  <input type="file" className="hidden" accept=".xml,.txt,.csv" onChange={(e) => console.log("Admin spec:", e.target.files?.[0]?.name)} />
                   <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
                   <p className={`font-medium ${textPrimary}`}>Admin Spec</p>
-                </div>
+                  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+                </label>
               </div>
-              <div className="mt-6 flex justify-center">
+              <div className="mt-6 flex justify-center gap-4">
+                <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download Sample Spec</Button>
                 <Button onClick={() => setShowSpecResults(true)}><Play className="h-4 w-4 mr-2" /> Run Sample Comparison</Button>
               </div>
             </Card>
@@ -782,16 +787,21 @@ export default function BCometPlatform() {
             <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
               <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload Files</h3>
               <div className="grid grid-cols-2 gap-6">
-                <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer`}>
+                <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
+                  <input type="file" className="hidden" accept=".log,.txt" onChange={(e) => console.log("Log file:", e.target.files?.[0]?.name)} />
                   <FileText className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
                   <p className={`font-medium ${textPrimary}`}>Log File</p>
-                </div>
-                <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer`}>
+                  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+                </label>
+                <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
+                  <input type="file" className="hidden" accept=".xml,.txt,.csv" onChange={(e) => console.log("FIX spec:", e.target.files?.[0]?.name)} />
                   <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
                   <p className={`font-medium ${textPrimary}`}>FIX Specification</p>
-                </div>
+                  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+                </label>
               </div>
-              <div className="mt-6 flex justify-center">
+              <div className="mt-6 flex justify-center gap-4">
+                <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download Sample Spec</Button>
                 <Button onClick={() => setShowLogResults(true)}><Play className="h-4 w-4 mr-2" /> Run Sample Analysis</Button>
               </div>
             </Card>
@@ -854,18 +864,24 @@ export default function BCometPlatform() {
             <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
               <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload Sources</h3>
               <div className="grid grid-cols-3 gap-6">
-                <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer`}>
+                <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
+                  <input type="file" className="hidden" accept=".log,.txt" onChange={(e) => console.log("Log file:", e.target.files?.[0]?.name)} />
                   <FileText className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
                   <p className={`font-medium ${textPrimary}`}>Log File</p>
-                </div>
-                <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer`}>
+                  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+                </label>
+                <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
+                  <input type="file" className="hidden" accept=".xml,.txt,.csv" onChange={(e) => console.log("FIX spec:", e.target.files?.[0]?.name)} />
                   <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
                   <p className={`font-medium ${textPrimary}`}>FIX Spec</p>
-                </div>
-                <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer`}>
+                  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+                </label>
+                <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
+                  <input type="file" className="hidden" accept=".log,.txt,.xml,.csv" multiple onChange={(e) => console.log("Both files:", Array.from(e.target.files || []).map(f => f.name))} />
                   <GitCompare className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
                   <p className={`font-medium ${textPrimary}`}>Both</p>
-                </div>
+                  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+                </label>
               </div>
               <div className="mt-6 flex justify-center">
                 <Button onClick={() => setShowScenarioResults(true)}><Play className="h-4 w-4 mr-2" /> Run Sample</Button>
@@ -937,10 +953,11 @@ export default function BCometPlatform() {
                 <Button variant="outline" onClick={() => setCurrentScreen("scenario-creation")}>
                   <Activity className="h-4 w-4 mr-2" /> Go to Scenarios
                 </Button>
-                <div className={`border-2 border-dashed ${borderColor} rounded-lg px-6 py-3 text-center hover:border-[#00e5ff] cursor-pointer flex items-center gap-2`}>
+                <label className={`border-2 border-dashed ${borderColor} rounded-lg px-6 py-3 text-center hover:border-[#00e5ff] cursor-pointer flex items-center gap-2 transition-colors`}>
+                  <input type="file" className="hidden" accept=".json,.xml,.txt" onChange={(e) => console.log("Scenario file:", e.target.files?.[0]?.name)} />
                   <Upload className={`h-5 w-5 ${textSecondary}`} />
                   <span className={textSecondary}>Upload Scenario File</span>
-                </div>
+                </label>
               </div>
             </Card>
 
@@ -1024,10 +1041,11 @@ export default function BCometPlatform() {
                 <Button variant="outline" onClick={() => setCurrentScreen("scenario-creation")}>
                   <Activity className="h-4 w-4 mr-2" /> Go to Scenarios
                 </Button>
-                <div className={`border-2 border-dashed ${borderColor} rounded-lg px-6 py-3 text-center hover:border-[#00e5ff] cursor-pointer flex items-center gap-2`}>
+                <label className={`border-2 border-dashed ${borderColor} rounded-lg px-6 py-3 text-center hover:border-[#00e5ff] cursor-pointer flex items-center gap-2 transition-colors`}>
+                  <input type="file" className="hidden" accept=".json,.xml,.txt" onChange={(e) => console.log("Scenario file:", e.target.files?.[0]?.name)} />
                   <Upload className={`h-5 w-5 ${textSecondary}`} />
                   <span className={textSecondary}>Upload Scenario File</span>
-                </div>
+                </label>
               </div>
             </Card>
 
