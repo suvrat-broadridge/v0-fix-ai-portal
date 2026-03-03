@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown } from "lucide-react"
+import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -22,6 +22,7 @@ export default function BCometPlatform() {
   const [showAddClientModal, setShowAddClientModal] = useState(false)
   const [newClient, setNewClient] = useState({ name: "", jira: "", accountManager: "", assetClasses: [] as string[] })
   const [isAdHocMode, setIsAdHocMode] = useState(false)
+  const [toolsExpanded, setToolsExpanded] = useState(false)
 
   // Theme colors
   const bgPrimary = isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"
@@ -298,51 +299,69 @@ export default function BCometPlatform() {
         ))}
       </nav>
 
-      {/* Tools Section */}
-      <div className={`p-2 border-t ${borderColor} space-y-1`}>
-        {!sidebarCollapsed && <p className={`px-3 py-2 text-xs font-semibold ${textSecondary} uppercase`}>Tools</p>}
-        {[
-          { icon: GitCompare, label: "Spec Compare", screen: "spec-compare" },
-          { icon: FileSearch, label: "Log Analysis", screen: "log-analysis" },
-          { icon: Activity, label: "Scenario Creation", screen: "scenario-creation" },
-        ].map((item) => (
-          <button
-            key={item.label}
-            onClick={() => { setCurrentScreen(item.screen as any); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-              currentScreen === item.screen && isAdHocMode
-                ? "bg-[#00e5ff]/10 text-[#00e5ff]" 
-                : `${textSecondary} hover:bg-[#1e4976]/30`
-            }`}
-          >
-            <item.icon className="h-5 w-5" />
-            {!sidebarCollapsed && <span>{item.label}</span>}
-          </button>
-        ))}
+      {/* Tools Section - Collapsible */}
+      <div className={`p-2 border-t ${borderColor}`}>
+        <button
+          onClick={() => setToolsExpanded(!toolsExpanded)}
+          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${textSecondary} hover:bg-[#1e4976]/30`}
+        >
+          <div className="flex items-center gap-3">
+            <Wrench className="h-5 w-5" />
+            {!sidebarCollapsed && <span>Tools</span>}
+          </div>
+          {!sidebarCollapsed && (
+            <ChevronDown className={`h-4 w-4 transition-transform ${toolsExpanded ? "rotate-180" : ""}`} />
+          )}
+        </button>
         
-        {/* VeriFIX and Conductor as separate items */}
-        <button
-          onClick={() => { setCurrentScreen("test-case-gen"); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
-          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-            currentScreen === "test-case-gen" && isAdHocMode
-              ? "bg-[#00e5ff]/10 text-[#00e5ff]" 
-              : `${textSecondary} hover:bg-[#1e4976]/30`
-          }`}
-        >
-          <VerifixLogo size={20} />
-          {!sidebarCollapsed && <span>Reg Test Cases</span>}
-        </button>
-        <button
-          onClick={() => { setCurrentScreen("certification-gen"); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
-          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-            currentScreen === "certification-gen" && isAdHocMode
-              ? "bg-[#00e5ff]/10 text-[#00e5ff]" 
-              : `${textSecondary} hover:bg-[#1e4976]/30`
-          }`}
-        >
-          <ConductorLogo size={20} />
-          {!sidebarCollapsed && <span>Cert Test Cases</span>}
-        </button>
+        {toolsExpanded && !sidebarCollapsed && (
+          <div className="ml-4 mt-1 space-y-1 border-l border-[#1e4976]/50 pl-2">
+            {[
+              { icon: GitCompare, label: "Spec Compare", screen: "spec-compare" },
+              { icon: FileSearch, label: "Log Analysis", screen: "log-analysis" },
+              { icon: Activity, label: "Scenario Creation", screen: "scenario-creation" },
+            ].map((item) => (
+              <button
+                key={item.label}
+                onClick={() => { setCurrentScreen(item.screen as any); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
+                  currentScreen === item.screen && isAdHocMode
+                    ? "bg-[#00e5ff]/10 text-[#00e5ff]" 
+                    : `${textSecondary} hover:bg-[#1e4976]/30`
+                }`}
+              >
+                <item.icon className="h-4 w-4" />
+                <span>{item.label}</span>
+              </button>
+            ))}
+            
+            {/* VeriFIX */}
+            <button
+              onClick={() => { setCurrentScreen("test-case-gen"); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
+                currentScreen === "test-case-gen" && isAdHocMode
+                  ? "bg-[#00e5ff]/10 text-[#00e5ff]" 
+                  : `${textSecondary} hover:bg-[#1e4976]/30`
+              }`}
+            >
+              <VerifixLogo size={16} />
+              <span>Reg Test Cases</span>
+            </button>
+            
+            {/* Conductor */}
+            <button
+              onClick={() => { setCurrentScreen("certification-gen"); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
+                currentScreen === "certification-gen" && isAdHocMode
+                  ? "bg-[#00e5ff]/10 text-[#00e5ff]" 
+                  : `${textSecondary} hover:bg-[#1e4976]/30`
+              }`}
+            >
+              <ConductorLogo size={16} />
+              <span>Cert Test Cases</span>
+            </button>
+          </div>
+        )}
       </div>
 
       <div className={`p-2 border-t ${borderColor} space-y-1 mt-auto`}>
