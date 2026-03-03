@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen">("home")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [selectedClient, setSelectedClient] = useState<any>(null)
@@ -184,8 +184,8 @@ export default function BCometPlatform() {
     </svg>
   )
 
-  // Add Client Modal
-  const AddClientModal = () => (
+  // Add Client Modal - rendered inline to prevent focus loss
+  const addClientModalJSX = showAddClientModal ? (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <Card className={`${bgCard} p-6 w-full max-w-md border ${borderColor}`}>
         <div className="flex items-center justify-between mb-6">
@@ -202,7 +202,7 @@ export default function BCometPlatform() {
               placeholder="Enter client name" 
               className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`}
               value={newClient.name}
-              onChange={(e) => setNewClient({ ...newClient, name: e.target.value })}
+              onChange={(e) => setNewClient(prev => ({ ...prev, name: e.target.value }))}
             />
           </div>
           <div>
@@ -211,7 +211,7 @@ export default function BCometPlatform() {
               placeholder="e.g., CLIENT-001" 
               className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`}
               value={newClient.jira}
-              onChange={(e) => setNewClient({ ...newClient, jira: e.target.value })}
+              onChange={(e) => setNewClient(prev => ({ ...prev, jira: e.target.value }))}
             />
           </div>
           <div>
@@ -220,7 +220,7 @@ export default function BCometPlatform() {
               placeholder="Enter manager name" 
               className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`}
               value={newClient.accountManager}
-              onChange={(e) => setNewClient({ ...newClient, accountManager: e.target.value })}
+              onChange={(e) => setNewClient(prev => ({ ...prev, accountManager: e.target.value }))}
             />
           </div>
           <div>
@@ -261,7 +261,7 @@ export default function BCometPlatform() {
         </div>
       </Card>
     </div>
-  )
+  ) : null
 
   // Sidebar Component with Tools
   const Sidebar = () => (
@@ -394,16 +394,20 @@ export default function BCometPlatform() {
 
         <header className={`${bgSecondary}/80 backdrop-blur-md border-b ${borderColor} sticky top-0 z-50`}>
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <CometLogo size={40} />
-              <span className={`text-xl font-bold ${textPrimary}`}>B-COMET</span>
+            <div className="flex items-center gap-3 overflow-hidden">
+              {/* Animated Comet Logo */}
+              <div className="relative">
+                <div className="animate-[cometFly_2s_ease-out_forwards] opacity-0" style={{ animationFillMode: 'forwards' }}>
+                  <CometLogo size={40} />
+                </div>
+              </div>
+              <span className={`text-xl font-bold ${textPrimary} animate-[fadeIn_0.5s_ease-out_1.5s_forwards] opacity-0`}>B-COMET</span>
             </div>
             <div className="flex items-center gap-4">
               <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}>
                 {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </button>
-              <Button variant="outline" onClick={() => { setSelectedRole("client"); setCurrentScreen("login"); }}>Login</Button>
-              <Button onClick={() => { setSelectedRole("admin"); setCurrentScreen("login"); }}>Get Started</Button>
+              <Button onClick={() => setCurrentScreen("role-select")}>Start Here</Button>
             </div>
           </div>
         </header>
@@ -431,8 +435,7 @@ export default function BCometPlatform() {
               </p>
 
               <div className="flex gap-4 mb-8">
-                <Button size="lg" onClick={() => { setSelectedRole("admin"); setCurrentScreen("login"); }}>Get Started</Button>
-                <Button size="lg" variant="outline" onClick={() => { setSelectedRole("client"); setCurrentScreen("login"); }}>View Demo</Button>
+                <Button size="lg" onClick={() => setCurrentScreen("role-select")}>Start Here</Button>
               </div>
 
               <div className="flex gap-8">
@@ -470,21 +473,6 @@ export default function BCometPlatform() {
             </div>
           </div>
 
-          <div className="mt-16">
-            <h2 className={`text-2xl font-bold text-center mb-8 ${textPrimary}`}>Choose Your Role</h2>
-            <div className="flex justify-center gap-6">
-              <Card className={`${bgCard} p-8 cursor-pointer hover:scale-105 hover:shadow-2xl border-2 ${borderColor} hover:border-[#00e5ff]`} onClick={() => { setSelectedRole("admin"); setCurrentScreen("login"); }}>
-                <Shield className="h-12 w-12 mx-auto mb-4 text-[#00e5ff]" />
-                <h3 className={`text-xl font-bold text-center ${textPrimary}`}>Admin</h3>
-                <p className={`text-sm text-center ${textSecondary}`}>Full access to manage clients</p>
-              </Card>
-              <Card className={`${bgCard} p-8 cursor-pointer hover:scale-105 hover:shadow-2xl border-2 ${borderColor} hover:border-[#00e5ff]`} onClick={() => { setSelectedRole("client"); setCurrentScreen("login"); }}>
-                <Building2 className="h-12 w-12 mx-auto mb-4 text-[#00e5ff]" />
-                <h3 className={`text-xl font-bold text-center ${textPrimary}`}>Client</h3>
-                <p className={`text-sm text-center ${textSecondary}`}>View your specifications</p>
-              </Card>
-            </div>
-          </div>
         </section>
 
         <section className={`${bgSecondary}/80 py-20`}>
@@ -501,6 +489,46 @@ export default function BCometPlatform() {
             </div>
           </div>
         </section>
+      </div>
+    )
+  }
+
+  // Role Selection Screen
+  if (currentScreen === "role-select") {
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex items-center justify-center`}>
+        <div className="text-center">
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <CometLogo size={48} />
+            <span className={`text-2xl font-bold ${textPrimary}`}>B-COMET</span>
+          </div>
+          <h2 className={`text-3xl font-bold mb-4 ${textPrimary}`}>Welcome</h2>
+          <p className={`mb-8 ${textSecondary}`}>Select your role to continue</p>
+          <div className="flex justify-center gap-6">
+            <Card 
+              className={`${bgCard} p-8 cursor-pointer hover:scale-105 hover:shadow-2xl border-2 ${borderColor} hover:border-[#00e5ff] transition-all w-48`} 
+              onClick={() => { setSelectedRole("admin"); setCurrentScreen("login"); }}
+            >
+              <Shield className="h-12 w-12 mx-auto mb-4 text-[#00e5ff]" />
+              <h3 className={`text-xl font-bold text-center ${textPrimary}`}>Admin</h3>
+              <p className={`text-sm text-center mt-2 ${textSecondary}`}>Full access to manage clients</p>
+            </Card>
+            <Card 
+              className={`${bgCard} p-8 cursor-pointer hover:scale-105 hover:shadow-2xl border-2 ${borderColor} hover:border-[#00e5ff] transition-all w-48`} 
+              onClick={() => { setSelectedRole("client"); setCurrentScreen("login"); }}
+            >
+              <Building2 className="h-12 w-12 mx-auto mb-4 text-[#00e5ff]" />
+              <h3 className={`text-xl font-bold text-center ${textPrimary}`}>Client</h3>
+              <p className={`text-sm text-center mt-2 ${textSecondary}`}>View your specifications</p>
+            </Card>
+          </div>
+          <button 
+            onClick={() => setCurrentScreen("home")} 
+            className={`mt-8 ${textSecondary} hover:text-[#00e5ff]`}
+          >
+            Back to Home
+          </button>
+        </div>
       </div>
     )
   }
@@ -539,7 +567,7 @@ export default function BCometPlatform() {
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
-        {showAddClientModal && <AddClientModal />}
+        {addClientModalJSX}
         
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
