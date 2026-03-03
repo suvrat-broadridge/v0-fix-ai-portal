@@ -1765,7 +1765,8 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
         </div>
       )}
     </div>
-  )}
+  )
+}
 
   // Recent spec comparisons for history
   const [recentSpecComparisons] = useState([
@@ -2298,7 +2299,8 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
         </div>
       )}
     </div>
-  )}
+  )
+}
 
   // Test Cases Panel Component
   const TestCasesPanel = () => {
