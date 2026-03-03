@@ -277,3 +277,29 @@
     text-shadow: none;
   }
 }
+
+/* Comet bounces back and forth across text during loading */
+@keyframes cometBounce {
+  0% {
+    left: -10px;
+  }
+  50% {
+    left: calc(100% - 20px);
+  }
+  100% {
+    left: -10px;
+  }
+}
+
+/* Letter illumination follows comet position */
+@keyframes letterIlluminate {
+  0%, 100% {
+    text-shadow: 0 0 15px #00e5ff, 0 0 30px #00e5ff;
+  }
+  25%, 75% {
+    text-shadow: 0 0 5px #00e5ff;
+  }
+  50% {
+    text-shadow: 0 0 15px #00e5ff, 0 0 30px #00e5ff;
+  }
+}

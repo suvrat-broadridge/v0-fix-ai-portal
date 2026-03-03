@@ -32,6 +32,7 @@ export default function BCometPlatform() {
   const [certSuiteGenerated, setCertSuiteGenerated] = useState(false)
   const [showContactPanel, setShowContactPanel] = useState(false)
   const [showDemoForm, setShowDemoForm] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   // FIX MSG Creator state
   const [fixMsgSelectedSpec, setFixMsgSelectedSpec] = useState("")
   const [fixMsgSelectedType, setFixMsgSelectedType] = useState("")
@@ -139,6 +140,14 @@ export default function BCometPlatform() {
     return <span className={`px-2 py-1 rounded text-xs font-medium ${styles[status]}`}>{labels[status]}</span>
   }
 
+  // Simulate a task with loading animation
+  const simulateTask = async (callback: () => void, duration: number = 2000) => {
+    setIsLoading(true)
+    await new Promise(resolve => setTimeout(resolve, duration))
+    callback()
+    setIsLoading(false)
+  }
+
   const handleAddClient = () => {
     if (newClient.name && newClient.jira && newClient.accountManager && newClient.assetClasses.length > 0) {
       const client = {
@@ -231,6 +240,41 @@ export default function BCometPlatform() {
       {/* Brightest center spot */}
       <ellipse cx="107" cy="13" rx="2" ry="1.5" fill="white" />
     </svg>
+  )
+
+  // Animated B- COMET Logo with bouncing comet for loading states
+  const AnimatedBCometLogo = ({ loading = false }: { loading?: boolean }) => (
+    <div className="relative inline-flex items-center">
+      <span className={`text-xl font-bold ${textPrimary} relative z-10 ${loading ? "animate-[letterIlluminate_1.5s_ease-in-out_infinite]" : ""}`}>
+        B- COMET
+      </span>
+      {loading && (
+        <div 
+          className="absolute top-1/2 -translate-y-1/2 z-20 animate-[cometBounce_1.5s_ease-in-out_infinite]"
+          style={{ width: '20px', height: '20px' }}
+        >
+          <svg viewBox="0 0 24 24" className="w-5 h-5">
+            <defs>
+              <radialGradient id="miniCometCore" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#ffffff" />
+                <stop offset="50%" stopColor="#ffffff" />
+                <stop offset="100%" stopColor="#b3f5ff" />
+              </radialGradient>
+              <filter id="miniGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="2" result="blur"/>
+                <feMerge>
+                  <feMergeNode in="blur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            <ellipse cx="12" cy="12" rx="6" ry="5" fill="#00e5ff" filter="url(#miniGlow)" />
+            <ellipse cx="12" cy="12" rx="3" ry="2.5" fill="url(#miniCometCore)" />
+            <ellipse cx="11" cy="11" rx="1.5" ry="1" fill="white" />
+          </svg>
+        </div>
+      )}
+    </div>
   )
 
   // VeriFIX Logo (VF in circle - blue and dark green)
@@ -337,7 +381,11 @@ export default function BCometPlatform() {
         {!sidebarCollapsed && (
           <div className="flex items-center gap-2">
             <CometLogo size={32} />
-            <span className={`font-bold ${textPrimary}`}>B-COMET</span>
+            {isLoading ? (
+              <AnimatedBCometLogo loading={true} />
+            ) : (
+              <span className={`font-bold ${textPrimary}`}>B- COMET</span>
+            )}
           </div>
         )}
         {sidebarCollapsed && <CometLogo size={32} />}
@@ -493,7 +541,7 @@ export default function BCometPlatform() {
         <header className={`${bgSecondary}/80 backdrop-blur-md border-b ${borderColor} sticky top-0 z-50`}>
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <div className="flex items-center overflow-visible">
-              {/* Animated Comet that travels across and stops at end of B-COMET text */}
+              {/* Animated Comet that travels across and stops at end of B- COMET text */}
               <div className="relative inline-flex items-center">
                 {/* The comet - starts left, travels to end of text, stays there */}
                 <div className="absolute top-1/2 -translate-y-1/2 left-[-80px] animate-[cometTravel_2s_ease-out_forwards] z-0">
@@ -501,7 +549,7 @@ export default function BCometPlatform() {
                 </div>
                 {/* Text on top */}
                 <span className={`text-xl font-bold ${textPrimary} relative z-10 animate-[letterGlow_2s_ease-out_forwards]`}>
-                  B-COMET
+                  B- COMET
                 </span>
               </div>
             </div>
@@ -519,7 +567,7 @@ export default function BCometPlatform() {
             <div className="lg:col-span-3">
               <div className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm mb-6 ${isDarkMode ? "bg-[#00e5ff]/10 border border-[#00e5ff]/20" : "bg-[#0a1628]/5 border border-[#0a1628]/10"}`}>
                 <span className="flex h-2 w-2 rounded-full bg-[#4caf50] animate-pulse" />
-                <span className={`font-medium ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`}>B-COMET FIX AI Platform</span>
+                <span className={`font-medium ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`}>B- COMET FIX AI Platform</span>
               </div>
               
               <h1 className={`text-4xl lg:text-5xl font-bold leading-tight mb-6 ${textPrimary}`}>
@@ -675,8 +723,8 @@ export default function BCometPlatform() {
           <X className="h-5 w-5" />
         </button>
         
-        <h2 className={`text-2xl font-bold mb-2 ${textPrimary}`}>Get Started with B-COMET</h2>
-        <p className={`${textSecondary} mb-6`}>Contact our team to learn more about B-COMET platform</p>
+        <h2 className={`text-2xl font-bold mb-2 ${textPrimary}`}>Get Started with B- COMET</h2>
+        <p className={`${textSecondary} mb-6`}>Contact our team to learn more about B- COMET platform</p>
         
         <div className="space-y-4">
           {[
@@ -698,7 +746,7 @@ export default function BCometPlatform() {
                 </a>
               </div>
               <a 
-                href={`mailto:${person.email}?subject=B-COMET Platform Inquiry`}
+                href={`mailto:${person.email}?subject=B- COMET Platform Inquiry`}
                 className="px-4 py-2 bg-[#00e5ff] text-[#0a1628] rounded-lg hover:bg-[#00e5ff]/80 font-medium text-sm"
               >
                 Email
@@ -892,7 +940,7 @@ export default function BCometPlatform() {
         <div className="text-center">
           <div className="flex items-center justify-center gap-3 mb-8">
             <CometLogo size={48} />
-            <span className={`text-2xl font-bold ${textPrimary}`}>B-COMET</span>
+            <span className={`text-2xl font-bold ${textPrimary}`}>B- COMET</span>
           </div>
           <h2 className={`text-3xl font-bold mb-4 ${textPrimary}`}>Welcome</h2>
           <p className={`mb-8 ${textSecondary}`}>Select your role to continue</p>
@@ -932,7 +980,7 @@ export default function BCometPlatform() {
         <Card className={`${bgCard} p-8 w-full max-w-md border ${borderColor}`}>
           <div className="flex items-center justify-center gap-3 mb-6">
             <CometLogo size={40} />
-            <span className={`text-xl font-bold ${textPrimary}`}>B-COMET</span>
+            <span className={`text-xl font-bold ${textPrimary}`}>B- COMET</span>
           </div>
           <h2 className={`text-2xl font-bold text-center mb-6 ${textPrimary}`}>{selectedRole === "admin" ? "Admin Login" : "Client Login"}</h2>
           <div className="space-y-4">
@@ -1408,7 +1456,7 @@ export default function BCometPlatform() {
               </div>
               <div className="mt-6 flex justify-center gap-4">
                 <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download Sample Spec</Button>
-                <Button onClick={() => setShowSpecResults(true)}><Play className="h-4 w-4 mr-2" /> Perform Comparison</Button>
+                <Button onClick={() => simulateTask(() => setShowSpecResults(true))} disabled={isLoading}><Play className="h-4 w-4 mr-2" /> {isLoading ? "Processing..." : "Perform Comparison"}</Button>
               </div>
             </Card>
 
@@ -1560,7 +1608,7 @@ export default function BCometPlatform() {
               </div>
               <div className="mt-6 flex justify-center gap-4">
                 <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download Sample Log</Button>
-                <Button onClick={() => setShowLogResults(true)}><Play className="h-4 w-4 mr-2" /> Run Analysis</Button>
+                <Button onClick={() => simulateTask(() => setShowLogResults(true))} disabled={isLoading}><Play className="h-4 w-4 mr-2" /> {isLoading ? "Processing..." : "Run Analysis"}</Button>
               </div>
             </Card>
 
@@ -1686,7 +1734,7 @@ export default function BCometPlatform() {
                 </label>
               </div>
               <div className="mt-6 flex justify-center">
-                <Button onClick={() => setShowScenarioResults(true)}><Play className="h-4 w-4 mr-2" /> Run Sample</Button>
+                <Button onClick={() => simulateTask(() => setShowScenarioResults(true))} disabled={isLoading}><Play className="h-4 w-4 mr-2" /> {isLoading ? "Processing..." : "Run Sample"}</Button>
               </div>
             </Card>
 
@@ -1782,8 +1830,8 @@ export default function BCometPlatform() {
             <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
               <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Step 2: Generate Regression Test Suite</h3>
               <p className={`mb-4 ${textSecondary}`}>Convert loaded scenarios into a generic regression test suite.</p>
-              <Button onClick={() => { setRegTestSuiteGenerated(true); setShowTestCaseResults(true); }}>
-                <Play className="h-4 w-4 mr-2" /> Generate Reg Test Suite
+<Button onClick={() => simulateTask(() => { setRegTestSuiteGenerated(true); setShowTestCaseResults(true); })} disabled={isLoading}>
+  <Play className="h-4 w-4 mr-2" /> {isLoading ? "Processing..." : "Generate Reg Test Suite"}
               </Button>
             </Card>
 
@@ -1868,8 +1916,8 @@ export default function BCometPlatform() {
             <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
               <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Step 2: Generate Certification Test Suite</h3>
               <p className={`mb-4 ${textSecondary}`}>Convert loaded scenarios into a certification test suite.</p>
-              <Button onClick={() => { setCertSuiteGenerated(true); setShowCertResults(true); }}>
-                <Play className="h-4 w-4 mr-2" /> Generate Certification Test Suite
+<Button onClick={() => simulateTask(() => { setCertSuiteGenerated(true); setShowCertResults(true); })} disabled={isLoading}>
+  <Play className="h-4 w-4 mr-2" /> {isLoading ? "Processing..." : "Generate Certification Test Suite"}
               </Button>
             </Card>
 
@@ -2088,7 +2136,7 @@ export default function BCometPlatform() {
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <h1 className={`text-2xl font-bold ${textPrimary}`}>Settings</h1>
-            <p className={textSecondary}>Configure your B-COMET preferences</p>
+            <p className={textSecondary}>Configure your B- COMET preferences</p>
           </header>
 
           <div className="p-6">
