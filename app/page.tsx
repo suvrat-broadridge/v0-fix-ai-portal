@@ -165,19 +165,21 @@ export default function BCometPlatform() {
     </svg>
   )
 
-  // VeriFIX Logo (VF in circle)
+  // VeriFIX Logo (VF in circle - blue and dark green)
   const VerifixLogo = ({ size = 24 }: { size?: number }) => (
     <svg viewBox="0 0 32 32" style={{ width: size, height: size }}>
       <circle cx="16" cy="16" r="14" fill="none" stroke="#0091ea" strokeWidth="2" />
-      <text x="16" y="20" textAnchor="middle" fill="#0091ea" fontSize="12" fontWeight="bold" fontFamily="Arial">VF</text>
+      <text x="10" y="21" fill="#0091ea" fontSize="13" fontWeight="bold" fontFamily="Arial">V</text>
+      <text x="17" y="21" fill="#1b5e20" fontSize="13" fontWeight="bold" fontFamily="Arial">F</text>
     </svg>
   )
 
-  // Conductor Logo (stylized C)
+  // Conductor Logo (CD in circle - green)
   const ConductorLogo = ({ size = 24 }: { size?: number }) => (
     <svg viewBox="0 0 32 32" style={{ width: size, height: size }}>
       <circle cx="16" cy="16" r="14" fill="none" stroke="#4caf50" strokeWidth="2" />
-      <path d="M20 10 C12 10, 8 14, 8 16 C8 18, 12 22, 20 22" stroke="#4caf50" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <text x="8" y="21" fill="#4caf50" fontSize="12" fontWeight="bold" fontFamily="Arial">C</text>
+      <text x="17" y="21" fill="#1b5e20" fontSize="12" fontWeight="bold" fontFamily="Arial">D</text>
     </svg>
   )
 
@@ -298,13 +300,11 @@ export default function BCometPlatform() {
 
       {/* Tools Section */}
       <div className={`p-2 border-t ${borderColor} space-y-1`}>
-        {!sidebarCollapsed && <p className={`px-3 py-2 text-xs font-semibold ${textSecondary} uppercase`}>Ad-hoc Tools</p>}
+        {!sidebarCollapsed && <p className={`px-3 py-2 text-xs font-semibold ${textSecondary} uppercase`}>Tools</p>}
         {[
           { icon: GitCompare, label: "Spec Compare", screen: "spec-compare" },
           { icon: FileSearch, label: "Log Analysis", screen: "log-analysis" },
-          { icon: Activity, label: "Scenarios", screen: "scenario-creation" },
-          { icon: VerifixLogo, label: "VeriFIX", screen: "test-case-gen", isLogo: true },
-          { icon: ConductorLogo, label: "Conductor", screen: "certification-gen", isLogo: true },
+          { icon: Activity, label: "Scenario Creation", screen: "scenario-creation" },
         ].map((item) => (
           <button
             key={item.label}
@@ -315,10 +315,34 @@ export default function BCometPlatform() {
                 : `${textSecondary} hover:bg-[#1e4976]/30`
             }`}
           >
-            {item.isLogo ? <item.icon size={20} /> : <item.icon className="h-5 w-5" />}
+            <item.icon className="h-5 w-5" />
             {!sidebarCollapsed && <span>{item.label}</span>}
           </button>
         ))}
+        
+        {/* VeriFIX and Conductor as separate items */}
+        <button
+          onClick={() => { setCurrentScreen("test-case-gen"); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+            currentScreen === "test-case-gen" && isAdHocMode
+              ? "bg-[#00e5ff]/10 text-[#00e5ff]" 
+              : `${textSecondary} hover:bg-[#1e4976]/30`
+          }`}
+        >
+          <VerifixLogo size={20} />
+          {!sidebarCollapsed && <span>Reg Test Cases</span>}
+        </button>
+        <button
+          onClick={() => { setCurrentScreen("certification-gen"); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+            currentScreen === "certification-gen" && isAdHocMode
+              ? "bg-[#00e5ff]/10 text-[#00e5ff]" 
+              : `${textSecondary} hover:bg-[#1e4976]/30`
+          }`}
+        >
+          <ConductorLogo size={20} />
+          {!sidebarCollapsed && <span>Cert Test Cases</span>}
+        </button>
       </div>
 
       <div className={`p-2 border-t ${borderColor} space-y-1 mt-auto`}>
@@ -596,8 +620,8 @@ export default function BCometPlatform() {
                     <div className="flex justify-between"><span className={textSecondary}>Spec Compare</span>{getStatusBadge(ac.specCompare)}</div>
                     <div className="flex justify-between"><span className={textSecondary}>Log Analysis</span>{getStatusBadge(ac.logAnalysis)}</div>
                     <div className="flex justify-between"><span className={textSecondary}>Scenarios</span>{getStatusBadge(ac.scenario)}</div>
-                    <div className="flex justify-between"><span className={textSecondary}>VeriFIX</span>{getStatusBadge(ac.testCase)}</div>
-                    <div className="flex justify-between"><span className={textSecondary}>Conductor</span>{getStatusBadge(ac.certification)}</div>
+                    <div className="flex justify-between"><span className={textSecondary}>Reg Test Cases</span>{getStatusBadge(ac.testCase)}</div>
+                    <div className="flex justify-between"><span className={textSecondary}>Cert Test Cases</span>{getStatusBadge(ac.certification)}</div>
                   </div>
                 </Card>
               ))}
@@ -615,8 +639,8 @@ export default function BCometPlatform() {
       { key: "specCompare", title: "Spec Comparison", icon: GitCompare, status: assetData?.specCompare, screen: "spec-compare" },
       { key: "logAnalysis", title: "Log Analysis", icon: FileSearch, status: assetData?.logAnalysis, screen: "log-analysis" },
       { key: "scenario", title: "Scenario Creation", icon: Activity, status: assetData?.scenario, screen: "scenario-creation" },
-      { key: "testCase", title: "VeriFIX Test Cases", icon: VerifixLogo, status: assetData?.testCase, screen: "test-case-gen", isLogo: true },
-      { key: "certification", title: "Conductor Certification", icon: ConductorLogo, status: assetData?.certification, screen: "certification-gen", isLogo: true },
+      { key: "testCase", title: "Reg Test Case Generation", icon: VerifixLogo, status: assetData?.testCase, screen: "test-case-gen", isLogo: true },
+      { key: "certification", title: "Certification Case Generation", icon: ConductorLogo, status: assetData?.certification, screen: "certification-gen", isLogo: true },
       { key: "config", title: "Configuration", icon: Cog, status: assetData?.config, screen: "asset-tools" },
     ]
 
@@ -867,8 +891,10 @@ export default function BCometPlatform() {
     )
   }
 
-  // Test Case Generation (VeriFIX)
+  // Reg Test Case Generation (VeriFIX)
   if (currentScreen === "test-case-gen") {
+    const [regTestSuiteGenerated, setRegTestSuiteGenerated] = useState(false)
+    
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
@@ -879,25 +905,41 @@ export default function BCometPlatform() {
             </button>
             <div className="flex items-center gap-3">
               <VerifixLogo size={32} />
-              <h1 className={`text-2xl font-bold ${textPrimary}`}>VeriFIX Test Case Generation {isAdHocMode && "(Ad-hoc)"}</h1>
+              <h1 className={`text-2xl font-bold ${textPrimary}`}>Reg Test Case Generation {isAdHocMode && "(Ad-hoc)"}</h1>
             </div>
           </header>
 
           <div className="p-6">
+            {/* Step 1: Load Scenarios */}
             <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
-              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Convert Scenarios to VeriFIX Test Cases</h3>
-              <p className={`mb-4 ${textSecondary}`}>Select scenarios from the Scenario Creation step to convert into VeriFIX regression test cases.</p>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Step 1: Load Scenarios</h3>
+              <p className={`mb-4 ${textSecondary}`}>Load scenarios from the Scenario Creation step or upload scenario file.</p>
               <div className="flex gap-4">
-                <Button onClick={() => setShowTestCaseResults(true)}><Play className="h-4 w-4 mr-2" /> Generate Test Cases</Button>
-                <Button variant="outline"><VerifixLogo size={16} /> Open VeriFIX</Button>
+                <Button variant="outline" onClick={() => setCurrentScreen("scenario-creation")}>
+                  <Activity className="h-4 w-4 mr-2" /> Go to Scenarios
+                </Button>
+                <div className={`border-2 border-dashed ${borderColor} rounded-lg px-6 py-3 text-center hover:border-[#00e5ff] cursor-pointer flex items-center gap-2`}>
+                  <Upload className={`h-5 w-5 ${textSecondary}`} />
+                  <span className={textSecondary}>Upload Scenario File</span>
+                </div>
               </div>
             </Card>
 
+            {/* Step 2: Generate Reg Test Suite */}
+            <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Step 2: Generate Regression Test Suite</h3>
+              <p className={`mb-4 ${textSecondary}`}>Convert loaded scenarios into a generic regression test suite.</p>
+              <Button onClick={() => { setRegTestSuiteGenerated(true); setShowTestCaseResults(true); }}>
+                <Play className="h-4 w-4 mr-2" /> Generate Reg Test Suite
+              </Button>
+            </Card>
+
+            {/* Step 3: Convert to VeriFIX */}
             {showTestCaseResults && (
-              <Card className={`${bgCard} p-6 border ${borderColor}`}>
-                <h2 className={`text-xl font-bold mb-4 ${textPrimary}`}>Generated VeriFIX Test Cases</h2>
-                <div className="space-y-2">
-                  {["TC001: New Order Validation", "TC002: Cancel Request Flow", "TC003: Execution Report Check", "TC004: Reject Handling"].map((tc, i) => (
+              <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
+                <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Step 3: Convert to VeriFIX Test Cases</h3>
+                <div className="space-y-2 mb-4">
+                  {["TC001: New Order Validation", "TC002: Cancel Request Flow", "TC003: Execution Report Check", "TC004: Reject Handling", "TC005: Order Modify Flow", "TC006: Mass Cancel Test"].map((tc, i) => (
                     <div key={i} className={`flex items-center justify-between p-3 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"}`}>
                       <div className="flex items-center gap-3">
                         <input type="checkbox" defaultChecked className="h-4 w-4" />
@@ -907,9 +949,26 @@ export default function BCometPlatform() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 flex justify-end gap-3">
-                  <Button variant="outline">Export to VeriFIX</Button>
-                  <Button><VerifixLogo size={16} /> Launch VeriFIX</Button>
+                <div className="flex gap-4">
+                  <Button onClick={() => {}}>
+                    <VerifixLogo size={16} /> Generate VeriFIX Test Cases
+                  </Button>
+                  <Button variant="outline">Export Test Suite</Button>
+                </div>
+              </Card>
+            )}
+
+            {/* Launch VeriFIX */}
+            {showTestCaseResults && (
+              <Card className={`${bgCard} p-6 border ${borderColor}`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className={`text-lg font-bold ${textPrimary}`}>Launch VeriFIX</h3>
+                    <p className={`${textSecondary}`}>Open VeriFIX to run your regression test cases</p>
+                  </div>
+                  <Button>
+                    <VerifixLogo size={20} /> Launch VeriFIX
+                  </Button>
                 </div>
               </Card>
             )}
@@ -919,8 +978,10 @@ export default function BCometPlatform() {
     )
   }
 
-  // Certification Test Case Generation (Conductor)
+  // Certification Case Generation (Conductor)
   if (currentScreen === "certification-gen") {
+    const [certSuiteGenerated, setCertSuiteGenerated] = useState(false)
+    
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
@@ -931,25 +992,41 @@ export default function BCometPlatform() {
             </button>
             <div className="flex items-center gap-3">
               <ConductorLogo size={32} />
-              <h1 className={`text-2xl font-bold ${textPrimary}`}>Conductor Certification Test Cases {isAdHocMode && "(Ad-hoc)"}</h1>
+              <h1 className={`text-2xl font-bold ${textPrimary}`}>Certification Case Generation {isAdHocMode && "(Ad-hoc)"}</h1>
             </div>
           </header>
 
           <div className="p-6">
+            {/* Step 1: Load Scenarios */}
             <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
-              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Convert Scenarios to Certification Test Cases</h3>
-              <p className={`mb-4 ${textSecondary}`}>Generate certification test cases for BTCS Conductor from your scenarios.</p>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Step 1: Load Scenarios</h3>
+              <p className={`mb-4 ${textSecondary}`}>Load scenarios from the Scenario Creation step or upload scenario file.</p>
               <div className="flex gap-4">
-                <Button onClick={() => setShowCertResults(true)}><Play className="h-4 w-4 mr-2" /> Generate Cert Cases</Button>
-                <Button variant="outline"><ConductorLogo size={16} /> Open Conductor</Button>
+                <Button variant="outline" onClick={() => setCurrentScreen("scenario-creation")}>
+                  <Activity className="h-4 w-4 mr-2" /> Go to Scenarios
+                </Button>
+                <div className={`border-2 border-dashed ${borderColor} rounded-lg px-6 py-3 text-center hover:border-[#00e5ff] cursor-pointer flex items-center gap-2`}>
+                  <Upload className={`h-5 w-5 ${textSecondary}`} />
+                  <span className={textSecondary}>Upload Scenario File</span>
+                </div>
               </div>
             </Card>
 
+            {/* Step 2: Generate Certification Test Suite */}
+            <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Step 2: Generate Certification Test Suite</h3>
+              <p className={`mb-4 ${textSecondary}`}>Convert loaded scenarios into a certification test suite.</p>
+              <Button onClick={() => { setCertSuiteGenerated(true); setShowCertResults(true); }}>
+                <Play className="h-4 w-4 mr-2" /> Generate Certification Test Suite
+              </Button>
+            </Card>
+
+            {/* Step 3: Convert to Conductor */}
             {showCertResults && (
-              <Card className={`${bgCard} p-6 border ${borderColor}`}>
-                <h2 className={`text-xl font-bold mb-4 ${textPrimary}`}>Generated Certification Test Cases</h2>
-                <div className="space-y-2">
-                  {["CERT001: Order Entry Certification", "CERT002: Cancel/Replace Certification", "CERT003: Execution Certification", "CERT004: Error Handling Certification"].map((tc, i) => (
+              <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
+                <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Step 3: Convert to Conductor Test Suite</h3>
+                <div className="space-y-2 mb-4">
+                  {["CERT001: Order Entry Certification", "CERT002: Cancel/Replace Certification", "CERT003: Execution Certification", "CERT004: Error Handling Certification", "CERT005: Market Data Certification", "CERT006: Session Management"].map((tc, i) => (
                     <div key={i} className={`flex items-center justify-between p-3 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"}`}>
                       <div className="flex items-center gap-3">
                         <input type="checkbox" defaultChecked className="h-4 w-4" />
@@ -959,9 +1036,26 @@ export default function BCometPlatform() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 flex justify-end gap-3">
-                  <Button variant="outline">Export to Conductor</Button>
-                  <Button><ConductorLogo size={16} /> Launch Conductor</Button>
+                <div className="flex gap-4">
+                  <Button onClick={() => {}}>
+                    <ConductorLogo size={16} /> Generate Conductor Test Suite
+                  </Button>
+                  <Button variant="outline">Export Test Suite</Button>
+                </div>
+              </Card>
+            )}
+
+            {/* Launch Conductor */}
+            {showCertResults && (
+              <Card className={`${bgCard} p-6 border ${borderColor}`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className={`text-lg font-bold ${textPrimary}`}>Launch Conductor</h3>
+                    <p className={`${textSecondary}`}>Open Conductor to run your certification test cases</p>
+                  </div>
+                  <Button>
+                    <ConductorLogo size={20} /> Launch Conductor
+                  </Button>
                 </div>
               </Card>
             )}
