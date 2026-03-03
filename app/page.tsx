@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X } from "lucide-react"
+import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -14,6 +14,8 @@ export default function BCometPlatform() {
   const [selectedClient, setSelectedClient] = useState<any>(null)
   const [showSpecResults, setShowSpecResults] = useState(false)
   const [showLogResults, setShowLogResults] = useState(false)
+  const [showAddClientModal, setShowAddClientModal] = useState(false)
+  const [newClient, setNewClient] = useState({ name: "", jira: "", accountManager: "", assetClass: "" })
 
   // Theme colors
   const bgPrimary = isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"
@@ -23,14 +25,16 @@ export default function BCometPlatform() {
   const textSecondary = isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"
   const borderColor = isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"
 
-  // Sample clients data
-  const clients = [
-    { id: 1, name: "Goldman Sachs", specCompare: "completed", logAnalysis: "error", scenario: "in-progress", testCase: "completed", certification: "not-started", config: "completed", alerts: 3 },
-    { id: 2, name: "Morgan Stanley", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "in-progress", certification: "not-started", config: "completed", alerts: 0 },
-    { id: 3, name: "JP Morgan", specCompare: "in-progress", logAnalysis: "not-started", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "in-progress", alerts: 5 },
-    { id: 4, name: "Citadel", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "completed", certification: "in-progress", config: "completed", alerts: 1 },
-    { id: 5, name: "Two Sigma", specCompare: "error", logAnalysis: "in-progress", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "error", alerts: 8 },
-  ]
+  // Sample clients data - now with state
+  const [clients, setClients] = useState([
+    { id: 1, name: "Goldman Sachs", jira: "GS-001", accountManager: "John Smith", assetClass: "Equities", specCompare: "completed", logAnalysis: "error", scenario: "in-progress", testCase: "completed", certification: "not-started", config: "completed", alerts: 3 },
+    { id: 2, name: "Morgan Stanley", jira: "MS-002", accountManager: "Jane Doe", assetClass: "Fixed Income", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "in-progress", certification: "not-started", config: "completed", alerts: 0 },
+    { id: 3, name: "JP Morgan", jira: "JPM-003", accountManager: "Bob Wilson", assetClass: "Derivatives", specCompare: "in-progress", logAnalysis: "not-started", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "in-progress", alerts: 5 },
+    { id: 4, name: "Citadel", jira: "CIT-004", accountManager: "Alice Brown", assetClass: "Equities", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "completed", certification: "in-progress", config: "completed", alerts: 1 },
+    { id: 5, name: "Two Sigma", jira: "TS-005", accountManager: "Charlie Davis", assetClass: "Multi-Asset", specCompare: "error", logAnalysis: "in-progress", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "error", alerts: 8 },
+  ])
+
+  const assetClasses = ["Equities", "Fixed Income", "Derivatives", "FX", "Commodities", "Multi-Asset"]
 
   // Features for landing page
   const features = [
@@ -58,6 +62,28 @@ export default function BCometPlatform() {
     return <span className={`px-2 py-1 rounded text-xs font-medium ${styles[status]}`}>{labels[status]}</span>
   }
 
+  const handleAddClient = () => {
+    if (newClient.name && newClient.jira && newClient.accountManager && newClient.assetClass) {
+      const client = {
+        id: clients.length + 1,
+        name: newClient.name,
+        jira: newClient.jira,
+        accountManager: newClient.accountManager,
+        assetClass: newClient.assetClass,
+        specCompare: "not-started",
+        logAnalysis: "not-started",
+        scenario: "not-started",
+        testCase: "not-started",
+        certification: "not-started",
+        config: "not-started",
+        alerts: 0,
+      }
+      setClients([...clients, client])
+      setNewClient({ name: "", jira: "", accountManager: "", assetClass: "" })
+      setShowAddClientModal(false)
+    }
+  }
+
   // Comet Logo Component
   const CometLogo = ({ size = 40 }: { size?: number }) => (
     <svg viewBox="0 0 40 40" style={{ width: size, height: size }}>
@@ -78,6 +104,72 @@ export default function BCometPlatform() {
       <circle cx="28" cy="20" r="8" fill="url(#cometHead)" />
       <circle cx="26" cy="18" r="2" fill="white" opacity="0.6" />
     </svg>
+  )
+
+  // Add Client Modal
+  const AddClientModal = () => (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <Card className={`${bgCard} p-6 w-full max-w-md border ${borderColor}`}>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className={`text-xl font-bold ${textPrimary}`}>Add New Client</h2>
+          <button onClick={() => setShowAddClientModal(false)} className={`p-1 rounded hover:bg-[#1e4976]/50 ${textSecondary}`}>
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        
+        <div className="space-y-4">
+          <div>
+            <label className={`text-sm font-medium ${textPrimary}`}>Client Name</label>
+            <Input 
+              placeholder="Enter client name" 
+              className="mt-1" 
+              value={newClient.name}
+              onChange={(e) => setNewClient({ ...newClient, name: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className={`text-sm font-medium ${textPrimary}`}>JIRA ID</label>
+            <Input 
+              placeholder="e.g., CLIENT-001" 
+              className="mt-1" 
+              value={newClient.jira}
+              onChange={(e) => setNewClient({ ...newClient, jira: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className={`text-sm font-medium ${textPrimary}`}>Sales/Account Manager</label>
+            <Input 
+              placeholder="Enter manager name" 
+              className="mt-1" 
+              value={newClient.accountManager}
+              onChange={(e) => setNewClient({ ...newClient, accountManager: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className={`text-sm font-medium ${textPrimary}`}>Asset Class</label>
+            <select 
+              className={`w-full mt-1 px-3 py-2 rounded-md border ${borderColor} ${bgSecondary} ${textPrimary}`}
+              value={newClient.assetClass}
+              onChange={(e) => setNewClient({ ...newClient, assetClass: e.target.value })}
+            >
+              <option value="">Select asset class</option>
+              {assetClasses.map((ac) => (
+                <option key={ac} value={ac}>{ac}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="flex gap-3 pt-4">
+            <Button variant="outline" className="flex-1" onClick={() => setShowAddClientModal(false)}>
+              Cancel
+            </Button>
+            <Button className="flex-1" onClick={handleAddClient}>
+              Add Client
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </div>
   )
 
   // Sidebar Component
@@ -280,6 +372,7 @@ export default function BCometPlatform() {
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
+        {showAddClientModal && <AddClientModal />}
         
         <div className="flex-1 overflow-auto">
           {/* Top Bar */}
@@ -288,6 +381,9 @@ export default function BCometPlatform() {
               {currentScreen === "dashboard" ? "Dashboard" : "Clients"}
             </h1>
             <div className="flex items-center gap-4">
+              <Button onClick={() => setShowAddClientModal(true)}>
+                <Plus className="h-4 w-4 mr-2" /> Add Client
+              </Button>
               <button className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 relative`}>
                 <Bell className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 h-4 w-4 bg-[#f44336] rounded-full text-xs text-white flex items-center justify-center">3</span>
@@ -377,6 +473,11 @@ export default function BCometPlatform() {
               <ArrowLeft className="h-4 w-4" /> Back to Dashboard
             </button>
             <h1 className={`text-2xl font-bold ${textPrimary}`}>{selectedClient.name}</h1>
+            <div className={`mt-2 flex gap-4 text-sm ${textSecondary}`}>
+              <span>JIRA: {selectedClient.jira}</span>
+              <span>Manager: {selectedClient.accountManager}</span>
+              <span>Asset Class: {selectedClient.assetClass}</span>
+            </div>
           </header>
 
           <div className="p-6">
