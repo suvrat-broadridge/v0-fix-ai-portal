@@ -147,24 +147,37 @@ export default function BCometPlatform() {
   }
 
   // Logo Components
-  const CometLogo = ({ size = 40 }: { size?: number }) => (
-    <svg viewBox="0 0 40 40" style={{ width: size, height: size }}>
+  const CometLogo = ({ size = 40, animated = false }: { size?: number; animated?: boolean }) => (
+    <svg viewBox="0 0 50 30" style={{ width: size * 1.25, height: size * 0.75 }} className={animated ? "animate-[cometGlow_2s_ease-out_forwards]" : ""}>
       <defs>
         <linearGradient id="cometTail" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stopColor="#00e5ff" stopOpacity="0" />
-          <stop offset="50%" stopColor="#00e5ff" stopOpacity="0.5" />
+          <stop offset="40%" stopColor="#00e5ff" stopOpacity="0.3" />
+          <stop offset="80%" stopColor="#00e5ff" stopOpacity="0.7" />
           <stop offset="100%" stopColor="#00e5ff" stopOpacity="1" />
         </linearGradient>
         <linearGradient id="cometHead" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#00e5ff" />
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="30%" stopColor="#00e5ff" />
           <stop offset="100%" stopColor="#0091ea" />
         </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
-      <path d="M2 20 Q12 18, 22 20" stroke="url(#cometTail)" strokeWidth="2" fill="none" opacity="0.6" />
-      <path d="M5 24 Q14 22, 24 22" stroke="url(#cometTail)" strokeWidth="1.5" fill="none" opacity="0.4" />
-      <path d="M4 16 Q13 15, 22 17" stroke="url(#cometTail)" strokeWidth="1.5" fill="none" opacity="0.4" />
-      <circle cx="28" cy="20" r="8" fill="url(#cometHead)" />
-      <circle cx="26" cy="18" r="2" fill="white" opacity="0.6" />
+      {/* Long trailing tail */}
+      <path d="M0 15 Q15 14, 32 15" stroke="url(#cometTail)" strokeWidth="3" fill="none" opacity="0.4" />
+      <path d="M5 18 Q18 17, 34 16" stroke="url(#cometTail)" strokeWidth="2" fill="none" opacity="0.3" />
+      <path d="M5 12 Q18 13, 34 14" stroke="url(#cometTail)" strokeWidth="2" fill="none" opacity="0.3" />
+      <path d="M10 20 Q22 19, 36 17" stroke="url(#cometTail)" strokeWidth="1" fill="none" opacity="0.2" />
+      <path d="M10 10 Q22 11, 36 13" stroke="url(#cometTail)" strokeWidth="1" fill="none" opacity="0.2" />
+      {/* Comet head with glow */}
+      <ellipse cx="40" cy="15" rx="7" ry="6" fill="url(#cometHead)" filter="url(#glow)" />
+      <ellipse cx="38" cy="13" rx="2" ry="1.5" fill="white" opacity="0.8" />
     </svg>
   )
 
@@ -396,14 +409,14 @@ export default function BCometPlatform() {
 
         <header className={`${bgSecondary}/80 backdrop-blur-md border-b ${borderColor} sticky top-0 z-50`}>
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3 overflow-hidden">
-              {/* Animated Comet Logo */}
-              <div className="relative">
-                <div className="animate-[cometFly_2s_ease-out_forwards] opacity-0" style={{ animationFillMode: 'forwards' }}>
-                  <CometLogo size={40} />
+            <div className="flex items-center gap-2 overflow-hidden">
+              {/* Animated Comet Logo that flies across and illuminates text */}
+              <div className="relative flex items-center">
+                <div className="animate-[cometFly_2s_ease-out_forwards]" style={{ animationFillMode: 'forwards' }}>
+                  <CometLogo size={36} animated />
                 </div>
+                <span className={`text-xl font-bold ${textPrimary} animate-[textGlow_2s_ease-out_forwards] ml-[-8px]`}>B-COMET</span>
               </div>
-              <span className={`text-xl font-bold ${textPrimary} animate-[fadeIn_0.5s_ease-out_1.5s_forwards] opacity-0`}>B-COMET</span>
             </div>
             <div className="flex items-center gap-4">
               <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}>
@@ -861,6 +874,13 @@ export default function BCometPlatform() {
                     </div>
                   </div>
                 ))}
+
+                {/* Navigation */}
+                <div className={`mt-6 pt-4 border-t ${borderColor} flex justify-end`}>
+                  <Button onClick={() => setCurrentScreen("log-analysis")}>
+                    Next: Log Analysis <ChevronRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </div>
               </Card>
             )}
           </div>
@@ -931,6 +951,16 @@ export default function BCometPlatform() {
                     </div>
                   </div>
                 ))}
+
+                {/* Navigation */}
+                <div className={`mt-6 pt-4 border-t ${borderColor} flex justify-between`}>
+                  <Button variant="outline" onClick={() => setCurrentScreen("spec-compare")}>
+                    <ChevronLeft className="h-4 w-4 mr-2" /> Back: Spec Compare
+                  </Button>
+                  <Button onClick={() => setCurrentScreen("scenario-creation")}>
+                    Next: Scenario Creation <ChevronRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </div>
               </Card>
             )}
           </div>
@@ -1016,6 +1046,23 @@ export default function BCometPlatform() {
                 <div className="mt-4 flex justify-end gap-3">
                   <Button variant="outline">Export</Button>
                   <Button>Save Scenarios</Button>
+                </div>
+
+                {/* Navigation */}
+                <div className={`mt-6 pt-4 border-t ${borderColor}`}>
+                  <div className="flex justify-between items-center">
+                    <Button variant="outline" onClick={() => setCurrentScreen("log-analysis")}>
+                      <ChevronLeft className="h-4 w-4 mr-2" /> Back: Log Analysis
+                    </Button>
+                    <div className="flex gap-3">
+                      <Button variant="outline" onClick={() => setCurrentScreen("test-case-gen")}>
+                        <VerifixLogo size={16} /> Reg Test Cases <ChevronRight className="h-4 w-4 ml-1" />
+                      </Button>
+                      <Button onClick={() => setCurrentScreen("certification-gen")}>
+                        <ConductorLogo size={16} /> Cert Test Cases <ChevronRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </Card>
             )}
