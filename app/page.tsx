@@ -1,4 +1,4 @@
-"use client"
+"use client";
 /* BControl FIX AI Platform - BTCS Certification Onboarding Network Testing Routing Operations Lifecycle */
 import { useState, useEffect } from "react"
 
