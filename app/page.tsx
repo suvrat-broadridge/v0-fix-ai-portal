@@ -3750,11 +3750,11 @@ const ConnectivityBadge = ({ status }: { status: "connected" | "not-connected" |
             </div>
             
             {/* Right: Animated Trading Visualization */}
-            <div className="relative">
-              <div className={`relative rounded-3xl shadow-2xl p-6 overflow-hidden ${
+            <div className="relative lg:ml-8 xl:ml-12">
+              <div className={`relative rounded-3xl shadow-2xl p-6 overflow-hidden backdrop-blur-xl ${
                 isDarkMode 
-                  ? "bg-[#0d1f3c] border border-[#1e4976]" 
-                  : "bg-white border border-[#e2e8f0]"
+                  ? "bg-[#0d1f3c]/80 border border-[#1e4976]/50" 
+                  : "bg-white/80 border border-[#e2e8f0]"
               }`}>
                 {/* Window Header */}
                 <div className="flex items-center gap-2 mb-6">
