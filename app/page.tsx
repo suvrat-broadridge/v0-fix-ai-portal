@@ -376,7 +376,7 @@ export default function BCometPlatform() {
 
   // Sidebar Component with Tools
   const Sidebar = () => (
-    <div className={`${sidebarCollapsed ? "w-16" : "w-64"} h-screen ${bgSecondary} border-r ${borderColor} flex flex-col transition-all duration-300`}>
+    <div className={`${sidebarCollapsed ? "w-16" : "w-64"} h-screen ${bgSecondary} border-r ${borderColor} flex flex-col transition-all duration-300 overflow-y-auto`}>
       <div className={`p-4 border-b ${borderColor} flex items-center ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
         {!sidebarCollapsed && (
           <div className="flex items-center gap-2">
@@ -434,8 +434,8 @@ export default function BCometPlatform() {
   {[
   { icon: GitCompare, label: "Spec Compare", screen: "spec-compare", roles: ["admin", "client"] },
   { icon: FileSearch, label: "Log Analysis", screen: "log-analysis", roles: ["admin", "client"] },
-  { icon: MessageSquare, label: "FIX MSG Creator", screen: "fix-msg-creator", roles: ["admin", "client"] },
   { icon: Activity, label: "Scenario Creation", screen: "scenario-creation", roles: ["admin"] },
+  { icon: MessageSquare, label: "FIX MSG Creator", screen: "fix-msg-creator", roles: ["admin", "client"] },
   ].filter(item => item.roles.includes(selectedRole || "")).map((item) => (
   <button
   key={item.label}
@@ -1454,10 +1454,10 @@ export default function BCometPlatform() {
                   </div>
                 </div>
               </div>
-              <div className="mt-6 flex justify-center gap-4">
-                <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download Sample Spec</Button>
-                <Button onClick={() => simulateTask(() => setShowSpecResults(true))} disabled={isLoading}><Play className="h-4 w-4 mr-2" /> {isLoading ? "Processing..." : "Perform Comparison"}</Button>
-              </div>
+<div className="mt-6 flex justify-center gap-4">
+  <Button onClick={() => simulateTask(() => setShowSpecResults(true))} disabled={isLoading} className="bg-white text-black hover:bg-gray-100 border border-gray-300"><Play className="h-4 w-4 mr-2" /> {isLoading ? "Processing..." : "Perform Comparison"}</Button>
+  <Button className="bg-white text-black hover:bg-gray-100 border border-gray-300"><Download className="h-4 w-4 mr-2" /> Download Comparison</Button>
+  </div>
             </Card>
 
             {showSpecResults && (
