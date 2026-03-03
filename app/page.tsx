@@ -495,7 +495,7 @@ export default function BCometPlatform() {
   <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 rounded-lg transition-colors ${isDarkMode ? "text-[#00e5ff] hover:bg-[#00e5ff]/20" : "text-[#0a1628] hover:bg-[#0a1628]/10"}`}>
   {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
   </button>
-  <Button variant="outline" onClick={() => setCurrentScreen("role-select")} className={`${isDarkMode ? "border-[#00e5ff] text-[#00e5ff] hover:bg-[#00e5ff]/10" : "border-[#0a1628] text-[#0a1628]"}`}>Login / Register</Button>
+  <Button onClick={() => setCurrentScreen("role-select")} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-semibold">Login / Register</Button>
   </div>
           </div>
         </header>
@@ -524,7 +524,6 @@ export default function BCometPlatform() {
 
   <div className="flex gap-4 mb-8">
   <Button size="lg" onClick={() => setShowContactPanel(true)} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-semibold">Start Here</Button>
-  <Button size="lg" variant="outline" onClick={() => setShowDemoForm(true)} className={`${isDarkMode ? "border-[#00e5ff] text-[#00e5ff] hover:bg-[#00e5ff]/10" : "border-[#0a1628] text-[#0a1628]"}`}>Request Demo</Button>
   </div>
 
               <div className="flex gap-8">
