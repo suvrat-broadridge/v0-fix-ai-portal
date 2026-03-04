@@ -1,5 +1,6 @@
 "use client"
 
+// B- COMET Platform - FIX Protocol Testing Suite
 import { useState } from "react"
 import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
