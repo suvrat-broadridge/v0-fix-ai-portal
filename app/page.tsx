@@ -1398,7 +1398,7 @@ export default function BCometPlatform() {
               <div className="grid grid-cols-2 gap-6">
                 {/* Client Spec */}
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Client Spec</label>
+                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Upload My Spec</label>
                   {!isAdHocMode && selectedClient && selectedAssetClass ? (
                     <div className={`border-2 ${borderColor} rounded-lg p-4`}>
                       <div className="flex items-center gap-3 mb-3">
@@ -1423,9 +1423,9 @@ export default function BCometPlatform() {
                   ) : (
                     <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
                       <input type="file" className="hidden" accept=".xml,.txt,.csv" />
-                      <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                      <p className={`font-medium ${textPrimary}`}>Client Spec</p>
-                      <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+<Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+  <p className={`font-medium ${textPrimary}`}>Upload My Spec</p>
+  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
                     </label>
                   )}
                 </div>
@@ -1467,7 +1467,7 @@ export default function BCometPlatform() {
                 <h2 className={`text-xl font-bold mb-6 ${textPrimary}`}>Comparison Results</h2>
                 
                 <div className="grid grid-cols-12 gap-4 mb-4">
-                  <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff]`}>Client Spec</h3></div>
+                  <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff]`}>My Spec</h3></div>
                   <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff]`}>Admin Spec</h3></div>
                   <div className="col-span-2"><h3 className={`font-bold text-[#00e5ff]`}>Action</h3></div>
                 </div>
