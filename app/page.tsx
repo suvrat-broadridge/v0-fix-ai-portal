@@ -1580,7 +1580,7 @@ export default function BCometPlatform() {
                 <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
                   <input type="file" className="hidden" accept=".log,.txt" />
                   <FileText className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                  <p className={`font-medium ${textPrimary}`}>Log File</p>
+                  <p className={`font-medium ${textPrimary}`}>Upload My Log File</p>
                   <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
                 </label>
                 
@@ -1720,7 +1720,7 @@ export default function BCometPlatform() {
                 <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
                   <input type="file" className="hidden" accept=".log,.txt" onChange={(e) => console.log("Log file:", e.target.files?.[0]?.name)} />
                   <FileText className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                  <p className={`font-medium ${textPrimary}`}>Log File</p>
+                  <p className={`font-medium ${textPrimary}`}>Upload My Log File</p>
                   <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
                 </label>
                 <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
