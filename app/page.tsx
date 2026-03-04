@@ -1590,8 +1590,8 @@ export default function BCometPlatform() {
                     <div className="flex items-center gap-3 mb-3">
                       <FileText className={`h-8 w-8 ${textSecondary}`} />
                       <div>
-                        <p className={`font-medium ${textPrimary}`}>Select FIX Specification</p>
-                        <p className={`text-xs ${textSecondary}`}>From Admin Specs</p>
+<p className={`font-medium ${textPrimary}`}>Select A File</p>
+  <p className={`text-xs ${textSecondary}`}>From Admin Specs</p>
                       </div>
                     </div>
                     <select 
