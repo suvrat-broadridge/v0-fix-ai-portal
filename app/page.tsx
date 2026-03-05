@@ -1425,7 +1425,7 @@ export default function BCometPlatform() {
                     <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
                       <input type="file" className="hidden" accept=".xml,.txt,.csv" />
 <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-  <p className={`font-medium ${textPrimary}`}>Upload My Spec</p>
+  <p className={`font-medium ${textPrimary}`}>Select A File</p>
   <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
                     </label>
                   )}
