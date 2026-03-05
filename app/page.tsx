@@ -1575,25 +1575,29 @@ export default function BCometPlatform() {
           <div className="p-6">
             <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
               <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload Files</h3>
-              <div className="grid grid-cols-2 gap-6">
-                {/* Log File Upload */}
-                <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
-                  <input type="file" className="hidden" accept=".log,.txt" />
-                  <FileText className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                  <p className={`font-medium ${textPrimary}`}>Upload My Log File</p>
-                  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
-                </label>
-                
-                {/* FIX Spec - Always select from dropdown */}
-                <div>
-                  <div className={`border-2 ${borderColor} rounded-lg p-4`}>
-                    <div className="flex items-center gap-3 mb-3">
-                      <FileText className={`h-8 w-8 ${textSecondary}`} />
-                      <div>
-<p className={`font-medium ${textPrimary}`}>Select A File</p>
+<div className="grid grid-cols-2 gap-6">
+  {/* Log File Upload */}
+  <div>
+  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Upload My Log File</label>
+  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
+  <input type="file" className="hidden" accept=".log,.txt" />
+  <FileText className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+  <p className={`font-medium ${textPrimary}`}>Select A File</p>
+  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+  </label>
+  </div>
+  
+  {/* FIX Spec - Always select from dropdown */}
+  <div>
+  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Admin Spec</label>
+  <div className={`border-2 ${borderColor} rounded-lg p-4`}>
+  <div className="flex items-center gap-3 mb-3">
+  <FileText className={`h-8 w-8 ${textSecondary}`} />
+  <div>
+  <p className={`font-medium ${textPrimary}`}>Select A File</p>
   <p className={`text-xs ${textSecondary}`}>From Admin Specs</p>
-                      </div>
-                    </div>
+  </div>
+  </div>
                     <select 
                       defaultValue={selectedAssetClass && selectedFixVersion ? `${selectedAssetClass?.toLowerCase().replace(" ", "-")}-${selectedFixVersion?.split(" ")[1]?.toLowerCase()}` : ""}
                       className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}
