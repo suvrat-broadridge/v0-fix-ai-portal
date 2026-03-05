@@ -1574,7 +1574,7 @@ export default function BCometPlatform() {
 
           <div className="p-6">
             <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
-              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload Files</h3>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Choose Files</h3>
 <div className="grid grid-cols-2 gap-6">
   {/* Log File Upload */}
   <div>
