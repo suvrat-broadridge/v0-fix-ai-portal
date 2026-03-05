@@ -1581,7 +1581,7 @@ export default function BCometPlatform() {
   <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Upload My Log File</label>
   <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
   <input type="file" className="hidden" accept=".log,.txt" />
-  <FileText className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+  <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
   <p className={`font-medium ${textPrimary}`}>Select A File</p>
   <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
   </label>
@@ -1613,10 +1613,10 @@ export default function BCometPlatform() {
                   </div>
                 </div>
               </div>
-              <div className="mt-6 flex justify-center gap-4">
-                <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download Sample Log</Button>
-                <Button onClick={() => simulateTask(() => setShowLogResults(true))} disabled={isLoading}><Play className="h-4 w-4 mr-2" /> {isLoading ? "Processing..." : "Run Analysis"}</Button>
-              </div>
+<div className="mt-6 flex justify-center gap-4">
+  <Button onClick={() => simulateTask(() => setShowLogResults(true))} disabled={isLoading} className="bg-white text-black hover:bg-gray-100 border border-gray-300"><Play className="h-4 w-4 mr-2" /> {isLoading ? "Processing..." : "Run Analysis"}</Button>
+  <Button className="bg-white text-black hover:bg-gray-100 border border-gray-300"><Download className="h-4 w-4 mr-2" /> Download Analysis</Button>
+  </div>
             </Card>
 
             {showLogResults && (
