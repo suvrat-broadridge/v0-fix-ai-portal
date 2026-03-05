@@ -1439,7 +1439,7 @@ export default function BCometPlatform() {
                       <FileText className={`h-8 w-8 ${textSecondary}`} />
                       <div>
                         <p className={`font-medium ${textPrimary}`}>Select from Admin Specs</p>
-                        <p className={`text-xs ${textSecondary}`}>Managed in Admin Specs section</p>
+                        <p className={`text-xs ${textSecondary}`}>Choose a specification</p>
                       </div>
                     </div>
                     <select 
