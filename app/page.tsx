@@ -1465,18 +1465,17 @@ export default function BCometPlatform() {
 
             {showSpecResults && (
               <Card className={`${bgCard} p-6 border ${borderColor}`}>
-                <h2 className={`text-xl font-bold mb-6 ${textPrimary}`}>Comparison Results</h2>
-                
-                <div className="grid grid-cols-12 gap-4 mb-4">
-                  <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff]`}>My Spec</h3></div>
-                  <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff]`}>Admin Spec</h3></div>
-                  <div className="col-span-2"><h3 className={`font-bold text-[#00e5ff]`}>Action</h3></div>
-                </div>
-
-                {specCompareResults.map((section, i) => (
-                  <div key={section.id} className={`border-t ${borderColor} py-4`}>
-                    <h4 className={`font-semibold mb-3 ${textPrimary}`}>{i + 1}. {section.title}</h4>
-                    <div className="grid grid-cols-12 gap-4">
+<h2 className={`text-xl font-bold mb-6 ${textPrimary}`}>Comparison Results</h2>
+  
+  {specCompareResults.map((section, i) => (
+  <div key={section.id} className={`border-t ${borderColor} py-4`}>
+  <h4 className={`font-semibold mb-3 ${textPrimary}`}>{i + 1}. {section.title}</h4>
+  <div className="grid grid-cols-12 gap-4 mb-2">
+  <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff] text-sm`}>My Spec</h3></div>
+  <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff] text-sm`}>Admin Spec</h3></div>
+  <div className="col-span-2"><h3 className={`font-bold text-[#00e5ff] text-sm`}>Action</h3></div>
+  </div>
+  <div className="grid grid-cols-12 gap-4">
                       <div className={`col-span-5 p-3 rounded ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"}`}>
                         <pre className={`text-sm whitespace-pre-wrap ${textSecondary}`}>{section.left}</pre>
                       </div>
