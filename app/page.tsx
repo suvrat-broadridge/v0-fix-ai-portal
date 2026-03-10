@@ -1360,12 +1360,14 @@ export default function BCometPlatform() {
 
   // Spec Compare Screen
   if (currentScreen === "spec-compare") {
-    const specCompareResults = [
-      { id: "diff-1", title: "Undefined Message Types", left: "35=K, 35=H Undefined In Counterparty Spec", right: "35=DF, 35=L Undefined In Counterparty Spec" },
-      { id: "diff-2", title: "Unsupported Tags", left: "35=D: tags 375, 943\n35=G: tags 524, 133", right: "35=D: tags 111, 6454\n35=8: tags 5124, 1331" },
-      { id: "diff-3", title: "Unsupported Tag Values", left: "123=4, 7, 9\n56=24, 56, gh", right: "123=12, 55, 78\n76=5, 8, 0" },
-      { id: "diff-4", title: "Datatype Mismatch", left: "Tag 46 is String", right: "Tag 98 is Char" },
-    ]
+const specCompareResults = [
+  { id: "diff-1", title: "Undefined Message Types", left: "35=K, 35=H Undefined In Counterparty Spec", right: "35=DF, 35=L Undefined In Counterparty Spec" },
+  { id: "diff-2", title: "Unsupported Tags", left: "35=D: tags 375, 943\n35=G: tags 524, 133", right: "35=D: tags 111, 6454\n35=8: tags 5124, 1331" },
+  { id: "diff-3", title: "Unsupported Tag Values", left: "123=4, 7, 9\n56=24, 56, gh", right: "123=12, 55, 78\n76=5, 8, 0" },
+  { id: "diff-4", title: "Datatype Mismatch", left: "Tag 46 is String", right: "Tag 98 is Char" },
+  ]
+  
+  const allActionsSelected = specCompareResults.every(section => comparisonFlags[section.id]?.status !== null && comparisonFlags[section.id]?.status !== undefined)
     
     const updateFlag = (id: string, status: "ignore" | "customization" | "flag" | null) => {
       setComparisonFlags(prev => ({ ...prev, [id]: { ...prev[id], status, note: prev[id]?.note || "" } }))
@@ -1526,7 +1528,7 @@ export default function BCometPlatform() {
   <div className={`mt-6 pt-4 border-t ${borderColor} flex justify-between items-center`}>
   <div className="flex gap-4">
   <Button className="bg-white text-black hover:bg-gray-100 border border-gray-300"><Download className="h-4 w-4 mr-2" /> Download Comparison</Button>
-  <Button className="bg-white text-black hover:bg-gray-100 border border-gray-300"><Mail className="h-4 w-4 mr-2" /> Email Results</Button>
+  <Button className={`border border-gray-300 ${allActionsSelected ? "bg-white text-black hover:bg-gray-100" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`} disabled={!allActionsSelected}><Mail className="h-4 w-4 mr-2" /> Email Results</Button>
   </div>
   <Button onClick={() => setCurrentScreen("log-analysis")}>
   Next: Log Analysis <ChevronRight className="h-4 w-4 ml-2" />
