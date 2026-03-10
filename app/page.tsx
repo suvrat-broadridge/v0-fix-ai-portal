@@ -1382,7 +1382,7 @@ const specCompareResults = [
         <Sidebar />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-            <button onClick={() => isAdHocMode ? setCurrentScreen("dashboard") : setCurrentScreen("client-detail")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+            <button onClick={() => { setShowSpecResults(false); isAdHocMode ? setCurrentScreen("dashboard") : setCurrentScreen("client-detail"); }} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> Back
             </button>
             <h1 className={`text-2xl font-bold ${textPrimary}`}>Spec Comparison</h1>
@@ -1530,7 +1530,7 @@ const specCompareResults = [
   <Button className="bg-white text-black hover:bg-gray-100 border border-gray-300"><Download className="h-4 w-4 mr-2" /> Download Comparison</Button>
   <Button className={`border border-gray-300 ${allActionsSelected ? "bg-white text-black hover:bg-gray-100" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`} disabled={!allActionsSelected}><Mail className="h-4 w-4 mr-2" /> Email Results</Button>
   </div>
-  <Button onClick={() => setCurrentScreen("log-analysis")}>
+  <Button onClick={() => { setShowSpecResults(false); setCurrentScreen("log-analysis"); }}>
   Next: Log Analysis <ChevronRight className="h-4 w-4 ml-2" />
   </Button>
   </div>
