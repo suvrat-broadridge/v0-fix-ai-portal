@@ -1470,8 +1470,8 @@ export default function BCometPlatform() {
   <div key={section.id} className={`border-t ${borderColor} py-4`}>
   <h4 className={`font-semibold mb-3 ${textPrimary}`}>{i + 1}. {section.title}</h4>
   <div className="grid grid-cols-12 gap-4 mb-2">
-  <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff] text-sm`}>{section.title === "Undefined Message Types" ? "Undefined In My Spec" : section.title === "Unsupported Tags" || section.title === "Unsupported Tag Values" ? "Supported In My Spec" : "My Spec"}</h3></div>
-  <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff] text-sm`}>{section.title === "Undefined Message Types" ? "Undefined In Admin Spec" : section.title === "Unsupported Tags" || section.title === "Unsupported Tag Values" ? "Supported In Admin Spec" : "Admin Spec"}</h3></div>
+  <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff] text-sm`}>{section.title === "Undefined Message Types" || section.title === "Datatype Mismatch" ? "Defined In My Spec" : section.title === "Unsupported Tags" || section.title === "Unsupported Tag Values" ? "Supported In My Spec" : "My Spec"}</h3></div>
+  <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff] text-sm`}>{section.title === "Undefined Message Types" || section.title === "Datatype Mismatch" ? "Defined In Admin Spec" : section.title === "Unsupported Tags" || section.title === "Unsupported Tag Values" ? "Supported In Admin Spec" : "Admin Spec"}</h3></div>
   <div className="col-span-2"><h3 className={`font-bold text-[#00e5ff] text-sm`}>Action</h3></div>
   </div>
   <div className="grid grid-cols-12 gap-4">
