@@ -1361,7 +1361,7 @@ export default function BCometPlatform() {
   // Spec Compare Screen
   if (currentScreen === "spec-compare") {
     const specCompareResults = [
-      { id: "diff-1", title: "Undefined Message Types", left: "35=K, 35=H Undefined In My Spec", right: "35=DF, 35=L Undefined In Admin Spec" },
+      { id: "diff-1", title: "Undefined Message Types", left: "35=K, 35=H undefined", right: "35=DF, 35=L undefined" },
       { id: "diff-2", title: "Unsupported Tags", left: "35=D: tags 375, 943\n35=G: tags 524, 133", right: "35=D: tags 111, 6454\n35=8: tags 5124, 1331" },
       { id: "diff-3", title: "Unsupported Tag Values", left: "123=4, 7, 9\n56=24, 56, gh", right: "123=12, 55, 78\n76=5, 8, 0" },
       { id: "diff-4", title: "Datatype Mismatch", left: "Tag 46 is String", right: "Tag 98 is Char" },
