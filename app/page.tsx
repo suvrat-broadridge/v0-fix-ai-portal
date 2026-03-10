@@ -1511,12 +1511,12 @@ export default function BCometPlatform() {
                             <span className={`text-xs ${textSecondary}`}>Flag</span>
                           </label>
                         </div>
-                        <Input
-                          placeholder="Add note..."
-                          value={comparisonFlags[section.id]?.note || ""}
-                          onChange={(e) => updateNote(section.id, e.target.value)}
-                          className={`h-7 text-xs ${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
-                        />
+<Input
+  placeholder="Add note..."
+  value={comparisonFlags[section.id]?.note || ""}
+  onChange={(e) => updateNote(section.id, e.target.value)}
+  className={`h-7 text-xs ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-gray-300" : "text-gray-600"}`}
+  />
                       </div>
                     </div>
                   </div>
