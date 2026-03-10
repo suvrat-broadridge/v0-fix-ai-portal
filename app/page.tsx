@@ -442,7 +442,7 @@ export default function BCometPlatform() {
   ].filter(item => selectedRole && item.roles.includes(selectedRole)).map((item) => (
   <button
   key={item.label}
-  onClick={() => { setCurrentScreen(item.screen as any); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
+  onClick={() => { if (item.screen === "spec-compare" || item.screen === "spec-compare-overview") setShowSpecResults(false); setCurrentScreen(item.screen as any); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
   currentScreen === item.screen && isAdHocMode
   ? "bg-[#00e5ff]/10 text-[#00e5ff]"
@@ -1273,7 +1273,7 @@ export default function BCometPlatform() {
                               variant="outline" 
                               size="sm" 
                               className="flex-1"
-                              onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.version); setCurrentScreen("spec-compare"); setIsAdHocMode(false); }}
+                              onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.version); setShowSpecResults(false); setCurrentScreen("spec-compare"); setIsAdHocMode(false); }}
                               disabled={!version.clientSpec}
                             >
                               <GitCompare className="h-3 w-3 mr-1" /> Compare
@@ -1339,7 +1339,7 @@ export default function BCometPlatform() {
                 <Card 
                   key={tool.key}
                   className={`${bgCard} p-6 border ${borderColor} cursor-pointer hover:border-[#00e5ff] transition-colors`}
-                  onClick={() => { setCurrentScreen(tool.screen as any); setIsAdHocMode(false); }}
+                  onClick={() => { if (tool.screen === "spec-compare") setShowSpecResults(false); setCurrentScreen(tool.screen as any); setIsAdHocMode(false); }}
                 >
                   <div className="flex items-center gap-4 mb-4">
                     {tool.isLogo ? <tool.icon size={32} /> : <tool.icon className="h-8 w-8 text-[#00e5ff]" />}
@@ -1686,9 +1686,9 @@ const specCompareResults = [
 
                 {/* Navigation */}
                 <div className={`mt-6 pt-4 border-t ${borderColor} flex justify-between`}>
-                  <Button variant="outline" onClick={() => setCurrentScreen("spec-compare")}>
-                    <ChevronLeft className="h-4 w-4 mr-2" /> Back: Spec Compare
-                  </Button>
+<Button variant="outline" onClick={() => { setShowSpecResults(false); setCurrentScreen("spec-compare"); }}>
+  <ChevronLeft className="h-4 w-4 mr-2" /> Back: Spec Compare
+  </Button>
                   <Button onClick={() => setCurrentScreen("scenario-creation")}>
                     Next: Scenario Creation <ChevronRight className="h-4 w-4 ml-2" />
                   </Button>
@@ -2106,7 +2106,7 @@ const specCompareResults = [
                           ) : version.clientSpec.uploaded ? (
                             <Button 
                               size="sm"
-                              onClick={() => { setSelectedAssetClass(assetClass.asset); setCurrentScreen("spec-compare"); setIsAdHocMode(false); }}
+                              onClick={() => { setSelectedAssetClass(assetClass.asset); setShowSpecResults(false); setCurrentScreen("spec-compare"); setIsAdHocMode(false); }}
                               className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 text-xs"
                             >
                               <GitCompare className="h-3 w-3 mr-1" /> Compare
