@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "fix-msg-creator">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "fix-msg-creator">("home")
   const [settingsTab, setSettingsTab] = useState<"look-feel" | "general" | "security" | "mail" | "questionnaires" | "license">("general")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -435,7 +435,7 @@ export default function BCometPlatform() {
   {toolsExpanded && !sidebarCollapsed && (
   <div className="ml-4 mt-1 space-y-1 border-l border-[#1e4976]/50 pl-2">
   {[
-  { icon: GitCompare, label: "Spec Compare", screen: "spec-compare", roles: ["admin", "client"] },
+  { icon: GitCompare, label: "Spec Compare", screen: selectedRole === "client" ? "spec-compare-overview" : "spec-compare", roles: ["admin", "client"] },
   { icon: FileSearch, label: "Log Analysis", screen: "log-analysis", roles: ["admin", "client"] },
   { icon: Activity, label: "Scenario Creation", screen: "scenario-creation", roles: ["admin"] },
   { icon: MessageSquare, label: "FIX MSG Creator", screen: "fix-msg-creator", roles: ["admin", "client"] },
@@ -1073,9 +1073,9 @@ export default function BCometPlatform() {
                         </div>
                       </div>
                       <div className="mt-4 flex gap-3">
-                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("spec-compare")}>
-                          <GitCompare className="h-4 w-4 mr-2" /> Run Spec Compare
-                        </Button>
+<Button variant="outline" size="sm" onClick={() => setCurrentScreen("spec-compare-overview")}>
+  <GitCompare className="h-4 w-4 mr-2" /> Run Spec Compare
+  </Button>
                         <Button variant="outline" size="sm" onClick={() => setCurrentScreen("log-analysis")}>
                           <FileSearch className="h-4 w-4 mr-2" /> Run Log Analysis
                         </Button>
@@ -1970,6 +1970,164 @@ const specCompareResults = [
                 </div>
               </Card>
             )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Spec Compare Overview Screen - For clients to see all protocols and their comparison status
+  if (currentScreen === "spec-compare-overview") {
+    const specCompareOverviewData = [
+      { 
+        asset: "Equities", 
+        versions: [
+          { protocol: "FIX 4.2", adminSpec: { name: "EQ_FIX42_v1.2.xml", uploaded: true }, clientSpec: { name: "client_eq_42.xml", uploaded: true }, status: "complete" },
+          { protocol: "FIX 4.4", adminSpec: { name: "EQ_FIX44_v2.1.xml", uploaded: true }, clientSpec: { name: null, uploaded: false }, status: "not-started" },
+          { protocol: "FIX 5.0", adminSpec: { name: "EQ_FIX50_v1.0.xml", uploaded: true }, clientSpec: { name: "client_eq_50.xml", uploaded: true }, status: "not-verified" },
+        ]
+      },
+      { 
+        asset: "Options", 
+        versions: [
+          { protocol: "FIX 4.2", adminSpec: { name: "OPT_FIX42_v1.1.xml", uploaded: true }, clientSpec: { name: null, uploaded: false }, status: "not-started" },
+          { protocol: "FIX 4.4", adminSpec: { name: "OPT_FIX44_v2.0.xml", uploaded: true }, clientSpec: { name: "client_opt_44.xml", uploaded: true }, status: "complete" },
+        ]
+      },
+      { 
+        asset: "Futures", 
+        versions: [
+          { protocol: "FIX 4.2", adminSpec: { name: "FUT_FIX42_v1.0.xml", uploaded: true }, clientSpec: { name: null, uploaded: false }, status: "not-started" },
+          { protocol: "FIX 4.4", adminSpec: { name: "FUT_FIX44_v1.1.xml", uploaded: true }, clientSpec: { name: null, uploaded: false }, status: "not-started" },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "FUT_FIX50SP2_v2.0.xml", uploaded: true }, clientSpec: { name: "client_fut_50sp2.xml", uploaded: true }, status: "not-verified" },
+        ]
+      },
+    ]
+
+    const getStatusBadge = (status: string) => {
+      switch(status) {
+        case "complete":
+          return <span className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-[#4caf50]/20 text-[#4caf50] border border-[#4caf50]/30"><CheckCircle className="h-3 w-3" /> Complete</span>
+        case "not-verified":
+          return <span className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-[#ff9800]/20 text-[#ff9800] border border-[#ff9800]/30"><AlertTriangle className="h-3 w-3" /> Not Verified</span>
+        case "not-started":
+        default:
+          return <span className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-gray-500/20 text-gray-400 border border-gray-500/30"><Clock className="h-3 w-3" /> Not Started</span>
+      }
+    }
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Spec Comparison Overview</h1>
+            <p className={textSecondary}>Compare your specifications with admin specs by asset class</p>
+          </header>
+
+          <div className="p-6">
+            <div className="grid gap-6">
+              {specCompareOverviewData.map((assetClass) => (
+                <Card key={assetClass.asset} className={`${bgCard} border ${borderColor}`}>
+                  <div className={`px-6 py-4 border-b ${borderColor}`}>
+                    <h2 className={`text-lg font-bold ${textPrimary}`}>{assetClass.asset}</h2>
+                  </div>
+                  
+                  {/* Table Header */}
+                  <div className={`grid grid-cols-12 gap-4 px-6 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} border-b ${borderColor}`}>
+                    <div className={`col-span-2 font-semibold text-sm ${textPrimary}`}>Status</div>
+                    <div className={`col-span-2 font-semibold text-sm ${textPrimary}`}>Protocol</div>
+                    <div className={`col-span-3 font-semibold text-sm ${textPrimary}`}>Admin Spec</div>
+                    <div className={`col-span-3 font-semibold text-sm ${textPrimary}`}>My Spec</div>
+                    <div className={`col-span-2 font-semibold text-sm ${textPrimary}`}>Action</div>
+                  </div>
+                  
+                  {/* Table Rows */}
+                  <div className="divide-y divide-[#1e4976]/30">
+                    {assetClass.versions.map((version) => (
+                      <div 
+                        key={`${assetClass.asset}-${version.protocol}`}
+                        className={`grid grid-cols-12 gap-4 px-6 py-4 hover:bg-[#1e4976]/10 transition-colors items-center`}
+                      >
+                        {/* Status Column */}
+                        <div className="col-span-2">
+                          {getStatusBadge(version.status)}
+                        </div>
+                        
+                        {/* Protocol Column */}
+                        <div className={`col-span-2 font-medium ${textPrimary}`}>
+                          {version.protocol}
+                        </div>
+                        
+                        {/* Admin Spec Column */}
+                        <div className="col-span-3 flex items-center gap-2">
+                          <div className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor}`}>
+                            <FileText className={`h-4 w-4 ${textSecondary}`} />
+                            <span className={`text-sm ${textPrimary} truncate`}>{version.adminSpec.name}</span>
+                          </div>
+                        </div>
+                        
+                        {/* My Spec Column */}
+                        <div className="col-span-3 flex items-center gap-2">
+                          {version.clientSpec.uploaded ? (
+                            <>
+                              <div className={`flex items-center gap-2 px-3 py-1.5 rounded ${isDarkMode ? "bg-[#4caf50]/20" : "bg-[#4caf50]/10"} border border-[#4caf50]/30`}>
+                                <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                <span className={`text-sm ${textPrimary} truncate`}>{version.clientSpec.name}</span>
+                              </div>
+                              <label className={`cursor-pointer p-1.5 rounded hover:bg-[#1e4976]/30 ${textSecondary}`} title="Replace">
+                                <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+                                <Upload className="h-4 w-4" />
+                              </label>
+                            </>
+                          ) : (
+                            <label className={`cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded border-2 border-dashed ${borderColor} hover:border-[#00e5ff] transition-colors`}>
+                              <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+                              <Upload className={`h-4 w-4 ${textSecondary}`} />
+                              <span className={`text-sm ${textSecondary}`}>Upload My Spec</span>
+                            </label>
+                          )}
+                        </div>
+                        
+                        {/* Action Column */}
+                        <div className="col-span-2">
+                          {version.status === "complete" ? (
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => { setShowSpecResults(true); setCurrentScreen("spec-compare"); }}
+                              className="text-xs"
+                            >
+                              <Eye className="h-3 w-3 mr-1" /> View Results
+                            </Button>
+                          ) : version.clientSpec.uploaded ? (
+                            <Button 
+                              size="sm"
+                              onClick={() => { setSelectedAssetClass(assetClass.asset); setCurrentScreen("spec-compare"); setIsAdHocMode(false); }}
+                              className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 text-xs"
+                            >
+                              <GitCompare className="h-3 w-3 mr-1" /> Compare
+                            </Button>
+                          ) : (
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              disabled
+                              className="text-xs opacity-50"
+                            >
+                              <GitCompare className="h-3 w-3 mr-1" /> Compare
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
       </div>
