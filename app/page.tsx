@@ -46,6 +46,7 @@ export default function BCometPlatform() {
   const [fixMsgSelectedRow, setFixMsgSelectedRow] = useState<number | null>(null)
   const [fixMsgCopied, setFixMsgCopied] = useState(false)
   const [fixMsgSent, setFixMsgSent] = useState(false)
+  const [selectedAdminSpecForResults, setSelectedAdminSpecForResults] = useState<string | null>(null)
   const [demoFormData, setDemoFormData] = useState({
     name: "",
     email: "",
@@ -1382,7 +1383,7 @@ const specCompareResults = [
         <Sidebar />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-            <button onClick={() => { setShowSpecResults(false); isAdHocMode ? setCurrentScreen("dashboard") : setCurrentScreen("client-detail"); }} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+            <button onClick={() => { setShowSpecResults(false); setSelectedAdminSpecForResults(null); isAdHocMode ? setCurrentScreen("dashboard") : setCurrentScreen("client-detail"); }} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> Back
             </button>
             <h1 className={`text-2xl font-bold ${textPrimary}`}>Spec Comparison</h1>
@@ -1435,34 +1436,45 @@ const specCompareResults = [
                 
                 {/* Admin Spec - Always select from dropdown */}
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Admin Spec</label>
-                  <div className={`border-2 ${borderColor} rounded-lg p-4`}>
-                    <div className="flex items-center gap-3 mb-3">
-                      <FileText className={`h-8 w-8 ${textSecondary}`} />
-                      <div>
-                        <p className={`font-medium ${textPrimary}`}>Select From Admin Specs</p>
-                        <p className={`text-xs ${textSecondary}`}>Choose a specification</p>
-                      </div>
-                    </div>
-                    <select 
-                      defaultValue={selectedAssetClass && selectedFixVersion ? `${selectedAssetClass?.toLowerCase().replace(" ", "-")}-${selectedFixVersion?.split(" ")[1]?.toLowerCase()}` : ""}
-                      className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}
-                    >
-                      <option value="">Choose a spec...</option>
-                      <option value="equities-4.2">Equities - FIX 4.2 v1.2</option>
-                      <option value="equities-4.4">Equities - FIX 4.4 v2.1</option>
+<label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Admin Spec</label>
+  {showSpecResults && selectedAdminSpecForResults ? (
+  <div className={`border-2 ${borderColor} rounded-lg p-4`}>
+  <div className="flex items-center gap-3">
+  <div className={`flex items-center gap-2 px-3 py-2 rounded ${isDarkMode ? "bg-[#4caf50]/20" : "bg-[#4caf50]/10"} border border-[#4caf50]/30`}>
+  <CheckCircle className="h-5 w-5 text-[#4caf50]" />
+  <span className={`font-medium ${textPrimary}`}>{selectedAdminSpecForResults}</span>
+  </div>
+  </div>
+  </div>
+  ) : (
+  <div className={`border-2 ${borderColor} rounded-lg p-4`}>
+  <div className="flex items-center gap-3 mb-3">
+  <FileText className={`h-8 w-8 ${textSecondary}`} />
+  <div>
+  <p className={`font-medium ${textPrimary}`}>Select From Admin Specs</p>
+  <p className={`text-xs ${textSecondary}`}>Choose a specification</p>
+  </div>
+  </div>
+  <select
+  defaultValue={selectedAssetClass && selectedFixVersion ? `${selectedAssetClass?.toLowerCase().replace(" ", "-")}-${selectedFixVersion?.split(" ")[1]?.toLowerCase()}` : ""}
+  className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}
+  >
+  <option value="">Choose a spec...</option>
+  <option value="equities-4.2">Equities - FIX 4.2 v1.2</option>
+  <option value="equities-4.4">Equities - FIX 4.4 v2.1</option>
                       <option value="options-4.4">Options - FIX 4.4 v2.0</option>
-                      <option value="futures-5.0">Futures - FIX 5.0 SP2 v2.0</option>
-                      <option value="fixed income-4.4">Fixed Income - FIX 4.4 v1.2</option>
-                      <option value="fx-5.0">FX - FIX 5.0 SP2 v1.1</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-<div className="mt-6 flex justify-center gap-4">
+<option value="futures-5.0">Futures - FIX 5.0 SP2 v2.0</option>
+  <option value="fixed income-4.4">Fixed Income - FIX 4.4 v1.2</option>
+  <option value="fx-5.0">FX - FIX 5.0 SP2 v1.1</option>
+  </select>
+  </div>
+  )}
+  </div>
+  </div>
+  <div className="mt-6 flex justify-center gap-4">
   <Button onClick={() => simulateTask(() => setShowSpecResults(true))} disabled={isLoading} className="bg-white text-black hover:bg-gray-100 border border-gray-300"><Play className="h-4 w-4 mr-2" /> {isLoading ? "Processing..." : "Perform Comparison"}</Button>
   </div>
-            </Card>
+  </Card>
 
             {showSpecResults && (
               <Card className={`${bgCard} p-6 border ${borderColor}`}>
@@ -1530,7 +1542,7 @@ const specCompareResults = [
   <Button className="bg-white text-black hover:bg-gray-100 border border-gray-300"><Download className="h-4 w-4 mr-2" /> Download Comparison</Button>
   <Button className={`border border-gray-300 ${allActionsSelected ? "bg-white text-black hover:bg-gray-100" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`} disabled={!allActionsSelected}><Mail className="h-4 w-4 mr-2" /> Email Results</Button>
   </div>
-  <Button onClick={() => { setShowSpecResults(false); setCurrentScreen("log-analysis"); }}>
+  <Button onClick={() => { setShowSpecResults(false); setSelectedAdminSpecForResults(null); setCurrentScreen("log-analysis"); }}>
   Next: Log Analysis <ChevronRight className="h-4 w-4 ml-2" />
   </Button>
   </div>
@@ -2098,7 +2110,7 @@ const specCompareResults = [
                             <Button 
                               size="sm" 
                               variant="outline"
-                              onClick={() => { setShowSpecResults(true); setCurrentScreen("spec-compare"); }}
+                              onClick={() => { setShowSpecResults(true); setSelectedAdminSpecForResults(version.adminSpec.name); setSelectedAssetClass(assetClass.asset); setCurrentScreen("spec-compare"); setIsAdHocMode(false); }}
                               className="text-xs"
                             >
                               <Eye className="h-3 w-3 mr-1" /> View Results
