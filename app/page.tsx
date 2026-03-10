@@ -1459,7 +1459,6 @@ export default function BCometPlatform() {
               </div>
 <div className="mt-6 flex justify-center gap-4">
   <Button onClick={() => simulateTask(() => setShowSpecResults(true))} disabled={isLoading} className="bg-white text-black hover:bg-gray-100 border border-gray-300"><Play className="h-4 w-4 mr-2" /> {isLoading ? "Processing..." : "Perform Comparison"}</Button>
-  <Button className="bg-white text-black hover:bg-gray-100 border border-gray-300"><Download className="h-4 w-4 mr-2" /> Download Comparison</Button>
   </div>
             </Card>
 
@@ -1523,15 +1522,19 @@ export default function BCometPlatform() {
                   </div>
                 ))}
 
-                {/* Navigation */}
-                <div className={`mt-6 pt-4 border-t ${borderColor} flex justify-end`}>
-                  <Button onClick={() => setCurrentScreen("log-analysis")}>
-                    Next: Log Analysis <ChevronRight className="h-4 w-4 ml-2" />
-                  </Button>
-                </div>
-              </Card>
-            )}
-          </div>
+{/* Actions and Navigation */}
+  <div className={`mt-6 pt-4 border-t ${borderColor} flex justify-between items-center`}>
+  <div className="flex gap-4">
+  <Button className="bg-white text-black hover:bg-gray-100 border border-gray-300"><Download className="h-4 w-4 mr-2" /> Download Comparison</Button>
+  <Button className="bg-white text-black hover:bg-gray-100 border border-gray-300"><Mail className="h-4 w-4 mr-2" /> Email Results</Button>
+  </div>
+  <Button onClick={() => setCurrentScreen("log-analysis")}>
+  Next: Log Analysis <ChevronRight className="h-4 w-4 ml-2" />
+  </Button>
+  </div>
+  </Card>
+  )}
+  </div>
         </div>
       </div>
     )
