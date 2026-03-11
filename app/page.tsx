@@ -1296,31 +1296,31 @@ export default function BCometPlatform() {
   // Client Detail - Show Asset Classes
   if (currentScreen === "client-detail" && selectedClient) {
     // Client progress data with multiple FIX versions per asset class
-    const clientProgressData = [
-      { 
-        name: "Equities", 
-        alerts: 2,
-        versions: [
-          { protocol: "FIX 4.2", specCompare: "complete", logAnalysis: "complete", adminSpec: "EQ_FIX42_v1.2.xml", clientSpec: "client_eq_42.xml" },
-          { protocol: "FIX 4.4", specCompare: "in-progress", logAnalysis: "pending", adminSpec: "EQ_FIX44_v2.1.xml", clientSpec: "client_eq_44.xml" },
-        ]
-      },
-      { 
-        name: "Options", 
-        alerts: 0,
-        versions: [
-          { protocol: "FIX 4.4", specCompare: "complete", logAnalysis: "complete", adminSpec: "OPT_FIX44_v2.0.xml", clientSpec: "client_opt_44.xml" },
-        ]
-      },
-      { 
-        name: "Futures", 
-        alerts: 1,
-        versions: [
-          { protocol: "FIX 4.2", specCompare: "pending", logAnalysis: "pending", adminSpec: "FUT_FIX42_v1.0.xml", clientSpec: null },
-          { protocol: "FIX 5.0 SP2", specCompare: "in-progress", logAnalysis: "in-progress", adminSpec: "FUT_FIX50SP2_v2.0.xml", clientSpec: "client_fut_50sp2.xml" },
-        ]
-      },
-    ]
+const clientProgressData = [
+  {
+  name: "Equities",
+  alerts: 2,
+  versions: [
+  { protocol: "FIX 4.2", specCompare: "complete", logAnalysis: "complete", atdlValidation: "complete", adminSpec: "EQ_FIX42_v1.2.xml", clientSpec: "client_eq_42.xml" },
+  { protocol: "FIX 4.4", specCompare: "in-progress", logAnalysis: "pending", atdlValidation: "in-progress", adminSpec: "EQ_FIX44_v2.1.xml", clientSpec: "client_eq_44.xml" },
+  ]
+  },
+  {
+  name: "Options",
+  alerts: 0,
+  versions: [
+  { protocol: "FIX 4.4", specCompare: "complete", logAnalysis: "complete", atdlValidation: "complete", adminSpec: "OPT_FIX44_v2.0.xml", clientSpec: "client_opt_44.xml" },
+  ]
+  },
+  {
+  name: "Futures",
+  alerts: 1,
+  versions: [
+  { protocol: "FIX 4.2", specCompare: "pending", logAnalysis: "pending", atdlValidation: "pending", adminSpec: "FUT_FIX42_v1.0.xml", clientSpec: null },
+  { protocol: "FIX 5.0 SP2", specCompare: "in-progress", logAnalysis: "in-progress", atdlValidation: "pending", adminSpec: "FUT_FIX50SP2_v2.0.xml", clientSpec: "client_fut_50sp2.xml" },
+  ]
+  },
+  ]
     
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
@@ -1387,40 +1387,62 @@ export default function BCometPlatform() {
                             </div>
                           </div>
                           
-                          {/* Log Analysis Progress */}
-                          <div className="mb-4">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className={`text-sm ${textSecondary}`}>Log Analysis</span>
-                              {getStatusBadge(version.logAnalysis)}
-                            </div>
-                            <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
-                              <div 
-                                className={`h-full rounded-full transition-all ${version.logAnalysis === "complete" ? "bg-[#4caf50]" : version.logAnalysis === "in-progress" ? "bg-[#2196f3]" : "bg-[#9e9e9e]"}`}
-                                style={{ width: version.logAnalysis === "complete" ? "100%" : version.logAnalysis === "in-progress" ? "60%" : "0%" }}
-                              />
-                            </div>
-                          </div>
-                          
-                          {/* Action Buttons */}
-                          <div className="flex gap-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="flex-1"
-                              onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.version); setShowSpecResults(false); setCurrentScreen("spec-compare"); setIsAdHocMode(false); }}
-                              disabled={!version.clientSpec}
-                            >
-                              <GitCompare className="h-3 w-3 mr-1" /> Compare
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="flex-1"
-                              onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.version); setCurrentScreen("log-analysis"); setIsAdHocMode(false); }}
-                            >
-                              <FileSearch className="h-3 w-3 mr-1" /> Analyze
-                            </Button>
-                          </div>
+{/* Log Analysis Progress */}
+  <div className="mb-3">
+  <div className="flex items-center justify-between mb-1">
+  <span className={`text-sm ${textSecondary}`}>Log Analysis</span>
+  {getStatusBadge(version.logAnalysis)}
+  </div>
+  <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+  <div 
+  className={`h-full rounded-full transition-all ${version.logAnalysis === "complete" ? "bg-[#4caf50]" : version.logAnalysis === "in-progress" ? "bg-[#2196f3]" : "bg-[#9e9e9e]"}`}
+  style={{ width: version.logAnalysis === "complete" ? "100%" : version.logAnalysis === "in-progress" ? "60%" : "0%" }}
+  />
+  </div>
+  </div>
+  
+  {/* ATDL Validation Progress */}
+  <div className="mb-4">
+  <div className="flex items-center justify-between mb-1">
+  <span className={`text-sm ${textSecondary}`}>ATDL Validation</span>
+  {getStatusBadge(version.atdlValidation)}
+  </div>
+  <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+  <div 
+  className={`h-full rounded-full transition-all ${version.atdlValidation === "complete" ? "bg-[#4caf50]" : version.atdlValidation === "in-progress" ? "bg-[#2196f3]" : "bg-[#9e9e9e]"}`}
+  style={{ width: version.atdlValidation === "complete" ? "100%" : version.atdlValidation === "in-progress" ? "60%" : "0%" }}
+  />
+  </div>
+  </div>
+  
+{/* Action Buttons */}
+  <div className="flex gap-2">
+  <Button 
+  variant="outline" 
+  size="sm" 
+  className="flex-1"
+  onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.version); setShowSpecResults(false); setCurrentScreen("spec-compare"); setIsAdHocMode(false); }}
+  disabled={!version.clientSpec}
+  >
+  <GitCompare className="h-3 w-3 mr-1" /> Compare
+  </Button>
+  <Button 
+  variant="outline" 
+  size="sm" 
+  className="flex-1"
+  onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.version); setCurrentScreen("log-analysis"); setIsAdHocMode(false); }}
+  >
+  <FileSearch className="h-3 w-3 mr-1" /> Analyze
+  </Button>
+  <Button 
+  variant="outline" 
+  size="sm" 
+  className="flex-1"
+  onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.version); setCurrentScreen("atdl-viewer"); setIsAdHocMode(false); }}
+  >
+  <Cog className="h-3 w-3 mr-1" /> ATDL
+  </Button>
+  </div>
                         </div>
                       ))}
                     </div>
