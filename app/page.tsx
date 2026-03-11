@@ -1561,7 +1561,7 @@ const specCompareResults = [
               <div className="grid grid-cols-2 gap-6">
 {/* Client Spec */}
   <div>
-  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>{selectedRole === "client" ? "Select My Spec" : "Upload My Spec"}</label>
+  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>{selectedRole === "client" ? "Select My Spec" : "Select Client Spec"}</label>
   {selectedRole === "client" ? (
   <div className={`border-2 ${borderColor} rounded-lg p-4`}>
   <div className="flex items-center gap-3 mb-3">
@@ -1594,10 +1594,6 @@ const specCompareResults = [
                           <option value="v1">Previous Version v1.0</option>
                           <option value="v2">Previous Version v0.9</option>
                         </select>
-                        <label className={`cursor-pointer p-2 rounded border ${borderColor} hover:border-[#00e5ff] ${textSecondary} hover:text-[#00e5ff]`} title="Upload different spec">
-                          <input type="file" className="hidden" accept=".xml,.txt,.csv" />
-                          <Upload className="h-4 w-4" />
-                        </label>
                       </div>
                     </div>
                   ) : selectedRole === "admin" && isAdHocMode ? (
@@ -1643,8 +1639,14 @@ const specCompareResults = [
   </select>
   </div>
   </div>
-  <div className={`mt-2 p-2 rounded ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"} text-xs ${textSecondary}`}>
-  Available spec: <span className={textPrimary}>client_eq_44_v2.xml</span> (Uploaded: Jan 12, 2024)
+  <div>
+  <label className={`text-xs ${textSecondary} mb-1 block`}>Spec Version</label>
+  <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+  <option value="">Select spec version...</option>
+  <option value="v1.2">client_eq_44_v1.2.xml (Jan 15, 2024)</option>
+  <option value="v1.1">client_eq_44_v1.1.xml (Jan 10, 2024)</option>
+  <option value="v1.0">client_eq_44_v1.0.xml (Dec 20, 2023)</option>
+  </select>
   </div>
   </div>
   </div>
@@ -1660,7 +1662,7 @@ const specCompareResults = [
                 
                 {/* Admin Spec - Always select from dropdown */}
                 <div>
-<label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Admin Spec</label>
+<label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Select Admin Spec</label>
   {showSpecResults && selectedAdminSpecForResults ? (
   <div className={`border-2 ${borderColor} rounded-lg p-4`}>
   <div className="flex items-center gap-3">
@@ -1679,18 +1681,47 @@ const specCompareResults = [
   <p className={`text-xs ${textSecondary}`}>Choose a specification</p>
   </div>
   </div>
-  <select
-  defaultValue={selectedAssetClass && selectedFixVersion ? `${selectedAssetClass?.toLowerCase().replace(" ", "-")}-${selectedFixVersion?.split(" ")[1]?.toLowerCase()}` : ""}
+  <div className="space-y-3">
+  <div className="grid grid-cols-2 gap-3">
+  <div>
+  <label className={`text-xs ${textSecondary} mb-1 block`}>Asset Class</label>
+  <select 
+  defaultValue={selectedAssetClass?.toLowerCase() || ""}
   className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}
   >
-  <option value="">Choose a spec...</option>
-  <option value="equities-4.2">Equities - FIX 4.2 v1.2</option>
-  <option value="equities-4.4">Equities - FIX 4.4 v2.1</option>
-                      <option value="options-4.4">Options - FIX 4.4 v2.0</option>
-<option value="futures-5.0">Futures - FIX 5.0 SP2 v2.0</option>
-  <option value="fixed income-4.4">Fixed Income - FIX 4.4 v1.2</option>
-  <option value="fx-5.0">FX - FIX 5.0 SP2 v1.1</option>
+  <option value="">Select asset...</option>
+  <option value="equities">Equities</option>
+  <option value="options">Options</option>
+  <option value="futures">Futures</option>
+  <option value="fixed-income">Fixed Income</option>
+  <option value="fx">FX</option>
   </select>
+  </div>
+  <div>
+  <label className={`text-xs ${textSecondary} mb-1 block`}>FIX Version</label>
+  <select 
+  defaultValue={selectedFixVersion?.split(" ")[1]?.toLowerCase() || ""}
+  className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}
+  >
+  <option value="">Select version...</option>
+  <option value="4.2">FIX 4.2</option>
+  <option value="4.4">FIX 4.4</option>
+  <option value="5.0">FIX 5.0</option>
+  <option value="5.0sp2">FIX 5.0 SP2</option>
+  </select>
+  </div>
+  </div>
+  <div>
+  <label className={`text-xs ${textSecondary} mb-1 block`}>Spec Version</label>
+  <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+  <option value="">Select spec version...</option>
+  <option value="v2.1">Equities FIX 4.4 v2.1 (Current)</option>
+  <option value="v2.0">Equities FIX 4.4 v2.0</option>
+  <option value="v1.9">Equities FIX 4.4 v1.9</option>
+  <option value="v1.8">Equities FIX 4.4 v1.8</option>
+  </select>
+  </div>
+  </div>
   </div>
   )}
   </div>
