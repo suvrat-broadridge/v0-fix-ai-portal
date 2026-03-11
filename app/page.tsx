@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "fix-msg-creator">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl">("home")
   const [settingsTab, setSettingsTab] = useState<"look-feel" | "general" | "security" | "mail" | "questionnaires" | "license">("general")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -440,6 +440,9 @@ export default function BCometPlatform() {
   { icon: FileSearch, label: "Log Analysis", screen: "log-analysis", roles: ["admin", "client"] },
   { icon: Activity, label: "Scenario Creation", screen: "scenario-creation", roles: ["admin"] },
   { icon: MessageSquare, label: "FIX MSG Creator", screen: "fix-msg-creator", roles: ["admin", "client"] },
+  { icon: Cog, label: "ATDL Compare", screen: "atdl-compare", roles: ["admin", "client"] },
+  { icon: Cog, label: "FIX to ATDL Compare", screen: "fix-atdl-compare", roles: ["admin", "client"] },
+  { icon: Cog, label: "FIX to ATDL Convert", screen: "fix-to-atdl", roles: ["admin", "client"] },
   ].filter(item => selectedRole && item.roles.includes(selectedRole)).map((item) => (
   <button
   key={item.label}
@@ -1986,8 +1989,315 @@ const specCompareResults = [
         </div>
       </div>
     )
+}
+
+  // ATDL to ATDL Comparison Screen
+  if (currentScreen === "atdl-compare") {
+    const [atdlShowResults, setAtdlShowResults] = useState(false)
+    
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        {selectedRole && <Sidebar />}
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>ATDL to ATDL Comparison</h1>
+            <p className={textSecondary}>Compare two ATDL (Algorithmic Trading Definition Language) files</p>
+          </header>
+
+          <div className="p-6">
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Choose ATDL Files</h3>
+              
+              <div className="grid grid-cols-2 gap-6">
+                {/* Buy Side ATDL */}
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Buy Side ATDL</label>
+                  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
+                    <input type="file" className="hidden" accept=".xml,.atdl" />
+                    <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                    <p className={`font-medium ${textPrimary}`}>Select A File</p>
+                    <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+                  </label>
+                </div>
+                
+                {/* Sell Side ATDL */}
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Sell Side ATDL</label>
+                  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
+                    <input type="file" className="hidden" accept=".xml,.atdl" />
+                    <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                    <p className={`font-medium ${textPrimary}`}>Select A File</p>
+                    <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+                  </label>
+                </div>
+              </div>
+              
+              <div className="mt-6 flex justify-center gap-4">
+                <Button onClick={() => simulateTask(() => setAtdlShowResults(true))} disabled={isLoading} className="bg-white text-black hover:bg-gray-100 border border-gray-300">
+                  <Play className="h-4 w-4 mr-2" /> {isLoading ? "Processing..." : "Perform Comparison"}
+                </Button>
+              </div>
+            </Card>
+
+            {atdlShowResults && (
+              <Card className={`${bgCard} border ${borderColor} p-6 mt-6`}>
+                <h2 className={`text-xl font-bold mb-6 ${textPrimary}`}>ATDL Comparison Results</h2>
+                
+                {[
+                  { id: "atdl-1", title: "Strategy Differences", left: "VWAP, TWAP, POV defined", right: "VWAP, TWAP defined (POV missing)" },
+                  { id: "atdl-2", title: "Parameter Mismatches", left: "StartTime: UTCTimestamp", right: "StartTime: LocalMktTime" },
+                  { id: "atdl-3", title: "Control Type Differences", left: "MinQty: Spinner (min=100)", right: "MinQty: TextField (no validation)" },
+                  { id: "atdl-4", title: "Enum Value Differences", left: "Urgency: Low, Medium, High, Critical", right: "Urgency: 1, 2, 3" },
+                ].map((section, i) => (
+                  <div key={section.id} className={`border-t ${borderColor} py-4`}>
+                    <h4 className={`font-semibold mb-3 ${textPrimary}`}>{i + 1}. {section.title}</h4>
+                    <div className="grid grid-cols-12 gap-4 mb-2">
+                      <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff] text-sm`}>Buy Side ATDL</h3></div>
+                      <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff] text-sm`}>Sell Side ATDL</h3></div>
+                      <div className="col-span-2"><h3 className={`font-bold text-[#00e5ff] text-sm`}>Action</h3></div>
+                    </div>
+                    <div className="grid grid-cols-12 gap-4">
+                      <div className={`col-span-5 p-3 rounded ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"}`}>
+                        <p className={`text-sm ${textSecondary} whitespace-pre-line`}>{section.left}</p>
+                      </div>
+                      <div className={`col-span-5 p-3 rounded ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"}`}>
+                        <p className={`text-sm ${textSecondary} whitespace-pre-line`}>{section.right}</p>
+                      </div>
+                      <div className="col-span-2 flex flex-col gap-2">
+                        <Button size="sm" variant="outline" className="text-xs"><Eye className="h-3 w-3 mr-1" /> Review</Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                
+                <div className={`mt-6 pt-4 border-t ${borderColor} flex justify-between items-center`}>
+                  <div className="flex gap-4">
+                    <Button className="bg-white text-black hover:bg-gray-100 border border-gray-300"><Download className="h-4 w-4 mr-2" /> Download Report</Button>
+                    <Button className="bg-white text-black hover:bg-gray-100 border border-gray-300"><Mail className="h-4 w-4 mr-2" /> Email Results</Button>
+                  </div>
+                </div>
+              </Card>
+            )}
+          </div>
+        </div>
+      </div>
+    )
   }
 
+  // FIX to ATDL Comparison Screen
+  if (currentScreen === "fix-atdl-compare") {
+    const [fixAtdlShowResults, setFixAtdlShowResults] = useState(false)
+    
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        {selectedRole && <Sidebar />}
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>FIX Spec to ATDL Comparison</h1>
+            <p className={textSecondary}>Compare FIX specification algo section with generated ATDL</p>
+          </header>
+
+          <div className="p-6">
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Choose Files</h3>
+              
+              <div className="grid grid-cols-2 gap-6">
+                {/* FIX Spec */}
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>FIX Specification (Algo Section)</label>
+                  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
+                    <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+                    <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                    <p className={`font-medium ${textPrimary}`}>Select FIX Spec</p>
+                    <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+                  </label>
+                </div>
+                
+                {/* ATDL File */}
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>ATDL File</label>
+                  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
+                    <input type="file" className="hidden" accept=".xml,.atdl" />
+                    <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                    <p className={`font-medium ${textPrimary}`}>Select ATDL</p>
+                    <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+                  </label>
+                </div>
+              </div>
+              
+              <div className="mt-6 flex justify-center gap-4">
+                <Button onClick={() => simulateTask(() => setFixAtdlShowResults(true))} disabled={isLoading} className="bg-white text-black hover:bg-gray-100 border border-gray-300">
+                  <Play className="h-4 w-4 mr-2" /> {isLoading ? "Processing..." : "Perform Comparison"}
+                </Button>
+              </div>
+            </Card>
+
+            {fixAtdlShowResults && (
+              <Card className={`${bgCard} border ${borderColor} p-6 mt-6`}>
+                <h2 className={`text-xl font-bold mb-6 ${textPrimary}`}>FIX to ATDL Comparison Results</h2>
+                
+                {[
+                  { id: "fix-atdl-1", title: "Missing Strategies in ATDL", left: "Strategies: VWAP, TWAP, POV, IS, MOC", right: "Strategies: VWAP, TWAP (POV, IS, MOC missing)" },
+                  { id: "fix-atdl-2", title: "Parameter Mapping Issues", left: "Tag 847 (TargetStrategy) = VWAP", right: "strategy/@name = 'VWAP' (Correct mapping)" },
+                  { id: "fix-atdl-3", title: "Missing Parameters", left: "Tag 7940 (StartTime), Tag 7941 (EndTime)", right: "StartTime parameter defined, EndTime missing" },
+                  { id: "fix-atdl-4", title: "Datatype Inconsistencies", left: "Tag 7942 (ParticipationRate): Percentage", right: "ParticipationRate: Decimal (0-1 range)" },
+                ].map((section, i) => (
+                  <div key={section.id} className={`border-t ${borderColor} py-4`}>
+                    <h4 className={`font-semibold mb-3 ${textPrimary}`}>{i + 1}. {section.title}</h4>
+                    <div className="grid grid-cols-12 gap-4 mb-2">
+                      <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff] text-sm`}>FIX Specification</h3></div>
+                      <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff] text-sm`}>ATDL Definition</h3></div>
+                      <div className="col-span-2"><h3 className={`font-bold text-[#00e5ff] text-sm`}>Action</h3></div>
+                    </div>
+                    <div className="grid grid-cols-12 gap-4">
+                      <div className={`col-span-5 p-3 rounded ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"}`}>
+                        <p className={`text-sm ${textSecondary} whitespace-pre-line`}>{section.left}</p>
+                      </div>
+                      <div className={`col-span-5 p-3 rounded ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"}`}>
+                        <p className={`text-sm ${textSecondary} whitespace-pre-line`}>{section.right}</p>
+                      </div>
+                      <div className="col-span-2 flex flex-col gap-2">
+                        <Button size="sm" variant="outline" className="text-xs"><Eye className="h-3 w-3 mr-1" /> Review</Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                
+                <div className={`mt-6 pt-4 border-t ${borderColor} flex justify-between items-center`}>
+                  <div className="flex gap-4">
+                    <Button className="bg-white text-black hover:bg-gray-100 border border-gray-300"><Download className="h-4 w-4 mr-2" /> Download Report</Button>
+                    <Button className="bg-white text-black hover:bg-gray-100 border border-gray-300"><Mail className="h-4 w-4 mr-2" /> Email Results</Button>
+                  </div>
+                </div>
+              </Card>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // FIX to ATDL Conversion Screen
+  if (currentScreen === "fix-to-atdl") {
+    const [conversionComplete, setConversionComplete] = useState(false)
+    
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        {selectedRole && <Sidebar />}
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>FIX Spec to ATDL Conversion</h1>
+            <p className={textSecondary}>Convert FIX specification algo trading section into ATDL format</p>
+          </header>
+
+          <div className="p-6">
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload FIX Specification</h3>
+              
+              <div className="max-w-md mx-auto">
+                <label className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
+                  <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+                  <Upload className={`h-12 w-12 mx-auto mb-4 ${textSecondary}`} />
+                  <p className={`font-medium ${textPrimary}`}>Select FIX Specification</p>
+                  <p className={`text-xs mt-2 ${textSecondary}`}>Upload file containing algo trading definitions</p>
+                  <p className={`text-xs mt-1 ${textSecondary}`}>Supported formats: XML, TXT, CSV</p>
+                </label>
+              </div>
+              
+              <div className="mt-6">
+                <h4 className={`font-medium mb-3 ${textPrimary}`}>Conversion Options</h4>
+                <div className="grid grid-cols-2 gap-4 max-w-lg">
+                  <div>
+                    <label className={`block text-sm mb-1 ${textSecondary}`}>ATDL Version</label>
+                    <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+                      <option value="1.1">ATDL 1.1</option>
+                      <option value="1.0">ATDL 1.0</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className={`block text-sm mb-1 ${textSecondary}`}>Output Format</label>
+                    <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+                      <option value="xml">XML</option>
+                      <option value="json">JSON</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-6 flex justify-center gap-4">
+                <Button onClick={() => simulateTask(() => setConversionComplete(true))} disabled={isLoading} className="bg-white text-black hover:bg-gray-100 border border-gray-300">
+                  <Play className="h-4 w-4 mr-2" /> {isLoading ? "Converting..." : "Convert to ATDL"}
+                </Button>
+              </div>
+            </Card>
+
+            {conversionComplete && (
+              <Card className={`${bgCard} border ${borderColor} p-6 mt-6`}>
+                <div className="flex items-center gap-3 mb-6">
+                  <CheckCircle className="h-8 w-8 text-[#4caf50]" />
+                  <div>
+                    <h2 className={`text-xl font-bold ${textPrimary}`}>Conversion Complete</h2>
+                    <p className={textSecondary}>ATDL file generated successfully</p>
+                  </div>
+                </div>
+                
+                <div className={`border ${borderColor} rounded-lg p-4 mb-6`}>
+                  <h4 className={`font-medium mb-3 ${textPrimary}`}>Conversion Summary</h4>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className={`${textSecondary}`}>Strategies Converted:</div>
+                    <div className={`${textPrimary} font-medium`}>5 (VWAP, TWAP, POV, IS, MOC)</div>
+                    <div className={`${textSecondary}`}>Total Parameters:</div>
+                    <div className={`${textPrimary} font-medium`}>23</div>
+                    <div className={`${textSecondary}`}>UI Controls Generated:</div>
+                    <div className={`${textPrimary} font-medium`}>18 (Spinners, Dropdowns, Checkboxes)</div>
+                    <div className={`${textSecondary}`}>Validation Rules:</div>
+                    <div className={`${textPrimary} font-medium`}>12</div>
+                  </div>
+                </div>
+
+                <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} rounded-lg p-4 mb-6 max-h-64 overflow-auto`}>
+                  <h4 className={`font-medium mb-2 ${textPrimary}`}>ATDL Preview</h4>
+                  <pre className={`text-xs ${textSecondary} font-mono`}>{`<?xml version="1.0" encoding="UTF-8"?>
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
+            xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+            xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow">
+  
+  <Strategy name="VWAP" uiRep="VWAP" wireValue="VWAP">
+    <Description>Volume Weighted Average Price</Description>
+    <Parameter name="StartTime" xsi:type="UTCTimestamp_t" 
+               fixTag="7940" use="required"/>
+    <Parameter name="EndTime" xsi:type="UTCTimestamp_t" 
+               fixTag="7941" use="required"/>
+    <Parameter name="ParticipationRate" xsi:type="Percentage_t"
+               fixTag="7942" minValue="0.01" maxValue="0.50"/>
+    ...
+  </Strategy>
+</Strategies>`}</pre>
+                </div>
+                
+                <div className="flex justify-center gap-4">
+                  <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80"><Download className="h-4 w-4 mr-2" /> Download ATDL</Button>
+                  <Button className="bg-white text-black hover:bg-gray-100 border border-gray-300"><Mail className="h-4 w-4 mr-2" /> Email ATDL</Button>
+                  <Button variant="outline"><Eye className="h-4 w-4 mr-2" /> View Full ATDL</Button>
+                </div>
+              </Card>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+  
   // Spec Compare Overview Screen - For clients to see all protocols and their comparison status
   if (currentScreen === "spec-compare-overview") {
     const specCompareOverviewData = [
