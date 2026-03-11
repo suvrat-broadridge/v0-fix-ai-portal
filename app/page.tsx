@@ -463,14 +463,14 @@ export default function BCometPlatform() {
   </button>
   ))}
   
-  {/* ATDL Tools Sub-section */}
+  {/* ATDL Validation Sub-section */}
   <button
   onClick={() => setAtdlToolsExpanded(!atdlToolsExpanded)}
   className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors text-sm ${textSecondary} hover:bg-[#1e4976]/30`}
   >
   <div className="flex items-center gap-3">
   <Cog className="h-4 w-4" />
-  <span>ATDL Tools</span>
+  <span>ATDL Validation</span>
   </div>
   <ChevronDown className={`h-3 w-3 transition-transform ${atdlToolsExpanded ? "rotate-180" : ""}`} />
   </button>
@@ -1171,7 +1171,7 @@ export default function BCometPlatform() {
                         {/* ATDL Viewer */}
                         <div className={`p-3 rounded-lg border ${borderColor}`}>
                           <div className="flex items-center justify-between mb-2">
-                            <span className={`text-xs font-medium ${textPrimary}`}>ATDL Tools</span>
+                            <span className={`text-xs font-medium ${textPrimary}`}>ATDL Validation</span>
                             {getStatusBadge(asset.atdlViewer)}
                           </div>
                           <div className={`h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
@@ -1208,7 +1208,7 @@ export default function BCometPlatform() {
                           <Award className="h-4 w-4 mr-1" /> Certification
                         </Button>
                         <Button variant="outline" size="sm" onClick={() => setCurrentScreen("atdl-viewer")}>
-                          <Cog className="h-4 w-4 mr-1" /> ATDL Tools
+                          <Cog className="h-4 w-4 mr-1" /> ATDL Validation
                         </Button>
                         <Button variant="outline" size="sm" onClick={() => setCurrentScreen("fix-msg-creator")}>
                           <MessageSquare className="h-4 w-4 mr-1" /> FIX MSG
