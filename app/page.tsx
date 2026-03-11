@@ -1526,6 +1526,15 @@ const specCompareResults = [
   { id: "diff-3", title: "Unsupported Tag Values", left: "123=4, 7, 9\n56=24, 56, gh", right: "123=12, 55, 78\n76=5, 8, 0" },
   { id: "diff-4", title: "Datatype Mismatch", left: "Tag 46 is String", right: "Tag 98 is Char" },
   ]
+
+  // All specs for this client when "Show All Specs" is clicked
+  const allClientSpecs = [
+    { asset: "Equities", protocol: "FIX 4.2", adminSpec: "EQ_FIX42_v1.2.xml", adminVersion: "v1.2", clientSpec: "client_eq_42_v1.1.xml", clientVersion: "v1.1", status: "complete", differences: 3 },
+    { asset: "Equities", protocol: "FIX 4.4", adminSpec: "EQ_FIX44_v2.1.xml", adminVersion: "v2.1", clientSpec: "client_eq_44_v1.2.xml", clientVersion: "v1.2", status: "in-progress", differences: 7 },
+    { asset: "Options", protocol: "FIX 4.4", adminSpec: "OPT_FIX44_v2.0.xml", adminVersion: "v2.0", clientSpec: "client_opt_44_v1.0.xml", clientVersion: "v1.0", status: "complete", differences: 2 },
+    { asset: "Futures", protocol: "FIX 4.2", adminSpec: "FUT_FIX42_v1.0.xml", adminVersion: "v1.0", clientSpec: null, clientVersion: null, status: "pending", differences: 0 },
+    { asset: "Futures", protocol: "FIX 5.0 SP2", adminSpec: "FUT_FIX50SP2_v2.0.xml", adminVersion: "v2.0", clientSpec: "client_fut_50sp2_v1.0.xml", clientVersion: "v1.0", status: "in-progress", differences: 5 },
+  ]
   
   const allActionsSelected = specCompareResults.every(section => comparisonFlags[section.id]?.status !== null && comparisonFlags[section.id]?.status !== undefined)
     
@@ -1536,28 +1545,255 @@ const specCompareResults = [
     const updateNote = (id: string, note: string) => {
       setComparisonFlags(prev => ({ ...prev, [id]: { ...prev[id], note, status: prev[id]?.status || null } }))
     }
-    
+
+    // Client-specific flow: When coming from Dashboard -> Client -> Compare
+    if (!isAdHocMode && selectedClient && selectedAssetClass) {
+      return (
+        <div className={`min-h-screen ${bgPrimary} flex`}>
+          <Sidebar />
+          <div className="flex-1 overflow-auto">
+            <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+              <button onClick={() => { setShowSpecResults(false); setSelectedAdminSpecForResults(null); setCurrentScreen("client-detail"); }} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+                <ArrowLeft className="h-4 w-4" /> Back to {selectedClient.name}
+              </button>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className={`text-2xl font-bold ${textPrimary}`}>Spec Comparison</h1>
+                  <p className={`text-sm ${textSecondary}`}>
+                    Client: <span className="text-[#00e5ff] font-medium">{selectedClient.name}</span>
+                    {selectedAssetClass && <> | Asset Class: <span className="text-[#00e5ff] font-medium">{selectedAssetClass}</span></>}
+                    {selectedFixVersion && <> | FIX Version: <span className="text-[#00e5ff] font-medium">{selectedFixVersion}</span></>}
+                  </p>
+                </div>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowSpecResults(!showSpecResults)}
+                  className={showSpecResults ? "bg-[#00e5ff]/10 border-[#00e5ff] text-[#00e5ff]" : ""}
+                >
+                  <Eye className="h-4 w-4 mr-2" /> {showSpecResults ? "Hide All Specs" : "Show All Specs"}
+                </Button>
+              </div>
+            </header>
+
+            <div className="p-6">
+              {/* Show All Specs View */}
+              {showSpecResults && (
+                <Card className={`${bgCard} border ${borderColor} mb-6`}>
+                  <div className={`px-6 py-4 border-b ${borderColor}`}>
+                    <h2 className={`text-lg font-bold ${textPrimary}`}>All Spec Comparisons for {selectedClient.name}</h2>
+                  </div>
+                  
+                  {/* Table Header */}
+                  <div className={`grid grid-cols-12 gap-4 px-6 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} border-b ${borderColor}`}>
+                    <div className={`col-span-2 font-semibold text-sm ${textPrimary}`}>Asset / Protocol</div>
+                    <div className={`col-span-3 font-semibold text-sm ${textPrimary}`}>Admin Spec</div>
+                    <div className={`col-span-3 font-semibold text-sm ${textPrimary}`}>Client Spec</div>
+                    <div className={`col-span-2 font-semibold text-sm ${textPrimary}`}>Status</div>
+                    <div className={`col-span-2 font-semibold text-sm ${textPrimary}`}>Actions</div>
+                  </div>
+                  
+                  {/* Spec Rows */}
+                  <div className="divide-y divide-[#1e4976]/30">
+                    {allClientSpecs.map((spec, i) => (
+                      <div key={i} className={`grid grid-cols-12 gap-4 px-6 py-4 hover:bg-[#1e4976]/10 transition-colors items-center ${spec.asset === selectedAssetClass && spec.protocol === selectedFixVersion ? "bg-[#00e5ff]/5 border-l-2 border-[#00e5ff]" : ""}`}>
+                        {/* Asset/Protocol */}
+                        <div className="col-span-2">
+                          <p className={`font-medium ${textPrimary}`}>{spec.asset}</p>
+                          <p className={`text-xs ${textSecondary}`}>{spec.protocol}</p>
+                        </div>
+                        
+                        {/* Admin Spec */}
+                        <div className="col-span-3">
+                          <div className="flex items-center gap-2">
+                            <select className={`flex-1 p-1.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+                              <option value={spec.adminVersion}>{spec.adminSpec}</option>
+                              <option value="prev">Previous version</option>
+                            </select>
+                          </div>
+                        </div>
+                        
+                        {/* Client Spec */}
+                        <div className="col-span-3">
+                          {spec.clientSpec ? (
+                            <div className="flex items-center gap-2">
+                              <select className={`flex-1 p-1.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+                                <option value={spec.clientVersion}>{spec.clientSpec}</option>
+                                <option value="prev">Previous version</option>
+                              </select>
+                            </div>
+                          ) : (
+                            <span className={`text-xs ${textSecondary}`}>No spec uploaded</span>
+                          )}
+                        </div>
+                        
+                        {/* Status */}
+                        <div className="col-span-2">
+                          <div className="flex items-center gap-2">
+                            {getStatusBadge(spec.status)}
+                            {spec.differences > 0 && (
+                              <span className={`text-xs ${textSecondary}`}>{spec.differences} diff</span>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {/* Actions */}
+                        <div className="col-span-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="text-xs"
+                            disabled={!spec.clientSpec}
+                            onClick={() => { setSelectedAssetClass(spec.asset); setSelectedFixVersion(spec.protocol); setShowSpecResults(false); }}
+                          >
+                            <GitCompare className="h-3 w-3 mr-1" /> Compare
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              )}
+
+              {/* Current Spec Comparison - Pre-loaded */}
+              <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className={`text-lg font-bold ${textPrimary}`}>Comparing: {selectedAssetClass} - {selectedFixVersion}</h3>
+                  <span className={`px-3 py-1 rounded text-xs ${isDarkMode ? "bg-[#2196f3]/20 text-[#2196f3]" : "bg-[#2196f3]/10 text-[#2196f3]"}`}>Pre-loaded</span>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-6">
+                  {/* Client Spec - Pre-loaded */}
+                  <div className={`border-2 ${borderColor} rounded-lg p-4`}>
+                    <div className="flex items-center justify-between mb-3">
+                      <label className={`text-sm font-medium ${textPrimary}`}>Client Spec</label>
+                      <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                    </div>
+                    <div className={`flex items-center gap-3 p-3 rounded ${isDarkMode ? "bg-[#4caf50]/10" : "bg-[#4caf50]/5"} border border-[#4caf50]/30 mb-3`}>
+                      <FileText className={`h-6 w-6 text-[#4caf50]`} />
+                      <div>
+                        <p className={`font-medium text-sm ${textPrimary}`}>{selectedClient.name} - {selectedAssetClass}</p>
+                        <p className={`text-xs ${textSecondary}`}>{selectedFixVersion}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <label className={`text-xs ${textSecondary} mb-1 block`}>Version</label>
+                      <select className={`w-full p-2 rounded border ${borderColor} text-sm ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+                        <option value="v1.2">client_eq_44_v1.2.xml (Current)</option>
+                        <option value="v1.1">client_eq_44_v1.1.xml (Jan 10)</option>
+                        <option value="v1.0">client_eq_44_v1.0.xml (Dec 20)</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  {/* Admin Spec - Pre-loaded */}
+                  <div className={`border-2 ${borderColor} rounded-lg p-4`}>
+                    <div className="flex items-center justify-between mb-3">
+                      <label className={`text-sm font-medium ${textPrimary}`}>Admin Spec</label>
+                      <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                    </div>
+                    <div className={`flex items-center gap-3 p-3 rounded ${isDarkMode ? "bg-[#4caf50]/10" : "bg-[#4caf50]/5"} border border-[#4caf50]/30 mb-3`}>
+                      <FileText className={`h-6 w-6 text-[#4caf50]`} />
+                      <div>
+                        <p className={`font-medium text-sm ${textPrimary}`}>{selectedAssetClass} - {selectedFixVersion}</p>
+                        <p className={`text-xs ${textSecondary}`}>Admin Reference Spec</p>
+                      </div>
+                    </div>
+                    <div>
+                      <label className={`text-xs ${textSecondary} mb-1 block`}>Version</label>
+                      <select className={`w-full p-2 rounded border ${borderColor} text-sm ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+                        <option value="v2.1">{selectedAssetClass} {selectedFixVersion} v2.1 (Current)</option>
+                        <option value="v2.0">{selectedAssetClass} {selectedFixVersion} v2.0</option>
+                        <option value="v1.9">{selectedAssetClass} {selectedFixVersion} v1.9</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-4 flex justify-center">
+                  <Button onClick={() => simulateTask(() => {})} disabled={isLoading} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
+                    <Play className="h-4 w-4 mr-2" /> {isLoading ? "Comparing..." : "Run Comparison"}
+                  </Button>
+                </div>
+              </Card>
+
+              {/* Comparison Results */}
+              <Card className={`${bgCard} border ${borderColor}`}>
+                <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
+                  <h3 className={`text-lg font-bold ${textPrimary}`}>Comparison Results</h3>
+                  <div className="flex gap-2">
+                    <span className="px-2 py-1 rounded text-xs bg-[#f44336]/20 text-[#f44336]">4 Differences Found</span>
+                  </div>
+                </div>
+                
+                <div className="p-6 space-y-4">
+                  {specCompareResults.map((section) => (
+                    <div key={section.id} className={`rounded-lg border ${borderColor} overflow-hidden`}>
+                      <div className={`${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"} px-4 py-3 flex items-center justify-between`}>
+                        <h4 className={`font-semibold ${textPrimary}`}>{section.title}</h4>
+                        <div className="flex items-center gap-2">
+                          {comparisonFlags[section.id]?.status && (
+                            <span className={`px-2 py-1 rounded text-xs ${
+                              comparisonFlags[section.id]?.status === "ignore" ? "bg-gray-500/20 text-gray-400" :
+                              comparisonFlags[section.id]?.status === "customization" ? "bg-[#2196f3]/20 text-[#2196f3]" :
+                              "bg-[#f44336]/20 text-[#f44336]"
+                            }`}>
+                              {comparisonFlags[section.id]?.status === "ignore" ? "Ignored" : comparisonFlags[section.id]?.status === "customization" ? "Customization" : "Flagged"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 divide-x divide-[#1e4976]/30">
+                        <div className={`p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
+                          <p className={`text-xs font-medium mb-2 ${textSecondary}`}>Client Spec</p>
+                          <p className={`text-sm whitespace-pre-line ${textPrimary}`}>{section.left}</p>
+                        </div>
+                        <div className={`p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
+                          <p className={`text-xs font-medium mb-2 ${textSecondary}`}>Admin Spec</p>
+                          <p className={`text-sm whitespace-pre-line ${textPrimary}`}>{section.right}</p>
+                        </div>
+                      </div>
+                      <div className={`px-4 py-3 border-t ${borderColor} flex items-center justify-between gap-4`}>
+                        <div className="flex gap-2">
+                          <Button size="sm" variant={comparisonFlags[section.id]?.status === "ignore" ? "default" : "outline"} onClick={() => updateFlag(section.id, "ignore")} className="text-xs">Ignore</Button>
+                          <Button size="sm" variant={comparisonFlags[section.id]?.status === "customization" ? "default" : "outline"} onClick={() => updateFlag(section.id, "customization")} className="text-xs">Customization</Button>
+                          <Button size="sm" variant={comparisonFlags[section.id]?.status === "flag" ? "default" : "outline"} onClick={() => updateFlag(section.id, "flag")} className="text-xs">Flag</Button>
+                        </div>
+                        <Input placeholder="Add note..." value={comparisonFlags[section.id]?.note || ""} onChange={(e) => updateNote(section.id, e.target.value)} className={`flex-1 max-w-xs text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className={`px-6 py-4 border-t ${borderColor} flex justify-between items-center`}>
+                  <span className={`text-sm ${textSecondary}`}>{Object.keys(comparisonFlags).filter(k => comparisonFlags[k]?.status).length} of {specCompareResults.length} differences resolved</span>
+                  <div className="flex gap-3">
+                    <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Export Report</Button>
+                    <Button disabled={!allActionsSelected} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80"><CheckCircle className="h-4 w-4 mr-2" /> Complete Review</Button>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    // Ad-hoc Mode: Tools -> Spec Compare (select any specs)
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-            <button onClick={() => { setShowSpecResults(false); setSelectedAdminSpecForResults(null); isAdHocMode ? setCurrentScreen("dashboard") : setCurrentScreen("client-detail"); }} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+            <button onClick={() => { setShowSpecResults(false); setSelectedAdminSpecForResults(null); setCurrentScreen("dashboard"); }} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> Back
             </button>
             <h1 className={`text-2xl font-bold ${textPrimary}`}>Spec Comparison</h1>
-            {!isAdHocMode && selectedClient && (
-              <p className={`text-sm ${textSecondary}`}>
-                Client: <span className="text-[#00e5ff] font-medium">{selectedClient.name}</span>
-                {selectedAssetClass && <> | Asset Class: <span className="text-[#00e5ff] font-medium">{selectedAssetClass}</span></>}
-                {selectedFixVersion && <> | FIX Version: <span className="text-[#00e5ff] font-medium">{selectedFixVersion}</span></>}
-              </p>
-            )}
+            <p className={textSecondary}>Compare any admin spec with any client spec</p>
           </header>
 
           <div className="p-6">
             <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
-              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Specifications</h3>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Select Specifications</h3>
               <div className="grid grid-cols-2 gap-6">
 {/* Client Spec */}
   <div>
@@ -1579,24 +1815,7 @@ const specCompareResults = [
   <option value="client_fut_50sp2_v1">Futures - FIX 5.0 SP2 (client_fut_50sp2_v1.xml)</option>
   </select>
   </div>
-  ) : !isAdHocMode && selectedClient && selectedAssetClass ? (
-  <div className={`border-2 ${borderColor} rounded-lg p-4`}>
-  <div className="flex items-center gap-3 mb-3">
-  <FileText className={`h-8 w-8 ${textSecondary}`} />
-  <div>
-  <p className={`font-medium ${textPrimary}`}>{selectedClient.name} - {selectedAssetClass}</p>
-  <p className={`text-xs ${textSecondary}`}>{selectedFixVersion} Spec (Pre-loaded)</p>
-  </div>
-  </div>
-                      <div className="flex items-center gap-2">
-                        <select className={`flex-1 p-2 rounded border ${borderColor} text-sm ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
-                          <option value="current">Current Version (Pre-loaded)</option>
-                          <option value="v1">Previous Version v1.0</option>
-                          <option value="v2">Previous Version v0.9</option>
-                        </select>
-                      </div>
-                    </div>
-                  ) : selectedRole === "admin" && isAdHocMode ? (
+  ) : (
   <div className={`border-2 ${borderColor} rounded-lg p-4`}>
   <div className="flex items-center gap-3 mb-3">
   <FileText className={`h-8 w-8 ${textSecondary}`} />
@@ -1650,14 +1869,7 @@ const specCompareResults = [
   </div>
   </div>
   </div>
-  ) : (
-                    <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
-                      <input type="file" className="hidden" accept=".xml,.txt,.csv" />
-<Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-  <p className={`font-medium ${textPrimary}`}>Select A File</p>
-  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
-                    </label>
-                  )}
+  )}
                 </div>
                 
                 {/* Admin Spec - Always select from dropdown */}
@@ -1686,7 +1898,6 @@ const specCompareResults = [
   <div>
   <label className={`text-xs ${textSecondary} mb-1 block`}>Asset Class</label>
   <select 
-  defaultValue={selectedAssetClass?.toLowerCase() || ""}
   className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}
   >
   <option value="">Select asset...</option>
@@ -1700,7 +1911,6 @@ const specCompareResults = [
   <div>
   <label className={`text-xs ${textSecondary} mb-1 block`}>FIX Version</label>
   <select 
-  defaultValue={selectedFixVersion?.split(" ")[1]?.toLowerCase() || ""}
   className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}
   >
   <option value="">Select version...</option>
