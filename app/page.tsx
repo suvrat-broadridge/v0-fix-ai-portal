@@ -47,6 +47,9 @@ export default function BCometPlatform() {
   const [fixMsgCopied, setFixMsgCopied] = useState(false)
   const [fixMsgSent, setFixMsgSent] = useState(false)
   const [selectedAdminSpecForResults, setSelectedAdminSpecForResults] = useState<string | null>(null)
+  const [atdlShowResults, setAtdlShowResults] = useState(false)
+  const [fixAtdlShowResults, setFixAtdlShowResults] = useState(false)
+  const [conversionComplete, setConversionComplete] = useState(false)
   const [demoFormData, setDemoFormData] = useState({
     name: "",
     email: "",
@@ -1993,7 +1996,6 @@ const specCompareResults = [
 
   // ATDL to ATDL Comparison Screen
   if (currentScreen === "atdl-compare") {
-    const [atdlShowResults, setAtdlShowResults] = useState(false)
     
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
@@ -2089,7 +2091,6 @@ const specCompareResults = [
 
   // FIX to ATDL Comparison Screen
   if (currentScreen === "fix-atdl-compare") {
-    const [fixAtdlShowResults, setFixAtdlShowResults] = useState(false)
     
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
@@ -2185,7 +2186,6 @@ const specCompareResults = [
 
   // FIX to ATDL Conversion Screen
   if (currentScreen === "fix-to-atdl") {
-    const [conversionComplete, setConversionComplete] = useState(false)
     
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
