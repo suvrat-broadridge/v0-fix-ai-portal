@@ -56,6 +56,8 @@ export default function BCometPlatform() {
   const [atdlFixMessageGenerated, setAtdlFixMessageGenerated] = useState(false)
   const [atdlFixValidationResults, setAtdlFixValidationResults] = useState(false)
   const [atdlSelectedStrategy, setAtdlSelectedStrategy] = useState("VWAP")
+  const [atdlSelectedFile, setAtdlSelectedFile] = useState("AlgoSuite_Complete_v1.5.atdl")
+  const [atdlSelectedFixSpec, setAtdlSelectedFixSpec] = useState("equities-4.4")
   const [demoFormData, setDemoFormData] = useState({
     name: "",
     email: "",
@@ -2142,11 +2144,27 @@ const specCompareResults = [
   <Card className={`${bgCard} border ${borderColor} p-6`}>
   <div className="flex items-center justify-between mb-4">
   <h3 className={`text-lg font-bold ${textPrimary}`}>2. ATDL UI Representation</h3>
+  <div className="flex items-center gap-3">
   <div className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
-  <FileText className={`h-4 w-4 ${textSecondary}`} />
+  <Cog className={`h-4 w-4 ${textSecondary}`} />
   <div className="text-xs">
-  <span className={textSecondary}>Spec: </span>
-  <span className={`font-medium ${textPrimary}`}>Equities FIX 4.4 v2.1</span>
+  <span className={textSecondary}>ATDL: </span>
+  <span className={`font-medium ${textPrimary}`}>{atdlSelectedFile}</span>
+  </div>
+  </div>
+  <div className={`flex items-center gap-2 px-2 py-1 rounded border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
+  <FileText className={`h-4 w-4 ${textSecondary}`} />
+  <select 
+  value={atdlSelectedFixSpec}
+  onChange={(e) => setAtdlSelectedFixSpec(e.target.value)}
+  className={`text-xs border-0 bg-transparent ${textPrimary} focus:outline-none cursor-pointer`}
+  >
+  <option value="equities-4.2">Equities FIX 4.2 v1.2</option>
+  <option value="equities-4.4">Equities FIX 4.4 v2.1</option>
+  <option value="equities-5.0">Equities FIX 5.0 v1.0</option>
+  <option value="options-4.4">Options FIX 4.4 v2.0</option>
+  <option value="futures-5.0">Futures FIX 5.0 SP2 v2.0</option>
+  </select>
   </div>
   </div>
   </div>
@@ -2255,11 +2273,27 @@ const specCompareResults = [
   <Card className={`${bgCard} border ${borderColor} p-6`}>
   <div className="flex items-center justify-between mb-4">
   <h3 className={`text-lg font-bold ${textPrimary}`}>3. Generated FIX Algo Message</h3>
+  <div className="flex items-center gap-3">
   <div className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
-  <FileText className={`h-4 w-4 ${textSecondary}`} />
+  <Cog className={`h-4 w-4 ${textSecondary}`} />
   <div className="text-xs">
-  <span className={textSecondary}>Spec: </span>
-  <span className={`font-medium ${textPrimary}`}>Equities FIX 4.4 v2.1</span>
+  <span className={textSecondary}>ATDL: </span>
+  <span className={`font-medium ${textPrimary}`}>{atdlSelectedFile}</span>
+  </div>
+  </div>
+  <div className={`flex items-center gap-2 px-2 py-1 rounded border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
+  <FileText className={`h-4 w-4 ${textSecondary}`} />
+  <select 
+  value={atdlSelectedFixSpec}
+  onChange={(e) => setAtdlSelectedFixSpec(e.target.value)}
+  className={`text-xs border-0 bg-transparent ${textPrimary} focus:outline-none cursor-pointer`}
+  >
+  <option value="equities-4.2">Equities FIX 4.2 v1.2</option>
+  <option value="equities-4.4">Equities FIX 4.4 v2.1</option>
+  <option value="equities-5.0">Equities FIX 5.0 v1.0</option>
+  <option value="options-4.4">Options FIX 4.4 v2.0</option>
+  <option value="futures-5.0">Futures FIX 5.0 SP2 v2.0</option>
+  </select>
   </div>
   </div>
   </div>
@@ -2293,11 +2327,28 @@ const specCompareResults = [
   <div className="flex items-center justify-between mb-4">
   <div className="flex items-center gap-4">
   <h3 className={`text-lg font-bold ${textPrimary}`}>4. FIX Spec Validation Results</h3>
+  <div className="flex items-center gap-2">
   <div className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
-  <FileText className={`h-4 w-4 ${textSecondary}`} />
+  <Cog className={`h-4 w-4 ${textSecondary}`} />
   <div className="text-xs">
-  <span className={textSecondary}>Validating Against: </span>
-  <span className={`font-medium ${textPrimary}`}>Equities FIX 4.4 v2.1</span>
+  <span className={textSecondary}>ATDL: </span>
+  <span className={`font-medium ${textPrimary}`}>{atdlSelectedFile}</span>
+  </div>
+  </div>
+  <div className={`flex items-center gap-2 px-2 py-1 rounded border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
+  <FileText className={`h-4 w-4 ${textSecondary}`} />
+  <span className={`text-xs ${textSecondary}`}>Against:</span>
+  <select 
+  value={atdlSelectedFixSpec}
+  onChange={(e) => setAtdlSelectedFixSpec(e.target.value)}
+  className={`text-xs border-0 bg-transparent ${textPrimary} focus:outline-none cursor-pointer`}
+  >
+  <option value="equities-4.2">Equities FIX 4.2 v1.2</option>
+  <option value="equities-4.4">Equities FIX 4.4 v2.1</option>
+  <option value="equities-5.0">Equities FIX 5.0 v1.0</option>
+  <option value="options-4.4">Options FIX 4.4 v2.0</option>
+  <option value="futures-5.0">Futures FIX 5.0 SP2 v2.0</option>
+  </select>
   </div>
   </div>
   </div>
