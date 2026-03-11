@@ -82,33 +82,33 @@ export default function BCometPlatform() {
   // Sample clients data with asset class progress
   const [clients, setClients] = useState([
     { 
-      id: 1, name: "Goldman Sachs", jira: "GS-001", accountManager: "John Smith", 
+      id: 1, name: "Nexus Trading Group", jira: "NTG-001", accountManager: "John Smith", 
       assetClasses: [
         { name: "Equities", specCompare: "completed", logAnalysis: "error", scenario: "in-progress", testCase: "completed", certification: "not-started", config: "completed", alerts: 2 },
         { name: "Options", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "in-progress", certification: "not-started", config: "completed", alerts: 1 },
       ]
     },
     { 
-      id: 2, name: "Morgan Stanley", jira: "MS-002", accountManager: "Jane Doe", 
+      id: 2, name: "Apex Capital Partners", jira: "ACP-002", accountManager: "Jane Doe", 
       assetClasses: [
         { name: "Fixed Income", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "in-progress", certification: "not-started", config: "completed", alerts: 0 },
       ]
     },
     { 
-      id: 3, name: "JP Morgan", jira: "JPM-003", accountManager: "Bob Wilson", 
+      id: 3, name: "Horizon Investments", jira: "HI-003", accountManager: "Bob Wilson", 
       assetClasses: [
         { name: "Futures", specCompare: "in-progress", logAnalysis: "not-started", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "in-progress", alerts: 3 },
         { name: "FX", specCompare: "completed", logAnalysis: "in-progress", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "completed", alerts: 2 },
       ]
     },
     { 
-      id: 4, name: "Citadel", jira: "CIT-004", accountManager: "Alice Brown", 
+      id: 4, name: "Velocity Securities", jira: "VS-004", accountManager: "Alice Brown", 
       assetClasses: [
         { name: "Equities", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "completed", certification: "in-progress", config: "completed", alerts: 1 },
       ]
     },
     { 
-      id: 5, name: "Two Sigma", jira: "TS-005", accountManager: "Charlie Davis", 
+      id: 5, name: "Quantum Asset Management", jira: "QAM-005", accountManager: "Charlie Davis", 
       assetClasses: [
         { name: "Commodities", specCompare: "error", logAnalysis: "in-progress", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "error", alerts: 5 },
         { name: "Equities", specCompare: "completed", logAnalysis: "completed", scenario: "in-progress", testCase: "not-started", certification: "not-started", config: "completed", alerts: 3 },
@@ -1831,10 +1831,10 @@ const specCompareResults = [
   <label className={`text-xs ${textSecondary} mb-1 block`}>Client</label>
   <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
   <option value="">Select a client...</option>
-  <option value="acme">Acme Trading Corp</option>
-  <option value="globex">Globex Partners</option>
-  <option value="initech">Initech Capital</option>
-  <option value="umbrella">Umbrella Investments</option>
+  <option value="nexus">Nexus Trading Group</option>
+  <option value="apex">Apex Capital Partners</option>
+  <option value="horizon">Horizon Investments</option>
+  <option value="velocity">Velocity Securities</option>
   </select>
   </div>
   <div className="grid grid-cols-2 gap-3">
