@@ -1068,10 +1068,22 @@ export default function BCometPlatform() {
     // For client role, show "My Progress" with their own asset classes
     if (selectedRole === "client") {
       const myAssetClasses = [
-        { name: "Equities", protocol: "FIX 4.4", specCompare: "complete", logAnalysis: "in-progress", alerts: 2 },
-        { name: "Options", protocol: "FIX 4.4", specCompare: "complete", logAnalysis: "complete", alerts: 0 },
-        { name: "Futures", protocol: "FIX 5.0 SP2", specCompare: "in-progress", logAnalysis: "pending", alerts: 1 },
+        { name: "Equities", protocol: "FIX 4.4", specCompare: "complete", logAnalysis: "in-progress", scenario: "complete", testCase: "in-progress", certification: "pending", atdlViewer: "complete", fixMsg: "complete", alerts: 2 },
+        { name: "Options", protocol: "FIX 4.4", specCompare: "complete", logAnalysis: "complete", scenario: "complete", testCase: "complete", certification: "in-progress", atdlViewer: "in-progress", fixMsg: "complete", alerts: 0 },
+        { name: "Futures", protocol: "FIX 5.0 SP2", specCompare: "in-progress", logAnalysis: "pending", scenario: "pending", testCase: "pending", certification: "pending", atdlViewer: "pending", fixMsg: "pending", alerts: 1 },
       ]
+
+      const getProgressWidth = (status: string) => {
+        if (status === "complete") return "100%"
+        if (status === "in-progress") return "60%"
+        return "0%"
+      }
+
+      const getProgressColor = (status: string) => {
+        if (status === "complete") return "bg-[#4caf50]"
+        if (status === "in-progress") return "bg-[#2196f3]"
+        return "bg-[#9e9e9e]"
+      }
       
       return (
         <div className={`min-h-screen ${bgPrimary} flex`}>
@@ -1104,38 +1116,102 @@ export default function BCometPlatform() {
                       )}
                     </div>
                     <div className="p-6">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className={`p-4 rounded-lg border ${borderColor}`}>
+                      {/* Tool Progress Grid */}
+                      <div className="grid grid-cols-4 gap-4 mb-4">
+                        {/* Spec Compare */}
+                        <div className={`p-3 rounded-lg border ${borderColor}`}>
                           <div className="flex items-center justify-between mb-2">
-                            <span className={`text-sm font-medium ${textPrimary}`}>Spec Compare</span>
+                            <span className={`text-xs font-medium ${textPrimary}`}>Spec Compare</span>
                             {getStatusBadge(asset.specCompare)}
                           </div>
-                          <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
-                            <div 
-                              className={`h-full rounded-full ${asset.specCompare === "complete" ? "bg-[#4caf50]" : asset.specCompare === "in-progress" ? "bg-[#2196f3]" : "bg-[#9e9e9e]"}`}
-                              style={{ width: asset.specCompare === "complete" ? "100%" : asset.specCompare === "in-progress" ? "60%" : "0%" }}
-                            />
+                          <div className={`h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                            <div className={`h-full rounded-full ${getProgressColor(asset.specCompare)}`} style={{ width: getProgressWidth(asset.specCompare) }} />
                           </div>
                         </div>
-                        <div className={`p-4 rounded-lg border ${borderColor}`}>
+                        {/* Log Analysis */}
+                        <div className={`p-3 rounded-lg border ${borderColor}`}>
                           <div className="flex items-center justify-between mb-2">
-                            <span className={`text-sm font-medium ${textPrimary}`}>Log Analysis</span>
+                            <span className={`text-xs font-medium ${textPrimary}`}>Log Analysis</span>
                             {getStatusBadge(asset.logAnalysis)}
                           </div>
-                          <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
-                            <div 
-                              className={`h-full rounded-full ${asset.logAnalysis === "complete" ? "bg-[#4caf50]" : asset.logAnalysis === "in-progress" ? "bg-[#2196f3]" : "bg-[#9e9e9e]"}`}
-                              style={{ width: asset.logAnalysis === "complete" ? "100%" : asset.logAnalysis === "in-progress" ? "60%" : "0%" }}
-                            />
+                          <div className={`h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                            <div className={`h-full rounded-full ${getProgressColor(asset.logAnalysis)}`} style={{ width: getProgressWidth(asset.logAnalysis) }} />
+                          </div>
+                        </div>
+                        {/* Scenario Creation */}
+                        <div className={`p-3 rounded-lg border ${borderColor}`}>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className={`text-xs font-medium ${textPrimary}`}>Scenarios</span>
+                            {getStatusBadge(asset.scenario)}
+                          </div>
+                          <div className={`h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                            <div className={`h-full rounded-full ${getProgressColor(asset.scenario)}`} style={{ width: getProgressWidth(asset.scenario) }} />
+                          </div>
+                        </div>
+                        {/* Test Case Gen */}
+                        <div className={`p-3 rounded-lg border ${borderColor}`}>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className={`text-xs font-medium ${textPrimary}`}>Test Cases</span>
+                            {getStatusBadge(asset.testCase)}
+                          </div>
+                          <div className={`h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                            <div className={`h-full rounded-full ${getProgressColor(asset.testCase)}`} style={{ width: getProgressWidth(asset.testCase) }} />
+                          </div>
+                        </div>
+                        {/* Certification */}
+                        <div className={`p-3 rounded-lg border ${borderColor}`}>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className={`text-xs font-medium ${textPrimary}`}>Certification</span>
+                            {getStatusBadge(asset.certification)}
+                          </div>
+                          <div className={`h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                            <div className={`h-full rounded-full ${getProgressColor(asset.certification)}`} style={{ width: getProgressWidth(asset.certification) }} />
+                          </div>
+                        </div>
+                        {/* ATDL Viewer */}
+                        <div className={`p-3 rounded-lg border ${borderColor}`}>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className={`text-xs font-medium ${textPrimary}`}>ATDL Tools</span>
+                            {getStatusBadge(asset.atdlViewer)}
+                          </div>
+                          <div className={`h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                            <div className={`h-full rounded-full ${getProgressColor(asset.atdlViewer)}`} style={{ width: getProgressWidth(asset.atdlViewer) }} />
+                          </div>
+                        </div>
+                        {/* FIX MSG Creator */}
+                        <div className={`p-3 rounded-lg border ${borderColor}`}>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className={`text-xs font-medium ${textPrimary}`}>FIX MSG</span>
+                            {getStatusBadge(asset.fixMsg)}
+                          </div>
+                          <div className={`h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                            <div className={`h-full rounded-full ${getProgressColor(asset.fixMsg)}`} style={{ width: getProgressWidth(asset.fixMsg) }} />
                           </div>
                         </div>
                       </div>
-                      <div className="mt-4 flex gap-3">
-<Button variant="outline" size="sm" onClick={() => setCurrentScreen("spec-compare-overview")}>
-  <GitCompare className="h-4 w-4 mr-2" /> Run Spec Compare
-  </Button>
+                      
+                      {/* Action Buttons */}
+                      <div className="flex flex-wrap gap-2">
+                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("spec-compare-overview")}>
+                          <GitCompare className="h-4 w-4 mr-1" /> Spec Compare
+                        </Button>
                         <Button variant="outline" size="sm" onClick={() => setCurrentScreen("log-analysis")}>
-                          <FileSearch className="h-4 w-4 mr-2" /> Run Log Analysis
+                          <FileSearch className="h-4 w-4 mr-1" /> Log Analysis
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("scenario-creation")}>
+                          <Activity className="h-4 w-4 mr-1" /> Scenarios
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("test-case-gen")}>
+                          <FileText className="h-4 w-4 mr-1" /> Test Cases
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("certification-gen")}>
+                          <Award className="h-4 w-4 mr-1" /> Certification
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("atdl-viewer")}>
+                          <Cog className="h-4 w-4 mr-1" /> ATDL Tools
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("fix-msg-creator")}>
+                          <MessageSquare className="h-4 w-4 mr-1" /> FIX MSG
                         </Button>
                       </div>
                     </div>
