@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-viewer">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-viewer">("home")
   const [settingsTab, setSettingsTab] = useState<"look-feel" | "general" | "security" | "mail" | "questionnaires" | "license">("general")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -30,6 +30,7 @@ export default function BCometPlatform() {
   const [toolsExpanded, setToolsExpanded] = useState(false)
   const [atdlToolsExpanded, setAtdlToolsExpanded] = useState(false)
   const [adminSpecsExpanded, setAdminSpecsExpanded] = useState(false)
+  const [clientSpecsExpanded, setClientSpecsExpanded] = useState(false)
   const [regTestSuiteGenerated, setRegTestSuiteGenerated] = useState(false)
   const [certSuiteGenerated, setCertSuiteGenerated] = useState(false)
   const [showContactPanel, setShowContactPanel] = useState(false)
@@ -527,20 +528,37 @@ export default function BCometPlatform() {
   )}
       </div>
 
-      {/* Admin Specs Navigation */}
-      <div className={`p-2 border-t ${borderColor}`}>
-        <button
-          onClick={() => setCurrentScreen("admin-specs")}
-          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-            currentScreen === "admin-specs"
-              ? "bg-[#00e5ff]/10 text-[#00e5ff]" 
-              : `${textSecondary} hover:bg-[#1e4976]/30`
-          }`}
-        >
-          <FileText className="h-5 w-5" />
-          {!sidebarCollapsed && <span>Admin Specs</span>}
-        </button>
-      </div>
+{/* Admin Specs Navigation */}
+  <div className={`p-2 border-t ${borderColor}`}>
+  <button
+  onClick={() => setCurrentScreen("admin-specs")}
+  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+  currentScreen === "admin-specs"
+  ? "bg-[#00e5ff]/10 text-[#00e5ff]"
+  : `${textSecondary} hover:bg-[#1e4976]/30`
+  }`}
+  >
+  <FileText className="h-5 w-5" />
+  {!sidebarCollapsed && <span>Admin Specs</span>}
+  </button>
+  </div>
+  
+  {/* Client Specs Navigation - Only for clients */}
+  {selectedRole === "client" && (
+  <div className={`p-2 border-t ${borderColor}`}>
+  <button
+  onClick={() => setCurrentScreen("client-specs")}
+  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+  currentScreen === "client-specs"
+  ? "bg-[#00e5ff]/10 text-[#00e5ff]"
+  : `${textSecondary} hover:bg-[#1e4976]/30`
+  }`}
+  >
+  <FileText className="h-5 w-5" />
+  {!sidebarCollapsed && <span>My Specs</span>}
+  </button>
+  </div>
+  )}
 
       <div className={`p-2 border-t ${borderColor} space-y-1 mt-auto`}>
         <button
@@ -1443,18 +1461,35 @@ const specCompareResults = [
             <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
               <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Specifications</h3>
               <div className="grid grid-cols-2 gap-6">
-                {/* Client Spec */}
-                <div>
-                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Upload My Spec</label>
-                  {!isAdHocMode && selectedClient && selectedAssetClass ? (
-                    <div className={`border-2 ${borderColor} rounded-lg p-4`}>
-                      <div className="flex items-center gap-3 mb-3">
-                        <FileText className={`h-8 w-8 ${textSecondary}`} />
-                        <div>
-                          <p className={`font-medium ${textPrimary}`}>{selectedClient.name} - {selectedAssetClass}</p>
-                          <p className={`text-xs ${textSecondary}`}>{selectedFixVersion} Spec (Pre-loaded)</p>
-                        </div>
-                      </div>
+{/* Client Spec */}
+  <div>
+  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>{selectedRole === "client" ? "Select My Spec" : "Upload My Spec"}</label>
+  {selectedRole === "client" ? (
+  <div className={`border-2 ${borderColor} rounded-lg p-4`}>
+  <div className="flex items-center gap-3 mb-3">
+  <FileText className={`h-8 w-8 ${textSecondary}`} />
+  <div>
+  <p className={`font-medium ${textPrimary}`}>Select From My Specs</p>
+  <p className={`text-xs ${textSecondary}`}>Choose from uploaded specifications</p>
+  </div>
+  </div>
+  <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+  <option value="">Choose a spec...</option>
+  <option value="client_eq_42_v1">Equities - FIX 4.2 (client_eq_42_v1.xml)</option>
+  <option value="client_eq_44_v2">Equities - FIX 4.4 (client_eq_44_v2.xml)</option>
+  <option value="client_opt_44_v1">Options - FIX 4.4 (client_opt_44_v1.xml)</option>
+  <option value="client_fut_50sp2_v1">Futures - FIX 5.0 SP2 (client_fut_50sp2_v1.xml)</option>
+  </select>
+  </div>
+  ) : !isAdHocMode && selectedClient && selectedAssetClass ? (
+  <div className={`border-2 ${borderColor} rounded-lg p-4`}>
+  <div className="flex items-center gap-3 mb-3">
+  <FileText className={`h-8 w-8 ${textSecondary}`} />
+  <div>
+  <p className={`font-medium ${textPrimary}`}>{selectedClient.name} - {selectedAssetClass}</p>
+  <p className={`text-xs ${textSecondary}`}>{selectedFixVersion} Spec (Pre-loaded)</p>
+  </div>
+  </div>
                       <div className="flex items-center gap-2">
                         <select className={`flex-1 p-2 rounded border ${borderColor} text-sm ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
                           <option value="current">Current Version (Pre-loaded)</option>
@@ -2077,18 +2112,29 @@ const specCompareResults = [
             <Card className={`${bgCard} border ${borderColor} p-6`}>
               <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>1. Upload & Validate ATDL</h3>
               
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
-                    <input type="file" className="hidden" accept=".xml,.atdl" />
-                    <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                    <p className={`font-medium ${textPrimary}`}>Upload ATDL File</p>
-                    <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse (.xml, .atdl)</p>
-                  </label>
-                </div>
-                
-                <div>
-                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Or Select from Admin ATDL Files</label>
+<div className="grid grid-cols-2 gap-6">
+  <div>
+  {selectedRole === "client" ? (
+  <>
+  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Select From My ATDL Files</label>
+  <select className={`w-full p-3 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+  <option value="">Choose an ATDL file...</option>
+  <option value="client-vwap">VWAP_Strategies_v1.0.atdl</option>
+  <option value="client-algo">AlgoSuite_Client_v2.1.atdl</option>
+  </select>
+  </>
+  ) : (
+  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
+  <input type="file" className="hidden" accept=".xml,.atdl" />
+  <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+  <p className={`font-medium ${textPrimary}`}>Upload ATDL File</p>
+  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse (.xml, .atdl)</p>
+  </label>
+  )}
+  </div>
+  
+  <div>
+  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Or Select from Admin ATDL Files</label>
                   <select className={`w-full p-3 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
                     <option value="">Choose an ATDL file...</option>
                     <option value="vwap-strategies">VWAP_Strategies_v2.1.atdl</option>
@@ -2531,17 +2577,35 @@ const specCompareResults = [
               
               <div className="grid grid-cols-2 gap-6">
                 {/* FIX Spec */}
-                <div>
-                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>FIX Specification (Algo Section)</label>
-                  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
-                    <input type="file" className="hidden" accept=".xml,.txt,.csv" />
-                    <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                    <p className={`font-medium ${textPrimary}`}>Select FIX Spec</p>
-                    <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
-                  </label>
-                </div>
-                
-                {/* ATDL File */}
+<div>
+  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>FIX Specification (Algo Section)</label>
+  {selectedRole === "client" ? (
+  <div className={`border-2 ${borderColor} rounded-lg p-4`}>
+  <div className="flex items-center gap-3 mb-3">
+  <FileText className={`h-8 w-8 ${textSecondary}`} />
+  <div>
+  <p className={`font-medium ${textPrimary}`}>Select From My Specs</p>
+  <p className={`text-xs ${textSecondary}`}>Choose from uploaded specifications</p>
+  </div>
+  </div>
+  <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+  <option value="">Choose a spec...</option>
+  <option value="client_eq_42_v1">Equities - FIX 4.2 (client_eq_42_v1.xml)</option>
+  <option value="client_eq_44_v2">Equities - FIX 4.4 (client_eq_44_v2.xml)</option>
+  <option value="client_opt_44_v1">Options - FIX 4.4 (client_opt_44_v1.xml)</option>
+  </select>
+  </div>
+  ) : (
+  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
+  <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+  <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+  <p className={`font-medium ${textPrimary}`}>Select FIX Spec</p>
+  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+  </label>
+  )}
+  </div>
+  
+  {/* ATDL File */}
                 <div>
                   <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>ATDL File</label>
                   <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
@@ -2631,17 +2695,36 @@ const specCompareResults = [
 
           <div className="p-6">
             <Card className={`${bgCard} border ${borderColor} p-6`}>
-              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload FIX Specification</h3>
-              
-              <div className="max-w-md mx-auto">
-                <label className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
-                  <input type="file" className="hidden" accept=".xml,.txt,.csv" />
-                  <Upload className={`h-12 w-12 mx-auto mb-4 ${textSecondary}`} />
-                  <p className={`font-medium ${textPrimary}`}>Select FIX Specification</p>
-                  <p className={`text-xs mt-2 ${textSecondary}`}>Upload file containing algo trading definitions</p>
-                  <p className={`text-xs mt-1 ${textSecondary}`}>Supported formats: XML, TXT, CSV</p>
-                </label>
-              </div>
+<h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>{selectedRole === "client" ? "Select FIX Specification" : "Upload FIX Specification"}</h3>
+  
+  <div className="max-w-md mx-auto">
+  {selectedRole === "client" ? (
+  <div className={`border-2 ${borderColor} rounded-lg p-6`}>
+  <div className="flex items-center gap-3 mb-4">
+  <FileText className={`h-10 w-10 ${textSecondary}`} />
+  <div>
+  <p className={`font-medium ${textPrimary}`}>Select From My Specs</p>
+  <p className={`text-xs ${textSecondary}`}>Choose from uploaded specifications</p>
+  </div>
+  </div>
+  <select className={`w-full p-3 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+  <option value="">Choose a spec...</option>
+  <option value="client_eq_42_v1">Equities - FIX 4.2 (client_eq_42_v1.xml)</option>
+  <option value="client_eq_44_v2">Equities - FIX 4.4 (client_eq_44_v2.xml)</option>
+  <option value="client_opt_44_v1">Options - FIX 4.4 (client_opt_44_v1.xml)</option>
+  <option value="client_fut_50sp2_v1">Futures - FIX 5.0 SP2 (client_fut_50sp2_v1.xml)</option>
+  </select>
+  </div>
+  ) : (
+  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
+  <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+  <Upload className={`h-12 w-12 mx-auto mb-4 ${textSecondary}`} />
+  <p className={`font-medium ${textPrimary}`}>Select FIX Specification</p>
+  <p className={`text-xs mt-2 ${textSecondary}`}>Upload file containing algo trading definitions</p>
+  <p className={`text-xs mt-1 ${textSecondary}`}>Supported formats: XML, TXT, CSV</p>
+  </label>
+  )}
+  </div>
               
               <div className="mt-6">
                 <h4 className={`font-medium mb-3 ${textPrimary}`}>Conversion Options</h4>
@@ -2848,15 +2931,15 @@ const specCompareResults = [
                             <label className={`cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded border-2 border-dashed ${borderColor} hover:border-[#00e5ff] transition-colors`}>
                               <input type="file" className="hidden" accept=".xml,.txt,.csv" />
                               <Upload className={`h-4 w-4 ${textSecondary}`} />
-                              <span className={`text-sm ${textSecondary}`}>Upload My Spec</span>
-                            </label>
-                          )}
-                        </div>
-                        
-                        {/* Action Column */}
-                        <div className="col-span-2">
-                          {version.status === "complete" ? (
-                            <Button 
+<span className={`text-sm ${textSecondary}`}>Select From My Specs</span>
+  </label>
+  )}
+  </div>
+  
+  {/* Action Column */}
+  <div className="col-span-2">
+  {version.status === "complete" ? (
+  <Button
                               size="sm" 
                               variant="outline"
                               onClick={() => { setShowSpecResults(true); setSelectedAdminSpecForResults(version.adminSpec.name); setSelectedAssetClass(assetClass.asset); setCurrentScreen("spec-compare"); setIsAdHocMode(false); }}
@@ -3045,9 +3128,139 @@ const specCompareResults = [
           </div>
         </div>
       </div>
-    )
+)
   }
 
+  // Client Specs Screen - For clients to upload and manage their specs
+  if (currentScreen === "client-specs") {
+    const clientSpecsData = [
+      {
+        asset: "Equities",
+        versions: [
+          { protocol: "FIX 4.2", specs: [{ name: "client_eq_42_v1.xml", uploaded: "2024-01-10", status: "active" }] },
+          { protocol: "FIX 4.4", specs: [{ name: "client_eq_44_v2.xml", uploaded: "2024-01-12", status: "active" }] },
+          { protocol: "FIX 5.0", specs: [] },
+        ]
+      },
+      {
+        asset: "Options",
+        versions: [
+          { protocol: "FIX 4.2", specs: [] },
+          { protocol: "FIX 4.4", specs: [{ name: "client_opt_44_v1.xml", uploaded: "2024-01-08", status: "active" }] },
+        ]
+      },
+      {
+        asset: "Futures",
+        versions: [
+          { protocol: "FIX 4.2", specs: [] },
+          { protocol: "FIX 4.4", specs: [] },
+          { protocol: "FIX 5.0 SP2", specs: [{ name: "client_fut_50sp2_v1.xml", uploaded: "2024-01-15", status: "active" }] },
+        ]
+      },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>My Specifications</h1>
+            <p className={textSecondary}>Upload and manage your FIX specifications by asset class</p>
+          </header>
+
+          <div className="p-6">
+            <div className="grid gap-6">
+              {clientSpecsData.map((assetClass) => (
+                <Card key={assetClass.asset} className={`${bgCard} border ${borderColor}`}>
+                  <div className={`px-6 py-4 border-b ${borderColor}`}>
+                    <h2 className={`text-lg font-bold ${textPrimary}`}>{assetClass.asset}</h2>
+                  </div>
+                  
+                  {/* Table Header */}
+                  <div className={`grid grid-cols-12 gap-4 px-6 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} border-b ${borderColor}`}>
+                    <div className={`col-span-2 font-semibold text-sm ${textPrimary}`}>Protocol</div>
+                    <div className={`col-span-4 font-semibold text-sm ${textPrimary}`}>Specification File</div>
+                    <div className={`col-span-2 font-semibold text-sm ${textPrimary}`}>Uploaded</div>
+                    <div className={`col-span-2 font-semibold text-sm ${textPrimary}`}>Status</div>
+                    <div className={`col-span-2 font-semibold text-sm ${textPrimary}`}>Actions</div>
+                  </div>
+                  
+                  {/* Table Rows */}
+                  <div className="divide-y divide-[#1e4976]/30">
+                    {assetClass.versions.map((version) => (
+                      <div 
+                        key={`${assetClass.asset}-${version.protocol}`}
+                        className={`grid grid-cols-12 gap-4 px-6 py-4 hover:bg-[#1e4976]/10 transition-colors items-center`}
+                      >
+                        {/* Protocol Column */}
+                        <div className={`col-span-2 font-medium ${textPrimary}`}>
+                          {version.protocol}
+                        </div>
+                        
+                        {/* Spec File Column */}
+                        <div className="col-span-4">
+                          {version.specs.length > 0 ? (
+                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded ${isDarkMode ? "bg-[#4caf50]/20" : "bg-[#4caf50]/10"} border border-[#4caf50]/30 w-fit`}>
+                              <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                              <span className={`text-sm ${textPrimary}`}>{version.specs[0].name}</span>
+                            </div>
+                          ) : (
+                            <span className={`text-sm ${textSecondary}`}>No spec uploaded</span>
+                          )}
+                        </div>
+                        
+                        {/* Uploaded Column */}
+                        <div className={`col-span-2 text-sm ${textSecondary}`}>
+                          {version.specs.length > 0 ? version.specs[0].uploaded : "-"}
+                        </div>
+                        
+                        {/* Status Column */}
+                        <div className="col-span-2">
+                          {version.specs.length > 0 ? (
+                            <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">Active</span>
+                          ) : (
+                            <span className="px-2 py-1 rounded text-xs bg-gray-500/20 text-gray-400">Pending</span>
+                          )}
+                        </div>
+                        
+                        {/* Actions Column */}
+                        <div className="col-span-2 flex gap-2">
+                          {version.specs.length > 0 ? (
+                            <>
+                              <Button size="sm" variant="outline" className="text-xs h-8">
+                                <Eye className="h-3 w-3 mr-1" /> View
+                              </Button>
+                              <label className="cursor-pointer">
+                                <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+                                <Button size="sm" variant="outline" className="text-xs h-8" asChild>
+                                  <span><Upload className="h-3 w-3 mr-1" /> Replace</span>
+                                </Button>
+                              </label>
+                            </>
+                          ) : (
+                            <label className="cursor-pointer">
+                              <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+                              <Button size="sm" className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 text-xs h-8" asChild>
+                                <span><Upload className="h-3 w-3 mr-1" /> Upload</span>
+                              </Button>
+                            </label>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  
   // Settings Screen
   if (currentScreen === "settings") {
     const settingsTabs = [
