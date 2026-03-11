@@ -1066,7 +1066,7 @@ export default function BCometPlatform() {
 
   // Dashboard
   if (currentScreen === "dashboard" || currentScreen === "clients") {
-    // For client role, show "My Progress" with their own asset classes
+    // For client role, show "My Progress" with their own asset classes (same for both dashboard and clients)
     if (selectedRole === "client") {
       const myAssetClasses = [
         { name: "Equities", protocol: "FIX 4.4", specCompare: "complete", logAnalysis: "in-progress", scenario: "complete", testCase: "in-progress", certification: "pending", atdlViewer: "complete", fixMsg: "complete", alerts: 2 },
@@ -1225,7 +1225,192 @@ export default function BCometPlatform() {
       )
     }
     
-    // Admin dashboard - show all clients
+    // Admin dashboard - overview with metrics
+    if (currentScreen === "dashboard") {
+      const totalClients = clients.length
+      const totalAlerts = clients.reduce((sum, c) => sum + getTotalAlerts(c), 0)
+      const completedCertifications = clients.filter(c => c.assetClasses.every(a => a.certification === "completed")).length
+      const inProgressClients = clients.filter(c => c.assetClasses.some(a => a.certification === "in-progress" || a.specCompare === "in-progress")).length
+
+      const recentActivity = [
+        { client: "Nexus Trading Group", action: "Spec Compare completed", asset: "Equities", time: "2 hours ago" },
+        { client: "Apex Capital Partners", action: "Log Analysis started", asset: "Fixed Income", time: "4 hours ago" },
+        { client: "Horizon Investments", action: "New spec uploaded", asset: "Futures", time: "Yesterday" },
+        { client: "Velocity Securities", action: "Certification in review", asset: "Equities", time: "Yesterday" },
+        { client: "Quantum Asset Management", action: "Alert resolved", asset: "Commodities", time: "2 days ago" },
+      ]
+
+      const pendingTasks = [
+        { client: "Nexus Trading Group", task: "Review spec differences", priority: "high", asset: "Options" },
+        { client: "Horizon Investments", task: "Complete log analysis", priority: "medium", asset: "FX" },
+        { client: "Quantum Asset Management", task: "Resolve configuration errors", priority: "high", asset: "Commodities" },
+      ]
+
+      return (
+        <div className={`min-h-screen ${bgPrimary} flex`}>
+          <Sidebar />
+          <div className="flex-1 overflow-auto">
+            <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
+              <div>
+                <h1 className={`text-xl font-bold ${textPrimary}`}>Dashboard</h1>
+                <p className={textSecondary}>Overview of client onboarding status</p>
+              </div>
+              <button className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 relative`}>
+                <Bell className="h-5 w-5" />
+                {totalAlerts > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#f44336] rounded-full text-[10px] text-white flex items-center justify-center">{totalAlerts}</span>}
+              </button>
+            </header>
+
+            <div className="p-6 space-y-6">
+              {/* Metrics Cards */}
+              <div className="grid grid-cols-4 gap-4">
+                <Card className={`${bgCard} border ${borderColor} p-4`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className={`text-sm ${textSecondary}`}>Total Clients</p>
+                      <p className={`text-2xl font-bold ${textPrimary}`}>{totalClients}</p>
+                    </div>
+                    <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#2196f3]/20" : "bg-[#2196f3]/10"}`}>
+                      <Users className="h-6 w-6 text-[#2196f3]" />
+                    </div>
+                  </div>
+                </Card>
+                <Card className={`${bgCard} border ${borderColor} p-4`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className={`text-sm ${textSecondary}`}>In Progress</p>
+                      <p className={`text-2xl font-bold ${textPrimary}`}>{inProgressClients}</p>
+                    </div>
+                    <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#ff9800]/20" : "bg-[#ff9800]/10"}`}>
+                      <Activity className="h-6 w-6 text-[#ff9800]" />
+                    </div>
+                  </div>
+                </Card>
+                <Card className={`${bgCard} border ${borderColor} p-4`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className={`text-sm ${textSecondary}`}>Certified</p>
+                      <p className={`text-2xl font-bold ${textPrimary}`}>{completedCertifications}</p>
+                    </div>
+                    <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#4caf50]/20" : "bg-[#4caf50]/10"}`}>
+                      <Award className="h-6 w-6 text-[#4caf50]" />
+                    </div>
+                  </div>
+                </Card>
+                <Card className={`${bgCard} border ${borderColor} p-4`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className={`text-sm ${textSecondary}`}>Active Alerts</p>
+                      <p className={`text-2xl font-bold ${totalAlerts > 0 ? "text-[#f44336]" : textPrimary}`}>{totalAlerts}</p>
+                    </div>
+                    <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#f44336]/20" : "bg-[#f44336]/10"}`}>
+                      <AlertCircle className="h-6 w-6 text-[#f44336]" />
+                    </div>
+                  </div>
+                </Card>
+              </div>
+
+              <div className="grid grid-cols-2 gap-6">
+                {/* Pending Tasks */}
+                <Card className={`${bgCard} border ${borderColor}`}>
+                  <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                    <h2 className={`font-semibold ${textPrimary}`}>Pending Tasks</h2>
+                    <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#f44336]/10 text-[#f44336]"}`}>{pendingTasks.length} tasks</span>
+                  </div>
+                  <div className="divide-y divide-[#1e4976]/30">
+                    {pendingTasks.map((task, i) => (
+                      <div key={i} className="px-4 py-3 flex items-center justify-between hover:bg-[#1e4976]/10 cursor-pointer" onClick={() => setCurrentScreen("clients")}>
+                        <div>
+                          <p className={`text-sm font-medium ${textPrimary}`}>{task.task}</p>
+                          <p className={`text-xs ${textSecondary}`}>{task.client} - {task.asset}</p>
+                        </div>
+                        <span className={`text-xs px-2 py-1 rounded ${task.priority === "high" ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>
+                          {task.priority}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className={`px-4 py-3 border-t ${borderColor}`}>
+                    <Button variant="outline" size="sm" className="w-full" onClick={() => setCurrentScreen("clients")}>View All Clients</Button>
+                  </div>
+                </Card>
+
+                {/* Recent Activity */}
+                <Card className={`${bgCard} border ${borderColor}`}>
+                  <div className={`px-4 py-3 border-b ${borderColor}`}>
+                    <h2 className={`font-semibold ${textPrimary}`}>Recent Activity</h2>
+                  </div>
+                  <div className="divide-y divide-[#1e4976]/30">
+                    {recentActivity.map((item, i) => (
+                      <div key={i} className="px-4 py-3 flex items-center gap-3">
+                        <div className={`w-2 h-2 rounded-full ${i === 0 ? "bg-[#4caf50]" : i === 1 ? "bg-[#2196f3]" : "bg-[#9e9e9e]"}`} />
+                        <div className="flex-1">
+                          <p className={`text-sm ${textPrimary}`}><span className="font-medium">{item.client}</span> - {item.action}</p>
+                          <p className={`text-xs ${textSecondary}`}>{item.asset} | {item.time}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </div>
+
+              {/* Client Status Summary */}
+              <Card className={`${bgCard} border ${borderColor}`}>
+                <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                  <h2 className={`font-semibold ${textPrimary}`}>Client Status Summary</h2>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentScreen("clients")}>View All</Button>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className={`${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
+                      <tr>
+                        <th className={`px-4 py-2 text-left text-sm font-medium ${textPrimary}`}>Client</th>
+                        <th className={`px-4 py-2 text-center text-sm font-medium ${textPrimary}`}>Progress</th>
+                        <th className={`px-4 py-2 text-center text-sm font-medium ${textPrimary}`}>Alerts</th>
+                        <th className={`px-4 py-2 text-center text-sm font-medium ${textPrimary}`}>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {clients.slice(0, 3).map((client) => {
+                        const completedSteps = client.assetClasses.reduce((sum, a) => {
+                          return sum + [a.specCompare, a.logAnalysis, a.scenario, a.testCase, a.certification, a.config].filter(s => s === "completed").length
+                        }, 0)
+                        const totalSteps = client.assetClasses.length * 6
+                        const progress = Math.round((completedSteps / totalSteps) * 100)
+                        return (
+                          <tr key={client.id} className={`border-t ${borderColor} cursor-pointer hover:bg-[#1e4976]/10`} onClick={() => { setSelectedClient(client); setCurrentScreen("client-detail"); }}>
+                            <td className={`px-4 py-3 ${textPrimary}`}>
+                              <div className="font-medium">{client.name}</div>
+                              <div className={`text-xs ${textSecondary}`}>{client.assetClasses.length} asset classes</div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex items-center gap-2">
+                                <div className={`flex-1 h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                                  <div className="h-full rounded-full bg-[#4caf50]" style={{ width: `${progress}%` }} />
+                                </div>
+                                <span className={`text-xs ${textSecondary}`}>{progress}%</span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              {getTotalAlerts(client) > 0 ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336] text-xs">{getTotalAlerts(client)}</span>
+                              ) : <span className={textSecondary}>-</span>}
+                            </td>
+                            <td className="px-4 py-3 text-center">{getStatusBadge(progress === 100 ? "completed" : progress > 50 ? "in-progress" : "not-started")}</td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    // Admin Clients page - full client list
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
@@ -1233,12 +1418,16 @@ export default function BCometPlatform() {
         
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
-            <h1 className={`text-xl font-bold ${textPrimary}`}>Dashboard</h1>
+            <div>
+              <h1 className={`text-xl font-bold ${textPrimary}`}>Clients</h1>
+              <p className={textSecondary}>Manage and track all client onboarding</p>
+            </div>
             <div className="flex items-center gap-4">
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
+                <Search className={`h-4 w-4 ${textSecondary}`} />
+                <input type="text" placeholder="Search clients..." className={`bg-transparent border-0 outline-none text-sm ${textPrimary} placeholder:${textSecondary}`} />
+              </div>
               <Button onClick={() => setShowAddClientModal(true)}><Plus className="h-4 w-4 mr-2" /> Add Client</Button>
-              <button className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 relative`}>
-                <Bell className="h-5 w-5" />
-              </button>
             </div>
           </header>
 
