@@ -1600,7 +1600,55 @@ const specCompareResults = [
                         </label>
                       </div>
                     </div>
-                  ) : (
+                  ) : selectedRole === "admin" && isAdHocMode ? (
+  <div className={`border-2 ${borderColor} rounded-lg p-4`}>
+  <div className="flex items-center gap-3 mb-3">
+  <FileText className={`h-8 w-8 ${textSecondary}`} />
+  <div>
+  <p className={`font-medium ${textPrimary}`}>Select Client Spec</p>
+  <p className={`text-xs ${textSecondary}`}>Choose from client uploaded specifications</p>
+  </div>
+  </div>
+  <div className="space-y-3">
+  <div>
+  <label className={`text-xs ${textSecondary} mb-1 block`}>Client</label>
+  <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+  <option value="">Select a client...</option>
+  <option value="acme">Acme Trading Corp</option>
+  <option value="globex">Globex Partners</option>
+  <option value="initech">Initech Capital</option>
+  <option value="umbrella">Umbrella Investments</option>
+  </select>
+  </div>
+  <div className="grid grid-cols-2 gap-3">
+  <div>
+  <label className={`text-xs ${textSecondary} mb-1 block`}>Asset Class</label>
+  <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+  <option value="">Select asset...</option>
+  <option value="equities">Equities</option>
+  <option value="options">Options</option>
+  <option value="futures">Futures</option>
+  <option value="fixed-income">Fixed Income</option>
+  <option value="fx">FX</option>
+  </select>
+  </div>
+  <div>
+  <label className={`text-xs ${textSecondary} mb-1 block`}>FIX Version</label>
+  <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+  <option value="">Select version...</option>
+  <option value="fix42">FIX 4.2</option>
+  <option value="fix44">FIX 4.4</option>
+  <option value="fix50">FIX 5.0</option>
+  <option value="fix50sp2">FIX 5.0 SP2</option>
+  </select>
+  </div>
+  </div>
+  <div className={`mt-2 p-2 rounded ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"} text-xs ${textSecondary}`}>
+  Available spec: <span className={textPrimary}>client_eq_44_v2.xml</span> (Uploaded: Jan 12, 2024)
+  </div>
+  </div>
+  </div>
+  ) : (
                     <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
                       <input type="file" className="hidden" accept=".xml,.txt,.csv" />
 <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
