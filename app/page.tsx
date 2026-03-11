@@ -2137,10 +2137,19 @@ const specCompareResults = [
               </Card>
             )}
 
-            {/* UI Representation */}
-            {atdlUiVisible && (
-              <Card className={`${bgCard} border ${borderColor} p-6`}>
-                <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>2. ATDL UI Representation</h3>
+{/* UI Representation */}
+  {atdlUiVisible && (
+  <Card className={`${bgCard} border ${borderColor} p-6`}>
+  <div className="flex items-center justify-between mb-4">
+  <h3 className={`text-lg font-bold ${textPrimary}`}>2. ATDL UI Representation</h3>
+  <div className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
+  <FileText className={`h-4 w-4 ${textSecondary}`} />
+  <div className="text-xs">
+  <span className={textSecondary}>Spec: </span>
+  <span className={`font-medium ${textPrimary}`}>Equities FIX 4.4 v2.1</span>
+  </div>
+  </div>
+  </div>
                 
                 {/* Strategy Tabs */}
                 <div className="flex gap-2 mb-6 border-b border-[#1e4976] pb-2">
@@ -2241,10 +2250,19 @@ const specCompareResults = [
               </Card>
             )}
 
-            {/* Generated FIX Message */}
-            {atdlFixMessageGenerated && (
-              <Card className={`${bgCard} border ${borderColor} p-6`}>
-                <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>3. Generated FIX Algo Message</h3>
+{/* Generated FIX Message */}
+  {atdlFixMessageGenerated && (
+  <Card className={`${bgCard} border ${borderColor} p-6`}>
+  <div className="flex items-center justify-between mb-4">
+  <h3 className={`text-lg font-bold ${textPrimary}`}>3. Generated FIX Algo Message</h3>
+  <div className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
+  <FileText className={`h-4 w-4 ${textSecondary}`} />
+  <div className="text-xs">
+  <span className={textSecondary}>Spec: </span>
+  <span className={`font-medium ${textPrimary}`}>Equities FIX 4.4 v2.1</span>
+  </div>
+  </div>
+  </div>
                 
                 <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} rounded-lg p-4 font-mono text-sm overflow-x-auto`}>
                   <p className={textSecondary}>
@@ -2269,16 +2287,25 @@ const specCompareResults = [
               </Card>
             )}
 
-            {/* FIX Spec Validation Results */}
-            {atdlFixValidationResults && (
-              <Card className={`${bgCard} border ${borderColor} p-6`}>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className={`text-lg font-bold ${textPrimary}`}>4. FIX Spec Validation Results</h3>
-                  <div className="flex gap-2">
-                    <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">4 Matches</span>
-                    <span className="px-2 py-1 rounded text-xs bg-[#f44336]/20 text-[#f44336]">3 Mismatches</span>
-                  </div>
-                </div>
+{/* FIX Spec Validation Results */}
+  {atdlFixValidationResults && (
+  <Card className={`${bgCard} border ${borderColor} p-6`}>
+  <div className="flex items-center justify-between mb-4">
+  <div className="flex items-center gap-4">
+  <h3 className={`text-lg font-bold ${textPrimary}`}>4. FIX Spec Validation Results</h3>
+  <div className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
+  <FileText className={`h-4 w-4 ${textSecondary}`} />
+  <div className="text-xs">
+  <span className={textSecondary}>Validating Against: </span>
+  <span className={`font-medium ${textPrimary}`}>Equities FIX 4.4 v2.1</span>
+  </div>
+  </div>
+  </div>
+  <div className="flex gap-2">
+  <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">4 Matches</span>
+  <span className="px-2 py-1 rounded text-xs bg-[#f44336]/20 text-[#f44336]">3 Mismatches</span>
+  </div>
+  </div>
 
                 <div className={`border ${borderColor} rounded-lg overflow-hidden`}>
                   {/* Table Header */}
@@ -2378,9 +2405,18 @@ const specCompareResults = [
               </div>
             </Card>
 
-            {atdlShowResults && (
-              <Card className={`${bgCard} border ${borderColor} p-6 mt-6`}>
-                <h2 className={`text-xl font-bold mb-6 ${textPrimary}`}>ATDL Comparison Results</h2>
+{atdlShowResults && (
+  <Card className={`${bgCard} border ${borderColor} p-6 mt-6`}>
+  <div className="flex items-center justify-between mb-6">
+  <h2 className={`text-xl font-bold ${textPrimary}`}>ATDL Comparison Results</h2>
+  <div className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
+  <FileText className={`h-4 w-4 ${textSecondary}`} />
+  <div className="text-xs">
+  <span className={textSecondary}>Base Spec: </span>
+  <span className={`font-medium ${textPrimary}`}>Equities FIX 4.4 v2.1</span>
+  </div>
+  </div>
+  </div>
                 
                 {[
                   { id: "atdl-1", title: "Strategy Differences", left: "VWAP, TWAP, POV defined", right: "VWAP, TWAP defined (POV missing)" },
@@ -2473,9 +2509,18 @@ const specCompareResults = [
               </div>
             </Card>
 
-            {fixAtdlShowResults && (
-              <Card className={`${bgCard} border ${borderColor} p-6 mt-6`}>
-                <h2 className={`text-xl font-bold mb-6 ${textPrimary}`}>FIX to ATDL Comparison Results</h2>
+{fixAtdlShowResults && (
+  <Card className={`${bgCard} border ${borderColor} p-6 mt-6`}>
+  <div className="flex items-center justify-between mb-6">
+  <h2 className={`text-xl font-bold ${textPrimary}`}>FIX to ATDL Comparison Results</h2>
+  <div className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
+  <FileText className={`h-4 w-4 ${textSecondary}`} />
+  <div className="text-xs">
+  <span className={textSecondary}>FIX Spec: </span>
+  <span className={`font-medium ${textPrimary}`}>Equities FIX 4.4 v2.1</span>
+  </div>
+  </div>
+  </div>
                 
                 {[
                   { id: "fix-atdl-1", title: "Missing Strategies in ATDL", left: "Strategies: VWAP, TWAP, POV, IS, MOC", right: "Strategies: VWAP, TWAP (POV, IS, MOC missing)" },
@@ -2574,15 +2619,24 @@ const specCompareResults = [
               </div>
             </Card>
 
-            {conversionComplete && (
-              <Card className={`${bgCard} border ${borderColor} p-6 mt-6`}>
-                <div className="flex items-center gap-3 mb-6">
-                  <CheckCircle className="h-8 w-8 text-[#4caf50]" />
-                  <div>
-                    <h2 className={`text-xl font-bold ${textPrimary}`}>Conversion Complete</h2>
-                    <p className={textSecondary}>ATDL file generated successfully</p>
-                  </div>
-                </div>
+{conversionComplete && (
+  <Card className={`${bgCard} border ${borderColor} p-6 mt-6`}>
+  <div className="flex items-center justify-between mb-6">
+  <div className="flex items-center gap-3">
+  <CheckCircle className="h-8 w-8 text-[#4caf50]" />
+  <div>
+  <h2 className={`text-xl font-bold ${textPrimary}`}>Conversion Complete</h2>
+  <p className={textSecondary}>ATDL file generated successfully</p>
+  </div>
+  </div>
+  <div className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
+  <FileText className={`h-4 w-4 ${textSecondary}`} />
+  <div className="text-xs">
+  <span className={textSecondary}>Source Spec: </span>
+  <span className={`font-medium ${textPrimary}`}>Equities FIX 4.4 v2.1</span>
+  </div>
+  </div>
+  </div>
                 
                 <div className={`border ${borderColor} rounded-lg p-4 mb-6`}>
                   <h4 className={`font-medium mb-3 ${textPrimary}`}>Conversion Summary</h4>
