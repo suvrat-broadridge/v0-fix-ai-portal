@@ -2587,10 +2587,10 @@ const specCompareResults = [
   </div>
   <div className={`flex items-center gap-2 px-2 py-1 rounded border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
   <FileText className={`h-4 w-4 ${textSecondary}`} />
-  <select 
+<select
   value={atdlSelectedFixSpec}
   onChange={(e) => setAtdlSelectedFixSpec(e.target.value)}
-  className={`text-xs border-0 bg-transparent ${textPrimary} focus:outline-none cursor-pointer`}
+  className={`text-xs border-0 rounded px-1 focus:outline-none cursor-pointer ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}
   >
   <option value="equities-4.2">Equities FIX 4.2 v1.2</option>
   <option value="equities-4.4">Equities FIX 4.4 v2.1</option>
@@ -2716,10 +2716,10 @@ const specCompareResults = [
   </div>
   <div className={`flex items-center gap-2 px-2 py-1 rounded border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
   <FileText className={`h-4 w-4 ${textSecondary}`} />
-  <select 
+<select
   value={atdlSelectedFixSpec}
   onChange={(e) => setAtdlSelectedFixSpec(e.target.value)}
-  className={`text-xs border-0 bg-transparent ${textPrimary} focus:outline-none cursor-pointer`}
+  className={`text-xs border-0 rounded px-1 focus:outline-none cursor-pointer ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}
   >
   <option value="equities-4.2">Equities FIX 4.2 v1.2</option>
   <option value="equities-4.4">Equities FIX 4.4 v2.1</option>
@@ -2771,10 +2771,10 @@ const specCompareResults = [
   <div className={`flex items-center gap-2 px-2 py-1 rounded border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
   <FileText className={`h-4 w-4 ${textSecondary}`} />
   <span className={`text-xs ${textSecondary}`}>Against:</span>
-  <select 
+<select
   value={atdlSelectedFixSpec}
   onChange={(e) => setAtdlSelectedFixSpec(e.target.value)}
-  className={`text-xs border-0 bg-transparent ${textPrimary} focus:outline-none cursor-pointer`}
+  className={`text-xs border-0 rounded px-1 focus:outline-none cursor-pointer ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}
   >
   <option value="equities-4.2">Equities FIX 4.2 v1.2</option>
   <option value="equities-4.4">Equities FIX 4.4 v2.1</option>
