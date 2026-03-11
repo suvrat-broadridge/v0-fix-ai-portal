@@ -478,10 +478,11 @@ export default function BCometPlatform() {
   {atdlToolsExpanded && (
   <div className="ml-4 space-y-1 border-l border-[#1e4976]/50 pl-2">
   {[
-  { icon: Eye, label: "ATDL Viewer & Validator", screen: "atdl-viewer" },
-  { icon: GitCompare, label: "ATDL Compare", screen: "atdl-compare" },
   { icon: GitCompare, label: "FIX to ATDL Compare", screen: "fix-atdl-compare" },
+  { icon: GitCompare, label: "ATDL to ATDL Compare", screen: "atdl-compare" },
   { icon: Zap, label: "FIX to ATDL Convert", screen: "fix-to-atdl" },
+  { icon: CheckCircle, label: "ATDL Standard Verification", screen: "atdl-viewer" },
+  { icon: Eye, label: "ATDL Usage", screen: "atdl-viewer" },
   ].map((item) => (
   <button
   key={item.label}
@@ -1475,10 +1476,11 @@ const tools = [
   { key: "scenario", title: "Scenario Creation", icon: Activity, status: assetData?.scenario, screen: "scenario-creation" },
   { key: "testCase", title: "Reg Test Case Generation", icon: VerifixLogo, status: assetData?.testCase, screen: "test-case-gen", isLogo: true },
   { key: "certification", title: "Certification Case Generation", icon: ConductorLogo, status: assetData?.certification, screen: "certification-gen", isLogo: true },
-  { key: "atdlViewer", title: "ATDL Viewer & Validator", icon: Eye, status: "not-started", screen: "atdl-viewer" },
-  { key: "atdlCompare", title: "ATDL Compare", icon: Cog, status: "not-started", screen: "atdl-compare" },
-  { key: "fixAtdlCompare", title: "FIX to ATDL Compare", icon: Cog, status: "not-started", screen: "fix-atdl-compare" },
+  { key: "fixAtdlCompare", title: "FIX to ATDL Compare", icon: GitCompare, status: "not-started", screen: "fix-atdl-compare" },
+  { key: "atdlCompare", title: "ATDL to ATDL Compare", icon: GitCompare, status: "not-started", screen: "atdl-compare" },
   { key: "fixToAtdl", title: "FIX to ATDL Convert", icon: Zap, status: "not-started", screen: "fix-to-atdl" },
+  { key: "atdlStandard", title: "ATDL Standard Verification", icon: CheckCircle, status: "not-started", screen: "atdl-viewer" },
+  { key: "atdlUsage", title: "ATDL Usage", icon: Eye, status: "not-started", screen: "atdl-viewer" },
   { key: "config", title: "Configuration", icon: Cog, status: assetData?.config, screen: "asset-tools" },
   ]
 
@@ -2839,7 +2841,7 @@ const specCompareResults = [
     )
   }
   
-  // ATDL to ATDL Comparison Screen
+  // ATDL to ATDL Compare Screen
   if (currentScreen === "atdl-compare") {
     
     return (
@@ -2850,7 +2852,7 @@ const specCompareResults = [
             <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> Back to Dashboard
             </button>
-            <h1 className={`text-2xl font-bold ${textPrimary}`}>ATDL to ATDL Comparison</h1>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>ATDL to ATDL Compare</h1>
             <p className={textSecondary}>Compare two ATDL (Algorithmic Trading Definition Language) files</p>
           </header>
 
@@ -3082,7 +3084,7 @@ const specCompareResults = [
 
           <div className="p-6">
             <Card className={`${bgCard} border ${borderColor} p-6`}>
-<h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>{selectedRole === "client" ? "Select FIX Specification" : "Upload FIX Specification"}</h3>
+<h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Select FIX Specification</h3>
   
   <div className="max-w-md mx-auto">
   {selectedRole === "client" ? (
@@ -3103,13 +3105,49 @@ const specCompareResults = [
   </select>
   </div>
   ) : (
-  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
-  <input type="file" className="hidden" accept=".xml,.txt,.csv" />
-  <Upload className={`h-12 w-12 mx-auto mb-4 ${textSecondary}`} />
-  <p className={`font-medium ${textPrimary}`}>Select FIX Specification</p>
-  <p className={`text-xs mt-2 ${textSecondary}`}>Upload file containing algo trading definitions</p>
-  <p className={`text-xs mt-1 ${textSecondary}`}>Supported formats: XML, TXT, CSV</p>
-  </label>
+  <div className={`border-2 ${borderColor} rounded-lg p-6`}>
+  <div className="flex items-center gap-3 mb-4">
+  <FileText className={`h-10 w-10 ${textSecondary}`} />
+  <div>
+  <p className={`font-medium ${textPrimary}`}>Select From Admin Specs</p>
+  <p className={`text-xs ${textSecondary}`}>Choose a specification to convert</p>
+  </div>
+  </div>
+  <div className="space-y-3">
+  <div className="grid grid-cols-2 gap-3">
+  <div>
+  <label className={`text-xs ${textSecondary} mb-1 block`}>Asset Class</label>
+  <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+  <option value="">Select asset...</option>
+  <option value="equities">Equities</option>
+  <option value="options">Options</option>
+  <option value="futures">Futures</option>
+  <option value="fixed-income">Fixed Income</option>
+  <option value="fx">FX</option>
+  </select>
+  </div>
+  <div>
+  <label className={`text-xs ${textSecondary} mb-1 block`}>FIX Version</label>
+  <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+  <option value="">Select version...</option>
+  <option value="4.2">FIX 4.2</option>
+  <option value="4.4">FIX 4.4</option>
+  <option value="5.0">FIX 5.0</option>
+  <option value="5.0sp2">FIX 5.0 SP2</option>
+  </select>
+  </div>
+  </div>
+  <div>
+  <label className={`text-xs ${textSecondary} mb-1 block`}>Spec Version</label>
+  <select className={`w-full p-3 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+  <option value="">Select spec version...</option>
+  <option value="v2.1">Equities FIX 4.4 v2.1 (Current)</option>
+  <option value="v2.0">Equities FIX 4.4 v2.0</option>
+  <option value="v1.9">Equities FIX 4.4 v1.9</option>
+  </select>
+  </div>
+  </div>
+  </div>
   )}
   </div>
               
