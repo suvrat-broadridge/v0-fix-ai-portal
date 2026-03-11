@@ -28,6 +28,7 @@ export default function BCometPlatform() {
   const [newClient, setNewClient] = useState({ name: "", jira: "", accountManager: "", assetClasses: [] as string[] })
   const [isAdHocMode, setIsAdHocMode] = useState(false)
   const [toolsExpanded, setToolsExpanded] = useState(false)
+  const [atdlToolsExpanded, setAtdlToolsExpanded] = useState(false)
   const [adminSpecsExpanded, setAdminSpecsExpanded] = useState(false)
   const [regTestSuiteGenerated, setRegTestSuiteGenerated] = useState(false)
   const [certSuiteGenerated, setCertSuiteGenerated] = useState(false)
@@ -438,28 +439,52 @@ export default function BCometPlatform() {
         
   {toolsExpanded && !sidebarCollapsed && (
   <div className="ml-4 mt-1 space-y-1 border-l border-[#1e4976]/50 pl-2">
-  {[
+{[
   { icon: GitCompare, label: "Spec Compare", screen: selectedRole === "client" ? "spec-compare-overview" : "spec-compare", roles: ["admin", "client"] },
   { icon: FileSearch, label: "Log Analysis", screen: "log-analysis", roles: ["admin", "client"] },
   { icon: Activity, label: "Scenario Creation", screen: "scenario-creation", roles: ["admin"] },
   { icon: MessageSquare, label: "FIX MSG Creator", screen: "fix-msg-creator", roles: ["admin", "client"] },
-  { icon: Cog, label: "ATDL Compare", screen: "atdl-compare", roles: ["admin", "client"] },
-  { icon: Cog, label: "FIX to ATDL Compare", screen: "fix-atdl-compare", roles: ["admin", "client"] },
-  { icon: Cog, label: "FIX to ATDL Convert", screen: "fix-to-atdl", roles: ["admin", "client"] },
   ].filter(item => selectedRole && item.roles.includes(selectedRole)).map((item) => (
   <button
   key={item.label}
   onClick={() => { if (item.screen === "spec-compare" || item.screen === "spec-compare-overview") setShowSpecResults(false); setCurrentScreen(item.screen as any); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
-  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
-  currentScreen === item.screen && isAdHocMode
-  ? "bg-[#00e5ff]/10 text-[#00e5ff]"
-  : `${textSecondary} hover:bg-[#1e4976]/30`
-  }`}
+  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${textSecondary} hover:bg-[#1e4976]/30`}
   >
   <item.icon className="h-4 w-4" />
   <span>{item.label}</span>
   </button>
   ))}
+  
+  {/* ATDL Tools Sub-section */}
+  <button
+  onClick={() => setAtdlToolsExpanded(!atdlToolsExpanded)}
+  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors text-sm ${textSecondary} hover:bg-[#1e4976]/30`}
+  >
+  <div className="flex items-center gap-3">
+  <Cog className="h-4 w-4" />
+  <span>ATDL Tools</span>
+  </div>
+  <ChevronDown className={`h-3 w-3 transition-transform ${atdlToolsExpanded ? "rotate-180" : ""}`} />
+  </button>
+  
+  {atdlToolsExpanded && (
+  <div className="ml-4 space-y-1 border-l border-[#1e4976]/50 pl-2">
+  {[
+  { icon: GitCompare, label: "ATDL Compare", screen: "atdl-compare" },
+  { icon: GitCompare, label: "FIX to ATDL Compare", screen: "fix-atdl-compare" },
+  { icon: Zap, label: "FIX to ATDL Convert", screen: "fix-to-atdl" },
+  ].map((item) => (
+  <button
+  key={item.label}
+  onClick={() => { setCurrentScreen(item.screen as any); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
+  className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg transition-colors text-xs ${textSecondary} hover:bg-[#1e4976]/30`}
+  >
+  <item.icon className="h-3 w-3" />
+  <span>{item.label}</span>
+  </button>
+  ))}
+  </div>
+  )}
   
   {/* VeriFIX - Admin only */}
   {selectedRole === "admin" && (
@@ -1320,14 +1345,17 @@ export default function BCometPlatform() {
   // Asset Tools Screen
   if (currentScreen === "asset-tools" && selectedClient && selectedAssetClass) {
     const assetData = selectedClient.assetClasses.find((ac: any) => ac.name === selectedAssetClass)
-    const tools = [
-      { key: "specCompare", title: "Spec Comparison", icon: GitCompare, status: assetData?.specCompare, screen: "spec-compare" },
-      { key: "logAnalysis", title: "Log Analysis", icon: FileSearch, status: assetData?.logAnalysis, screen: "log-analysis" },
-      { key: "scenario", title: "Scenario Creation", icon: Activity, status: assetData?.scenario, screen: "scenario-creation" },
-      { key: "testCase", title: "Reg Test Case Generation", icon: VerifixLogo, status: assetData?.testCase, screen: "test-case-gen", isLogo: true },
-      { key: "certification", title: "Certification Case Generation", icon: ConductorLogo, status: assetData?.certification, screen: "certification-gen", isLogo: true },
-      { key: "config", title: "Configuration", icon: Cog, status: assetData?.config, screen: "asset-tools" },
-    ]
+const tools = [
+  { key: "specCompare", title: "Spec Comparison", icon: GitCompare, status: assetData?.specCompare, screen: "spec-compare" },
+  { key: "logAnalysis", title: "Log Analysis", icon: FileSearch, status: assetData?.logAnalysis, screen: "log-analysis" },
+  { key: "scenario", title: "Scenario Creation", icon: Activity, status: assetData?.scenario, screen: "scenario-creation" },
+  { key: "testCase", title: "Reg Test Case Generation", icon: VerifixLogo, status: assetData?.testCase, screen: "test-case-gen", isLogo: true },
+  { key: "certification", title: "Certification Case Generation", icon: ConductorLogo, status: assetData?.certification, screen: "certification-gen", isLogo: true },
+  { key: "atdlCompare", title: "ATDL Compare", icon: Cog, status: "not-started", screen: "atdl-compare" },
+  { key: "fixAtdlCompare", title: "FIX to ATDL Compare", icon: Cog, status: "not-started", screen: "fix-atdl-compare" },
+  { key: "fixToAtdl", title: "FIX to ATDL Convert", icon: Zap, status: "not-started", screen: "fix-to-atdl" },
+  { key: "config", title: "Configuration", icon: Cog, status: assetData?.config, screen: "asset-tools" },
+  ]
 
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
