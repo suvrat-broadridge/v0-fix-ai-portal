@@ -1208,7 +1208,7 @@ export default function BCometPlatform() {
                         <Button variant="outline" size="sm" onClick={() => setCurrentScreen("certification-gen")}>
                           <Award className="h-4 w-4 mr-1" /> Certification
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("atdl-viewer")}>
+                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("atdl-validate")}>
                           <Cog className="h-4 w-4 mr-1" /> ATDL Validation
                         </Button>
                         <Button variant="outline" size="sm" onClick={() => setCurrentScreen("fix-msg-creator")}>
@@ -1628,7 +1628,7 @@ const clientProgressData = [
   variant="outline" 
   size="sm" 
   className="flex-1"
-  onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.version); setCurrentScreen("atdl-viewer"); setIsAdHocMode(false); }}
+  onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.version); setCurrentScreen("atdl-validate"); setIsAdHocMode(false); }}
   >
   <Cog className="h-3 w-3 mr-1" /> ATDL
   </Button>
