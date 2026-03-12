@@ -4660,5 +4660,13 @@ const copyToClipboard = () => {
     )
   }
   
-  return null
+  // Fallback - no matching screen found
+  return (
+    <div className="min-h-screen bg-[#0a1628] flex items-center justify-center">
+      <div className="text-center">
+        <p className="text-white text-lg mb-4">Screen not found: {currentScreen}</p>
+        <Button onClick={() => setCurrentScreen("dashboard")}>Return to Dashboard</Button>
+      </div>
+    </div>
+  )
 }
