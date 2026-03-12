@@ -2248,16 +2248,41 @@ const specCompareResults = [
             <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
               <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Choose Files</h3>
 <div className="grid grid-cols-2 gap-6">
-  {/* Log File Upload */}
-  <div>
-  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Upload My Log File</label>
-  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
-  <input type="file" className="hidden" accept=".log,.txt" />
-  <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-  <p className={`font-medium ${textPrimary}`}>Select A File</p>
-  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
-  </label>
-  </div>
+                {/* Log File Selection */}
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>
+                    {selectedRole === "client" ? "Upload My Log File" : `Select ${selectedClient?.name || "Client"} Log File`}
+                  </label>
+                  {selectedRole === "client" ? (
+                    <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
+                      <input type="file" className="hidden" accept=".log,.txt" />
+                      <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                      <p className={`font-medium ${textPrimary}`}>Select A File</p>
+                      <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+                    </label>
+                  ) : (
+                    <div className={`border-2 ${borderColor} rounded-lg p-4`}>
+                      <div className="flex items-center gap-3 mb-3">
+                        <FileSearch className={`h-8 w-8 ${textSecondary}`} />
+                        <div>
+                          <p className={`font-medium ${textPrimary}`}>Client Log Files</p>
+                          <p className={`text-xs ${textSecondary}`}>Select from uploaded logs</p>
+                        </div>
+                      </div>
+                      <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+                        <option value="">Choose a log file...</option>
+                        <option value="log1">{selectedClient?.name || "Client"}_session_20240115.log</option>
+                        <option value="log2">{selectedClient?.name || "Client"}_session_20240110.log</option>
+                        <option value="log3">{selectedClient?.name || "Client"}_session_20240105.log</option>
+                      </select>
+                      <div className="mt-3 pt-3 border-t border-dashed border-[#1e4976]/50">
+                        <Button variant="outline" size="sm" className="w-full text-xs">
+                          <Mail className="h-3 w-3 mr-2" /> Request Log File from Client
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
   
   {/* FIX Spec - Always select from dropdown */}
   <div>
@@ -2391,26 +2416,63 @@ const specCompareResults = [
 
           <div className="p-6">
             <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
-              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload Sources</h3>
-              <div className="grid grid-cols-3 gap-6">
-                <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
-                  <input type="file" className="hidden" accept=".log,.txt" onChange={(e) => console.log("Log file:", e.target.files?.[0]?.name)} />
-                  <FileText className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                  <p className={`font-medium ${textPrimary}`}>Upload My Log File</p>
-                  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
-                </label>
-                <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
-                  <input type="file" className="hidden" accept=".xml,.txt,.csv" onChange={(e) => console.log("FIX spec:", e.target.files?.[0]?.name)} />
-                  <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                  <p className={`font-medium ${textPrimary}`}>FIX Spec</p>
-                  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
-                </label>
-                <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors`}>
-                  <input type="file" className="hidden" accept=".log,.txt,.xml,.csv" multiple onChange={(e) => console.log("Both files:", Array.from(e.target.files || []).map(f => f.name))} />
-                  <GitCompare className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                  <p className={`font-medium ${textPrimary}`}>Both</p>
-                  <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
-                </label>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Select Sources</h3>
+              <div className="grid grid-cols-2 gap-6">
+                {/* Log File */}
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>
+                    {selectedRole === "client" ? "My Log File" : `${selectedClient?.name || "Client"} Log File`}
+                  </label>
+                  {selectedRole === "client" ? (
+                    <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
+                      <input type="file" className="hidden" accept=".log,.txt" />
+                      <FileText className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                      <p className={`font-medium ${textPrimary}`}>Upload Log File</p>
+                      <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
+                    </label>
+                  ) : (
+                    <div className={`border-2 ${borderColor} rounded-lg p-4`}>
+                      <div className="flex items-center gap-3 mb-3">
+                        <FileSearch className={`h-8 w-8 ${textSecondary}`} />
+                        <div>
+                          <p className={`font-medium ${textPrimary}`}>Client Log Files</p>
+                          <p className={`text-xs ${textSecondary}`}>Select from uploaded logs</p>
+                        </div>
+                      </div>
+                      <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+                        <option value="">Choose a log file...</option>
+                        <option value="log1">{selectedClient?.name || "Client"}_session_20240115.log</option>
+                        <option value="log2">{selectedClient?.name || "Client"}_session_20240110.log</option>
+                        <option value="log3">{selectedClient?.name || "Client"}_session_20240105.log</option>
+                      </select>
+                      <div className="mt-3 pt-3 border-t border-dashed border-[#1e4976]/50">
+                        <Button variant="outline" size="sm" className="w-full text-xs">
+                          <Mail className="h-3 w-3 mr-2" /> Request Log File from Client
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {/* FIX Spec */}
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Admin Spec</label>
+                  <div className={`border-2 ${borderColor} rounded-lg p-4`}>
+                    <div className="flex items-center gap-3 mb-3">
+                      <FileText className={`h-8 w-8 ${textSecondary}`} />
+                      <div>
+                        <p className={`font-medium ${textPrimary}`}>Select From Admin Specs</p>
+                        <p className={`text-xs ${textSecondary}`}>Choose a specification</p>
+                      </div>
+                    </div>
+                    <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+                      <option value="">Choose a spec...</option>
+                      <option value="equities-4.2">Equities - FIX 4.2 v1.2</option>
+                      <option value="equities-4.4">Equities - FIX 4.4 v2.1</option>
+                      <option value="options-4.4">Options - FIX 4.4 v2.0</option>
+                      <option value="futures-5.0">Futures - FIX 5.0 SP2 v2.0</option>
+                    </select>
+                  </div>
+                </div>
               </div>
               <div className="mt-6 flex justify-center">
                 <Button onClick={() => simulateTask(() => setShowScenarioResults(true))} disabled={isLoading}><Play className="h-4 w-4 mr-2" /> {isLoading ? "Processing..." : "Run Sample"}</Button>
