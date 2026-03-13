@@ -1990,13 +1990,13 @@ const specCompareResults = [
               <div className="grid grid-cols-2 gap-6">
 {/* Client Spec */}
   <div>
-  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>{selectedRole === "client" ? "Select My Spec" : "Select Client Spec"}</label>
+  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Select Client Spec</label>
   {selectedRole === "client" ? (
   <div className={`border-2 ${borderColor} rounded-lg p-4`}>
   <div className="flex items-center gap-3 mb-3">
   <FileText className={`h-8 w-8 ${textSecondary}`} />
   <div>
-  <p className={`font-medium ${textPrimary}`}>Select From My Specs</p>
+  <p className={`font-medium ${textPrimary}`}>Select From Client Specs</p>
   <p className={`text-xs ${textSecondary}`}>Choose from uploaded specifications</p>
   </div>
   </div>
@@ -2758,7 +2758,7 @@ const specCompareResults = [
                 <div>
                   {selectedRole === "client" ? (
                     <>
-                      <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Select From My ATDL Files</label>
+                      <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Select From Client ATDL Files</label>
                       <select className={`w-full p-3 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
                         <option value="">Choose an ATDL file...</option>
                         <option value="client-vwap">VWAP_Strategies_v1.0.atdl</option>
@@ -2876,7 +2876,7 @@ const specCompareResults = [
                 <div>
                   {selectedRole === "client" ? (
                     <>
-                      <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Select From My ATDL Files</label>
+                      <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Select From Client ATDL Files</label>
                       <select className={`w-full p-3 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
                         <option value="">Choose an ATDL file...</option>
                         <option value="client-vwap">VWAP_Strategies_v1.0.atdl</option>
@@ -3235,7 +3235,7 @@ const specCompareResults = [
   <div className="flex items-center gap-3 mb-3">
   <FileText className={`h-8 w-8 ${textSecondary}`} />
   <div>
-  <p className={`font-medium ${textPrimary}`}>Select From My Specs</p>
+  <p className={`font-medium ${textPrimary}`}>Select From Client Specs</p>
   <p className={`text-xs ${textSecondary}`}>Choose from uploaded specifications</p>
   </div>
   </div>
@@ -3354,7 +3354,7 @@ const specCompareResults = [
   <div className="flex items-center gap-3 mb-4">
   <FileText className={`h-10 w-10 ${textSecondary}`} />
   <div>
-  <p className={`font-medium ${textPrimary}`}>Select From My Specs</p>
+  <p className={`font-medium ${textPrimary}`}>Select From Client Specs</p>
   <p className={`text-xs ${textSecondary}`}>Choose from uploaded specifications</p>
   </div>
   </div>
@@ -3618,7 +3618,7 @@ const specCompareResults = [
                             <label className={`cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded border-2 border-dashed ${borderColor} hover:border-[#00e5ff] transition-colors`}>
                               <input type="file" className="hidden" accept=".xml,.txt,.csv" />
                               <Upload className={`h-4 w-4 ${textSecondary}`} />
-<span className={`text-sm ${textSecondary}`}>Select From My Specs</span>
+<span className={`text-sm ${textSecondary}`}>Select From Client Specs</span>
   </label>
   )}
   </div>
