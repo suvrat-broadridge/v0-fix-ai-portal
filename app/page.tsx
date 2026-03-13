@@ -2911,13 +2911,14 @@ const specCompareResults = [
               </div>
 
               <div className="mt-4 flex justify-end">
-                <Button onClick={() => simulateTask(() => {})} disabled={isLoading} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
+                <Button onClick={() => simulateTask(() => { setAtdlUiVisible(true); setAtdlFixMessageGenerated(false); setAtdlFixValidationResults(false); })} disabled={isLoading} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
                   <Play className="h-4 w-4 mr-2" /> {isLoading ? "Loading..." : "Load Strategy UI"}
                 </Button>
               </div>
             </Card>
 
             {/* ATDL UI Representation */}
+            {atdlUiVisible && (
             <Card className={`${bgCard} border ${borderColor} p-6`}>
               <div className="flex items-center justify-between mb-4">
                 <h3 className={`text-lg font-bold ${textPrimary}`}>2. ATDL UI Representation</h3>
@@ -2955,33 +2956,41 @@ const specCompareResults = [
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <label className={`block text-xs mb-1 ${textSecondary}`}>Start Time</label>
-                    <Input type="time" defaultValue="09:30" className={`${isDarkMode ? "bg-[#1e4976]/30 border-[#1e4976]" : ""}`} />
+                    <Input type="time" defaultValue="09:30" className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white text-[#0a1628]"}`} />
                   </div>
                   <div>
                     <label className={`block text-xs mb-1 ${textSecondary}`}>End Time</label>
-                    <Input type="time" defaultValue="16:00" className={`${isDarkMode ? "bg-[#1e4976]/30 border-[#1e4976]" : ""}`} />
+                    <Input type="time" defaultValue="16:00" className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white text-[#0a1628]"}`} />
                   </div>
                   <div>
                     <label className={`block text-xs mb-1 ${textSecondary}`}>Participation Rate (%)</label>
-                    <Input type="number" defaultValue="15" className={`${isDarkMode ? "bg-[#1e4976]/30 border-[#1e4976]" : ""}`} />
+                    <Input type="number" defaultValue="15" className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white text-[#0a1628]"}`} />
                   </div>
                   <div>
                     <label className={`block text-xs mb-1 ${textSecondary}`}>Min Quantity</label>
-                    <Input type="number" defaultValue="100" className={`${isDarkMode ? "bg-[#1e4976]/30 border-[#1e4976]" : ""}`} />
+                    <Input type="number" defaultValue="100" className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white text-[#0a1628]"}`} />
                   </div>
                   <div>
                     <label className={`block text-xs mb-1 ${textSecondary}`}>Max Floor</label>
-                    <Input type="number" defaultValue="500" className={`${isDarkMode ? "bg-[#1e4976]/30 border-[#1e4976]" : ""}`} />
+                    <Input type="number" defaultValue="500" className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white text-[#0a1628]"}`} />
                   </div>
                   <div>
                     <label className={`block text-xs mb-1 ${textSecondary}`}>Display Qty</label>
-                    <Input type="number" defaultValue="200" className={`${isDarkMode ? "bg-[#1e4976]/30 border-[#1e4976]" : ""}`} />
+                    <Input type="number" defaultValue="200" className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white text-[#0a1628]"}`} />
                   </div>
                 </div>
               </div>
+
+              <div className="mt-4 flex justify-end">
+                <Button onClick={() => simulateTask(() => setAtdlFixMessageGenerated(true))} disabled={isLoading} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
+                  <Zap className="h-4 w-4 mr-2" /> {isLoading ? "Generating..." : "Generate FIX Message"}
+                </Button>
+              </div>
             </Card>
+            )}
 
             {/* Generated FIX Algo Message */}
+            {atdlFixMessageGenerated && (
             <Card className={`${bgCard} border ${borderColor} p-6`}>
               <div className="flex items-center justify-between mb-4">
                 <h3 className={`text-lg font-bold ${textPrimary}`}>3. Generated FIX Algo Message</h3>
@@ -3021,13 +3030,15 @@ const specCompareResults = [
                   <Button variant="outline" size="sm"><Copy className="h-4 w-4 mr-2" /> Copy Message</Button>
                   <Button variant="outline" size="sm"><Download className="h-4 w-4 mr-2" /> Download</Button>
                 </div>
-                <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
-                  <Zap className="h-4 w-4 mr-2" /> Validate Against FIX Spec
+                <Button onClick={() => simulateTask(() => setAtdlFixValidationResults(true))} disabled={isLoading} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
+                  <Zap className="h-4 w-4 mr-2" /> {isLoading ? "Validating..." : "Validate Against FIX Spec"}
                 </Button>
               </div>
             </Card>
+            )}
 
             {/* FIX Spec Validation Results */}
+            {atdlFixValidationResults && (
             <Card className={`${bgCard} border ${borderColor} p-6`}>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-4">
@@ -3085,6 +3096,7 @@ const specCompareResults = [
                 ))}
               </div>
             </Card>
+            )}
           </div>
         </div>
       </div>
