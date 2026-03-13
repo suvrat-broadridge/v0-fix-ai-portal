@@ -1901,13 +1901,14 @@ const specCompareResults = [
                 </div>
                 
                 <div className="mt-4 flex justify-center">
-                  <Button onClick={() => simulateTask(() => {})} disabled={isLoading} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
+                  <Button onClick={() => simulateTask(() => setShowSpecResults(true))} disabled={isLoading} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
                     <Play className="h-4 w-4 mr-2" /> {isLoading ? "Comparing..." : "Run Comparison"}
                   </Button>
                 </div>
               </Card>
 
               {/* Comparison Results */}
+              {showSpecResults && (
               <Card className={`${bgCard} border ${borderColor}`}>
                 <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
                   <h3 className={`text-lg font-bold ${textPrimary}`}>Comparison Results</h3>
@@ -1963,6 +1964,7 @@ const specCompareResults = [
                   </div>
                 </div>
               </Card>
+              )}
             </div>
           </div>
         </div>
