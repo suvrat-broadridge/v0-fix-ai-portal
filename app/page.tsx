@@ -2020,7 +2020,12 @@ const specCompareResults = [
                   <div>
                     <div className={`px-4 py-2 ${isDarkMode ? "bg-[#00e5ff]/10" : "bg-[#00e5ff]/5"} border-b ${borderColor} flex items-center justify-between`}>
                       <h4 className={`font-semibold text-[#00e5ff] text-sm`}>Admin Spec: {selectedAssetClass} - {selectedFixVersion}</h4>
-                      <Button variant="outline" size="sm" className="text-xs h-6 px-2"><Plus className="h-3 w-3 mr-1" /> Add Row</Button>
+                      {selectedRole === "admin" && (
+                        <Button variant="outline" size="sm" className="text-xs h-6 px-2"><Plus className="h-3 w-3 mr-1" /> Add Row</Button>
+                      )}
+                      {selectedRole === "client" && (
+                        <span className={`text-xs ${textSecondary} italic`}>Read-only</span>
+                      )}
                     </div>
                     <div className="overflow-auto max-h-[350px]">
                       <table className="w-full text-xs">
@@ -2066,20 +2071,20 @@ const specCompareResults = [
                             { tag: "37", groupTag: "", name: "OrderID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
                           ]).map((row, i) => (
                             <tr key={i} className={`border-b ${borderColor} hover:${isDarkMode ? "bg-[#1e4976]/20" : "bg-[#f1f5f9]"}`}>
-                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.tag} className={`w-12 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
-                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.groupTag} className={`w-12 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
-                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.name} className={`w-20 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.tag} readOnly={selectedRole === "client"} className={`w-12 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} ${selectedRole === "client" ? "opacity-60 cursor-not-allowed" : ""}`} /></td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.groupTag} readOnly={selectedRole === "client"} className={`w-12 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} ${selectedRole === "client" ? "opacity-60 cursor-not-allowed" : ""}`} /></td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.name} readOnly={selectedRole === "client"} className={`w-20 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} ${selectedRole === "client" ? "opacity-60 cursor-not-allowed" : ""}`} /></td>
                               <td className={`px-2 py-1`}>
-                                <select defaultValue={row.required} className={`w-10 px-0.5 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} ${row.required === "Y" ? "text-[#4caf50]" : row.required === "CR" ? "text-[#ff9800]" : ""}`}>
+                                <select defaultValue={row.required} disabled={selectedRole === "client"} className={`w-10 px-0.5 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} ${row.required === "Y" ? "text-[#4caf50]" : row.required === "CR" ? "text-[#ff9800]" : ""} ${selectedRole === "client" ? "opacity-60 cursor-not-allowed" : ""}`}>
                                   <option value="Y">Y</option>
                                   <option value="N">N</option>
                                   <option value="CR">CR</option>
                                 </select>
                               </td>
-                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.crCondition} className={`w-14 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-[#ff9800]" : "bg-white text-[#ff9800]"}`} /></td>
-                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.dataType} className={`w-20 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
-                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.values} className={`w-16 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
-                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.comment} className={`w-full px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.crCondition} readOnly={selectedRole === "client"} className={`w-14 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-[#ff9800]" : "bg-white text-[#ff9800]"} ${selectedRole === "client" ? "opacity-60 cursor-not-allowed" : ""}`} /></td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.dataType} readOnly={selectedRole === "client"} className={`w-20 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} ${selectedRole === "client" ? "opacity-60 cursor-not-allowed" : ""}`} /></td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.values} readOnly={selectedRole === "client"} className={`w-16 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} ${selectedRole === "client" ? "opacity-60 cursor-not-allowed" : ""}`} /></td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.comment} readOnly={selectedRole === "client"} className={`w-full px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} ${selectedRole === "client" ? "opacity-60 cursor-not-allowed" : ""}`} /></td>
                             </tr>
                           ))}
                         </tbody>
@@ -2088,7 +2093,13 @@ const specCompareResults = [
                   </div>
                 </div>
 
-                <div className={`px-6 py-4 border-t ${borderColor} flex justify-center`}>
+                <div className={`px-6 py-4 border-t ${borderColor} flex justify-between items-center`}>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => alert("Client spec saved as standardized format")}><Download className="h-4 w-4 mr-2" /> Save Client Spec</Button>
+                    {selectedRole === "admin" && (
+                      <Button variant="outline" size="sm" onClick={() => alert("Admin spec saved as standardized format")}><Download className="h-4 w-4 mr-2" /> Save Admin Spec</Button>
+                    )}
+                  </div>
                   <Button onClick={() => simulateTask(() => setShowSpecResults(true))} disabled={isLoading} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
                     <GitCompare className="h-4 w-4 mr-2" /> {isLoading ? "Comparing..." : "Run Comparison"}
                   </Button>
@@ -2677,13 +2688,21 @@ const specCompareResults = [
                       defaultValue={selectedAssetClass && selectedFixVersion ? `${selectedAssetClass?.toLowerCase().replace(" ", "-")}-${selectedFixVersion?.split(" ")[1]?.toLowerCase()}` : ""}
                       className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}
                     >
-                      <option value="">Choose a spec...</option>
-                      <option value="equities-4.2">Equities - FIX 4.2 v1.2</option>
-                      <option value="equities-4.4">Equities - FIX 4.4 v2.1</option>
-                      <option value="options-4.4">Options - FIX 4.4 v2.0</option>
-                      <option value="futures-5.0">Futures - FIX 5.0 SP2 v2.0</option>
-                      <option value="fixed income-4.4">Fixed Income - FIX 4.4 v1.2</option>
-                      <option value="fx-5.0">FX - FIX 5.0 SP2 v1.1</option>
+<option value="">Choose a spec...</option>
+  <optgroup label="Standardized Specs">
+    <option value="equities-4.2-std">Equities FIX 4.2 v1.2 - Standardized</option>
+    <option value="equities-4.4-std">Equities FIX 4.4 v2.1 - Standardized</option>
+    <option value="options-4.4-std">Options FIX 4.4 v2.0 - Standardized</option>
+    <option value="futures-5.0-std">Futures FIX 5.0 SP2 v2.0 - Standardized</option>
+  </optgroup>
+  <optgroup label="Original Specs">
+    <option value="equities-4.2">Equities - FIX 4.2 v1.2</option>
+    <option value="equities-4.4">Equities - FIX 4.4 v2.1</option>
+    <option value="options-4.4">Options - FIX 4.4 v2.0</option>
+    <option value="futures-5.0">Futures - FIX 5.0 SP2 v2.0</option>
+    <option value="fixed income-4.4">Fixed Income - FIX 4.4 v1.2</option>
+    <option value="fx-5.0">FX - FIX 5.0 SP2 v1.1</option>
+  </optgroup>
                     </select>
                   </div>
                 </div>
@@ -2842,13 +2861,21 @@ const specCompareResults = [
                         <p className={`text-xs ${textSecondary}`}>Choose a specification</p>
                       </div>
                     </div>
-                    <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
-                      <option value="">Choose a spec...</option>
-                      <option value="equities-4.2">Equities - FIX 4.2 v1.2</option>
-                      <option value="equities-4.4">Equities - FIX 4.4 v2.1</option>
-                      <option value="options-4.4">Options - FIX 4.4 v2.0</option>
-                      <option value="futures-5.0">Futures - FIX 5.0 SP2 v2.0</option>
-                    </select>
+<select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+  <option value="">Choose a spec...</option>
+  <optgroup label="Standardized Specs">
+    <option value="equities-4.2-std">Equities FIX 4.2 v1.2 - Standardized</option>
+    <option value="equities-4.4-std">Equities FIX 4.4 v2.1 - Standardized</option>
+    <option value="options-4.4-std">Options FIX 4.4 v2.0 - Standardized</option>
+    <option value="futures-5.0-std">Futures FIX 5.0 SP2 v2.0 - Standardized</option>
+  </optgroup>
+  <optgroup label="Original Specs">
+    <option value="equities-4.2">Equities - FIX 4.2 v1.2</option>
+    <option value="equities-4.4">Equities - FIX 4.4 v2.1</option>
+    <option value="options-4.4">Options - FIX 4.4 v2.0</option>
+    <option value="futures-5.0">Futures - FIX 5.0 SP2 v2.0</option>
+  </optgroup>
+  </select>
                   </div>
                 </div>
               </div>
@@ -4047,38 +4074,38 @@ const specCompareResults = [
       { 
         asset: "Equities", 
         versions: [
-          { protocol: "FIX 4.2", adminSpec: { name: "EQ_FIX42_v1.2.xml", uploaded: true }, clientSpec: { name: "client_eq_42.xml", uploaded: true } },
-          { protocol: "FIX 4.4", adminSpec: { name: "EQ_FIX44_v2.1.xml", uploaded: true }, clientSpec: { name: null, uploaded: false } },
-          { protocol: "FIX 5.0", adminSpec: { name: "EQ_FIX50_v1.0.xml", uploaded: true }, clientSpec: { name: "client_eq_50.xml", uploaded: true } },
+          { protocol: "FIX 4.2", adminSpec: { name: "EQ_FIX42_v1.2.xml", uploaded: true }, standardizedSpec: { name: "EQ_FIX42_v1.2_Standardized.xlsx", available: true }, clientSpec: { name: "client_eq_42.xml", uploaded: true } },
+          { protocol: "FIX 4.4", adminSpec: { name: "EQ_FIX44_v2.1.xml", uploaded: true }, standardizedSpec: { name: "EQ_FIX44_v2.1_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 5.0", adminSpec: { name: "EQ_FIX50_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: "client_eq_50.xml", uploaded: true } },
         ]
       },
       { 
         asset: "Options", 
         versions: [
-          { protocol: "FIX 4.2", adminSpec: { name: "OPT_FIX42_v1.1.xml", uploaded: true }, clientSpec: { name: null, uploaded: false } },
-          { protocol: "FIX 4.4", adminSpec: { name: "OPT_FIX44_v2.0.xml", uploaded: true }, clientSpec: { name: "client_opt_44.xml", uploaded: true } },
+          { protocol: "FIX 4.2", adminSpec: { name: "OPT_FIX42_v1.1.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 4.4", adminSpec: { name: "OPT_FIX44_v2.0.xml", uploaded: true }, standardizedSpec: { name: "OPT_FIX44_v2.0_Standardized.xlsx", available: true }, clientSpec: { name: "client_opt_44.xml", uploaded: true } },
         ]
       },
       { 
         asset: "Futures", 
         versions: [
-          { protocol: "FIX 4.2", adminSpec: { name: "FUT_FIX42_v1.0.xml", uploaded: true }, clientSpec: { name: null, uploaded: false } },
-          { protocol: "FIX 4.4", adminSpec: { name: "FUT_FIX44_v1.1.xml", uploaded: true }, clientSpec: { name: null, uploaded: false } },
-          { protocol: "FIX 5.0 SP2", adminSpec: { name: "FUT_FIX50SP2_v2.0.xml", uploaded: true }, clientSpec: { name: "client_fut_50sp2.xml", uploaded: true } },
+          { protocol: "FIX 4.2", adminSpec: { name: "FUT_FIX42_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 4.4", adminSpec: { name: "FUT_FIX44_v1.1.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "FUT_FIX50SP2_v2.0.xml", uploaded: true }, standardizedSpec: { name: "FUT_FIX50SP2_v2.0_Standardized.xlsx", available: true }, clientSpec: { name: "client_fut_50sp2.xml", uploaded: true } },
         ]
       },
       { 
         asset: "Fixed Income", 
         versions: [
-          { protocol: "FIX 4.4", adminSpec: { name: "FI_FIX44_v1.2.xml", uploaded: true }, clientSpec: { name: "client_fi_44.xml", uploaded: true } },
-          { protocol: "FIX 5.0", adminSpec: { name: "FI_FIX50_v1.0.xml", uploaded: true }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 4.4", adminSpec: { name: "FI_FIX44_v1.2.xml", uploaded: true }, standardizedSpec: { name: "FI_FIX44_v1.2_Standardized.xlsx", available: true }, clientSpec: { name: "client_fi_44.xml", uploaded: true } },
+          { protocol: "FIX 5.0", adminSpec: { name: "FI_FIX50_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false } },
         ]
       },
       { 
         asset: "FX", 
         versions: [
-          { protocol: "FIX 4.4", adminSpec: { name: "FX_FIX44_v1.0.xml", uploaded: true }, clientSpec: { name: null, uploaded: false } },
-          { protocol: "FIX 5.0 SP2", adminSpec: { name: "FX_FIX50SP2_v1.1.xml", uploaded: true }, clientSpec: { name: "client_fx_50sp2.xml", uploaded: true } },
+          { protocol: "FIX 4.4", adminSpec: { name: "FX_FIX44_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "FX_FIX50SP2_v1.1.xml", uploaded: true }, standardizedSpec: { name: "FX_FIX50SP2_v1.1_Standardized.xlsx", available: true }, clientSpec: { name: "client_fx_50sp2.xml", uploaded: true } },
         ]
       },
     ]
@@ -4100,10 +4127,11 @@ const specCompareResults = [
                     <h2 className={`text-lg font-bold ${textPrimary}`}>{assetClass.asset}</h2>
                   </div>
                   
-                  {/* Table Header - 2 columns for admin, 3 for client */}
-                  <div className={`grid ${selectedRole === "admin" ? "grid-cols-2" : "grid-cols-3"} gap-4 px-6 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} border-b ${borderColor}`}>
+                  {/* Table Header - 3 columns for admin, 4 for client */}
+                  <div className={`grid ${selectedRole === "admin" ? "grid-cols-3" : "grid-cols-4"} gap-4 px-6 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} border-b ${borderColor}`}>
                     <div className={`font-semibold text-sm ${textPrimary}`}>Protocol</div>
-                    <div className={`font-semibold text-sm ${textPrimary}`}>Admin Spec</div>
+                    <div className={`font-semibold text-sm ${textPrimary}`}>Admin Spec (Original)</div>
+                    <div className={`font-semibold text-sm ${textPrimary}`}>Admin Spec (Standardized)</div>
                     {selectedRole === "client" && (
                       <div className={`font-semibold text-sm ${textPrimary}`}>My Specs</div>
                     )}
@@ -4111,17 +4139,17 @@ const specCompareResults = [
                   
                   {/* Table Rows */}
                   <div className="divide-y divide-[#1e4976]/30">
-                    {assetClass.versions.map((version) => (
+                    {assetClass.versions.map((version: any) => (
                       <div 
                         key={`${assetClass.asset}-${version.protocol}`}
-                        className={`grid ${selectedRole === "admin" ? "grid-cols-2" : "grid-cols-3"} gap-4 px-6 py-4 hover:bg-[#1e4976]/10 transition-colors items-center`}
+                        className={`grid ${selectedRole === "admin" ? "grid-cols-3" : "grid-cols-4"} gap-4 px-6 py-4 hover:bg-[#1e4976]/10 transition-colors items-center`}
                       >
                         {/* Protocol Column */}
                         <div className={`font-medium ${textPrimary}`}>
                           {version.protocol}
                         </div>
                         
-{/* Admin Spec Column */}
+{/* Admin Spec (Original) Column */}
   <div className="flex items-center gap-2">
   <div className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor}`}>
   <FileText className={`h-4 w-4 ${textSecondary}`} />
@@ -4142,12 +4170,32 @@ const specCompareResults = [
   {selectedRole === "admin" && (
   <label className={`cursor-pointer p-1.5 rounded hover:bg-[#1e4976]/30 ${textSecondary} hover:text-[#00e5ff] transition-colors`} title="Replace">
   <input type="file" className="hidden" accept=".xml,.txt,.csv" />
-  <Upload className="h-4 w-4" />
+<Upload className="h-4 w-4" />
   </label>
   )}
   </div>
-                        
-                        {/* My Specs Column - Only for client role */}
+
+{/* Admin Spec (Standardized) Column */}
+  <div className="flex items-center gap-2">
+  {version.standardizedSpec?.available ? (
+  <>
+  <div className={`flex items-center gap-2 px-3 py-1.5 rounded ${isDarkMode ? "bg-[#4caf50]/20" : "bg-[#4caf50]/10"} border border-[#4caf50]/30`}>
+  <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+  <span className={`text-sm ${textPrimary}`}>{version.standardizedSpec.name}</span>
+  </div>
+  <button className={`p-1.5 rounded hover:bg-[#00e5ff]/20 ${textSecondary} hover:text-[#00e5ff] transition-colors`} title="View standardized">
+  <Eye className="h-4 w-4" />
+  </button>
+  <button className={`p-1.5 rounded hover:bg-[#00e5ff]/20 ${textSecondary} hover:text-[#00e5ff] transition-colors`} title="Download standardized">
+  <Download className="h-4 w-4" />
+  </button>
+  </>
+  ) : (
+  <span className={`text-sm ${textSecondary} italic`}>Not yet standardized</span>
+  )}
+  </div>
+  
+{/* My Specs Column - Only for client role */}
                         {selectedRole === "client" && (
                           <div className="flex items-center gap-2">
                             {version.clientSpec.uploaded ? (
