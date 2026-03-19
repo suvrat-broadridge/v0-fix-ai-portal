@@ -18,6 +18,7 @@ export default function BCometPlatform() {
   const [selectedFixVersion, setSelectedFixVersion] = useState<string | null>(null)
   const [showSpecResults, setShowSpecResults] = useState(false)
   const [showStandardizedSpecs, setShowStandardizedSpecs] = useState(false)
+  const [standardizedMsgTypeTab, setStandardizedMsgTypeTab] = useState<string>("D")
   const [showLogResults, setShowLogResults] = useState(false)
   const [comparisonFlags, setComparisonFlags] = useState<Record<string, { status: "ignore" | "customization" | "flag" | null; note: string }>>({})
   const [logAnalysisFlags, setLogAnalysisFlags] = useState<Record<string, { status: "ignore" | "customization" | "flag" | null; note: string }>>({})
@@ -1914,55 +1915,100 @@ const specCompareResults = [
                 <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
                   <div>
                     <h3 className={`text-lg font-bold ${textPrimary}`}>Standardized Specifications</h3>
-                    <p className={`text-xs ${textSecondary}`}>Both specs converted to standard Excel format for comparison</p>
+                    <p className={`text-xs ${textSecondary}`}>Both specs converted to standard format - review and edit before comparison</p>
                   </div>
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm"><Download className="h-4 w-4 mr-2" /> Export Client</Button>
                     <Button variant="outline" size="sm"><Download className="h-4 w-4 mr-2" /> Export Admin</Button>
                   </div>
                 </div>
+
+                {/* Message Type Tabs */}
+                <div className={`px-4 py-2 border-b ${borderColor} flex gap-1 overflow-x-auto`}>
+                  {[
+                    { id: "D", label: "New Order Single (D)" },
+                    { id: "F", label: "Order Cancel Request (F)" },
+                    { id: "G", label: "Order Cancel/Replace (G)" },
+                    { id: "8", label: "Execution Report (8)" },
+                    { id: "9", label: "Order Cancel Reject (9)" },
+                    { id: "j", label: "Business Reject (j)" },
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setStandardizedMsgTypeTab(tab.id)}
+                      className={`px-3 py-1.5 rounded text-xs font-medium whitespace-nowrap transition-colors ${
+                        standardizedMsgTypeTab === tab.id
+                          ? "bg-[#00e5ff] text-[#0a1628]"
+                          : `${textSecondary} hover:bg-[#1e4976]/30`
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
                 
                 <div className="grid grid-cols-2 gap-0">
                   {/* Client Spec Standardized View */}
                   <div className={`border-r ${borderColor}`}>
-                    <div className={`px-4 py-3 ${isDarkMode ? "bg-[#2196f3]/10" : "bg-[#2196f3]/5"} border-b ${borderColor}`}>
-                      <h4 className={`font-semibold text-[#2196f3] text-sm`}>Client Spec: {selectedClient?.name} - {selectedAssetClass}</h4>
+                    <div className={`px-4 py-2 ${isDarkMode ? "bg-[#2196f3]/10" : "bg-[#2196f3]/5"} border-b ${borderColor} flex items-center justify-between`}>
+                      <h4 className={`font-semibold text-[#2196f3] text-sm`}>Client Spec: {selectedClient?.name}</h4>
+                      <Button variant="outline" size="sm" className="text-xs h-6 px-2"><Plus className="h-3 w-3 mr-1" /> Add Row</Button>
                     </div>
-                    <div className="overflow-auto max-h-[400px]">
+                    <div className="overflow-auto max-h-[350px]">
                       <table className="w-full text-xs">
                         <thead className={`sticky top-0 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
                           <tr className={`border-b ${borderColor}`}>
-                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Message Type</th>
-                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Tag</th>
-                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Name</th>
-                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Type</th>
-                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Required</th>
+                            <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Tag</th>
+                            <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>GroupTag</th>
+                            <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>TagName</th>
+                            <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Req</th>
+                            <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>CRCondition</th>
+                            <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>DataType</th>
+                            <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Values</th>
+                            <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Comment</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {[
-                            { msgType: "D", tag: "11", name: "ClOrdID", type: "String", required: "Y" },
-                            { msgType: "D", tag: "21", name: "HandlInst", type: "Char", required: "Y" },
-                            { msgType: "D", tag: "38", name: "OrderQty", type: "Qty", required: "N" },
-                            { msgType: "D", tag: "40", name: "OrdType", type: "Char", required: "Y" },
-                            { msgType: "D", tag: "44", name: "Price", type: "Price", required: "N" },
-                            { msgType: "D", tag: "54", name: "Side", type: "Char", required: "Y" },
-                            { msgType: "D", tag: "55", name: "Symbol", type: "String", required: "Y" },
-                            { msgType: "D", tag: "59", name: "TimeInForce", type: "Char", required: "N" },
-                            { msgType: "D", tag: "60", name: "TransactTime", type: "UTCTimestamp", required: "Y" },
-                            { msgType: "D", tag: "375", name: "ContraBroker", type: "String", required: "N" },
-                            { msgType: "D", tag: "943", name: "TimeBracket", type: "String", required: "N" },
-                            { msgType: "8", tag: "6", name: "AvgPx", type: "Price", required: "Y" },
-                            { msgType: "8", tag: "14", name: "CumQty", type: "Qty", required: "Y" },
-                            { msgType: "8", tag: "17", name: "ExecID", type: "String", required: "Y" },
-                            { msgType: "8", tag: "20", name: "ExecTransType", type: "Char", required: "Y" },
-                          ].map((row, i) => (
+                          {(standardizedMsgTypeTab === "D" ? [
+                            { tag: "11", groupTag: "", name: "ClOrdID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                            { tag: "21", groupTag: "", name: "HandlInst", required: "Y", crCondition: "", dataType: "Char", values: "1,2,3", comment: "" },
+                            { tag: "38", groupTag: "", name: "OrderQty", required: "CR", crCondition: "152=N", dataType: "Qty", values: "", comment: "Required if CashOrderQty not specified" },
+                            { tag: "40", groupTag: "", name: "OrdType", required: "Y", crCondition: "", dataType: "Char", values: "1,2,3,4,P", comment: "" },
+                            { tag: "44", groupTag: "", name: "Price", required: "CR", crCondition: "40=2", dataType: "Price", values: "", comment: "Required for Limit orders" },
+                            { tag: "54", groupTag: "", name: "Side", required: "Y", crCondition: "", dataType: "Char", values: "1,2,5,6", comment: "" },
+                            { tag: "55", groupTag: "", name: "Symbol", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                            { tag: "59", groupTag: "", name: "TimeInForce", required: "N", crCondition: "", dataType: "Char", values: "0,1,3,4,6", comment: "" },
+                            { tag: "60", groupTag: "", name: "TransactTime", required: "Y", crCondition: "", dataType: "UTCTimestamp", values: "", comment: "" },
+                            { tag: "453", groupTag: "", name: "NoPartyIDs", required: "N", crCondition: "", dataType: "NumInGroup", values: "", comment: "Repeating group" },
+                            { tag: "448", groupTag: "453", name: "PartyID", required: "N", crCondition: "", dataType: "String", values: "", comment: "" },
+                            { tag: "447", groupTag: "453", name: "PartyIDSource", required: "N", crCondition: "", dataType: "Char", values: "B,C,D", comment: "" },
+                          ] : standardizedMsgTypeTab === "8" ? [
+                            { tag: "6", groupTag: "", name: "AvgPx", required: "Y", crCondition: "", dataType: "Price", values: "", comment: "" },
+                            { tag: "14", groupTag: "", name: "CumQty", required: "Y", crCondition: "", dataType: "Qty", values: "", comment: "" },
+                            { tag: "17", groupTag: "", name: "ExecID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                            { tag: "37", groupTag: "", name: "OrderID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                            { tag: "39", groupTag: "", name: "OrdStatus", required: "Y", crCondition: "", dataType: "Char", values: "0,1,2,4,8", comment: "" },
+                            { tag: "150", groupTag: "", name: "ExecType", required: "Y", crCondition: "", dataType: "Char", values: "0,F,4,8", comment: "" },
+                            { tag: "151", groupTag: "", name: "LeavesQty", required: "Y", crCondition: "", dataType: "Qty", values: "", comment: "" },
+                          ] : [
+                            { tag: "11", groupTag: "", name: "ClOrdID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                            { tag: "37", groupTag: "", name: "OrderID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                          ]).map((row, i) => (
                             <tr key={i} className={`border-b ${borderColor} hover:${isDarkMode ? "bg-[#1e4976]/20" : "bg-[#f1f5f9]"}`}>
-                              <td className={`px-3 py-2 font-mono ${textPrimary}`}>{row.msgType}</td>
-                              <td className={`px-3 py-2 font-mono ${textSecondary}`}>{row.tag}</td>
-                              <td className={`px-3 py-2 ${textPrimary}`}>{row.name}</td>
-                              <td className={`px-3 py-2 ${textSecondary}`}>{row.type}</td>
-                              <td className={`px-3 py-2 ${row.required === "Y" ? "text-[#4caf50]" : textSecondary}`}>{row.required}</td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.tag} className={`w-12 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.groupTag} className={`w-12 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.name} className={`w-20 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
+                              <td className={`px-2 py-1`}>
+                                <select defaultValue={row.required} className={`w-10 px-0.5 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} ${row.required === "Y" ? "text-[#4caf50]" : row.required === "CR" ? "text-[#ff9800]" : ""}`}>
+                                  <option value="Y">Y</option>
+                                  <option value="N">N</option>
+                                  <option value="CR">CR</option>
+                                </select>
+                              </td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.crCondition} className={`w-14 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-[#ff9800]" : "bg-white text-[#ff9800]"}`} /></td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.dataType} className={`w-20 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.values} className={`w-16 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.comment} className={`w-full px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
                             </tr>
                           ))}
                         </tbody>
@@ -1972,44 +2018,68 @@ const specCompareResults = [
 
                   {/* Admin Spec Standardized View */}
                   <div>
-                    <div className={`px-4 py-3 ${isDarkMode ? "bg-[#00e5ff]/10" : "bg-[#00e5ff]/5"} border-b ${borderColor}`}>
+                    <div className={`px-4 py-2 ${isDarkMode ? "bg-[#00e5ff]/10" : "bg-[#00e5ff]/5"} border-b ${borderColor} flex items-center justify-between`}>
                       <h4 className={`font-semibold text-[#00e5ff] text-sm`}>Admin Spec: {selectedAssetClass} - {selectedFixVersion}</h4>
+                      <Button variant="outline" size="sm" className="text-xs h-6 px-2"><Plus className="h-3 w-3 mr-1" /> Add Row</Button>
                     </div>
-                    <div className="overflow-auto max-h-[400px]">
+                    <div className="overflow-auto max-h-[350px]">
                       <table className="w-full text-xs">
                         <thead className={`sticky top-0 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
                           <tr className={`border-b ${borderColor}`}>
-                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Message Type</th>
-                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Tag</th>
-                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Name</th>
-                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Type</th>
-                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Required</th>
+                            <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Tag</th>
+                            <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>GroupTag</th>
+                            <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>TagName</th>
+                            <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Req</th>
+                            <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>CRCondition</th>
+                            <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>DataType</th>
+                            <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Values</th>
+                            <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Comment</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {[
-                            { msgType: "D", tag: "11", name: "ClOrdID", type: "String", required: "Y" },
-                            { msgType: "D", tag: "21", name: "HandlInst", type: "Char", required: "Y" },
-                            { msgType: "D", tag: "38", name: "OrderQty", type: "Qty", required: "Y" },
-                            { msgType: "D", tag: "40", name: "OrdType", type: "Char", required: "Y" },
-                            { msgType: "D", tag: "44", name: "Price", type: "Price", required: "N" },
-                            { msgType: "D", tag: "54", name: "Side", type: "Char", required: "Y" },
-                            { msgType: "D", tag: "55", name: "Symbol", type: "String", required: "Y" },
-                            { msgType: "D", tag: "59", name: "TimeInForce", type: "Char", required: "N" },
-                            { msgType: "D", tag: "60", name: "TransactTime", type: "UTCTimestamp", required: "Y" },
-                            { msgType: "D", tag: "111", name: "MaxFloor", type: "Qty", required: "N" },
-                            { msgType: "D", tag: "6454", name: "CustomTag", type: "String", required: "N" },
-                            { msgType: "8", tag: "6", name: "AvgPx", type: "Price", required: "Y" },
-                            { msgType: "8", tag: "14", name: "CumQty", type: "Qty", required: "Y" },
-                            { msgType: "8", tag: "17", name: "ExecID", type: "String", required: "Y" },
-                            { msgType: "8", tag: "150", name: "ExecType", type: "Char", required: "Y" },
-                          ].map((row, i) => (
+                          {(standardizedMsgTypeTab === "D" ? [
+                            { tag: "11", groupTag: "", name: "ClOrdID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                            { tag: "21", groupTag: "", name: "HandlInst", required: "Y", crCondition: "", dataType: "Char", values: "1,2,3", comment: "" },
+                            { tag: "38", groupTag: "", name: "OrderQty", required: "Y", crCondition: "", dataType: "Qty", values: "", comment: "" },
+                            { tag: "40", groupTag: "", name: "OrdType", required: "Y", crCondition: "", dataType: "Char", values: "1,2,3,4,K,P", comment: "Includes Pegged" },
+                            { tag: "44", groupTag: "", name: "Price", required: "CR", crCondition: "40=2", dataType: "Price", values: "", comment: "Required for Limit orders" },
+                            { tag: "54", groupTag: "", name: "Side", required: "Y", crCondition: "", dataType: "Char", values: "1,2", comment: "Buy/Sell only" },
+                            { tag: "55", groupTag: "", name: "Symbol", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                            { tag: "59", groupTag: "", name: "TimeInForce", required: "N", crCondition: "", dataType: "Char", values: "0,1,3,4,6,7", comment: "Includes At the Close" },
+                            { tag: "60", groupTag: "", name: "TransactTime", required: "Y", crCondition: "", dataType: "UTCTimestamp", values: "", comment: "" },
+                            { tag: "111", groupTag: "", name: "MaxFloor", required: "N", crCondition: "", dataType: "Qty", values: "", comment: "Iceberg orders" },
+                            { tag: "453", groupTag: "", name: "NoPartyIDs", required: "Y", crCondition: "", dataType: "NumInGroup", values: "", comment: "Required repeating group" },
+                            { tag: "448", groupTag: "453", name: "PartyID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                            { tag: "447", groupTag: "453", name: "PartyIDSource", required: "Y", crCondition: "", dataType: "Char", values: "B,C,D,P", comment: "" },
+                          ] : standardizedMsgTypeTab === "8" ? [
+                            { tag: "6", groupTag: "", name: "AvgPx", required: "Y", crCondition: "", dataType: "Price", values: "", comment: "" },
+                            { tag: "14", groupTag: "", name: "CumQty", required: "Y", crCondition: "", dataType: "Qty", values: "", comment: "" },
+                            { tag: "17", groupTag: "", name: "ExecID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                            { tag: "37", groupTag: "", name: "OrderID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                            { tag: "39", groupTag: "", name: "OrdStatus", required: "Y", crCondition: "", dataType: "Char", values: "0,1,2,4,8,C", comment: "Includes Expired" },
+                            { tag: "150", groupTag: "", name: "ExecType", required: "Y", crCondition: "", dataType: "Char", values: "0,F,4,8,C", comment: "" },
+                            { tag: "151", groupTag: "", name: "LeavesQty", required: "Y", crCondition: "", dataType: "Qty", values: "", comment: "" },
+                            { tag: "31", groupTag: "", name: "LastPx", required: "CR", crCondition: "150=F", dataType: "Price", values: "", comment: "Required on fills" },
+                            { tag: "32", groupTag: "", name: "LastQty", required: "CR", crCondition: "150=F", dataType: "Qty", values: "", comment: "Required on fills" },
+                          ] : [
+                            { tag: "11", groupTag: "", name: "ClOrdID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                            { tag: "37", groupTag: "", name: "OrderID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                          ]).map((row, i) => (
                             <tr key={i} className={`border-b ${borderColor} hover:${isDarkMode ? "bg-[#1e4976]/20" : "bg-[#f1f5f9]"}`}>
-                              <td className={`px-3 py-2 font-mono ${textPrimary}`}>{row.msgType}</td>
-                              <td className={`px-3 py-2 font-mono ${textSecondary}`}>{row.tag}</td>
-                              <td className={`px-3 py-2 ${textPrimary}`}>{row.name}</td>
-                              <td className={`px-3 py-2 ${textSecondary}`}>{row.type}</td>
-                              <td className={`px-3 py-2 ${row.required === "Y" ? "text-[#4caf50]" : textSecondary}`}>{row.required}</td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.tag} className={`w-12 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.groupTag} className={`w-12 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.name} className={`w-20 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
+                              <td className={`px-2 py-1`}>
+                                <select defaultValue={row.required} className={`w-10 px-0.5 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} ${row.required === "Y" ? "text-[#4caf50]" : row.required === "CR" ? "text-[#ff9800]" : ""}`}>
+                                  <option value="Y">Y</option>
+                                  <option value="N">N</option>
+                                  <option value="CR">CR</option>
+                                </select>
+                              </td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.crCondition} className={`w-14 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-[#ff9800]" : "bg-white text-[#ff9800]"}`} /></td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.dataType} className={`w-20 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.values} className={`w-16 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
+                              <td className={`px-2 py-1`}><input type="text" defaultValue={row.comment} className={`w-full px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
                             </tr>
                           ))}
                         </tbody>
