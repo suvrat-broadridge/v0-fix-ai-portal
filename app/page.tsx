@@ -17,6 +17,7 @@ export default function BCometPlatform() {
   const [selectedAssetClass, setSelectedAssetClass] = useState<string | null>(null)
   const [selectedFixVersion, setSelectedFixVersion] = useState<string | null>(null)
   const [showSpecResults, setShowSpecResults] = useState(false)
+  const [showStandardizedSpecs, setShowStandardizedSpecs] = useState(false)
   const [showLogResults, setShowLogResults] = useState(false)
   const [comparisonFlags, setComparisonFlags] = useState<Record<string, { status: "ignore" | "customization" | "flag" | null; note: string }>>({})
   const [logAnalysisFlags, setLogAnalysisFlags] = useState<Record<string, { status: "ignore" | "customization" | "flag" | null; note: string }>>({})
@@ -1744,7 +1745,7 @@ const specCompareResults = [
           <Sidebar />
           <div className="flex-1 overflow-auto">
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-              <button onClick={() => { setShowSpecResults(false); setSelectedAdminSpecForResults(null); setCurrentScreen("client-detail"); }} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <button onClick={() => { setShowSpecResults(false); setShowStandardizedSpecs(false); setSelectedAdminSpecForResults(null); setCurrentScreen("client-detail"); }} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
                 <ArrowLeft className="h-4 w-4" /> Back to {selectedClient.name}
               </button>
               <div className="flex items-center justify-between">
@@ -1901,11 +1902,129 @@ const specCompareResults = [
                 </div>
                 
                 <div className="mt-4 flex justify-center">
-                  <Button onClick={() => simulateTask(() => setShowSpecResults(true))} disabled={isLoading} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
-                    <Play className="h-4 w-4 mr-2" /> {isLoading ? "Comparing..." : "Run Comparison"}
+                  <Button onClick={() => simulateTask(() => { setShowStandardizedSpecs(true); setShowSpecResults(false); })} disabled={isLoading} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
+                    <Zap className="h-4 w-4 mr-2" /> {isLoading ? "Converting..." : "Convert to Standard Format"}
                   </Button>
                 </div>
               </Card>
+
+              {/* Step 2: Standardized Specs Side by Side */}
+              {showStandardizedSpecs && (
+              <Card className={`${bgCard} border ${borderColor}`}>
+                <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
+                  <div>
+                    <h3 className={`text-lg font-bold ${textPrimary}`}>Standardized Specifications</h3>
+                    <p className={`text-xs ${textSecondary}`}>Both specs converted to standard Excel format for comparison</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm"><Download className="h-4 w-4 mr-2" /> Export Client</Button>
+                    <Button variant="outline" size="sm"><Download className="h-4 w-4 mr-2" /> Export Admin</Button>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-0">
+                  {/* Client Spec Standardized View */}
+                  <div className={`border-r ${borderColor}`}>
+                    <div className={`px-4 py-3 ${isDarkMode ? "bg-[#2196f3]/10" : "bg-[#2196f3]/5"} border-b ${borderColor}`}>
+                      <h4 className={`font-semibold text-[#2196f3] text-sm`}>Client Spec: {selectedClient?.name} - {selectedAssetClass}</h4>
+                    </div>
+                    <div className="overflow-auto max-h-[400px]">
+                      <table className="w-full text-xs">
+                        <thead className={`sticky top-0 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+                          <tr className={`border-b ${borderColor}`}>
+                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Message Type</th>
+                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Tag</th>
+                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Name</th>
+                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Type</th>
+                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Required</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[
+                            { msgType: "D", tag: "11", name: "ClOrdID", type: "String", required: "Y" },
+                            { msgType: "D", tag: "21", name: "HandlInst", type: "Char", required: "Y" },
+                            { msgType: "D", tag: "38", name: "OrderQty", type: "Qty", required: "N" },
+                            { msgType: "D", tag: "40", name: "OrdType", type: "Char", required: "Y" },
+                            { msgType: "D", tag: "44", name: "Price", type: "Price", required: "N" },
+                            { msgType: "D", tag: "54", name: "Side", type: "Char", required: "Y" },
+                            { msgType: "D", tag: "55", name: "Symbol", type: "String", required: "Y" },
+                            { msgType: "D", tag: "59", name: "TimeInForce", type: "Char", required: "N" },
+                            { msgType: "D", tag: "60", name: "TransactTime", type: "UTCTimestamp", required: "Y" },
+                            { msgType: "D", tag: "375", name: "ContraBroker", type: "String", required: "N" },
+                            { msgType: "D", tag: "943", name: "TimeBracket", type: "String", required: "N" },
+                            { msgType: "8", tag: "6", name: "AvgPx", type: "Price", required: "Y" },
+                            { msgType: "8", tag: "14", name: "CumQty", type: "Qty", required: "Y" },
+                            { msgType: "8", tag: "17", name: "ExecID", type: "String", required: "Y" },
+                            { msgType: "8", tag: "20", name: "ExecTransType", type: "Char", required: "Y" },
+                          ].map((row, i) => (
+                            <tr key={i} className={`border-b ${borderColor} hover:${isDarkMode ? "bg-[#1e4976]/20" : "bg-[#f1f5f9]"}`}>
+                              <td className={`px-3 py-2 font-mono ${textPrimary}`}>{row.msgType}</td>
+                              <td className={`px-3 py-2 font-mono ${textSecondary}`}>{row.tag}</td>
+                              <td className={`px-3 py-2 ${textPrimary}`}>{row.name}</td>
+                              <td className={`px-3 py-2 ${textSecondary}`}>{row.type}</td>
+                              <td className={`px-3 py-2 ${row.required === "Y" ? "text-[#4caf50]" : textSecondary}`}>{row.required}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Admin Spec Standardized View */}
+                  <div>
+                    <div className={`px-4 py-3 ${isDarkMode ? "bg-[#00e5ff]/10" : "bg-[#00e5ff]/5"} border-b ${borderColor}`}>
+                      <h4 className={`font-semibold text-[#00e5ff] text-sm`}>Admin Spec: {selectedAssetClass} - {selectedFixVersion}</h4>
+                    </div>
+                    <div className="overflow-auto max-h-[400px]">
+                      <table className="w-full text-xs">
+                        <thead className={`sticky top-0 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+                          <tr className={`border-b ${borderColor}`}>
+                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Message Type</th>
+                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Tag</th>
+                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Name</th>
+                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Type</th>
+                            <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Required</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[
+                            { msgType: "D", tag: "11", name: "ClOrdID", type: "String", required: "Y" },
+                            { msgType: "D", tag: "21", name: "HandlInst", type: "Char", required: "Y" },
+                            { msgType: "D", tag: "38", name: "OrderQty", type: "Qty", required: "Y" },
+                            { msgType: "D", tag: "40", name: "OrdType", type: "Char", required: "Y" },
+                            { msgType: "D", tag: "44", name: "Price", type: "Price", required: "N" },
+                            { msgType: "D", tag: "54", name: "Side", type: "Char", required: "Y" },
+                            { msgType: "D", tag: "55", name: "Symbol", type: "String", required: "Y" },
+                            { msgType: "D", tag: "59", name: "TimeInForce", type: "Char", required: "N" },
+                            { msgType: "D", tag: "60", name: "TransactTime", type: "UTCTimestamp", required: "Y" },
+                            { msgType: "D", tag: "111", name: "MaxFloor", type: "Qty", required: "N" },
+                            { msgType: "D", tag: "6454", name: "CustomTag", type: "String", required: "N" },
+                            { msgType: "8", tag: "6", name: "AvgPx", type: "Price", required: "Y" },
+                            { msgType: "8", tag: "14", name: "CumQty", type: "Qty", required: "Y" },
+                            { msgType: "8", tag: "17", name: "ExecID", type: "String", required: "Y" },
+                            { msgType: "8", tag: "150", name: "ExecType", type: "Char", required: "Y" },
+                          ].map((row, i) => (
+                            <tr key={i} className={`border-b ${borderColor} hover:${isDarkMode ? "bg-[#1e4976]/20" : "bg-[#f1f5f9]"}`}>
+                              <td className={`px-3 py-2 font-mono ${textPrimary}`}>{row.msgType}</td>
+                              <td className={`px-3 py-2 font-mono ${textSecondary}`}>{row.tag}</td>
+                              <td className={`px-3 py-2 ${textPrimary}`}>{row.name}</td>
+                              <td className={`px-3 py-2 ${textSecondary}`}>{row.type}</td>
+                              <td className={`px-3 py-2 ${row.required === "Y" ? "text-[#4caf50]" : textSecondary}`}>{row.required}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={`px-6 py-4 border-t ${borderColor} flex justify-center`}>
+                  <Button onClick={() => simulateTask(() => setShowSpecResults(true))} disabled={isLoading} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
+                    <GitCompare className="h-4 w-4 mr-2" /> {isLoading ? "Comparing..." : "Run Comparison"}
+                  </Button>
+                </div>
+              </Card>
+              )}
 
               {/* Comparison Results */}
               {showSpecResults && (
