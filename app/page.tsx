@@ -19,8 +19,53 @@ export default function BCometPlatform() {
   const [showSpecResults, setShowSpecResults] = useState(false)
   const [showStandardizedSpecs, setShowStandardizedSpecs] = useState(false)
   const [standardizedMsgTypeTab, setStandardizedMsgTypeTab] = useState<string>("D")
-  const [viewingClientSpec, setViewingClientSpec] = useState<{asset: string, protocol: string, specName: string} | null>(null)
+  const [viewingClientSpec, setViewingClientSpec] = useState<{asset: string, protocol: string, specName: string, clientSpecFile?: string, clientName?: string} | null>(null)
   const [clientSpecStandardized, setClientSpecStandardized] = useState(false)
+  const [isConverting, setIsConverting] = useState(false)
+  const [conversionError, setConversionError] = useState<string | null>(null)
+  const [standardizedSpecData, setStandardizedSpecData] = useState<any>(null)
+
+  const handleConvertToStandard = async (spec: {asset: string, protocol: string, clientSpec: string, clientSpecFile?: string}) => {
+    setIsConverting(true)
+    setConversionError(null)
+    try {
+      const response = await fetch("http://localhost:5000/api/clients/spec/convert-to-standard", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Runner-Token": "my-secret-token",
+        },
+        body: JSON.stringify({
+          inputPath: spec.clientSpecFile || spec.clientSpec,
+          outputDir: "output",
+          clientName: selectedClient?.name || "Unknown",
+          assetClass: spec.asset,
+          fixVersion: spec.protocol,
+        }),
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Conversion failed: ${response.statusText}`)
+      }
+      
+      const data = await response.json()
+      console.log("[v0] Conversion response:", data)
+      setStandardizedSpecData(data)
+      setViewingClientSpec({ 
+        asset: spec.asset, 
+        protocol: spec.protocol, 
+        specName: spec.clientSpec,
+        clientSpecFile: spec.clientSpecFile,
+        clientName: selectedClient?.name
+      })
+      setClientSpecStandardized(false)
+    } catch (error: any) {
+      console.error("[v0] Conversion error:", error)
+      setConversionError(error.message || "Failed to convert spec")
+    } finally {
+      setIsConverting(false)
+    }
+  }
   const [showLogResults, setShowLogResults] = useState(false)
   const [comparisonFlags, setComparisonFlags] = useState<Record<string, { status: "ignore" | "customization" | "flag" | null; note: string }>>({})
   const [logAnalysisFlags, setLogAnalysisFlags] = useState<Record<string, { status: "ignore" | "customization" | "flag" | null; note: string }>>({})
@@ -1556,11 +1601,11 @@ const clientProgressData = [
                   </thead>
                   <tbody>
                     {[
-                      { asset: "Equities", protocol: "FIX 4.2", clientSpec: "client_eq_42.xml", standardized: true, standardizedName: "client_eq_42_standardized.xlsx" },
-                      { asset: "Equities", protocol: "FIX 4.4", clientSpec: "client_eq_44.xml", standardized: false, standardizedName: null },
-                      { asset: "Options", protocol: "FIX 4.4", clientSpec: "client_opt_44.xml", standardized: true, standardizedName: "client_opt_44_standardized.xlsx" },
-                      { asset: "Futures", protocol: "FIX 4.2", clientSpec: null, standardized: false, standardizedName: null },
-                      { asset: "Futures", protocol: "FIX 5.0 SP2", clientSpec: "client_fut_50sp2.xml", standardized: false, standardizedName: null },
+                      { asset: "Equities", protocol: "FIX 4.2", clientSpec: "client_eq_42.xml", clientSpecFile: "/specs/clients/nexus/equities/fix42/client_eq_42.xml", standardized: true, standardizedName: "client_eq_42_standardized.xlsx" },
+                      { asset: "Equities", protocol: "FIX 4.4", clientSpec: "client_eq_44.xml", clientSpecFile: "/specs/clients/nexus/equities/fix44/client_eq_44.xml", standardized: false, standardizedName: null },
+                      { asset: "Options", protocol: "FIX 4.4", clientSpec: "client_opt_44.xml", clientSpecFile: "/specs/clients/nexus/options/fix44/client_opt_44.xml", standardized: true, standardizedName: "client_opt_44_standardized.xlsx" },
+                      { asset: "Futures", protocol: "FIX 4.2", clientSpec: null, clientSpecFile: null, standardized: false, standardizedName: null },
+                      { asset: "Futures", protocol: "FIX 5.0 SP2", clientSpec: "client_fut_50sp2.xml", clientSpecFile: "/specs/clients/nexus/futures/fix50sp2/client_fut_50sp2.xml", standardized: false, standardizedName: null },
                     ].map((spec, i) => (
                       <tr key={i} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
                         <td className={`px-4 py-3 ${textPrimary}`}>{spec.asset}</td>
@@ -1600,8 +1645,8 @@ const clientProgressData = [
                                   </Button>
                                 </>
                               ) : (
-                                <Button size="sm" className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80" onClick={() => { setViewingClientSpec({ asset: spec.asset, protocol: spec.protocol, specName: spec.clientSpec || "" }); setClientSpecStandardized(false); }}>
-                                  <Zap className="h-3 w-3 mr-1" /> Convert to Standard
+                                <Button size="sm" className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80" disabled={isConverting} onClick={() => handleConvertToStandard(spec)}>
+                                  <Zap className="h-3 w-3 mr-1" /> {isConverting ? "Converting..." : "Convert to Standard"}
                                 </Button>
                               )}
                             </div>
@@ -1614,6 +1659,22 @@ const clientProgressData = [
               </div>
             </Card>
 
+            {/* Conversion Error Display */}
+            {conversionError && (
+              <Card className={`${bgCard} border border-red-500/50 mb-6 p-4`}>
+                <div className="flex items-center gap-3">
+                  <AlertCircle className="h-5 w-5 text-red-500" />
+                  <div>
+                    <p className="text-red-500 font-medium">Conversion Error</p>
+                    <p className={`text-sm ${textSecondary}`}>{conversionError}</p>
+                  </div>
+                  <Button variant="outline" size="sm" className="ml-auto" onClick={() => setConversionError(null)}>
+                    Dismiss
+                  </Button>
+                </div>
+              </Card>
+            )}
+
             {/* Client Spec Conversion/View Modal */}
             {viewingClientSpec && (
               <Card className={`${bgCard} border ${borderColor} mb-6`}>
@@ -1624,7 +1685,7 @@ const clientProgressData = [
                     </h3>
                     <p className={`text-xs ${textSecondary}`}>{viewingClientSpec.specName}</p>
                   </div>
-                  <Button variant="outline" size="sm" onClick={() => setViewingClientSpec(null)}>
+                  <Button variant="outline" size="sm" onClick={() => { setViewingClientSpec(null); setStandardizedSpecData(null); }}>
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
