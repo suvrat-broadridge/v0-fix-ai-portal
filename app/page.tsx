@@ -2963,11 +2963,9 @@ const specCompareResults = [
 <option value="">Choose a standardized spec...</option>
     <option value="equities-4.2-std">Equities FIX 4.2 v1.2 - Standardized</option>
     <option value="equities-4.4-std">Equities FIX 4.4 v2.1 - Standardized</option>
-    <option value="options-4.4-std">Options FIX 4.4 v2.0 - Standardized</option>
-    <option value="futures-5.0-std">Futures FIX 5.0 SP2 v2.0 - Standardized</option>
-    <option value="fixed-income-4.4-std">Fixed Income FIX 4.4 v1.2 - Standardized</option>
-    <option value="fx-5.0-std">FX FIX 5.0 SP2 v1.1 - Standardized</option>
-                    </select>
+<option value="options-4.4-std">Options FIX 4.4 v2.0 - Standardized</option>
+  <option value="futures-5.0-std">Futures FIX 5.0 SP2 v2.0 - Standardized</option>
+  </select>
                   </div>
                 </div>
               </div>
