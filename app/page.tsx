@@ -22,12 +22,21 @@ export default function BCometPlatform() {
   const [viewingClientSpec, setViewingClientSpec] = useState<{asset: string, protocol: string, specName: string, clientSpecFile?: string, clientName?: string} | null>(null)
   const [clientSpecStandardized, setClientSpecStandardized] = useState(false)
   const [isConverting, setIsConverting] = useState(false)
-  const [conversionError, setConversionError] = useState<string | null>(null)
+  const [conversionError, setConversionError] = useState<{message: string, endpoint: string, requestBody: any} | null>(null)
   const [standardizedSpecData, setStandardizedSpecData] = useState<any>(null)
 
   const handleConvertToStandard = async (spec: {asset: string, protocol: string, clientSpec: string, clientSpecFile?: string}) => {
     setIsConverting(true)
     setConversionError(null)
+    
+    const endpoint = "http://localhost:5000/api/clients/spec/convert-to-standard"
+    const requestBody = {
+      inputPath: spec.clientSpecFile || spec.clientSpec,
+      outputDir: "output",
+      clientName: selectedClient?.name || "Unknown",
+      assetClass: spec.asset,
+      fixVersion: spec.protocol,
+    }
     
     // Always show the modal
     setViewingClientSpec({ 
@@ -40,29 +49,27 @@ export default function BCometPlatform() {
     setClientSpecStandardized(false)
     
     try {
-      const response = await fetch("http://localhost:5000/api/clients/spec/convert-to-standard", {
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "X-Runner-Token": "my-secret-token",
         },
-        body: JSON.stringify({
-          inputPath: spec.clientSpecFile || spec.clientSpec,
-          outputDir: "output",
-          clientName: selectedClient?.name || "Unknown",
-          assetClass: spec.asset,
-          fixVersion: spec.protocol,
-        }),
+        body: JSON.stringify(requestBody),
       })
       
       if (!response.ok) {
-        throw new Error(`Conversion failed: ${response.statusText}`)
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
       
       const data = await response.json()
       setStandardizedSpecData(data)
     } catch (error: any) {
-      setConversionError(error.message || "Failed to connect to backend - showing sample data")
+      setConversionError({
+        message: error.message || "Unknown error",
+        endpoint: endpoint,
+        requestBody: requestBody
+      })
       // Clear standardizedSpecData so dummy data will be shown
       setStandardizedSpecData(null)
     } finally {
@@ -1665,15 +1672,26 @@ const clientProgressData = [
             {/* Conversion Error Display */}
             {conversionError && (
               <Card className={`${bgCard} border border-red-500/50 mb-6 p-4`}>
-                <div className="flex items-center gap-3">
-                  <AlertCircle className="h-5 w-5 text-red-500" />
-                  <div>
-                    <p className="text-red-500 font-medium">Conversion Error</p>
-                    <p className={`text-sm ${textSecondary}`}>{conversionError}</p>
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-red-500 font-medium">API Call Failed - Showing Sample Data</p>
+                      <Button variant="outline" size="sm" onClick={() => setConversionError(null)}>
+                        Dismiss
+                      </Button>
+                    </div>
+                    <div className={`text-sm ${textSecondary} space-y-2`}>
+                      <p><span className="font-medium text-red-400">Error:</span> {conversionError.message}</p>
+                      <p><span className="font-medium text-[#00e5ff]">Endpoint:</span> <code className="bg-[#1e4976]/30 px-1 rounded text-xs">{conversionError.endpoint}</code></p>
+                      <div>
+                        <span className="font-medium text-[#00e5ff]">Request Body:</span>
+                        <pre className={`mt-1 p-2 rounded text-xs overflow-x-auto ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-100"} border ${borderColor}`}>
+{JSON.stringify(conversionError.requestBody, null, 2)}
+                        </pre>
+                      </div>
+                    </div>
                   </div>
-                  <Button variant="outline" size="sm" className="ml-auto" onClick={() => setConversionError(null)}>
-                    Dismiss
-                  </Button>
                 </div>
               </Card>
             )}
