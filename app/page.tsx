@@ -19,6 +19,8 @@ export default function BCometPlatform() {
   const [showSpecResults, setShowSpecResults] = useState(false)
   const [showStandardizedSpecs, setShowStandardizedSpecs] = useState(false)
   const [standardizedMsgTypeTab, setStandardizedMsgTypeTab] = useState<string>("D")
+  const [viewingClientSpec, setViewingClientSpec] = useState<{asset: string, protocol: string, specName: string} | null>(null)
+  const [clientSpecStandardized, setClientSpecStandardized] = useState(false)
   const [showLogResults, setShowLogResults] = useState(false)
   const [comparisonFlags, setComparisonFlags] = useState<Record<string, { status: "ignore" | "customization" | "flag" | null; note: string }>>({})
   const [logAnalysisFlags, setLogAnalysisFlags] = useState<Record<string, { status: "ignore" | "customization" | "flag" | null; note: string }>>({})
@@ -1533,6 +1535,195 @@ const clientProgressData = [
           </header>
 
           <div className="p-6">
+            {/* Client Specs Section */}
+            <Card className={`${bgCard} border ${borderColor} mb-6`}>
+              <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
+                <div>
+                  <h2 className={`text-lg font-bold ${textPrimary}`}>Client Specifications</h2>
+                  <p className={`text-sm ${textSecondary}`}>View and convert client specs to standardized format</p>
+                </div>
+              </div>
+              <div className="p-6">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className={`border-b ${borderColor}`}>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Asset Class</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>FIX Version</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Client Spec (Original)</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Standardized Version</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { asset: "Equities", protocol: "FIX 4.2", clientSpec: "client_eq_42.xml", standardized: true, standardizedName: "client_eq_42_standardized.xlsx" },
+                      { asset: "Equities", protocol: "FIX 4.4", clientSpec: "client_eq_44.xml", standardized: false, standardizedName: null },
+                      { asset: "Options", protocol: "FIX 4.4", clientSpec: "client_opt_44.xml", standardized: true, standardizedName: "client_opt_44_standardized.xlsx" },
+                      { asset: "Futures", protocol: "FIX 4.2", clientSpec: null, standardized: false, standardizedName: null },
+                      { asset: "Futures", protocol: "FIX 5.0 SP2", clientSpec: "client_fut_50sp2.xml", standardized: false, standardizedName: null },
+                    ].map((spec, i) => (
+                      <tr key={i} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
+                        <td className={`px-4 py-3 ${textPrimary}`}>{spec.asset}</td>
+                        <td className={`px-4 py-3 ${textPrimary}`}>{spec.protocol}</td>
+                        <td className={`px-4 py-3`}>
+                          {spec.clientSpec ? (
+                            <div className="flex items-center gap-2">
+                              <FileText className={`h-4 w-4 ${textSecondary}`} />
+                              <span className={textPrimary}>{spec.clientSpec}</span>
+                            </div>
+                          ) : (
+                            <span className={`${textSecondary} italic`}>Not uploaded</span>
+                          )}
+                        </td>
+                        <td className={`px-4 py-3`}>
+                          {spec.standardized ? (
+                            <div className="flex items-center gap-2">
+                              <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                              <span className="text-[#4caf50]">{spec.standardizedName}</span>
+                            </div>
+                          ) : spec.clientSpec ? (
+                            <span className={`text-[#ff9800] italic`}>Not yet converted</span>
+                          ) : (
+                            <span className={`${textSecondary} italic`}>-</span>
+                          )}
+                        </td>
+                        <td className={`px-4 py-3`}>
+                          {spec.clientSpec && (
+                            <div className="flex items-center gap-2">
+                              {spec.standardized ? (
+                                <>
+                                  <Button variant="outline" size="sm" onClick={() => { setViewingClientSpec({ asset: spec.asset, protocol: spec.protocol, specName: spec.standardizedName || "" }); setClientSpecStandardized(true); }}>
+                                    <Eye className="h-3 w-3 mr-1" /> View
+                                  </Button>
+                                  <Button variant="outline" size="sm">
+                                    <Download className="h-3 w-3 mr-1" /> Export
+                                  </Button>
+                                </>
+                              ) : (
+                                <Button size="sm" className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80" onClick={() => { setViewingClientSpec({ asset: spec.asset, protocol: spec.protocol, specName: spec.clientSpec || "" }); setClientSpecStandardized(false); }}>
+                                  <Zap className="h-3 w-3 mr-1" /> Convert to Standard
+                                </Button>
+                              )}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+
+            {/* Client Spec Conversion/View Modal */}
+            {viewingClientSpec && (
+              <Card className={`${bgCard} border ${borderColor} mb-6`}>
+                <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
+                  <div>
+                    <h3 className={`text-lg font-bold ${textPrimary}`}>
+                      {clientSpecStandardized ? "Standardized Spec" : "Convert to Standard Format"}: {viewingClientSpec.asset} - {viewingClientSpec.protocol}
+                    </h3>
+                    <p className={`text-xs ${textSecondary}`}>{viewingClientSpec.specName}</p>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => setViewingClientSpec(null)}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* Message Type Tabs */}
+                <div className={`px-4 py-2 border-b ${borderColor} flex gap-1 overflow-x-auto`}>
+                  {[
+                    { id: "D", label: "New Order Single (D)" },
+                    { id: "F", label: "Order Cancel Request (F)" },
+                    { id: "G", label: "Order Cancel/Replace (G)" },
+                    { id: "8", label: "Execution Report (8)" },
+                    { id: "9", label: "Order Cancel Reject (9)" },
+                    { id: "j", label: "Business Reject (j)" },
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setStandardizedMsgTypeTab(tab.id)}
+                      className={`px-3 py-1.5 rounded text-xs font-medium whitespace-nowrap transition-colors ${
+                        standardizedMsgTypeTab === tab.id
+                          ? "bg-[#00e5ff] text-[#0a1628]"
+                          : `${textSecondary} hover:bg-[#1e4976]/30`
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="overflow-auto max-h-[400px]">
+                  <table className="w-full text-xs">
+                    <thead className={`sticky top-0 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+                      <tr className={`border-b ${borderColor}`}>
+                        <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Tag</th>
+                        <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>GroupTag</th>
+                        <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>TagName</th>
+                        <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Required</th>
+                        <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>CRCondition</th>
+                        <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>DataType</th>
+                        <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>SupportedValues</th>
+                        <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Comment</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(standardizedMsgTypeTab === "D" ? [
+                        { tag: "11", groupTag: "", name: "ClOrdID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                        { tag: "21", groupTag: "", name: "HandlInst", required: "Y", crCondition: "", dataType: "Char", values: "1,2,3", comment: "" },
+                        { tag: "38", groupTag: "", name: "OrderQty", required: "CR", crCondition: "152=N", dataType: "Qty", values: "", comment: "Required if CashOrderQty not specified" },
+                        { tag: "40", groupTag: "", name: "OrdType", required: "Y", crCondition: "", dataType: "Char", values: "1,2,3,4,P", comment: "" },
+                        { tag: "44", groupTag: "", name: "Price", required: "CR", crCondition: "40=2", dataType: "Price", values: "", comment: "Required for Limit orders" },
+                        { tag: "54", groupTag: "", name: "Side", required: "Y", crCondition: "", dataType: "Char", values: "1,2,5,6", comment: "" },
+                        { tag: "55", groupTag: "", name: "Symbol", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                        { tag: "59", groupTag: "", name: "TimeInForce", required: "N", crCondition: "", dataType: "Char", values: "0,1,3,4,6", comment: "" },
+                        { tag: "60", groupTag: "", name: "TransactTime", required: "Y", crCondition: "", dataType: "UTCTimestamp", values: "", comment: "" },
+                        { tag: "453", groupTag: "", name: "NoPartyIDs", required: "N", crCondition: "", dataType: "NumInGroup", values: "", comment: "Repeating group" },
+                        { tag: "448", groupTag: "453", name: "PartyID", required: "N", crCondition: "", dataType: "String", values: "", comment: "" },
+                      ] : standardizedMsgTypeTab === "8" ? [
+                        { tag: "6", groupTag: "", name: "AvgPx", required: "Y", crCondition: "", dataType: "Price", values: "", comment: "" },
+                        { tag: "14", groupTag: "", name: "CumQty", required: "Y", crCondition: "", dataType: "Qty", values: "", comment: "" },
+                        { tag: "17", groupTag: "", name: "ExecID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                        { tag: "37", groupTag: "", name: "OrderID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                        { tag: "39", groupTag: "", name: "OrdStatus", required: "Y", crCondition: "", dataType: "Char", values: "0,1,2,4,8", comment: "" },
+                        { tag: "150", groupTag: "", name: "ExecType", required: "Y", crCondition: "", dataType: "Char", values: "0,F,4,8", comment: "" },
+                      ] : [
+                        { tag: "11", groupTag: "", name: "ClOrdID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                        { tag: "37", groupTag: "", name: "OrderID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                      ]).map((row, i) => (
+                        <tr key={i} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
+                          <td className={`px-3 py-1`}><input type="text" defaultValue={row.tag} className={`w-12 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
+                          <td className={`px-3 py-1`}><input type="text" defaultValue={row.groupTag} className={`w-12 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
+                          <td className={`px-3 py-1`}><input type="text" defaultValue={row.name} className={`w-24 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
+                          <td className={`px-3 py-1`}>
+                            <select defaultValue={row.required} className={`w-12 px-0.5 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} ${row.required === "Y" ? "text-[#4caf50]" : row.required === "CR" ? "text-[#ff9800]" : ""}`}>
+                              <option value="Y">Y</option>
+                              <option value="N">N</option>
+                              <option value="CR">CR</option>
+                            </select>
+                          </td>
+                          <td className={`px-3 py-1`}><input type="text" defaultValue={row.crCondition} className={`w-16 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-[#ff9800]" : "bg-white text-[#ff9800]"}`} /></td>
+                          <td className={`px-3 py-1`}><input type="text" defaultValue={row.dataType} className={`w-24 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
+                          <td className={`px-3 py-1`}><input type="text" defaultValue={row.values} className={`w-20 px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
+                          <td className={`px-3 py-1`}><input type="text" defaultValue={row.comment} className={`w-full px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`} /></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className={`px-6 py-4 border-t ${borderColor} flex justify-between items-center`}>
+                  <Button variant="outline" size="sm"><Plus className="h-4 w-4 mr-2" /> Add Row</Button>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setViewingClientSpec(null)}>Cancel</Button>
+                    <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80" onClick={() => { alert("Standardized spec saved!"); setViewingClientSpec(null); }}>
+                      <Download className="h-4 w-4 mr-2" /> Save Standardized Spec
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            )}
+
             <div className="grid gap-6">
               {clientProgressData.map((asset) => (
                 <Card key={asset.name} className={`${bgCard} border ${borderColor} overflow-hidden`}>
@@ -1904,7 +2095,7 @@ const specCompareResults = [
                 
                 <div className="mt-4 flex justify-center">
                   <Button onClick={() => simulateTask(() => { setShowStandardizedSpecs(true); setShowSpecResults(false); })} disabled={isLoading} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
-                    <Zap className="h-4 w-4 mr-2" /> {isLoading ? "Converting..." : "Convert to Standard Format"}
+                    <GitCompare className="h-4 w-4 mr-2" /> {isLoading ? "Loading..." : "Load Standardized Specs"}
                   </Button>
                 </div>
               </Card>
@@ -2252,12 +2443,11 @@ const specCompareResults = [
   </div>
   </div>
   <div>
-  <label className={`text-xs ${textSecondary} mb-1 block`}>Spec Version</label>
+  <label className={`text-xs ${textSecondary} mb-1 block`}>Standardized Spec Version</label>
   <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
-  <option value="">Select spec version...</option>
-  <option value="v1.2">client_eq_44_v1.2.xml (Jan 15, 2024)</option>
-  <option value="v1.1">client_eq_44_v1.1.xml (Jan 10, 2024)</option>
-  <option value="v1.0">client_eq_44_v1.0.xml (Dec 20, 2023)</option>
+  <option value="">Select standardized spec...</option>
+  <option value="v1.2-std">client_eq_44_v1.2_Standardized.xlsx (Jan 15, 2024)</option>
+  <option value="v1.1-std">client_eq_44_v1.1_Standardized.xlsx (Jan 10, 2024)</option>
   </select>
   </div>
   </div>
@@ -2330,7 +2520,7 @@ const specCompareResults = [
   </div>
   </div>
   <div className="mt-6 flex justify-center gap-4">
-  <Button onClick={() => simulateTask(() => { setShowStandardizedSpecs(true); setShowSpecResults(false); })} disabled={isLoading} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80"><Zap className="h-4 w-4 mr-2" /> {isLoading ? "Converting..." : "Convert to Standard Format"}</Button>
+  <Button onClick={() => simulateTask(() => { setShowStandardizedSpecs(true); setShowSpecResults(false); })} disabled={isLoading} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80"><GitCompare className="h-4 w-4 mr-2" /> {isLoading ? "Loading..." : "Load Standardized Specs"}</Button>
   </div>
   </Card>
 
@@ -2340,7 +2530,7 @@ const specCompareResults = [
               <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
                 <div>
                   <h3 className={`text-lg font-bold ${textPrimary}`}>Standardized Specifications</h3>
-                  <p className={`text-xs ${textSecondary}`}>Both specs converted to standard format - review and edit before comparison</p>
+                  <p className={`text-xs ${textSecondary}`}>Review standardized specs before running comparison</p>
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm"><Download className="h-4 w-4 mr-2" /> Export Client</Button>
@@ -2688,21 +2878,13 @@ const specCompareResults = [
                       defaultValue={selectedAssetClass && selectedFixVersion ? `${selectedAssetClass?.toLowerCase().replace(" ", "-")}-${selectedFixVersion?.split(" ")[1]?.toLowerCase()}` : ""}
                       className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}
                     >
-<option value="">Choose a spec...</option>
-  <optgroup label="Standardized Specs">
+<option value="">Choose a standardized spec...</option>
     <option value="equities-4.2-std">Equities FIX 4.2 v1.2 - Standardized</option>
     <option value="equities-4.4-std">Equities FIX 4.4 v2.1 - Standardized</option>
     <option value="options-4.4-std">Options FIX 4.4 v2.0 - Standardized</option>
     <option value="futures-5.0-std">Futures FIX 5.0 SP2 v2.0 - Standardized</option>
-  </optgroup>
-  <optgroup label="Original Specs">
-    <option value="equities-4.2">Equities - FIX 4.2 v1.2</option>
-    <option value="equities-4.4">Equities - FIX 4.4 v2.1</option>
-    <option value="options-4.4">Options - FIX 4.4 v2.0</option>
-    <option value="futures-5.0">Futures - FIX 5.0 SP2 v2.0</option>
-    <option value="fixed income-4.4">Fixed Income - FIX 4.4 v1.2</option>
-    <option value="fx-5.0">FX - FIX 5.0 SP2 v1.1</option>
-  </optgroup>
+    <option value="fixed-income-4.4-std">Fixed Income FIX 4.4 v1.2 - Standardized</option>
+    <option value="fx-5.0-std">FX FIX 5.0 SP2 v1.1 - Standardized</option>
                     </select>
                   </div>
                 </div>
@@ -2868,13 +3050,7 @@ const specCompareResults = [
     <option value="equities-4.4-std">Equities FIX 4.4 v2.1 - Standardized</option>
     <option value="options-4.4-std">Options FIX 4.4 v2.0 - Standardized</option>
     <option value="futures-5.0-std">Futures FIX 5.0 SP2 v2.0 - Standardized</option>
-  </optgroup>
-  <optgroup label="Original Specs">
-    <option value="equities-4.2">Equities - FIX 4.2 v1.2</option>
-    <option value="equities-4.4">Equities - FIX 4.4 v2.1</option>
-    <option value="options-4.4">Options - FIX 4.4 v2.0</option>
-    <option value="futures-5.0">Futures - FIX 5.0 SP2 v2.0</option>
-  </optgroup>
+
   </select>
                   </div>
                 </div>
@@ -4817,11 +4993,11 @@ const copyToClipboard = () => {
                         onChange={(e) => handleSpecChange(e.target.value)}
                         className={`w-full p-2 rounded border ${isDarkMode ? "bg-[#1e3a5f] border-[#3d5a80] text-white" : "bg-white border-gray-300 text-gray-900"}`}
                       >
-                        <option value="">Choose a spec...</option>
-                        <option value="eq-42">Equities - FIX 4.2</option>
-                        <option value="eq-44">Equities - FIX 4.4</option>
-                        <option value="opt-44">Options - FIX 4.4</option>
-                        <option value="fut-50">Futures - FIX 5.0 SP2</option>
+<option value="">Choose a standardized spec...</option>
+  <option value="eq-42-std">Equities FIX 4.2 - Standardized</option>
+  <option value="eq-44-std">Equities FIX 4.4 - Standardized</option>
+  <option value="opt-44-std">Options FIX 4.4 - Standardized</option>
+  <option value="fut-50-std">Futures FIX 5.0 SP2 - Standardized</option>
                       </select>
                     </div>
                     <div>
