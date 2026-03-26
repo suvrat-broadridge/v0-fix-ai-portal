@@ -28,6 +28,17 @@ export default function BCometPlatform() {
   const handleConvertToStandard = async (spec: {asset: string, protocol: string, clientSpec: string, clientSpecFile?: string}) => {
     setIsConverting(true)
     setConversionError(null)
+    
+    // Always show the modal
+    setViewingClientSpec({ 
+      asset: spec.asset, 
+      protocol: spec.protocol, 
+      specName: spec.clientSpec,
+      clientSpecFile: spec.clientSpecFile,
+      clientName: selectedClient?.name
+    })
+    setClientSpecStandardized(false)
+    
     try {
       const response = await fetch("http://localhost:5000/api/clients/spec/convert-to-standard", {
         method: "POST",
@@ -49,19 +60,11 @@ export default function BCometPlatform() {
       }
       
       const data = await response.json()
-      console.log("[v0] Conversion response:", data)
       setStandardizedSpecData(data)
-      setViewingClientSpec({ 
-        asset: spec.asset, 
-        protocol: spec.protocol, 
-        specName: spec.clientSpec,
-        clientSpecFile: spec.clientSpecFile,
-        clientName: selectedClient?.name
-      })
-      setClientSpecStandardized(false)
     } catch (error: any) {
-      console.error("[v0] Conversion error:", error)
-      setConversionError(error.message || "Failed to convert spec")
+      setConversionError(error.message || "Failed to connect to backend - showing sample data")
+      // Clear standardizedSpecData so dummy data will be shown
+      setStandardizedSpecData(null)
     } finally {
       setIsConverting(false)
     }
