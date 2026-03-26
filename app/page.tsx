@@ -3044,13 +3044,11 @@ const specCompareResults = [
                       </div>
                     </div>
 <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
-  <option value="">Choose a spec...</option>
-  <optgroup label="Standardized Specs">
+  <option value="">Choose a standardized spec...</option>
     <option value="equities-4.2-std">Equities FIX 4.2 v1.2 - Standardized</option>
     <option value="equities-4.4-std">Equities FIX 4.4 v2.1 - Standardized</option>
     <option value="options-4.4-std">Options FIX 4.4 v2.0 - Standardized</option>
     <option value="futures-5.0-std">Futures FIX 5.0 SP2 v2.0 - Standardized</option>
-
   </select>
                   </div>
                 </div>
