@@ -96,6 +96,7 @@ export default function BCometPlatform() {
   const [certTestSource, setCertTestSource] = useState<"spec" | "log" | "scenario" | null>(null)
   const [regLogTab, setRegLogTab] = useState<"upload" | "existing">("upload")
   const [certLogTab, setCertLogTab] = useState<"upload" | "existing">("upload")
+  const [generatingRegTest, setGeneratingRegTest] = useState<string | null>(null)
   const [showContactPanel, setShowContactPanel] = useState(false)
   const [showDemoForm, setShowDemoForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -3365,38 +3366,64 @@ const specCompareResults = [
                               </div>
                             ) : (
                               <div className={`${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"} rounded-lg p-4 mt-3`}>
-                                <p className={`text-sm ${textSecondary} mb-3`}>Generate a regression test suite from:</p>
-                                <div className="flex flex-wrap gap-2">
-                                  {version.spec && (
-                                    <Button 
-                                      size="sm" 
-                                      variant="outline"
-                                      onClick={() => { setRegTestSource("spec"); simulateTask(() => { setShowTestCaseResults(true); }); }}
-                                    >
-                                      <FileText className="h-3 w-3 mr-1" /> Spec: {version.spec}
-                                    </Button>
-                                  )}
-                                  {version.logs && version.logs.length > 0 && version.logs.map((log, li) => (
-                                    <Button 
-                                      key={li}
-                                      size="sm" 
-                                      variant="outline"
-                                      onClick={() => { setRegTestSource("log"); simulateTask(() => { setShowTestCaseResults(true); }); }}
-                                    >
-                                      <FileSearch className="h-3 w-3 mr-1" /> Log: {log}
-                                    </Button>
-                                  ))}
-                                  <Button 
-                                    size="sm" 
-                                    variant="outline"
-                                    onClick={() => setCurrentScreen("scenario-creation")}
-                                  >
-                                    <Activity className="h-3 w-3 mr-1" /> From Scenarios
-                                  </Button>
-                                  {!version.spec && (!version.logs || version.logs.length === 0) && (
-                                    <span className={`text-xs ${textSecondary} italic self-center`}>Upload spec or log files first</span>
-                                  )}
-                                </div>
+                                {generatingRegTest === `${assetClass.asset}-${version.protocol}` ? (
+                                  <div className="flex items-center gap-3">
+                                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-[#00e5ff] border-t-transparent"></div>
+                                    <span className={textPrimary}>Generating regression test suite...</span>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <p className={`text-sm ${textSecondary} mb-3`}>Generate a regression test suite from:</p>
+                                    <div className="flex flex-wrap gap-2">
+                                      {version.spec && (
+                                        <Button 
+                                          size="sm" 
+                                          variant="outline"
+                                          disabled={generatingRegTest !== null}
+                                          onClick={async () => { 
+                                            const key = `${assetClass.asset}-${version.protocol}`;
+                                            setGeneratingRegTest(key);
+                                            setRegTestSource("spec"); 
+                                            await new Promise(resolve => setTimeout(resolve, 2000));
+                                            setShowTestCaseResults(true);
+                                            setGeneratingRegTest(null);
+                                          }}
+                                        >
+                                          <FileText className="h-3 w-3 mr-1" /> Spec: {version.spec}
+                                        </Button>
+                                      )}
+                                      {version.logs && version.logs.length > 0 && version.logs.map((log, li) => (
+                                        <Button 
+                                          key={li}
+                                          size="sm" 
+                                          variant="outline"
+                                          disabled={generatingRegTest !== null}
+                                          onClick={async () => { 
+                                            const key = `${assetClass.asset}-${version.protocol}`;
+                                            setGeneratingRegTest(key);
+                                            setRegTestSource("log"); 
+                                            await new Promise(resolve => setTimeout(resolve, 2000));
+                                            setShowTestCaseResults(true);
+                                            setGeneratingRegTest(null);
+                                          }}
+                                        >
+                                          <FileSearch className="h-3 w-3 mr-1" /> Log: {log}
+                                        </Button>
+                                      ))}
+                                      <Button 
+                                        size="sm" 
+                                        variant="outline"
+                                        disabled={generatingRegTest !== null}
+                                        onClick={() => setCurrentScreen("scenario-creation")}
+                                      >
+                                        <Activity className="h-3 w-3 mr-1" /> From Scenarios
+                                      </Button>
+                                      {!version.spec && (!version.logs || version.logs.length === 0) && (
+                                        <span className={`text-xs ${textSecondary} italic self-center`}>Upload spec or log files first</span>
+                                      )}
+                                    </div>
+                                  </>
+                                )}
                               </div>
                             )}
                           </div>
