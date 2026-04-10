@@ -94,6 +94,8 @@ export default function BCometPlatform() {
   const [certSuiteGenerated, setCertSuiteGenerated] = useState(false)
   const [regTestSource, setRegTestSource] = useState<"spec" | "log" | "scenario" | null>(null)
   const [certTestSource, setCertTestSource] = useState<"spec" | "log" | "scenario" | null>(null)
+  const [regLogTab, setRegLogTab] = useState<"upload" | "existing">("upload")
+  const [certLogTab, setCertLogTab] = useState<"upload" | "existing">("upload")
   const [showContactPanel, setShowContactPanel] = useState(false)
   const [showDemoForm, setShowDemoForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -3317,13 +3319,44 @@ const specCompareResults = [
               {/* Log File Upload */}
               {regTestSource === "log" && (
                 <div className={`p-4 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"}`}>
-                  <h4 className={`font-medium mb-3 ${textPrimary}`}>Upload Log File</h4>
-                  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center hover:border-[#00e5ff] cursor-pointer block transition-colors`}>
-                    <input type="file" className="hidden" accept=".log,.txt,.fix" />
-                    <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                    <p className={textPrimary}>Drop FIX log file here or click to browse</p>
-                    <p className={`text-xs ${textSecondary} mt-1`}>Supports .log, .txt, .fix formats</p>
-                  </label>
+                  <h4 className={`font-medium mb-3 ${textPrimary}`}>Select Log File</h4>
+                  {/* Tab toggle */}
+                  <div className={`flex gap-1 p-1 rounded-lg mb-4 w-fit ${isDarkMode ? "bg-[#0a1628]" : "bg-[#e2e8f0]"}`}>
+                    <button onClick={() => setRegLogTab("upload")} className={`px-4 py-1.5 rounded text-xs font-medium transition-colors ${regLogTab === "upload" ? "bg-[#00e5ff] text-[#0a1628]" : textSecondary}`}>
+                      Upload New
+                    </button>
+                    <button onClick={() => setRegLogTab("existing")} className={`px-4 py-1.5 rounded text-xs font-medium transition-colors ${regLogTab === "existing" ? "bg-[#00e5ff] text-[#0a1628]" : textSecondary}`}>
+                      Choose Uploaded
+                    </button>
+                  </div>
+                  {regLogTab === "upload" ? (
+                    <label className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center hover:border-[#00e5ff] cursor-pointer block transition-colors`}>
+                      <input type="file" className="hidden" accept=".log,.txt,.fix" />
+                      <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                      <p className={textPrimary}>Drop FIX log file here or click to browse</p>
+                      <p className={`text-xs ${textSecondary} mt-1`}>Supports .log, .txt, .fix formats</p>
+                    </label>
+                  ) : (
+                    <div className="space-y-2">
+                      {[
+                        { name: "nexus_eq_fix42_20240115.log", size: "2.4 MB", date: "Jan 15, 2024", client: "Nexus Trading Group", asset: "Equities" },
+                        { name: "nexus_opt_fix44_20240110.log", size: "1.1 MB", date: "Jan 10, 2024", client: "Nexus Trading Group", asset: "Options" },
+                        { name: "apex_fi_fix44_20240108.log",  size: "3.7 MB", date: "Jan 8, 2024",  client: "Apex Capital Partners", asset: "Fixed Income" },
+                        { name: "horizon_fx_fix50_20231220.log", size: "890 KB", date: "Dec 20, 2023", client: "Horizon Investments", asset: "FX" },
+                        { name: "velocity_eq_fix42_20231215.log", size: "5.2 MB", date: "Dec 15, 2023", client: "Velocity Securities", asset: "Equities" },
+                      ].map((file, i) => (
+                        <label key={i} className={`flex items-center gap-3 p-3 rounded border ${borderColor} cursor-pointer hover:bg-[#1e4976]/10 hover:border-[#00e5ff]/50 transition-colors`}>
+                          <input type="radio" name="regLogFile" className="h-4 w-4 flex-shrink-0" />
+                          <FileSearch className={`h-4 w-4 flex-shrink-0 ${textSecondary}`} />
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm font-medium ${textPrimary} truncate`}>{file.name}</p>
+                            <p className={`text-xs ${textSecondary}`}>{file.client} &middot; {file.asset} &middot; {file.date}</p>
+                          </div>
+                          <span className={`text-xs ${textSecondary} flex-shrink-0`}>{file.size}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -3564,13 +3597,44 @@ const specCompareResults = [
               {/* Log File Upload */}
               {certTestSource === "log" && (
                 <div className={`p-4 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"}`}>
-                  <h4 className={`font-medium mb-3 ${textPrimary}`}>Upload Log File</h4>
-                  <label className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center hover:border-[#00e5ff] cursor-pointer block transition-colors`}>
-                    <input type="file" className="hidden" accept=".log,.txt,.fix" />
-                    <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                    <p className={textPrimary}>Drop FIX log file here or click to browse</p>
-                    <p className={`text-xs ${textSecondary} mt-1`}>Supports .log, .txt, .fix formats</p>
-                  </label>
+                  <h4 className={`font-medium mb-3 ${textPrimary}`}>Select Log File</h4>
+                  {/* Tab toggle */}
+                  <div className={`flex gap-1 p-1 rounded-lg mb-4 w-fit ${isDarkMode ? "bg-[#0a1628]" : "bg-[#e2e8f0]"}`}>
+                    <button onClick={() => setCertLogTab("upload")} className={`px-4 py-1.5 rounded text-xs font-medium transition-colors ${certLogTab === "upload" ? "bg-[#00e5ff] text-[#0a1628]" : textSecondary}`}>
+                      Upload New
+                    </button>
+                    <button onClick={() => setCertLogTab("existing")} className={`px-4 py-1.5 rounded text-xs font-medium transition-colors ${certLogTab === "existing" ? "bg-[#00e5ff] text-[#0a1628]" : textSecondary}`}>
+                      Choose Uploaded
+                    </button>
+                  </div>
+                  {certLogTab === "upload" ? (
+                    <label className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center hover:border-[#00e5ff] cursor-pointer block transition-colors`}>
+                      <input type="file" className="hidden" accept=".log,.txt,.fix" />
+                      <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                      <p className={textPrimary}>Drop FIX log file here or click to browse</p>
+                      <p className={`text-xs ${textSecondary} mt-1`}>Supports .log, .txt, .fix formats</p>
+                    </label>
+                  ) : (
+                    <div className="space-y-2">
+                      {[
+                        { name: "nexus_eq_fix42_20240115.log", size: "2.4 MB", date: "Jan 15, 2024", client: "Nexus Trading Group", asset: "Equities" },
+                        { name: "nexus_opt_fix44_20240110.log", size: "1.1 MB", date: "Jan 10, 2024", client: "Nexus Trading Group", asset: "Options" },
+                        { name: "apex_fi_fix44_20240108.log",  size: "3.7 MB", date: "Jan 8, 2024",  client: "Apex Capital Partners", asset: "Fixed Income" },
+                        { name: "horizon_fx_fix50_20231220.log", size: "890 KB", date: "Dec 20, 2023", client: "Horizon Investments", asset: "FX" },
+                        { name: "velocity_eq_fix42_20231215.log", size: "5.2 MB", date: "Dec 15, 2023", client: "Velocity Securities", asset: "Equities" },
+                      ].map((file, i) => (
+                        <label key={i} className={`flex items-center gap-3 p-3 rounded border ${borderColor} cursor-pointer hover:bg-[#1e4976]/10 hover:border-[#00e5ff]/50 transition-colors`}>
+                          <input type="radio" name="certLogFile" className="h-4 w-4 flex-shrink-0" />
+                          <FileSearch className={`h-4 w-4 flex-shrink-0 ${textSecondary}`} />
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm font-medium ${textPrimary} truncate`}>{file.name}</p>
+                            <p className={`text-xs ${textSecondary}`}>{file.client} &middot; {file.asset} &middot; {file.date}</p>
+                          </div>
+                          <span className={`text-xs ${textSecondary} flex-shrink-0`}>{file.size}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
