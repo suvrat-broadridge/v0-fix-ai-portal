@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr">("home")
   const [settingsTab, setSettingsTab] = useState<"look-feel" | "general" | "security" | "mail" | "questionnaires" | "license">("general")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -607,19 +607,30 @@ export default function BCometPlatform() {
   </button>
   </div>
   
-  {/* Client Specs Navigation - Only for clients */}
+{/* Client Specs & Log Files Navigation - Only for clients */}
   {selectedRole === "client" && (
-  <div className={`p-2 border-t ${borderColor}`}>
+  <div className={`p-2 border-t ${borderColor} space-y-1`}>
   <button
-  onClick={() => setCurrentScreen("client-specs")}
-  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-  currentScreen === "client-specs"
-  ? "bg-[#00e5ff]/10 text-[#00e5ff]"
-  : `${textSecondary} hover:bg-[#1e4976]/30`
-  }`}
+    onClick={() => setCurrentScreen("client-specs")}
+    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+      currentScreen === "client-specs"
+        ? "bg-[#00e5ff]/10 text-[#00e5ff]"
+        : `${textSecondary} hover:bg-[#1e4976]/30`
+    }`}
   >
-  <FileText className="h-5 w-5" />
-  {!sidebarCollapsed && <span>My Specs</span>}
+    <FileText className="h-5 w-5" />
+    {!sidebarCollapsed && <span>My Specs</span>}
+  </button>
+  <button
+    onClick={() => setCurrentScreen("client-log-files")}
+    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+      currentScreen === "client-log-files"
+        ? "bg-[#00e5ff]/10 text-[#00e5ff]"
+        : `${textSecondary} hover:bg-[#1e4976]/30`
+    }`}
+  >
+    <FileSearch className="h-5 w-5" />
+    {!sidebarCollapsed && <span>My Log Files</span>}
   </button>
   </div>
   )}
@@ -2916,37 +2927,53 @@ const specCompareResults = [
                 {/* Log File Selection */}
                 <div>
                   <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>
-                    {selectedRole === "client" ? "Upload My Log File" : `Select ${selectedClient?.name || "Client"} Log File`}
+                    {selectedRole === "client" ? "Select Log File" : `Select ${selectedClient?.name || "Client"} Log File`}
                   </label>
-                  {selectedRole === "client" ? (
-                    <label className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#00e5ff] cursor-pointer transition-colors block`}>
-                      <input type="file" className="hidden" accept=".log,.txt" />
-                      <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                      <p className={`font-medium ${textPrimary}`}>Select A File</p>
-                      <p className={`text-xs mt-1 ${textSecondary}`}>Click to browse</p>
-                    </label>
-                  ) : (
-                    <div className={`border-2 ${borderColor} rounded-lg p-4`}>
-                      <div className="flex items-center gap-3 mb-3">
-                        <FileSearch className={`h-8 w-8 ${textSecondary}`} />
-                        <div>
-                          <p className={`font-medium ${textPrimary}`}>Client Log Files</p>
-                          <p className={`text-xs ${textSecondary}`}>Select from uploaded logs</p>
-                        </div>
+                  <div className={`border-2 ${borderColor} rounded-lg p-4`}>
+                    <div className="flex items-center gap-3 mb-3">
+                      <FileSearch className={`h-8 w-8 ${textSecondary}`} />
+                      <div>
+                        <p className={`font-medium ${textPrimary}`}>{selectedRole === "client" ? "My Log Files" : "Client Log Files"}</p>
+                        <p className={`text-xs ${textSecondary}`}>Select from uploaded logs</p>
                       </div>
-                      <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
-                        <option value="">Choose a log file...</option>
-                        <option value="log1">{selectedClient?.name || "Client"}_session_20240115.log</option>
-                        <option value="log2">{selectedClient?.name || "Client"}_session_20240110.log</option>
-                        <option value="log3">{selectedClient?.name || "Client"}_session_20240105.log</option>
-                      </select>
+                    </div>
+                    <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
+                      <option value="">Choose a log file...</option>
+                      {selectedRole === "client" ? (
+                        <>
+                          <optgroup label="Equities - FIX 4.2">
+                            <option value="eq42-1">eq_fix42_20240115.log (2.4 MB)</option>
+                            <option value="eq42-2">eq_fix42_20240110.log (1.8 MB)</option>
+                          </optgroup>
+                          <optgroup label="Equities - FIX 4.4">
+                            <option value="eq44-1">eq_fix44_20240112.log (3.1 MB)</option>
+                          </optgroup>
+                          <optgroup label="Options - FIX 4.4">
+                            <option value="opt44-1">opt_fix44_20240108.log (1.1 MB)</option>
+                          </optgroup>
+                        </>
+                      ) : (
+                        <>
+                          <option value="log1">{selectedClient?.name || "Client"}_session_20240115.log</option>
+                          <option value="log2">{selectedClient?.name || "Client"}_session_20240110.log</option>
+                          <option value="log3">{selectedClient?.name || "Client"}_session_20240105.log</option>
+                        </>
+                      )}
+                    </select>
+                    {selectedRole === "client" ? (
+                      <div className="mt-3 pt-3 border-t border-dashed border-[#1e4976]/50">
+                        <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => setCurrentScreen("client-log-files")}>
+                          <Upload className="h-3 w-3 mr-2" /> Go to My Log Files to Upload
+                        </Button>
+                      </div>
+                    ) : (
                       <div className="mt-3 pt-3 border-t border-dashed border-[#1e4976]/50">
                         <Button variant="outline" size="sm" className="w-full text-xs">
                           <Mail className="h-3 w-3 mr-2" /> Request Log File from Client
                         </Button>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
   
   {/* FIX Spec - Always select from dropdown */}
@@ -4978,6 +5005,182 @@ const specCompareResults = [
                             </label>
                           )}
                         </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Client Log Files Screen - For clients to upload and manage their FIX log files
+  if (currentScreen === "client-log-files") {
+    const clientLogFilesData = [
+      {
+        asset: "Equities",
+        versions: [
+          { protocol: "FIX 4.2", logs: [
+            { name: "eq_fix42_20240115.log", uploaded: "2024-01-15", size: "2.4 MB", status: "active" },
+            { name: "eq_fix42_20240110.log", uploaded: "2024-01-10", size: "1.8 MB", status: "archived" },
+          ]},
+          { protocol: "FIX 4.4", logs: [
+            { name: "eq_fix44_20240112.log", uploaded: "2024-01-12", size: "3.1 MB", status: "active" },
+          ]},
+        ]
+      },
+      {
+        asset: "Options",
+        versions: [
+          { protocol: "FIX 4.4", logs: [
+            { name: "opt_fix44_20240108.log", uploaded: "2024-01-08", size: "1.1 MB", status: "active" },
+          ]},
+        ]
+      },
+      {
+        asset: "Futures",
+        versions: [
+          { protocol: "FIX 4.2", logs: [] },
+          { protocol: "FIX 5.0 SP2", logs: [] },
+        ]
+      },
+      {
+        asset: "Fixed Income",
+        versions: [
+          { protocol: "FIX 4.4", logs: [] },
+        ]
+      },
+      {
+        asset: "FX",
+        versions: [
+          { protocol: "FIX 5.0 SP2", logs: [] },
+        ]
+      },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>My Log Files</h1>
+            <p className={textSecondary}>Upload and manage your FIX log files by asset class</p>
+          </header>
+
+          <div className="p-6">
+            <div className="grid gap-6">
+              {clientLogFilesData.map((assetClass) => (
+                <Card key={assetClass.asset} className={`${bgCard} border ${borderColor}`}>
+                  <div className={`px-6 py-4 border-b ${borderColor}`}>
+                    <h2 className={`text-lg font-bold ${textPrimary}`}>{assetClass.asset}</h2>
+                  </div>
+                  
+                  {/* Table Header */}
+                  <div className={`grid grid-cols-12 gap-4 px-6 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} border-b ${borderColor}`}>
+                    <div className={`col-span-2 font-semibold text-sm ${textPrimary}`}>Protocol</div>
+                    <div className={`col-span-4 font-semibold text-sm ${textPrimary}`}>Log File</div>
+                    <div className={`col-span-1 font-semibold text-sm ${textPrimary}`}>Size</div>
+                    <div className={`col-span-2 font-semibold text-sm ${textPrimary}`}>Uploaded</div>
+                    <div className={`col-span-1 font-semibold text-sm ${textPrimary}`}>Status</div>
+                    <div className={`col-span-2 font-semibold text-sm ${textPrimary}`}>Actions</div>
+                  </div>
+                  
+                  {/* Table Rows */}
+                  <div className="divide-y divide-[#1e4976]/30">
+                    {assetClass.versions.map((version) => (
+                      <div key={`${assetClass.asset}-${version.protocol}`}>
+                        {version.logs.length > 0 ? (
+                          version.logs.map((log, logIndex) => (
+                            <div 
+                              key={`${version.protocol}-${log.name}`}
+                              className={`grid grid-cols-12 gap-4 px-6 py-4 hover:bg-[#1e4976]/10 transition-colors items-center`}
+                            >
+                              {/* Protocol Column - only show on first row */}
+                              <div className={`col-span-2 font-medium ${textPrimary}`}>
+                                {logIndex === 0 ? version.protocol : ""}
+                              </div>
+                              
+                              {/* Log File Column */}
+                              <div className="col-span-4">
+                                <div className={`flex items-center gap-2 px-3 py-1.5 rounded ${isDarkMode ? "bg-[#2196f3]/20" : "bg-[#2196f3]/10"} border border-[#2196f3]/30 w-fit`}>
+                                  <FileSearch className="h-4 w-4 text-[#2196f3]" />
+                                  <span className={`text-sm ${textPrimary}`}>{log.name}</span>
+                                </div>
+                              </div>
+                              
+                              {/* Size Column */}
+                              <div className={`col-span-1 text-sm ${textSecondary}`}>
+                                {log.size}
+                              </div>
+                              
+                              {/* Uploaded Column */}
+                              <div className={`col-span-2 text-sm ${textSecondary}`}>
+                                {log.uploaded}
+                              </div>
+                              
+                              {/* Status Column */}
+                              <div className="col-span-1">
+                                <span className={`px-2 py-1 rounded text-xs ${log.status === "active" ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-gray-500/20 text-gray-400"}`}>
+                                  {log.status === "active" ? "Active" : "Archived"}
+                                </span>
+                              </div>
+                              
+                              {/* Actions Column */}
+                              <div className="col-span-2 flex gap-2">
+                                <Button size="sm" variant="outline" className="text-xs h-8">
+                                  <Eye className="h-3 w-3 mr-1" /> View
+                                </Button>
+                                <Button size="sm" variant="outline" className="text-xs h-8 text-red-400 hover:text-red-300">
+                                  <X className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className={`grid grid-cols-12 gap-4 px-6 py-4 hover:bg-[#1e4976]/10 transition-colors items-center`}>
+                            {/* Protocol Column */}
+                            <div className={`col-span-2 font-medium ${textPrimary}`}>
+                              {version.protocol}
+                            </div>
+                            
+                            {/* No Logs Message */}
+                            <div className="col-span-4">
+                              <span className={`text-sm ${textSecondary}`}>No log files uploaded</span>
+                            </div>
+                            
+                            <div className="col-span-1"></div>
+                            <div className="col-span-2"></div>
+                            <div className="col-span-1"></div>
+                            
+                            {/* Upload Action */}
+                            <div className="col-span-2">
+                              <label className="cursor-pointer">
+                                <input type="file" className="hidden" accept=".log,.txt,.fix" />
+                                <Button size="sm" className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 text-xs h-8" asChild>
+                                  <span><Upload className="h-3 w-3 mr-1" /> Upload</span>
+                                </Button>
+                              </label>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Add More button for protocols that already have logs */}
+                        {version.logs.length > 0 && (
+                          <div className={`px-6 py-2 ${isDarkMode ? "bg-[#0a1628]/30" : "bg-[#f8fafc]"}`}>
+                            <label className="cursor-pointer inline-block">
+                              <input type="file" className="hidden" accept=".log,.txt,.fix" />
+                              <Button size="sm" variant="outline" className="text-xs h-7" asChild>
+                                <span><Plus className="h-3 w-3 mr-1" /> Add Another Log File for {version.protocol}</span>
+                              </Button>
+                            </label>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
