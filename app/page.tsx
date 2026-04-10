@@ -92,6 +92,8 @@ export default function BCometPlatform() {
   const [clientSpecsExpanded, setClientSpecsExpanded] = useState(false)
   const [regTestSuiteGenerated, setRegTestSuiteGenerated] = useState(false)
   const [certSuiteGenerated, setCertSuiteGenerated] = useState(false)
+  const [regTestSource, setRegTestSource] = useState<"spec" | "log" | "scenario" | null>(null)
+  const [certTestSource, setCertTestSource] = useState<"spec" | "log" | "scenario" | null>(null)
   const [showContactPanel, setShowContactPanel] = useState(false)
   const [showDemoForm, setShowDemoForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -3195,8 +3197,6 @@ const specCompareResults = [
 
   // Reg Test Case Generation (VeriFIX)
   if (currentScreen === "test-case-gen") {
-    const [regTestSource, setRegTestSource] = useState<"spec" | "log" | "scenario" | null>(null)
-    
     // Client specs available for test generation (standardized only)
     const clientStandardizedSpecs = !isAdHocMode && selectedClient ? [
       { asset: "Equities", protocol: "FIX 4.2", specName: "client_eq_42_standardized.xlsx", status: "completed" },
@@ -3420,8 +3420,6 @@ const specCompareResults = [
 
   // Certification Case Generation (Conductor)
   if (currentScreen === "certification-gen") {
-    const [certTestSource, setCertTestSource] = useState<"spec" | "log" | "scenario" | null>(null)
-    
     // Client specs that have been completed (standardized and ready for certification)
     const clientCompletedSpecs = !isAdHocMode && selectedClient ? [
       { asset: "Equities", protocol: "FIX 4.2", specName: "client_eq_42_standardized.xlsx", status: "completed", comparisonDone: true },
