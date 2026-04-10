@@ -97,6 +97,10 @@ export default function BCometPlatform() {
   const [regLogTab, setRegLogTab] = useState<"upload" | "existing">("upload")
   const [certLogTab, setCertLogTab] = useState<"upload" | "existing">("upload")
   const [generatingRegTest, setGeneratingRegTest] = useState<string | null>(null)
+  const [generatedRegSuites, setGeneratedRegSuites] = useState<Record<string, {suiteName: string, testCount: number, lastGenerated: string}>>({
+    "Equities-FIX 4.2": { suiteName: "EQ_FIX42_RegTests_v1.2", testCount: 24, lastGenerated: "Jan 15, 2024" },
+    "Options-FIX 4.4": { suiteName: "OPT_FIX44_RegTests_v2.0", testCount: 18, lastGenerated: "Jan 10, 2024" },
+  })
   const [showContactPanel, setShowContactPanel] = useState(false)
   const [showDemoForm, setShowDemoForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -3227,41 +3231,47 @@ const specCompareResults = [
 
   // Reg Test Case Generation (VeriFIX)
   if (currentScreen === "test-case-gen") {
-    // Asset classes with their reg test suite status
+    // Asset classes with their available specs/logs - suite status comes from state
     const regTestAssetClasses = [
       {
         asset: "Equities",
         versions: [
-          { protocol: "FIX 4.2", hasSuite: true, suiteName: "EQ_FIX42_RegTests_v1.2", testCount: 24, lastGenerated: "Jan 15, 2024", spec: "client_eq_42_standardized.xlsx" },
-          { protocol: "FIX 4.4", hasSuite: false, spec: "client_eq_44_standardized.xlsx", logs: ["eq_fix44_20240112.log"] },
+          { protocol: "FIX 4.2", spec: "client_eq_42_standardized.xlsx", logs: [] },
+          { protocol: "FIX 4.4", spec: "client_eq_44_standardized.xlsx", logs: ["eq_fix44_20240112.log"] },
         ]
       },
       {
         asset: "Options",
         versions: [
-          { protocol: "FIX 4.4", hasSuite: true, suiteName: "OPT_FIX44_RegTests_v2.0", testCount: 18, lastGenerated: "Jan 10, 2024", spec: "client_opt_44_standardized.xlsx" },
+          { protocol: "FIX 4.4", spec: "client_opt_44_standardized.xlsx", logs: [] },
         ]
       },
       {
         asset: "Futures",
         versions: [
-          { protocol: "FIX 4.2", hasSuite: false, spec: null, logs: [] },
-          { protocol: "FIX 5.0 SP2", hasSuite: false, spec: "client_fut_50sp2_standardized.xlsx", logs: ["fut_fix50_20240105.log"] },
+          { protocol: "FIX 4.2", spec: null, logs: [] },
+          { protocol: "FIX 5.0 SP2", spec: "client_fut_50sp2_standardized.xlsx", logs: ["fut_fix50_20240105.log"] },
         ]
       },
       {
         asset: "Fixed Income",
         versions: [
-          { protocol: "FIX 4.4", hasSuite: false, spec: null, logs: ["fi_fix44_20240108.log"] },
+          { protocol: "FIX 4.4", spec: null, logs: ["fi_fix44_20240108.log"] },
         ]
       },
       {
         asset: "FX",
         versions: [
-          { protocol: "FIX 5.0 SP2", hasSuite: false, spec: null, logs: [] },
+          { protocol: "FIX 5.0 SP2", spec: null, logs: [] },
         ]
       },
     ]
+    
+    // Helper to check if a suite exists
+    const getSuiteInfo = (asset: string, protocol: string) => {
+      const key = `${asset}-${protocol}`;
+      return generatedRegSuites[key] || null;
+    }
 
     // Grouped test cases for viewing existing suites
     const testCaseGroups = [
@@ -3326,28 +3336,32 @@ const specCompareResults = [
                   </div>
                   
                   <div className="divide-y divide-[#1e4976]/30">
-                    {assetClass.versions.map((version) => (
-                      <div key={`${assetClass.asset}-${version.protocol}`} className="p-6">
+                    {assetClass.versions.map((version) => {
+                      const suiteInfo = getSuiteInfo(assetClass.asset, version.protocol);
+                      const suiteKey = `${assetClass.asset}-${version.protocol}`;
+                      
+                      return (
+                      <div key={suiteKey} className="p-6">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
                               <span className={`font-medium ${textPrimary}`}>{version.protocol}</span>
-                              {version.hasSuite ? (
+                              {suiteInfo ? (
                                 <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">Suite Generated</span>
                               ) : (
                                 <span className="px-2 py-1 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">No Suite</span>
                               )}
                             </div>
                             
-                            {version.hasSuite ? (
+                            {suiteInfo ? (
                               <div className={`${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"} rounded-lg p-4 mt-3`}>
                                 <div className="flex items-center gap-4 mb-3">
                                   <div className="flex items-center gap-2">
                                     <VerifixLogo size={20} />
-                                    <span className={`font-medium ${textPrimary}`}>{version.suiteName}</span>
+                                    <span className={`font-medium ${textPrimary}`}>{suiteInfo.suiteName}</span>
                                   </div>
-                                  <span className={`text-xs ${textSecondary}`}>{version.testCount} test cases</span>
-                                  <span className={`text-xs ${textSecondary}`}>Generated: {version.lastGenerated}</span>
+                                  <span className={`text-xs ${textSecondary}`}>{suiteInfo.testCount} test cases</span>
+                                  <span className={`text-xs ${textSecondary}`}>Generated: {suiteInfo.lastGenerated}</span>
                                 </div>
                                 <div className="flex gap-2">
                                   <Button size="sm" variant="outline" onClick={() => { setShowTestCaseResults(true); }}>
@@ -3366,7 +3380,7 @@ const specCompareResults = [
                               </div>
                             ) : (
                               <div className={`${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"} rounded-lg p-4 mt-3`}>
-                                {generatingRegTest === `${assetClass.asset}-${version.protocol}` ? (
+                                {generatingRegTest === suiteKey ? (
                                   <div className="flex items-center gap-3">
                                     <div className="animate-spin rounded-full h-5 w-5 border-2 border-[#00e5ff] border-t-transparent"></div>
                                     <span className={textPrimary}>Generating regression test suite...</span>
@@ -3381,11 +3395,22 @@ const specCompareResults = [
                                           variant="outline"
                                           disabled={generatingRegTest !== null}
                                           onClick={async () => { 
-                                            const key = `${assetClass.asset}-${version.protocol}`;
-                                            setGeneratingRegTest(key);
+                                            setGeneratingRegTest(suiteKey);
                                             setRegTestSource("spec"); 
                                             await new Promise(resolve => setTimeout(resolve, 2000));
-                                            setShowTestCaseResults(true);
+                                            // Generate suite name based on asset/protocol
+                                            const assetCode = assetClass.asset.substring(0, 3).toUpperCase();
+                                            const protocolCode = version.protocol.replace(/\s+/g, "").replace(".", "");
+                                            const today = new Date();
+                                            const dateStr = today.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                                            setGeneratedRegSuites(prev => ({
+                                              ...prev,
+                                              [suiteKey]: {
+                                                suiteName: `${assetCode}_${protocolCode}_RegTests_v1.0`,
+                                                testCount: Math.floor(Math.random() * 15) + 12,
+                                                lastGenerated: dateStr
+                                              }
+                                            }));
                                             setGeneratingRegTest(null);
                                           }}
                                         >
@@ -3399,11 +3424,22 @@ const specCompareResults = [
                                           variant="outline"
                                           disabled={generatingRegTest !== null}
                                           onClick={async () => { 
-                                            const key = `${assetClass.asset}-${version.protocol}`;
-                                            setGeneratingRegTest(key);
+                                            setGeneratingRegTest(suiteKey);
                                             setRegTestSource("log"); 
                                             await new Promise(resolve => setTimeout(resolve, 2000));
-                                            setShowTestCaseResults(true);
+                                            // Generate suite name based on asset/protocol
+                                            const assetCode = assetClass.asset.substring(0, 3).toUpperCase();
+                                            const protocolCode = version.protocol.replace(/\s+/g, "").replace(".", "");
+                                            const today = new Date();
+                                            const dateStr = today.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                                            setGeneratedRegSuites(prev => ({
+                                              ...prev,
+                                              [suiteKey]: {
+                                                suiteName: `${assetCode}_${protocolCode}_RegTests_v1.0`,
+                                                testCount: Math.floor(Math.random() * 15) + 12,
+                                                lastGenerated: dateStr
+                                              }
+                                            }));
                                             setGeneratingRegTest(null);
                                           }}
                                         >
@@ -3429,7 +3465,7 @@ const specCompareResults = [
                           </div>
                         </div>
                       </div>
-                    ))}
+                    )})}
                   </div>
                 </Card>
               ))}
