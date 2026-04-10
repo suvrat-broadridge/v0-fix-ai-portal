@@ -101,6 +101,11 @@ export default function BCometPlatform() {
     "Equities-FIX 4.2": { suiteName: "EQ_FIX42_RegTests_v1.2", testCount: 24, lastGenerated: "Jan 15, 2024" },
     "Options-FIX 4.4": { suiteName: "OPT_FIX44_RegTests_v2.0", testCount: 18, lastGenerated: "Jan 10, 2024" },
   })
+  const [generatingCertTest, setGeneratingCertTest] = useState<string | null>(null)
+  const [generatedCertSuites, setGeneratedCertSuites] = useState<Record<string, {suiteName: string, testCount: number, lastGenerated: string}>>({
+    "Equities-FIX 4.2": { suiteName: "EQ_FIX42_CertTests_v1.2", testCount: 32, lastGenerated: "Jan 15, 2024" },
+    "Options-FIX 4.4": { suiteName: "OPT_FIX44_CertTests_v2.0", testCount: 28, lastGenerated: "Jan 10, 2024" },
+  })
   const [showContactPanel, setShowContactPanel] = useState(false)
   const [showDemoForm, setShowDemoForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -575,7 +580,7 @@ export default function BCometPlatform() {
   }`}
   >
   <VerifixLogo size={16} />
-  <span>Reg Test Cases</span>
+        <span>Testing</span>
   </button>
   )}
   
@@ -590,7 +595,7 @@ export default function BCometPlatform() {
   }`}
   >
   <ConductorLogo size={16} />
-  <span>Cert Test Cases</span>
+        <span>Certification</span>
   </button>
   )}
   </div>
@@ -3213,10 +3218,10 @@ const specCompareResults = [
                     </Button>
                     <div className="flex gap-3">
                       <Button variant="outline" onClick={() => setCurrentScreen("test-case-gen")}>
-                        <VerifixLogo size={16} /> Reg Test Cases <ChevronRight className="h-4 w-4 ml-1" />
+                        <VerifixLogo size={16} /> Testing <ChevronRight className="h-4 w-4 ml-1" />
                       </Button>
                       <Button onClick={() => setCurrentScreen("certification-gen")}>
-                        <ConductorLogo size={16} /> Cert Test Cases <ChevronRight className="h-4 w-4 ml-1" />
+                        <ConductorLogo size={16} /> Certification <ChevronRight className="h-4 w-4 ml-1" />
                       </Button>
                     </div>
                   </div>
@@ -3525,16 +3530,47 @@ const specCompareResults = [
 
   // Certification Case Generation (Conductor)
   if (currentScreen === "certification-gen") {
-    // Client specs that have been completed (standardized and ready for certification)
-    const clientCompletedSpecs = !isAdHocMode && selectedClient ? [
-      { asset: "Equities", protocol: "FIX 4.2", specName: "client_eq_42_standardized.xlsx", status: "completed", comparisonDone: true },
-      { asset: "Options", protocol: "FIX 4.4", specName: "client_opt_44_standardized.xlsx", status: "completed", comparisonDone: true },
-    ] : [
-      { asset: "Equities", protocol: "FIX 4.2", specName: "EQ_FIX42_v1.2_Standardized.xlsx", status: "available", comparisonDone: false },
-      { asset: "Equities", protocol: "FIX 4.4", specName: "EQ_FIX44_v2.1_Standardized.xlsx", status: "available", comparisonDone: false },
-      { asset: "Options", protocol: "FIX 4.4", specName: "OPT_FIX44_v2.0_Standardized.xlsx", status: "available", comparisonDone: false },
-      { asset: "Futures", protocol: "FIX 5.0 SP2", specName: "FUT_FIX50SP2_v2.0_Standardized.xlsx", status: "available", comparisonDone: false },
+    // Asset classes with their available specs/logs - suite status comes from state
+    const certTestAssetClasses = [
+      {
+        asset: "Equities",
+        versions: [
+          { protocol: "FIX 4.2", spec: "client_eq_42_standardized.xlsx", logs: [] },
+          { protocol: "FIX 4.4", spec: "client_eq_44_standardized.xlsx", logs: ["eq_fix44_20240112.log"] },
+        ]
+      },
+      {
+        asset: "Options",
+        versions: [
+          { protocol: "FIX 4.4", spec: "client_opt_44_standardized.xlsx", logs: [] },
+        ]
+      },
+      {
+        asset: "Futures",
+        versions: [
+          { protocol: "FIX 4.2", spec: null, logs: [] },
+          { protocol: "FIX 5.0 SP2", spec: "client_fut_50sp2_standardized.xlsx", logs: ["fut_fix50_20240105.log"] },
+        ]
+      },
+      {
+        asset: "Fixed Income",
+        versions: [
+          { protocol: "FIX 4.4", spec: null, logs: ["fi_fix44_20240108.log"] },
+        ]
+      },
+      {
+        asset: "FX",
+        versions: [
+          { protocol: "FIX 5.0 SP2", spec: null, logs: [] },
+        ]
+      },
     ]
+    
+    // Helper to check if a suite exists
+    const getCertSuiteInfo = (asset: string, protocol: string) => {
+      const key = `${asset}-${protocol}`;
+      return generatedCertSuites[key] || null;
+    }
 
     // Grouped certification test cases
     const certTestGroups = [
@@ -3597,153 +3633,164 @@ const specCompareResults = [
               <ConductorLogo size={32} />
               <h1 className={`text-2xl font-bold ${textPrimary}`}>Certification Case Generation {isAdHocMode && "(Ad-hoc)"}</h1>
             </div>
-            {!isAdHocMode && selectedClient && (
-              <p className={`text-sm ${textSecondary} mt-1`}>Client: {selectedClient.name}</p>
-            )}
+            <p className={`text-sm ${textSecondary} mt-1`}>Manage certification test suites by asset class</p>
           </header>
 
           <div className="p-6">
-            {/* Step 1: Select Source */}
-            <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
-              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Step 1: Select Certification Source</h3>
-              <p className={`mb-4 ${textSecondary}`}>Choose a source to generate certification test cases from.</p>
-              
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <button 
-                  onClick={() => setCertTestSource("spec")}
-                  className={`p-4 rounded-lg border-2 transition-all ${certTestSource === "spec" ? "border-[#00e5ff] bg-[#00e5ff]/10" : `border-${borderColor} hover:border-[#00e5ff]/50`}`}
-                >
-                  <FileText className={`h-8 w-8 mx-auto mb-2 ${certTestSource === "spec" ? "text-[#00e5ff]" : textSecondary}`} />
-                  <p className={`font-medium ${textPrimary}`}>Standardized Spec</p>
-                  <p className={`text-xs ${textSecondary}`}>Generate from FIX spec</p>
-                </button>
-                <button 
-                  onClick={() => setCertTestSource("log")}
-                  className={`p-4 rounded-lg border-2 transition-all ${certTestSource === "log" ? "border-[#00e5ff] bg-[#00e5ff]/10" : `border-${borderColor} hover:border-[#00e5ff]/50`}`}
-                >
-                  <FileSearch className={`h-8 w-8 mx-auto mb-2 ${certTestSource === "log" ? "text-[#00e5ff]" : textSecondary}`} />
-                  <p className={`font-medium ${textPrimary}`}>Log File</p>
-                  <p className={`text-xs ${textSecondary}`}>Extract from FIX logs</p>
-                </button>
-                <button 
-                  onClick={() => setCertTestSource("scenario")}
-                  className={`p-4 rounded-lg border-2 transition-all ${certTestSource === "scenario" ? "border-[#00e5ff] bg-[#00e5ff]/10" : `border-${borderColor} hover:border-[#00e5ff]/50`}`}
-                >
-                  <Activity className={`h-8 w-8 mx-auto mb-2 ${certTestSource === "scenario" ? "text-[#00e5ff]" : textSecondary}`} />
-                  <p className={`font-medium ${textPrimary}`}>Scenarios</p>
-                  <p className={`text-xs ${textSecondary}`}>Use created scenarios</p>
-                </button>
-              </div>
-
-              {/* Spec Selection - Shows completed client specs when accessed through client */}
-              {certTestSource === "spec" && (
-                <div className={`p-4 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"}`}>
-                  <h4 className={`font-medium mb-3 ${textPrimary}`}>
-                    {!isAdHocMode && selectedClient ? "Select Completed Client Spec" : "Select Standardized Spec"}
-                  </h4>
-                  {!isAdHocMode && selectedClient && (
-                    <p className={`text-sm ${textSecondary} mb-3`}>Showing specs that have been standardized and compared for {selectedClient.name}</p>
-                  )}
-                  <div className="space-y-2">
-                    {clientCompletedSpecs.map((spec, i) => (
-                      <label key={i} className={`flex items-center gap-3 p-3 rounded border ${borderColor} cursor-pointer hover:bg-[#1e4976]/10`}>
-                        <input type="radio" name="certTestSpec" className="h-4 w-4" />
-                        <div className="flex-1">
-                          <span className={textPrimary}>{spec.asset} - {spec.protocol}</span>
-                          <span className={`text-xs ${textSecondary} ml-2`}>{spec.specName}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {spec.comparisonDone && (
-                            <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">Comparison Done</span>
-                          )}
-                          <span className={`px-2 py-1 rounded text-xs ${spec.status === "completed" ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#2196f3]/20 text-[#2196f3]"}`}>
-                            {spec.status === "completed" ? "Ready" : "Available"}
-                          </span>
-                        </div>
-                      </label>
-                    ))}
+            {/* Asset Class Test Suites */}
+            <div className="space-y-6">
+              {certTestAssetClasses.map((assetClass) => (
+                <Card key={assetClass.asset} className={`${bgCard} border ${borderColor}`}>
+                  <div className={`px-6 py-4 border-b ${borderColor}`}>
+                    <h2 className={`text-lg font-bold ${textPrimary}`}>{assetClass.asset}</h2>
                   </div>
-                </div>
-              )}
-
-              {/* Log File Upload */}
-              {certTestSource === "log" && (
-                <div className={`p-4 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"}`}>
-                  <h4 className={`font-medium mb-3 ${textPrimary}`}>Select Log File</h4>
-                  {/* Tab toggle */}
-                  <div className={`flex gap-1 p-1 rounded-lg mb-4 w-fit ${isDarkMode ? "bg-[#0a1628]" : "bg-[#e2e8f0]"}`}>
-                    <button onClick={() => setCertLogTab("upload")} className={`px-4 py-1.5 rounded text-xs font-medium transition-colors ${certLogTab === "upload" ? "bg-[#00e5ff] text-[#0a1628]" : textSecondary}`}>
-                      Upload New
-                    </button>
-                    <button onClick={() => setCertLogTab("existing")} className={`px-4 py-1.5 rounded text-xs font-medium transition-colors ${certLogTab === "existing" ? "bg-[#00e5ff] text-[#0a1628]" : textSecondary}`}>
-                      Choose Uploaded
-                    </button>
-                  </div>
-                  {certLogTab === "upload" ? (
-                    <label className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center hover:border-[#00e5ff] cursor-pointer block transition-colors`}>
-                      <input type="file" className="hidden" accept=".log,.txt,.fix" />
-                      <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                      <p className={textPrimary}>Drop FIX log file here or click to browse</p>
-                      <p className={`text-xs ${textSecondary} mt-1`}>Supports .log, .txt, .fix formats</p>
-                    </label>
-                  ) : (
-                    <div className="space-y-2">
-                      {[
-                        { name: "nexus_eq_fix42_20240115.log", size: "2.4 MB", date: "Jan 15, 2024", client: "Nexus Trading Group", asset: "Equities" },
-                        { name: "nexus_opt_fix44_20240110.log", size: "1.1 MB", date: "Jan 10, 2024", client: "Nexus Trading Group", asset: "Options" },
-                        { name: "apex_fi_fix44_20240108.log",  size: "3.7 MB", date: "Jan 8, 2024",  client: "Apex Capital Partners", asset: "Fixed Income" },
-                        { name: "horizon_fx_fix50_20231220.log", size: "890 KB", date: "Dec 20, 2023", client: "Horizon Investments", asset: "FX" },
-                        { name: "velocity_eq_fix42_20231215.log", size: "5.2 MB", date: "Dec 15, 2023", client: "Velocity Securities", asset: "Equities" },
-                      ].map((file, i) => (
-                        <label key={i} className={`flex items-center gap-3 p-3 rounded border ${borderColor} cursor-pointer hover:bg-[#1e4976]/10 hover:border-[#00e5ff]/50 transition-colors`}>
-                          <input type="radio" name="certLogFile" className="h-4 w-4 flex-shrink-0" />
-                          <FileSearch className={`h-4 w-4 flex-shrink-0 ${textSecondary}`} />
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-sm font-medium ${textPrimary} truncate`}>{file.name}</p>
-                            <p className={`text-xs ${textSecondary}`}>{file.client} &middot; {file.asset} &middot; {file.date}</p>
+                  
+                  <div className="divide-y divide-[#1e4976]/30">
+                    {assetClass.versions.map((version) => {
+                      const suiteInfo = getCertSuiteInfo(assetClass.asset, version.protocol);
+                      const suiteKey = `${assetClass.asset}-${version.protocol}`;
+                      
+                      return (
+                      <div key={suiteKey} className="p-6">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className={`font-medium ${textPrimary}`}>{version.protocol}</span>
+                              {suiteInfo ? (
+                                <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">Suite Generated</span>
+                              ) : (
+                                <span className="px-2 py-1 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">No Suite</span>
+                              )}
+                            </div>
+                            
+                            {suiteInfo ? (
+                              <div className={`${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"} rounded-lg p-4 mt-3`}>
+                                <div className="flex items-center gap-4 mb-3">
+                                  <div className="flex items-center gap-2">
+                                    <ConductorLogo size={20} />
+                                    <span className={`font-medium ${textPrimary}`}>{suiteInfo.suiteName}</span>
+                                  </div>
+                                  <span className={`text-xs ${textSecondary}`}>{suiteInfo.testCount} test cases</span>
+                                  <span className={`text-xs ${textSecondary}`}>Generated: {suiteInfo.lastGenerated}</span>
+                                </div>
+                                <div className="flex gap-2">
+                                  <Button size="sm" variant="outline" onClick={() => { setShowCertResults(true); }}>
+                                    <Eye className="h-3 w-3 mr-1" /> View Tests
+                                  </Button>
+                                  <Button size="sm" variant="outline">
+                                    <Download className="h-3 w-3 mr-1" /> Export
+                                  </Button>
+                                  <Button size="sm" className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
+                                    <ConductorLogo size={14} /> Run in Conductor
+                                  </Button>
+                                  <Button size="sm" variant="outline" className="text-[#ff9800] border-[#ff9800]/30 hover:bg-[#ff9800]/10">
+                                    <RefreshCw className="h-3 w-3 mr-1" /> Regenerate
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className={`${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"} rounded-lg p-4 mt-3`}>
+                                {generatingCertTest === suiteKey ? (
+                                  <div className="flex items-center gap-3">
+                                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-[#00e5ff] border-t-transparent"></div>
+                                    <span className={textPrimary}>Generating certification test suite...</span>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <p className={`text-sm ${textSecondary} mb-3`}>Generate a certification test suite from:</p>
+                                    <div className="flex flex-wrap gap-2">
+                                      {version.spec && (
+                                        <Button 
+                                          size="sm" 
+                                          variant="outline"
+                                          disabled={generatingCertTest !== null}
+                                          onClick={async () => { 
+                                            setGeneratingCertTest(suiteKey);
+                                            setCertTestSource("spec"); 
+                                            await new Promise(resolve => setTimeout(resolve, 2000));
+                                            // Generate suite name based on asset/protocol
+                                            const assetCode = assetClass.asset.substring(0, 3).toUpperCase();
+                                            const protocolCode = version.protocol.replace(/\s+/g, "").replace(".", "");
+                                            const today = new Date();
+                                            const dateStr = today.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                                            setGeneratedCertSuites(prev => ({
+                                              ...prev,
+                                              [suiteKey]: {
+                                                suiteName: `${assetCode}_${protocolCode}_CertTests_v1.0`,
+                                                testCount: Math.floor(Math.random() * 15) + 20,
+                                                lastGenerated: dateStr
+                                              }
+                                            }));
+                                            setGeneratingCertTest(null);
+                                          }}
+                                        >
+                                          <FileText className="h-3 w-3 mr-1" /> Spec: {version.spec}
+                                        </Button>
+                                      )}
+                                      {version.logs && version.logs.length > 0 && version.logs.map((log, li) => (
+                                        <Button 
+                                          key={li}
+                                          size="sm" 
+                                          variant="outline"
+                                          disabled={generatingCertTest !== null}
+                                          onClick={async () => { 
+                                            setGeneratingCertTest(suiteKey);
+                                            setCertTestSource("log"); 
+                                            await new Promise(resolve => setTimeout(resolve, 2000));
+                                            // Generate suite name based on asset/protocol
+                                            const assetCode = assetClass.asset.substring(0, 3).toUpperCase();
+                                            const protocolCode = version.protocol.replace(/\s+/g, "").replace(".", "");
+                                            const today = new Date();
+                                            const dateStr = today.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                                            setGeneratedCertSuites(prev => ({
+                                              ...prev,
+                                              [suiteKey]: {
+                                                suiteName: `${assetCode}_${protocolCode}_CertTests_v1.0`,
+                                                testCount: Math.floor(Math.random() * 15) + 20,
+                                                lastGenerated: dateStr
+                                              }
+                                            }));
+                                            setGeneratingCertTest(null);
+                                          }}
+                                        >
+                                          <FileSearch className="h-3 w-3 mr-1" /> Log: {log}
+                                        </Button>
+                                      ))}
+                                      <Button 
+                                        size="sm" 
+                                        variant="outline"
+                                        disabled={generatingCertTest !== null}
+                                        onClick={() => setCurrentScreen("scenario-creation")}
+                                      >
+                                        <Activity className="h-3 w-3 mr-1" /> From Scenarios
+                                      </Button>
+                                      {!version.spec && (!version.logs || version.logs.length === 0) && (
+                                        <span className={`text-xs ${textSecondary} italic self-center`}>Upload spec or log files first</span>
+                                      )}
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            )}
                           </div>
-                          <span className={`text-xs ${textSecondary} flex-shrink-0`}>{file.size}</span>
-                        </label>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Scenario Selection */}
-              {certTestSource === "scenario" && (
-                <div className={`p-4 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"}`}>
-                  <h4 className={`font-medium mb-3 ${textPrimary}`}>Load Scenarios</h4>
-                  <div className="flex gap-4">
-                    <Button variant="outline" onClick={() => setCurrentScreen("scenario-creation")}>
-                      <Activity className="h-4 w-4 mr-2" /> Go to Scenario Creation
-                    </Button>
-                    <label className={`border-2 border-dashed ${borderColor} rounded-lg px-6 py-3 hover:border-[#00e5ff] cursor-pointer flex items-center gap-2 transition-colors`}>
-                      <input type="file" className="hidden" accept=".json,.xml" />
-                      <Upload className={`h-5 w-5 ${textSecondary}`} />
-                      <span className={textSecondary}>Upload Scenario File</span>
-                    </label>
+                        </div>
+                      </div>
+                    )})}
                   </div>
-                </div>
-              )}
-            </Card>
+                </Card>
+              ))}
+            </div>
 
-            {/* Step 2: Generate Certification Test Cases */}
-            {certTestSource && (
-              <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
-                <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Step 2: Generate Certification Test Suite</h3>
-                <p className={`mb-4 ${textSecondary}`}>Analyze the selected source and generate certification test cases.</p>
-                <Button onClick={() => simulateTask(() => { setCertSuiteGenerated(true); setShowCertResults(true); })} disabled={isLoading}>
-                  <Play className="h-4 w-4 mr-2" /> {isLoading ? "Generating..." : "Generate Certification Tests"}
-                </Button>
-              </Card>
-            )}
-
-            {/* Step 3: Review & Export Test Cases */}
+            {/* View Test Cases Modal/Expanded Section */}
             {showCertResults && (
-              <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
-                <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Step 3: Review Certification Test Cases</h3>
-                <p className={`mb-4 ${textSecondary}`}>Review generated certification test cases grouped by category. Select which to include in Conductor export.</p>
+              <Card className={`${bgCard} p-6 border ${borderColor} mt-6`}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className={`text-lg font-bold ${textPrimary}`}>Certification Suite Details</h3>
+                  <Button variant="outline" size="sm" onClick={() => setShowCertResults(false)}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <p className={`mb-4 ${textSecondary}`}>Review certification test cases grouped by category. Select which to include in Conductor export.</p>
                 
                 <div className="space-y-4">
                   {certTestGroups.map((group, gi) => (
@@ -3773,25 +3820,10 @@ const specCompareResults = [
                 </div>
 
                 <div className="flex gap-4 mt-6">
-                  <Button onClick={() => {}}>
-                    <ConductorLogo size={16} /> Generate Conductor Test Suite
-                  </Button>
-                  <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Export Test Suite</Button>
-                </div>
-              </Card>
-            )}
-
-            {/* Launch Conductor */}
-            {showCertResults && (
-              <Card className={`${bgCard} p-6 border ${borderColor}`}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className={`text-lg font-bold ${textPrimary}`}>Launch Conductor</h3>
-                    <p className={`${textSecondary}`}>Open Conductor to run your certification test cases</p>
-                  </div>
                   <Button>
-                    <ConductorLogo size={20} /> Launch Conductor
+                    <ConductorLogo size={16} /> Export to Conductor
                   </Button>
+                  <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download Suite</Button>
                 </div>
               </Card>
             )}
@@ -3799,7 +3831,7 @@ const specCompareResults = [
         </div>
       </div>
     )
-}
+  }
 
   // ATDL Validate Structure Screen
   if (currentScreen === "atdl-validate") {
