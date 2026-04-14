@@ -194,7 +194,6 @@ export default function Page() {
             </div>
           ))}
         </nav>
-        </nav>
 
         <div className="p-4 border-t border-[#1e4976]">
           <div className="flex items-center gap-2 mb-3">
