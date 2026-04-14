@@ -10,11 +10,11 @@ import {
   TrendingUp, Users, Zap, AlertCircle, Target, FileCheck, BarChart3,
   ChevronRight, Search, Filter, Download, Plus, TrendingDown, ShieldAlert,
   Calendar, Eye, ThumbsUp, ThumbsDown, MessageSquare, Lock, Package,
-  Rocket, Award, TestTube
+  Rocket, Award, TestTube, ArrowRight, GitCompare, Activity, Gauge, Shield
 } from "lucide-react"
 
 export default function Page() {
-  const [currentScreen, setCurrentScreen] = useState<"login" | "role-select" | "dashboard" | "onboarding-cases" | "approvals" | "evidence-vault" | "rule-library" | "atdl-suite" | "testing" | "certification" | "sla-analytics">("login")
+  const [currentScreen, setCurrentScreen] = useState<"welcome" | "login" | "role-select" | "dashboard" | "onboarding-cases" | "approvals" | "evidence-vault" | "rule-library" | "atdl-suite" | "testing" | "certification" | "sla-analytics">("welcome")
   const [selectedRole, setSelectedRole] = useState<"client" | "admin" | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isDarkMode, setIsDarkMode] = useState(true)
@@ -78,6 +78,143 @@ export default function Page() {
       </div>
     </div>
   )
+
+  // ========== WELCOME SCREEN ==========
+  if (currentScreen === "welcome") {
+    const [demoEmail, setDemoEmail] = useState("")
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} overflow-hidden`}>
+        {/* Navigation */}
+        <nav className={`${bgSecondary} border-b ${borderColor} sticky top-0 z-50`}>
+          <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-[#00e5ff]">B-COMET</h1>
+            <Button onClick={() => setCurrentScreen("login")} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00d0e8]">
+              <LogIn className="h-4 w-4 mr-2" /> Login
+            </Button>
+          </div>
+        </nav>
+
+        {/* Hero Section */}
+        <section className="relative py-20 px-6">
+          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className={`text-5xl font-bold ${textPrimary} mb-4`}>Enterprise FIX Protocol Testing & Onboarding</h2>
+              <p className={`text-lg ${textSecondary} mb-6`}>B-COMET streamlines your FIX trading system integration with automated testing, comprehensive certification, and collaborative onboarding.</p>
+              <div className="flex gap-4">
+                <Button onClick={() => setCurrentScreen("login")} style={{ backgroundColor: "#00e5ff", color: "#0a1628" }} className="text-lg px-8 py-6">
+                  Get Started <ArrowRight className="h-5 w-5 ml-2" />
+                </Button>
+                <Button variant="outline" className={`text-lg px-8 py-6 border-[#00e5ff] text-[#00e5ff]`}>
+                  Learn More
+                </Button>
+              </div>
+            </div>
+
+            {/* Animated Model */}
+            <div className={`relative h-96 rounded-lg ${bgCard} border ${borderColor} overflow-hidden flex items-center justify-center`}>
+              <div className="relative w-full h-full flex items-center justify-center">
+                {/* Animated circles */}
+                <div className="absolute w-24 h-24 rounded-full border-2 border-[#00e5ff] animate-pulse" />
+                <div className="absolute w-40 h-40 rounded-full border-2 border-[#00e5ff]/50 animate-[spin_20s_linear_infinite]" />
+                <div className="absolute w-56 h-56 rounded-full border-2 border-[#00e5ff]/25 animate-[spin_40s_linear_infinite_reverse]" />
+                
+                {/* Center icon */}
+                <div className="relative z-10">
+                  <div className="w-16 h-16 rounded-full bg-[#00e5ff]/20 flex items-center justify-center border border-[#00e5ff]">
+                    <Rocket className="h-8 w-8 text-[#00e5ff]" />
+                  </div>
+                </div>
+
+                {/* Orbiting elements */}
+                <div className="absolute w-32 h-32 animate-[spin_30s_linear_infinite]">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-8 bg-[#2196f3]/30 rounded-full border border-[#2196f3]" />
+                </div>
+                <div className="absolute w-48 h-48 animate-[spin_20s_linear_infinite_reverse]">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-8 bg-[#4caf50]/30 rounded-full border border-[#4caf50]" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Product Capabilities Grid */}
+        <section className="py-20 px-6">
+          <div className="max-w-6xl mx-auto">
+            <h3 className={`text-4xl font-bold ${textPrimary} text-center mb-12`}>What B-COMET Does</h3>
+            
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: GitCompare,
+                  title: "Specification Compare",
+                  description: "Compare FIX protocol specifications across versions and standards with automated validation."
+                },
+                {
+                  icon: Activity,
+                  title: "Log Analysis",
+                  description: "Analyze trading logs against spec requirements and identify compliance gaps instantly."
+                },
+                {
+                  icon: TestTube,
+                  title: "Automated Testing",
+                  description: "Run comprehensive test suites with configurable scenarios and detailed result tracking."
+                },
+                {
+                  icon: Award,
+                  title: "Certification",
+                  description: "Build certification packs with evidence artifacts and manage approval workflows."
+                },
+                {
+                  icon: Gauge,
+                  title: "SLA Monitoring",
+                  description: "Track onboarding progress against SLAs with breach risk alerts and leadership dashboards."
+                },
+                {
+                  icon: Shield,
+                  title: "Compliance Tracking",
+                  description: "Maintain detailed evidence vault with lineage tracking and audit trails for every decision."
+                },
+              ].map((item, idx) => (
+                <Card key={idx} className={`${bgCard} border ${borderColor} p-6 hover:border-[#00e5ff] transition-colors cursor-pointer`}>
+                  <item.icon className="h-8 w-8 text-[#00e5ff] mb-3" />
+                  <h4 className={`text-lg font-semibold ${textPrimary} mb-2`}>{item.title}</h4>
+                  <p className={`${textSecondary} text-sm`}>{item.description}</p>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Demo Request Section */}
+        <section className={`py-16 px-6 ${bgSecondary} border-y ${borderColor}`}>
+          <div className="max-w-2xl mx-auto text-center">
+            <h3 className={`text-3xl font-bold ${textPrimary} mb-4`}>Ready to See It in Action?</h3>
+            <p className={`${textSecondary} mb-8`}>Request a personalized demo to see how B-COMET can streamline your FIX protocol testing and onboarding.</p>
+            
+            <div className="flex gap-3 max-w-md mx-auto">
+              <Input 
+                placeholder="your@email.com" 
+                value={demoEmail}
+                onChange={(e) => setDemoEmail(e.target.value)}
+                className={`${isDarkMode ? "bg-[#0d2137] border-[#1e4976]" : ""}`}
+              />
+              <Button style={{ backgroundColor: "#00e5ff", color: "#0a1628" }} className="px-8">
+                Request Demo
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className={`${bgSecondary} py-8 px-6 border-t ${borderColor}`}>
+          <div className="max-w-6xl mx-auto text-center">
+            <p className={`${textSecondary} text-sm`}>© 2024 B-COMET. Enterprise FIX Protocol Platform. All rights reserved.</p>
+          </div>
+        </footer>
+      </div>
+    )
+  }
 
   // ========== LOGIN SCREEN ==========
   if (currentScreen === "login") {

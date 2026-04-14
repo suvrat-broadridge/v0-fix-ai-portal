@@ -3,10 +3,10 @@ import urllib.request
 import ssl
 import os
 
-# Fetch from GitHub main branch (working, clean version)
-url = "https://raw.githubusercontent.com/suvrat-broadridge/v0-fix-ai-portal/main/app/page.tsx"
+# Fetch from GitHub v0 branch (full comprehensive version)
+url = "https://raw.githubusercontent.com/suvrat-broadridge/v0-fix-ai-portal/v0/suvratdandekar-2328-2c8b4e70/app/page.tsx"
 
-print(f"Fetching clean working version from main branch...")
+print(f"Fetching full version from v0 branch...")
 
 try:
     # Create SSL context that doesn't verify (for corporate networks)
