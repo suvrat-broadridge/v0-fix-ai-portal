@@ -1,0 +1,305 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* Broadridge Color Palette */
+:root {
+  /* Base colors - Light Theme */
+  --background: #f8fafc;
+  --foreground: #0a1628;
+  --card: #ffffff;
+  --card-foreground: #0a1628;
+  --popover: #ffffff;
+  --popover-foreground: #0a1628;
+  
+  /* Broadridge Blues */
+  --deep-blue: #0a1628;
+  --broadridge-blue: #4a90c2;
+  --vibrant-blue: #2b7cd3;
+  --intelligent-cyan: #00bcd4;
+  --open-blue: #64b5f6;
+  --true-blue: #1976d2;
+  --fresh-blue: #42a5f5;
+  --clear-blue: #90caf9;
+  
+  /* Accent Colors from Broadridge Palette */
+  --accent-orange: #f57c00;
+  --accent-orange-bright: #ff9800;
+  --accent-orange-light: #ffb74d;
+  
+  /* Status Colors */
+  --status-success: #4caf50;
+  --status-success-light: #81c784;
+  --status-warning: #ffc107;
+  --status-warning-light: #ffecb3;
+  --status-error: #f44336;
+  --status-error-light: #ef9a9a;
+  
+  /* Primary & Secondary - Deep Blue Buttons */
+  --primary: #0a1628;
+  --primary-foreground: #ffffff;
+  --secondary: #e8f4fc;
+  --secondary-foreground: #0a1628;
+  --muted: #e2e8f0;
+  --muted-foreground: #475569;
+  --accent: #1976d2;
+  --accent-foreground: #ffffff;
+  
+  /* Button specific colors */
+  --btn-bg: #0a1628;
+  --btn-bg-hover: #1e3a5f;
+  --btn-secondary-bg: #e2e8f0;
+  --btn-secondary-hover: #cbd5e1;
+  --btn-text: #ffffff;
+  --btn-secondary-text: #0a1628;
+  
+  /* Functional colors */
+  --destructive: #d32f2f;
+  --destructive-foreground: #ffffff;
+  --success: #4caf50;
+  --warning: #ffeb3b;
+  --border: #cbd5e1;
+  --input: #e2e8f0;
+  --ring: #1976d2;
+  
+  --radius: 0.625rem;
+  --sidebar: #f1f5f9;
+  --sidebar-foreground: #0a1628;
+  --sidebar-primary: #0a1628;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e2e8f0;
+  --sidebar-accent-foreground: #0a1628;
+  --sidebar-border: #cbd5e1;
+  --sidebar-ring: #1976d2;
+}
+
+.dark {
+  /* Base colors - Dark Theme */
+  --background: #0a1628;
+  --foreground: #ffffff;
+  --card: #0f2847;
+  --card-foreground: #ffffff;
+  --popover: #0f2847;
+  --popover-foreground: #ffffff;
+  
+  /* Primary & Secondary - Bright Cyan Buttons */
+  --primary: #00bcd4;
+  --primary-foreground: #0a1628;
+  --secondary: #162d50;
+  --secondary-foreground: #ffffff;
+  --muted: #1e3a5f;
+  --muted-foreground: #90caf9;
+  --accent: #00bcd4;
+  --accent-foreground: #0a1628;
+  
+  /* Button specific colors */
+  --btn-bg: #00bcd4;
+  --btn-bg-hover: #00e5ff;
+  --btn-secondary-bg: #1e4976;
+  --btn-secondary-hover: #2a5f8f;
+  --btn-text: #0a1628;
+  --btn-secondary-text: #ffffff;
+  
+  /* Functional colors */
+  --destructive: #f44336;
+  --destructive-foreground: #ffffff;
+  --border: #1e4976;
+  --input: #162d50;
+  --ring: #00bcd4;
+  
+  --sidebar: #0f2847;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #00bcd4;
+  --sidebar-primary-foreground: #0a1628;
+  --sidebar-accent: #1e4976;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #1e4976;
+  --sidebar-ring: #00bcd4;
+}
+
+@theme inline {
+  --font-sans: 'Geist', 'Geist Fallback';
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Comet Animation - travels across text, brightens, then stays at end */
+@keyframes cometTravel {
+  0% {
+    transform: translateX(0);
+    opacity: 0.3;
+    filter: brightness(0.6);
+  }
+  20% {
+    opacity: 0.8;
+    filter: brightness(1) drop-shadow(0 0 5px #00e5ff);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(1.8) drop-shadow(0 0 15px #00e5ff) drop-shadow(0 0 30px #00e5ff);
+  }
+  80% {
+    filter: brightness(1.5) drop-shadow(0 0 10px #00e5ff) drop-shadow(0 0 20px #00e5ff);
+  }
+  100% {
+    transform: translateX(80px);
+    opacity: 1;
+    filter: brightness(1.2) drop-shadow(0 0 8px #00e5ff);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes progressBar {
+  0%, 100% {
+    width: 20%;
+  }
+  50% {
+    width: 90%;
+  }
+}
+
+@keyframes barGrow {
+  0%, 100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateX(-10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Text glows as comet passes over it */
+@keyframes letterGlow {
+  0% {
+    opacity: 0.3;
+    text-shadow: none;
+  }
+  20% {
+    opacity: 0.6;
+    text-shadow: none;
+  }
+  40% {
+    opacity: 1;
+    text-shadow: 0 0 10px #00e5ff, 0 0 20px #00e5ff;
+  }
+  50% {
+    text-shadow: 0 0 20px #00e5ff, 0 0 40px #00e5ff, 0 0 60px #00e5ff;
+  }
+  60% {
+    text-shadow: 0 0 15px #00e5ff, 0 0 30px #00e5ff;
+  }
+  80% {
+    text-shadow: 0 0 5px #00e5ff;
+  }
+  100% {
+    opacity: 1;
+    text-shadow: none;
+  }
+}
+
+/* Comet bounces back and forth across text during loading */
+@keyframes cometBounce {
+  0% {
+    left: -10px;
+  }
+  50% {
+    left: calc(100% - 20px);
+  }
+  100% {
+    left: -10px;
+  }
+}
+
+/* Letter illumination follows comet position */
+@keyframes letterIlluminate {
+  0%, 100% {
+    text-shadow: 0 0 15px #00e5ff, 0 0 30px #00e5ff;
+  }
+  25%, 75% {
+    text-shadow: 0 0 5px #00e5ff;
+  }
+  50% {
+    text-shadow: 0 0 15px #00e5ff, 0 0 30px #00e5ff;
+  }
+}
