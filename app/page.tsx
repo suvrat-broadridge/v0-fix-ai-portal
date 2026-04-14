@@ -1695,24 +1695,74 @@ export default function BCometPlatform() {
     
     // Admin dashboard - overview with metrics
     if (currentScreen === "dashboard") {
-      const totalClients = clients.length
       const totalAlerts = clients.reduce((sum, c) => sum + getTotalAlerts(c), 0)
-      const completedCertifications = clients.filter(c => c.assetClasses.every(a => a.certification === "completed")).length
-      const inProgressClients = clients.filter(c => c.assetClasses.some(a => a.certification === "in-progress" || a.specCompare === "in-progress")).length
 
-      const recentActivity = [
-        { client: "Nexus Trading Group", action: "Spec Compare completed", asset: "Equities", time: "2 hours ago" },
-        { client: "Apex Capital Partners", action: "Log Analysis started", asset: "Fixed Income", time: "4 hours ago" },
-        { client: "Horizon Investments", action: "New spec uploaded", asset: "Futures", time: "Yesterday" },
-        { client: "Velocity Securities", action: "Certification in review", asset: "Equities", time: "Yesterday" },
-        { client: "Quantum Asset Management", action: "Alert resolved", asset: "Commodities", time: "2 days ago" },
+      // Onboarding case metrics
+      const activeCases = 12
+      const casesAtRisk = 3
+      const approvalsPending = 4
+      const evidenceCompleteness = 78
+      const readyForGoLive = 2
+
+      // SLA forecast data
+      const slaForecast = {
+        onTrack: 7,
+        atRisk: 3,
+        breached: 2,
+        projectedThisWeek: 4
+      }
+
+      // Stage funnel data
+      const stageFunnel = [
+        { stage: "Intake", count: 2, color: "#2196f3" },
+        { stage: "Spec Analysis", count: 3, color: "#9c27b0" },
+        { stage: "Connectivity", count: 2, color: "#00bcd4" },
+        { stage: "Testing", count: 3, color: "#ff9800" },
+        { stage: "Certification", count: 1, color: "#e91e63" },
+        { stage: "Approval", count: 2, color: "#4caf50" },
+        { stage: "Go-Live", count: 1, color: "#00e5ff" },
       ]
 
+      // Blockers and Escalations
+      const blockers = [
+        { id: 1, caseId: "OB-2026-0142", client: "Apex Capital", issue: "Schema validation failure", severity: "critical", owner: "J. Smith", daysOpen: 4, escalated: true },
+        { id: 2, caseId: "OB-2026-0147", client: "Nexus Trading", issue: "Missing FIX spec v2.1", severity: "high", owner: "Sarah Chen", daysOpen: 2, escalated: false },
+        { id: 3, caseId: "OB-2026-0138", client: "Velocity Securities", issue: "Connectivity test timeout", severity: "medium", owner: "R. Patel", daysOpen: 1, escalated: false },
+      ]
+
+      // Enhanced pending tasks with urgency
       const pendingTasks = [
-        { client: "Nexus Trading Group", task: "Review spec differences", priority: "high", asset: "Options" },
-        { client: "Horizon Investments", task: "Complete log analysis", priority: "medium", asset: "FX" },
-        { client: "Quantum Asset Management", task: "Resolve configuration errors", priority: "high", asset: "Commodities" },
+        { caseId: "OB-2026-0142", client: "Apex Capital Partners", task: "Resolve schema errors", owner: "J. Smith", dueDate: "Apr 12", daysToSla: -2, priority: "critical", actions: ["Review", "Escalate"] },
+        { caseId: "OB-2026-0147", client: "Nexus Trading Group", task: "Complete mapping review", owner: "Sarah Chen", dueDate: "Apr 18", daysToSla: 4, priority: "high", actions: ["Review", "Approve"] },
+        { caseId: "OB-2026-0138", client: "Velocity Securities", task: "Business sign-off pending", owner: "M. Thompson", dueDate: "Apr 22", daysToSla: 8, priority: "medium", actions: ["Approve", "Reassign"] },
+        { caseId: "OB-2026-0151", client: "Horizon Investments", task: "Assign case owners", owner: "Unassigned", dueDate: "Apr 25", daysToSla: 11, priority: "low", actions: ["Assign", "Review"] },
       ]
+
+      // Enhanced recent activity with filters
+      const recentActivity = [
+        { caseId: "OB-2026-0142", client: "Apex Capital", action: "SLA breach - Schema validation overdue", stage: "Spec Analysis", severity: "critical", type: "Failure", time: "2 hours ago" },
+        { caseId: "OB-2026-0147", client: "Nexus Trading", action: "Mapping review completed", stage: "Testing", severity: "info", type: "Pass", time: "3 hours ago" },
+        { caseId: "OB-2026-0138", client: "Velocity Securities", action: "Certification submitted for approval", stage: "Approval", severity: "info", type: "Approval", time: "5 hours ago" },
+        { caseId: "OB-2026-0129", client: "Nexus Trading", action: "Go-live certification complete", stage: "Go-Live", severity: "success", type: "Pass", time: "Yesterday" },
+        { caseId: "OB-2026-0151", client: "Horizon Investments", action: "New case created", stage: "Intake", severity: "info", type: "Upload", time: "Yesterday" },
+      ]
+
+      // Case health data
+      const caseHealth = [
+        { caseId: "OB-2026-0142", client: "Apex Capital Partners", stage: "Spec Analysis", blockers: 6, lastUpdate: "2h ago", riskScore: 85, nextAction: "Resolve schema errors", owner: "J. Smith" },
+        { caseId: "OB-2026-0147", client: "Nexus Trading Group", stage: "Testing", blockers: 2, lastUpdate: "3h ago", riskScore: 45, nextAction: "Complete mapping review", owner: "Sarah Chen" },
+        { caseId: "OB-2026-0138", client: "Velocity Securities", stage: "Approval", blockers: 0, lastUpdate: "5h ago", riskScore: 15, nextAction: "Business sign-off", owner: "M. Thompson" },
+        { caseId: "OB-2026-0151", client: "Horizon Investments", stage: "Intake", blockers: 0, lastUpdate: "1d ago", riskScore: 25, nextAction: "Assign owners", owner: "Unassigned" },
+      ]
+
+      // Role-based next best action
+      const nextBestAction = {
+        title: "Resolve Critical Blockers",
+        subtitle: "2 cases need immediate attention",
+        cta: "View Blockers",
+        icon: AlertOctagon,
+        color: "#f44336"
+      }
 
       return (
         <div className={`min-h-screen ${bgPrimary} flex`}>
@@ -1720,10 +1770,24 @@ export default function BCometPlatform() {
           <div className="flex-1 overflow-auto">
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
               <div>
-                <h1 className={`text-xl font-bold ${textPrimary}`}>Dashboard</h1>
-                <p className={textSecondary}>Overview of client onboarding status</p>
+                <h1 className={`text-xl font-bold ${textPrimary}`}>Onboarding Control Center</h1>
+                <p className={textSecondary}>Operational view of all onboarding cases</p>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                {/* Date Range Selector */}
+                <div className={`flex gap-1 p-1 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-100"}`}>
+                  {["Today", "7 Days", "30 Days", "Quarter"].map(range => (
+                    <button key={range} className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${range === "7 Days" ? "bg-[#00e5ff] text-[#0a1628]" : textSecondary}`}>
+                      {range}
+                    </button>
+                  ))}
+                </div>
+                {/* Saved Views */}
+                <select className={`px-3 py-1.5 rounded-lg text-xs border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"}`}>
+                  <option>Operations View</option>
+                  <option>Leadership View</option>
+                  <option>Certification War Room</option>
+                </select>
                 {/* View Toggle */}
                 <div className={`flex gap-1 p-1 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-100"}`}>
                   <button 
@@ -1736,7 +1800,7 @@ export default function BCometPlatform() {
                     onClick={() => setDashboardView("kanban")}
                     className={`px-3 py-1.5 rounded text-xs font-medium transition-colors flex items-center gap-1 ${dashboardView === "kanban" ? "bg-[#00e5ff] text-[#0a1628]" : textSecondary}`}
                   >
-                    <TrendingUp className="h-3 w-3" /> Kanban
+                    <TrendingUp className="h-3 w-3" /> Pipeline
                   </button>
                 </div>
                 <button className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 relative`}>
@@ -1746,54 +1810,138 @@ export default function BCometPlatform() {
               </div>
             </header>
 
-            <div className="p-6 space-y-6">
-              {/* Metrics Cards - Always visible */}
-              <div className="grid grid-cols-4 gap-4">
+            <div className="p-6 space-y-5">
+              {/* Quick Actions Bar */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Button size="sm" onClick={() => setShowAddClientModal(true)} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
+                    <Plus className="h-3.5 w-3.5 mr-1.5" /> Create Case
+                  </Button>
+                  <Button size="sm" variant="outline">
+                    <Upload className="h-3.5 w-3.5 mr-1.5" /> Upload Spec
+                  </Button>
+                  <Button size="sm" variant="outline">
+                    <FileSearch className="h-3.5 w-3.5 mr-1.5" /> Run Analysis
+                  </Button>
+                  <Button size="sm" variant="outline">
+                    <TestTube className="h-3.5 w-3.5 mr-1.5" /> Generate Tests
+                  </Button>
+                  <Button size="sm" variant="outline">
+                    <Award className="h-3.5 w-3.5 mr-1.5" /> Evidence Pack
+                  </Button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs ${textSecondary}`}>Last refreshed: 2 min ago</span>
+                  <Button size="sm" variant="ghost"><RefreshCw className="h-3.5 w-3.5" /></Button>
+                </div>
+              </div>
+
+              {/* SLA Forecast Strip */}
+              <div className={`flex items-center gap-4 p-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/60" : "bg-gray-50"}`}>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-[#00e5ff]" />
+                  <span className={`text-xs font-semibold uppercase tracking-wider ${textSecondary}`}>SLA Forecast</span>
+                </div>
+                <div className="flex items-center gap-6 flex-1">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#4caf50]" />
+                    <span className={`text-sm ${textPrimary}`}><span className="font-bold">{slaForecast.onTrack}</span> <span className={textSecondary}>On Track</span></span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#ff9800]" />
+                    <span className={`text-sm ${textPrimary}`}><span className="font-bold">{slaForecast.atRisk}</span> <span className={textSecondary}>At Risk (3 days)</span></span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#f44336]" />
+                    <span className={`text-sm ${textPrimary}`}><span className="font-bold">{slaForecast.breached}</span> <span className={textSecondary}>Breached</span></span>
+                  </div>
+                  <div className={`h-4 w-px ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-300"}`} />
+                  <div className="flex items-center gap-2">
+                    <Rocket className="h-4 w-4 text-[#00e5ff]" />
+                    <span className={`text-sm ${textPrimary}`}><span className="font-bold">{slaForecast.projectedThisWeek}</span> <span className={textSecondary}>Go-Lives This Week</span></span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Top Metrics - Case and Risk Focused */}
+              <div className="grid grid-cols-5 gap-4">
                 <Card className={`${bgCard} border ${borderColor} p-4`}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className={`text-sm ${textSecondary}`}>Total Clients</p>
-                      <p className={`text-2xl font-bold ${textPrimary}`}>{totalClients}</p>
+                      <p className={`text-xs ${textSecondary}`}>Active Cases</p>
+                      <p className={`text-2xl font-bold ${textPrimary}`}>{activeCases}</p>
                     </div>
-                    <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#2196f3]/20" : "bg-[#2196f3]/10"}`}>
-                      <Users className="h-6 w-6 text-[#2196f3]" />
+                    <div className={`p-2.5 rounded-lg ${isDarkMode ? "bg-[#2196f3]/20" : "bg-[#2196f3]/10"}`}>
+                      <Briefcase className="h-5 w-5 text-[#2196f3]" />
+                    </div>
+                  </div>
+                </Card>
+                <Card className={`${bgCard} border border-[#f44336]/30 p-4`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className={`text-xs ${textSecondary}`}>Cases At Risk</p>
+                      <p className={`text-2xl font-bold text-[#f44336]`}>{casesAtRisk}</p>
+                    </div>
+                    <div className={`p-2.5 rounded-lg bg-[#f44336]/20`}>
+                      <AlertOctagon className="h-5 w-5 text-[#f44336]" />
+                    </div>
+                  </div>
+                </Card>
+                <Card className={`${bgCard} border border-[#ff9800]/30 p-4`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className={`text-xs ${textSecondary}`}>Approvals Pending</p>
+                      <p className={`text-2xl font-bold text-[#ff9800]`}>{approvalsPending}</p>
+                    </div>
+                    <div className={`p-2.5 rounded-lg bg-[#ff9800]/20`}>
+                      <ClipboardCheck className="h-5 w-5 text-[#ff9800]" />
                     </div>
                   </div>
                 </Card>
                 <Card className={`${bgCard} border ${borderColor} p-4`}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className={`text-sm ${textSecondary}`}>In Progress</p>
-                      <p className={`text-2xl font-bold ${textPrimary}`}>{inProgressClients}</p>
+                      <p className={`text-xs ${textSecondary}`}>Evidence Complete</p>
+                      <p className={`text-2xl font-bold ${textPrimary}`}>{evidenceCompleteness}%</p>
                     </div>
-                    <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#ff9800]/20" : "bg-[#ff9800]/10"}`}>
-                      <Activity className="h-6 w-6 text-[#ff9800]" />
-                    </div>
-                  </div>
-                </Card>
-                <Card className={`${bgCard} border ${borderColor} p-4`}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className={`text-sm ${textSecondary}`}>Certified</p>
-                      <p className={`text-2xl font-bold ${textPrimary}`}>{completedCertifications}</p>
-                    </div>
-                    <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#4caf50]/20" : "bg-[#4caf50]/10"}`}>
-                      <Award className="h-6 w-6 text-[#4caf50]" />
+                    <div className={`p-2.5 rounded-lg ${isDarkMode ? "bg-[#9c27b0]/20" : "bg-[#9c27b0]/10"}`}>
+                      <FileCheck className="h-5 w-5 text-[#9c27b0]" />
                     </div>
                   </div>
                 </Card>
-                <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <Card className={`${bgCard} border border-[#4caf50]/30 p-4`}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className={`text-sm ${textSecondary}`}>Active Alerts</p>
-                      <p className={`text-2xl font-bold ${totalAlerts > 0 ? "text-[#f44336]" : textPrimary}`}>{totalAlerts}</p>
+                      <p className={`text-xs ${textSecondary}`}>Ready for Go-Live</p>
+                      <p className={`text-2xl font-bold text-[#4caf50]`}>{readyForGoLive}</p>
                     </div>
-                    <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#f44336]/20" : "bg-[#f44336]/10"}`}>
-                      <AlertCircle className="h-6 w-6 text-[#f44336]" />
+                    <div className={`p-2.5 rounded-lg bg-[#4caf50]/20`}>
+                      <Rocket className="h-5 w-5 text-[#4caf50]" />
                     </div>
                   </div>
                 </Card>
               </div>
+
+              {/* Stage Funnel Widget */}
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className={`text-sm font-semibold ${textPrimary}`}>Pipeline Funnel</h3>
+                  <span className={`text-xs ${textSecondary}`}>{stageFunnel.reduce((a,s) => a + s.count, 0)} total cases</span>
+                </div>
+                <div className="flex items-end gap-2 h-20">
+                  {stageFunnel.map((stage, i) => (
+                    <div key={stage.stage} className="flex-1 flex flex-col items-center gap-1">
+                      <span className={`text-xs font-bold ${textPrimary}`}>{stage.count}</span>
+                      <div 
+                        className="w-full rounded-t transition-all hover:opacity-80 cursor-pointer" 
+                        style={{ backgroundColor: stage.color, height: `${Math.max(20, stage.count * 20)}px` }}
+                        title={`${stage.stage}: ${stage.count} cases`}
+                      />
+                      <span className={`text-[10px] ${textSecondary} text-center leading-tight`}>{stage.stage}</span>
+                    </div>
+                  ))}
+                </div>
+              </Card>
 
               {/* Kanban View */}
               {dashboardView === "kanban" && (
@@ -1862,46 +2010,134 @@ export default function BCometPlatform() {
                 </div>
               )}
 
-              {/* Cards View - Original Dashboard Content */}
+              {/* Cards View - Onboarding Control Content */}
               {dashboardView === "cards" && (
               <>
-              <div className="grid grid-cols-2 gap-6">
-                {/* Pending Tasks */}
-                <Card className={`${bgCard} border ${borderColor}`}>
-                  <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
-                    <h2 className={`font-semibold ${textPrimary}`}>Pending Tasks</h2>
-                    <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#f44336]/10 text-[#f44336]"}`}>{pendingTasks.length} tasks</span>
-                  </div>
-                  <div className="divide-y divide-[#1e4976]/30">
-                    {pendingTasks.map((task, i) => (
-                      <div key={i} className="px-4 py-3 flex items-center justify-between hover:bg-[#1e4976]/10 cursor-pointer" onClick={() => setCurrentScreen("clients")}>
-                        <div>
-                          <p className={`text-sm font-medium ${textPrimary}`}>{task.task}</p>
-                          <p className={`text-xs ${textSecondary}`}>{task.client} - {task.asset}</p>
-                        </div>
-                        <span className={`text-xs px-2 py-1 rounded ${task.priority === "high" ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>
-                          {task.priority}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className={`px-4 py-3 border-t ${borderColor}`}>
-                    <Button variant="outline" size="sm" className="w-full" onClick={() => setCurrentScreen("clients")}>View All Clients</Button>
+              <div className="grid grid-cols-3 gap-4">
+                {/* Next Best Action Card */}
+                <Card className={`${bgCard} border border-[#f44336]/30 p-4`}>
+                  <div className="flex items-start gap-3">
+                    <div className="p-2.5 rounded-lg bg-[#f44336]/20">
+                      <nextBestAction.icon className="h-5 w-5 text-[#f44336]" />
+                    </div>
+                    <div className="flex-1">
+                      <p className={`font-semibold ${textPrimary}`}>{nextBestAction.title}</p>
+                      <p className={`text-xs ${textSecondary} mt-0.5`}>{nextBestAction.subtitle}</p>
+                      <Button size="sm" className="mt-3 bg-[#f44336] hover:bg-[#f44336]/80 text-white">
+                        {nextBestAction.cta}
+                      </Button>
+                    </div>
                   </div>
                 </Card>
 
-                {/* Recent Activity */}
-                <Card className={`${bgCard} border ${borderColor}`}>
-                  <div className={`px-4 py-3 border-b ${borderColor}`}>
-                    <h2 className={`font-semibold ${textPrimary}`}>Recent Activity</h2>
+                {/* Blockers and Escalations Panel */}
+                <Card className={`${bgCard} border ${borderColor} col-span-2`}>
+                  <div className={`px-4 py-2.5 border-b ${borderColor} flex items-center justify-between`}>
+                    <div className="flex items-center gap-2">
+                      <AlertOctagon className="h-4 w-4 text-[#f44336]" />
+                      <h3 className={`text-sm font-semibold ${textPrimary}`}>Blockers & Escalations</h3>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded text-xs bg-[#f44336]/20 text-[#f44336]">{blockers.filter(b => b.severity === "critical").length} Critical</span>
+                      <span className="px-2 py-0.5 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">{blockers.filter(b => b.escalated).length} Escalated</span>
+                    </div>
                   </div>
-                  <div className="divide-y divide-[#1e4976]/30">
+                  <div className="divide-y divide-[#1e4976]/30 max-h-32 overflow-y-auto">
+                    {blockers.map(blocker => (
+                      <div key={blocker.id} className="px-4 py-2 flex items-center gap-3 hover:bg-[#1e4976]/10 cursor-pointer">
+                        <div className={`w-2 h-2 rounded-full ${blocker.severity === "critical" ? "bg-[#f44336]" : blocker.severity === "high" ? "bg-[#ff9800]" : "bg-[#2196f3]"}`} />
+                        <span className={`text-xs font-mono ${textSecondary}`}>{blocker.caseId}</span>
+                        <span className={`text-sm ${textPrimary} flex-1`}>{blocker.issue}</span>
+                        <span className={`text-xs ${textSecondary}`}>{blocker.owner}</span>
+                        <span className={`text-xs px-1.5 py-0.5 rounded ${blocker.daysOpen > 2 ? "bg-[#f44336]/20 text-[#f44336]" : "bg-slate-500/20 text-slate-400"}`}>{blocker.daysOpen}d</span>
+                        {blocker.escalated && <span className="text-xs px-1.5 py-0.5 rounded bg-[#9c27b0]/20 text-[#9c27b0]">Escalated</span>}
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {/* Action Queue - Enhanced Pending Tasks */}
+                <Card className={`${bgCard} border ${borderColor}`}>
+                  <div className={`px-4 py-2.5 border-b ${borderColor} flex items-center justify-between`}>
+                    <div className="flex items-center gap-2">
+                      <Target className="h-4 w-4 text-[#00e5ff]" />
+                      <h3 className={`text-sm font-semibold ${textPrimary}`}>Action Queue</h3>
+                    </div>
+                    <span className={`text-xs px-2 py-0.5 rounded ${isDarkMode ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#f44336]/10 text-[#f44336]"}`}>{pendingTasks.length} pending</span>
+                  </div>
+                  <div className="divide-y divide-[#1e4976]/30 max-h-56 overflow-y-auto">
+                    {pendingTasks.map((task, i) => (
+                      <div key={i} className="px-4 py-2.5 hover:bg-[#1e4976]/10">
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-2">
+                            <span className={`text-xs font-mono ${textSecondary}`}>{task.caseId}</span>
+                            <span className={`text-sm font-medium ${textPrimary}`}>{task.task}</span>
+                          </div>
+                          <span className={`text-xs px-1.5 py-0.5 rounded ${
+                            task.priority === "critical" ? "bg-[#f44336]/20 text-[#f44336]" :
+                            task.priority === "high" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                            task.priority === "medium" ? "bg-[#2196f3]/20 text-[#2196f3]" :
+                            "bg-slate-500/20 text-slate-400"
+                          }`}>{task.priority}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3 text-xs">
+                            <span className={textSecondary}>{task.client}</span>
+                            <span className={textSecondary}>|</span>
+                            <span className={textSecondary}>{task.owner}</span>
+                            <span className={textSecondary}>|</span>
+                            <span className={task.daysToSla < 0 ? "text-[#f44336]" : task.daysToSla < 3 ? "text-[#ff9800]" : textSecondary}>
+                              {task.daysToSla < 0 ? `${Math.abs(task.daysToSla)}d overdue` : `${task.daysToSla}d to SLA`}
+                            </span>
+                          </div>
+                          <div className="flex gap-1">
+                            {task.actions.map(action => (
+                              <button key={action} className={`px-2 py-0.5 rounded text-xs border ${borderColor} ${textSecondary} hover:border-[#00e5ff] hover:text-[#00e5ff]`}>
+                                {action}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+
+                {/* Recent Activity - Enhanced with Filters */}
+                <Card className={`${bgCard} border ${borderColor}`}>
+                  <div className={`px-4 py-2.5 border-b ${borderColor} flex items-center justify-between`}>
+                    <div className="flex items-center gap-2">
+                      <Activity className="h-4 w-4 text-[#00e5ff]" />
+                      <h3 className={`text-sm font-semibold ${textPrimary}`}>Recent Activity</h3>
+                    </div>
+                    <div className="flex gap-1">
+                      {["All", "Critical", "Approvals"].map(f => (
+                        <button key={f} className={`px-2 py-0.5 rounded text-xs ${f === "All" ? "bg-[#00e5ff]/20 text-[#00e5ff]" : `${textSecondary} hover:bg-[#1e4976]/30`}`}>{f}</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="divide-y divide-[#1e4976]/30 max-h-56 overflow-y-auto">
                     {recentActivity.map((item, i) => (
-                      <div key={i} className="px-4 py-3 flex items-center gap-3">
-                        <div className={`w-2 h-2 rounded-full ${i === 0 ? "bg-[#4caf50]" : i === 1 ? "bg-[#2196f3]" : "bg-[#9e9e9e]"}`} />
+                      <div key={i} className={`px-4 py-2.5 flex items-start gap-3 ${item.severity === "critical" ? "bg-[#f44336]/5" : ""}`}>
+                        <div className={`w-2 h-2 rounded-full mt-1.5 ${
+                          item.severity === "critical" ? "bg-[#f44336]" :
+                          item.severity === "success" ? "bg-[#4caf50]" :
+                          "bg-[#2196f3]"
+                        }`} />
                         <div className="flex-1">
-                          <p className={`text-sm ${textPrimary}`}><span className="font-medium">{item.client}</span> - {item.action}</p>
-                          <p className={`text-xs ${textSecondary}`}>{item.asset} | {item.time}</p>
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <span className={`text-xs font-mono ${textSecondary}`}>{item.caseId}</span>
+                            <span className={`text-xs px-1.5 py-0.5 rounded ${
+                              item.type === "Failure" ? "bg-[#f44336]/20 text-[#f44336]" :
+                              item.type === "Pass" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                              item.type === "Approval" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                              "bg-[#2196f3]/20 text-[#2196f3]"
+                            }`}>{item.type}</span>
+                          </div>
+                          <p className={`text-sm ${textPrimary}`}>{item.action}</p>
+                          <p className={`text-xs ${textSecondary}`}>{item.client} | {item.stage} | {item.time}</p>
                         </div>
                       </div>
                     ))}
@@ -1909,52 +2145,55 @@ export default function BCometPlatform() {
                 </Card>
               </div>
 
-              {/* Client Status Summary */}
+              {/* Case Health Table */}
               <Card className={`${bgCard} border ${borderColor}`}>
-                <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
-                  <h2 className={`font-semibold ${textPrimary}`}>Client Status Summary</h2>
-                  <Button variant="outline" size="sm" onClick={() => setCurrentScreen("clients")}>View All</Button>
+                <div className={`px-4 py-2.5 border-b ${borderColor} flex items-center justify-between`}>
+                  <div className="flex items-center gap-2">
+                    <Gauge className="h-4 w-4 text-[#00e5ff]" />
+                    <h3 className={`text-sm font-semibold ${textPrimary}`}>Case Health</h3>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => setCurrentScreen("atdl-workbench" as any)}>View All Cases</Button>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className={`${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
                       <tr>
-                        <th className={`px-4 py-2 text-left text-sm font-medium ${textPrimary}`}>Client</th>
-                        <th className={`px-4 py-2 text-center text-sm font-medium ${textPrimary}`}>Progress</th>
-                        <th className={`px-4 py-2 text-center text-sm font-medium ${textPrimary}`}>Alerts</th>
-                        <th className={`px-4 py-2 text-center text-sm font-medium ${textPrimary}`}>Status</th>
+                        <th className={`px-4 py-2 text-left text-xs font-medium ${textSecondary}`}>Case ID</th>
+                        <th className={`px-4 py-2 text-left text-xs font-medium ${textSecondary}`}>Client</th>
+                        <th className={`px-4 py-2 text-center text-xs font-medium ${textSecondary}`}>Stage</th>
+                        <th className={`px-4 py-2 text-center text-xs font-medium ${textSecondary}`}>Blockers</th>
+                        <th className={`px-4 py-2 text-center text-xs font-medium ${textSecondary}`}>Last Update</th>
+                        <th className={`px-4 py-2 text-center text-xs font-medium ${textSecondary}`}>Risk Score</th>
+                        <th className={`px-4 py-2 text-left text-xs font-medium ${textSecondary}`}>Next Action</th>
+                        <th className={`px-4 py-2 text-left text-xs font-medium ${textSecondary}`}>Owner</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {clients.slice(0, 3).map((client) => {
-                        const completedSteps = client.assetClasses.reduce((sum, a) => {
-                          return sum + [a.specCompare, a.logAnalysis, a.scenario, a.testCase, a.certification, a.config].filter(s => s === "completed").length
-                        }, 0)
-                        const totalSteps = client.assetClasses.length * 6
-                        const progress = Math.round((completedSteps / totalSteps) * 100)
-                        return (
-                          <tr key={client.id} className={`border-t ${borderColor} cursor-pointer hover:bg-[#1e4976]/10`} onClick={() => { setSelectedClient(client); setCurrentScreen("client-detail"); }}>
-                            <td className={`px-4 py-3 ${textPrimary}`}>
-                              <div className="font-medium">{client.name}</div>
-                              <div className={`text-xs ${textSecondary}`}>{client.assetClasses.length} asset classes</div>
-                            </td>
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-2">
-                                <div className={`flex-1 h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
-                                  <div className="h-full rounded-full bg-[#4caf50]" style={{ width: `${progress}%` }} />
-                                </div>
-                                <span className={`text-xs ${textSecondary}`}>{progress}%</span>
+                      {caseHealth.map((c) => (
+                        <tr key={c.caseId} className={`border-t ${borderColor} cursor-pointer hover:bg-[#1e4976]/10`} onClick={() => setCurrentScreen("atdl-workbench" as any)}>
+                          <td className={`px-4 py-2.5 font-mono text-xs ${textPrimary}`}>{c.caseId}</td>
+                          <td className={`px-4 py-2.5 text-sm ${textPrimary}`}>{c.client}</td>
+                          <td className="px-4 py-2.5 text-center">
+                            <span className={`text-xs px-2 py-0.5 rounded ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-100"} ${textSecondary}`}>{c.stage}</span>
+                          </td>
+                          <td className="px-4 py-2.5 text-center">
+                            {c.blockers > 0 ? (
+                              <span className="text-xs px-2 py-0.5 rounded bg-[#f44336]/20 text-[#f44336]">{c.blockers}</span>
+                            ) : <span className={textSecondary}>-</span>}
+                          </td>
+                          <td className={`px-4 py-2.5 text-center text-xs ${textSecondary}`}>{c.lastUpdate}</td>
+                          <td className="px-4 py-2.5 text-center">
+                            <div className="flex items-center justify-center gap-1.5">
+                              <div className={`w-16 h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"} overflow-hidden`}>
+                                <div className={`h-full rounded-full ${c.riskScore > 60 ? "bg-[#f44336]" : c.riskScore > 30 ? "bg-[#ff9800]" : "bg-[#4caf50]"}`} style={{ width: `${c.riskScore}%` }} />
                               </div>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              {getTotalAlerts(client) > 0 ? (
-                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336] text-xs">{getTotalAlerts(client)}</span>
-                              ) : <span className={textSecondary}>-</span>}
-                            </td>
-                            <td className="px-4 py-3 text-center">{getStatusBadge(progress === 100 ? "completed" : progress > 50 ? "in-progress" : "not-started")}</td>
-                          </tr>
-                        )
-                      })}
+                              <span className={`text-xs ${c.riskScore > 60 ? "text-[#f44336]" : c.riskScore > 30 ? "text-[#ff9800]" : "text-[#4caf50]"}`}>{c.riskScore}</span>
+                            </div>
+                          </td>
+                          <td className={`px-4 py-2.5 text-xs ${textPrimary}`}>{c.nextAction}</td>
+                          <td className={`px-4 py-2.5 text-xs ${textSecondary}`}>{c.owner}</td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
