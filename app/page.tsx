@@ -3372,7 +3372,6 @@ const specCompareResults = [
   </div>
   )}
                 </div>
-              )}
             </div>
           </div>
         </div>
