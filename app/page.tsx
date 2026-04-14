@@ -785,21 +785,25 @@ export default function BCometPlatform() {
   </button>
   
   {atdlToolsExpanded && (
-                    <div className="ml-4 space-y-1 border-l border-[#1e4976]/50 pl-2">
+                    <div className="ml-7 mt-1 space-y-0.5">
                       {[
                         { icon: GitCompare, label: "FIX to ATDL Compare", screen: "fix-atdl-compare" },
                         { icon: GitCompare, label: "ATDL to ATDL Compare", screen: "atdl-compare" },
                         { icon: Zap, label: "FIX to ATDL Convert", screen: "fix-to-atdl" },
-                        { icon: CheckCircle, label: "ATDL Validate Structure", screen: "atdl-validate" },
-                        { icon: Eye, label: "ATDL Usage", screen: "atdl-ui-repr" },
+                        { icon: CheckCircle, label: "Validate Structure", screen: "atdl-validate" },
+                        { icon: Eye, label: "Usage Preview", screen: "atdl-ui-repr" },
                       ].map((item) => (
                         <button
                           key={item.label}
                           onClick={() => { setCurrentScreen(item.screen as any); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
-                          className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg transition-colors text-xs ${textSecondary} hover:bg-[#1e4976]/30`}
+                          className={`w-full flex items-center gap-2 px-2 py-1.5 rounded transition-colors text-xs ${
+                            currentScreen === item.screen && isAdHocMode
+                              ? "bg-[#00e5ff]/10 text-[#00e5ff]"
+                              : `${textSecondary} hover:bg-[#1e4976]/30`
+                          }`}
                         >
-                          <item.icon className="h-3 w-3" />
-                          <span>{item.label}</span>
+                          <item.icon className="h-3.5 w-3.5 flex-shrink-0" />
+                          <span className="truncate">{item.label}</span>
                         </button>
                       ))}
                     </div>
