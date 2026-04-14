@@ -173,8 +173,8 @@ export default function Page() {
               <Button onClick={() => setCurrentScreen("demo-request")} variant="outline" className="border-[#00e5ff] text-[#00e5ff]">
                 Request Demo
               </Button>
-              <Button onClick={() => setCurrentScreen("login")} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00d0e8]">
-                <LogIn className="h-4 w-4 mr-2" /> Login
+              <Button onClick={() => setCurrentScreen("role-select")} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00d0e8]">
+                <LogIn className="h-4 w-4 mr-2" /> Login / Register
               </Button>
             </div>
           </div>
@@ -318,67 +318,87 @@ export default function Page() {
     )
   }
 
-  // ========== LOGIN SCREEN ==========
-  if (currentScreen === "login") {
+  // ========== ROLE SELECT SCREEN (shown first after clicking Login) ==========
+  if (currentScreen === "role-select") {
     return (
       <div className={`min-h-screen ${bgPrimary} flex items-center justify-center p-4`}>
-        <Card className={`${bgCard} border ${borderColor} p-8 w-full max-w-md`}>
+        <Card className={`${bgCard} border ${borderColor} p-8 w-full max-w-lg`}>
           <Button variant="ghost" onClick={() => setCurrentScreen("welcome")} className="mb-4 text-[#00e5ff]">
             <ArrowRight className="h-4 w-4 mr-2 rotate-180" /> Back
           </Button>
-          
+
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-[#00e5ff] mb-2">B-COMET</h1>
+            <h1 className="text-3xl font-bold text-[#00e5ff] mb-1">B-COMET</h1>
             <p className={`text-sm ${textSecondary}`}>Enterprise Onboarding Control Center</p>
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <label className={`block text-sm font-medium ${textPrimary} mb-2`}>Username</label>
-              <Input placeholder="Enter username" className={`${isDarkMode ? "bg-[#0d2137] border-[#1e4976]" : ""}`} />
-            </div>
-            <div>
-              <label className={`block text-sm font-medium ${textPrimary} mb-2`}>Password</label>
-              <Input type="password" placeholder="Enter password" className={`${isDarkMode ? "bg-[#0d2137] border-[#1e4976]" : ""}`} />
-            </div>
-            <Button onClick={() => setCurrentScreen("role-select")} className="w-full bg-[#00e5ff] text-[#0a1628] hover:bg-[#00d0e8]">
-              <LogIn className="h-4 w-4 mr-2" /> Login
-            </Button>
+          <h2 className={`text-lg font-semibold ${textPrimary} mb-5 text-center`}>How would you like to sign in?</h2>
+
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              onClick={() => { setSelectedRole("client"); setCurrentScreen("login"); }}
+              className={`flex flex-col items-center justify-center gap-3 p-6 rounded-lg ${bgSecondary} border-2 ${borderColor} hover:border-[#00e5ff] transition-all group`}
+            >
+              <div className="w-14 h-14 rounded-full bg-[#2196f3]/20 flex items-center justify-center border border-[#2196f3] group-hover:border-[#00e5ff] transition-all">
+                <Users className="h-7 w-7 text-[#2196f3]" />
+              </div>
+              <div className="text-center">
+                <p className={`font-semibold ${textPrimary}`}>Client</p>
+                <p className={`text-xs ${textSecondary} mt-1`}>View onboarding status and progress</p>
+              </div>
+            </button>
+
+            <button
+              onClick={() => { setSelectedRole("admin"); setCurrentScreen("login"); }}
+              className={`flex flex-col items-center justify-center gap-3 p-6 rounded-lg ${bgSecondary} border-2 ${borderColor} hover:border-[#00e5ff] transition-all group`}
+            >
+              <div className="w-14 h-14 rounded-full bg-[#00e5ff]/20 flex items-center justify-center border border-[#00e5ff] group-hover:bg-[#00e5ff]/30 transition-all">
+                <Settings className="h-7 w-7 text-[#00e5ff]" />
+              </div>
+              <div className="text-center">
+                <p className={`font-semibold ${textPrimary}`}>Administrator</p>
+                <p className={`text-xs ${textSecondary} mt-1`}>Manage cases, tools and workflows</p>
+              </div>
+            </button>
           </div>
         </Card>
       </div>
     )
   }
 
-  // ========== ROLE SELECT SCREEN ==========
-  if (currentScreen === "role-select") {
+  // ========== LOGIN SCREEN (shown after role is selected) ==========
+  if (currentScreen === "login") {
     return (
       <div className={`min-h-screen ${bgPrimary} flex items-center justify-center p-4`}>
         <Card className={`${bgCard} border ${borderColor} p-8 w-full max-w-md`}>
-          <h2 className={`text-2xl font-bold ${textPrimary} mb-6 text-center`}>Select Your Role</h2>
-          
+          <Button variant="ghost" onClick={() => setCurrentScreen("role-select")} className="mb-4 text-[#00e5ff]">
+            <ArrowRight className="h-4 w-4 mr-2 rotate-180" /> Back
+          </Button>
+
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold text-[#00e5ff] mb-1">B-COMET</h1>
+            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs mt-2 ${
+              selectedRole === "admin" 
+                ? "bg-[#00e5ff]/20 text-[#00e5ff] border border-[#00e5ff]/40" 
+                : "bg-[#2196f3]/20 text-[#2196f3] border border-[#2196f3]/40"
+            }`}>
+              {selectedRole === "admin" ? <Settings className="h-3 w-3" /> : <Users className="h-3 w-3" />}
+              Signing in as {selectedRole === "admin" ? "Administrator" : "Client"}
+            </div>
+          </div>
+
           <div className="space-y-4">
-            <button 
-              onClick={() => { setSelectedRole("client"); setCurrentScreen("dashboard"); }}
-              className={`w-full h-32 flex flex-col items-center justify-center gap-3 rounded-lg ${bgSecondary} border-2 ${borderColor} hover:border-[#00e5ff] transition-colors`}
-            >
-              <Users className="h-8 w-8 text-[#00e5ff]" />
-              <div className="text-center">
-                <p className={`font-semibold ${textPrimary}`}>Client</p>
-                <p className={`text-xs ${textSecondary}`}>View your onboarding status and progress</p>
-              </div>
-            </button>
-            
-            <button 
-              onClick={() => { setSelectedRole("admin"); setCurrentScreen("dashboard"); }}
-              className={`w-full h-32 flex flex-col items-center justify-center gap-3 rounded-lg ${bgSecondary} border-2 ${borderColor} hover:border-[#00e5ff] transition-colors`}
-            >
-              <Settings className="h-8 w-8 text-[#00e5ff]" />
-              <div className="text-center">
-                <p className={`font-semibold ${textPrimary}`}>Administrator</p>
-                <p className={`text-xs ${textSecondary}`}>Manage onboarding cases and workflows</p>
-              </div>
-            </button>
+            <div>
+              <label className={`block text-sm font-medium ${textPrimary} mb-2`}>Username</label>
+              <Input placeholder="Enter username" className={`${isDarkMode ? "bg-[#0d2137] border-[#1e4976] text-white" : ""}`} />
+            </div>
+            <div>
+              <label className={`block text-sm font-medium ${textPrimary} mb-2`}>Password</label>
+              <Input type="password" placeholder="Enter password" className={`${isDarkMode ? "bg-[#0d2137] border-[#1e4976] text-white" : ""}`} />
+            </div>
+            <Button onClick={() => setCurrentScreen("dashboard")} className="w-full bg-[#00e5ff] text-[#0a1628] hover:bg-[#00d0e8] font-semibold">
+              <LogIn className="h-4 w-4 mr-2" /> Login as {selectedRole === "admin" ? "Administrator" : "Client"}
+            </Button>
           </div>
         </Card>
       </div>
