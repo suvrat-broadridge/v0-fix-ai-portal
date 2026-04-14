@@ -3371,12 +3371,6 @@ const specCompareResults = [
   </div>
   </div>
   )}
-            </Card>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   // Scenario Creation Screen
   if (currentScreen === "scenario-creation") {
