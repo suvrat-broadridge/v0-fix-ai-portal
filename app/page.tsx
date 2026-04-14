@@ -3386,6 +3386,7 @@ const specCompareResults = [
                 </div>
               </div>
             ) : null}
+            </div>
 
             {showLogResults && (
               <Card className={`${bgCard} p-6 border ${borderColor}`}>
