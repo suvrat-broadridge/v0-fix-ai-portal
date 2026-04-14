@@ -84,7 +84,7 @@ export default function BCometPlatform() {
   const [showCertResults, setShowCertResults] = useState(false)
   const [scenarioFilter, setScenarioFilter] = useState<string>("all")
   const [showAddClientModal, setShowAddClientModal] = useState(false)
-  const [newClient, setNewClient] = useState({ name: "", jira: "", accountManager: "", assetClasses: [] as string[] })
+  const [newClient, setNewClient] = useState({ name: "", legalEntity: "", jira: "", accountManager: "", assetClasses: [] as string[], onboardingTracks: [] as string[], includesAtdl: true, slaDays: 22, onboardingManager: "", technicalLead: "" })
   const [isAdHocMode, setIsAdHocMode] = useState(false)
   const [toolsExpanded, setToolsExpanded] = useState(false)
   const [atdlToolsExpanded, setAtdlToolsExpanded] = useState(false)
@@ -493,7 +493,7 @@ export default function BCometPlatform() {
   }
 
   const handleAddClient = () => {
-    if (newClient.name && newClient.jira && newClient.accountManager && newClient.assetClasses.length > 0) {
+    if (newClient.name && newClient.legalEntity && newClient.assetClasses.length > 0 && newClient.onboardingManager && newClient.technicalLead) {
       const client = {
         id: clients.length + 1,
         name: newClient.name,
@@ -511,19 +511,11 @@ export default function BCometPlatform() {
         }))
       }
       setClients([...clients, client])
-      setNewClient({ name: "", jira: "", accountManager: "", assetClasses: [] })
+      setNewClient({ name: "", legalEntity: "", jira: "", accountManager: "", assetClasses: [], onboardingTracks: [], includesAtdl: true, slaDays: 22, onboardingManager: "", technicalLead: "" })
       setShowAddClientModal(false)
     }
   }
 
-  const toggleAssetClass = (assetClass: string) => {
-    setNewClient(prev => ({
-      ...prev,
-      assetClasses: prev.assetClasses.includes(assetClass)
-        ? prev.assetClasses.filter(ac => ac !== assetClass)
-        : [...prev.assetClasses, assetClass]
-    }))
-  }
 
   // Logo Components - Realistic bright comet like reference image
   const CometLogo = ({ size = 40 }: { size?: number }) => (
@@ -641,43 +633,63 @@ export default function BCometPlatform() {
 
   // Add Client Modal - rendered inline to prevent focus loss
   const addClientModalJSX = showAddClientModal ? (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <Card className={`${bgCard} p-6 w-full max-w-md border ${borderColor}`}>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-y-auto">
+      <Card className={`${bgCard} p-6 w-full max-w-2xl border ${borderColor} my-8`}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className={`text-xl font-bold ${textPrimary}`}>Add New Client</h2>
+          <div>
+            <h2 className={`text-xl font-bold ${textPrimary}`}>Create Onboarding Case</h2>
+            <p className={`text-xs ${textSecondary} mt-1`}>Initiate a new client onboarding from intake through certification</p>
+          </div>
           <button onClick={() => setShowAddClientModal(false)} className={`p-1 rounded hover:bg-[#1e4976]/50 ${textSecondary}`}>
             <X className="h-5 w-5" />
           </button>
         </div>
         
-        <div className="space-y-4">
-          <div>
-            <label className={`text-sm font-medium ${textPrimary}`}>Client Name</label>
-            <Input 
-              placeholder="Enter client name" 
-              className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`}
-              value={newClient.name}
-              onChange={(e) => setNewClient(prev => ({ ...prev, name: e.target.value }))}
-            />
+        <div className="space-y-5">
+          {/* Client Info Section */}
+          <div className={`p-4 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}>
+            <p className={`text-xs font-semibold uppercase tracking-wider ${textSecondary} mb-4`}>Client Information</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={`text-sm font-medium ${textPrimary}`}>Client Name</label>
+                <Input 
+                  placeholder="e.g., Nexus Trading Group" 
+                  className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`}
+                  value={newClient.name}
+                  onChange={(e) => setNewClient(prev => ({ ...prev, name: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className={`text-sm font-medium ${textPrimary}`}>Legal Entity</label>
+                <Input 
+                  placeholder="e.g., Nexus Trading LLC" 
+                  className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`}
+                  value={newClient.legalEntity}
+                  onChange={(e) => setNewClient(prev => ({ ...prev, legalEntity: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className={`text-sm font-medium ${textPrimary}`}>JIRA ID</label>
+                <Input 
+                  placeholder="e.g., OB-2026-0150" 
+                  className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`}
+                  value={newClient.jira}
+                  onChange={(e) => setNewClient(prev => ({ ...prev, jira: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className={`text-sm font-medium ${textPrimary}`}>Sales/Account Manager</label>
+                <Input 
+                  placeholder="Enter manager name" 
+                  className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`}
+                  value={newClient.accountManager}
+                  onChange={(e) => setNewClient(prev => ({ ...prev, accountManager: e.target.value }))}
+                />
+              </div>
+            </div>
           </div>
-          <div>
-            <label className={`text-sm font-medium ${textPrimary}`}>JIRA ID</label>
-            <Input 
-              placeholder="e.g., CLIENT-001" 
-              className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`}
-              value={newClient.jira}
-              onChange={(e) => setNewClient(prev => ({ ...prev, jira: e.target.value }))}
-            />
-          </div>
-          <div>
-            <label className={`text-sm font-medium ${textPrimary}`}>Sales/Account Manager</label>
-            <Input 
-              placeholder="Enter manager name" 
-              className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`}
-              value={newClient.accountManager}
-              onChange={(e) => setNewClient(prev => ({ ...prev, accountManager: e.target.value }))}
-            />
-          </div>
+
+          {/* Asset Classes */}
           <div>
             <label className={`text-sm font-medium ${textPrimary}`}>Asset Classes (select multiple)</label>
             <div className="mt-2 flex flex-wrap gap-2">
@@ -685,7 +697,12 @@ export default function BCometPlatform() {
                 <button
                   key={ac}
                   type="button"
-                  onClick={() => toggleAssetClass(ac)}
+                  onClick={() => {
+                    const updated = newClient.assetClasses.includes(ac)
+                      ? newClient.assetClasses.filter(a => a !== ac)
+                      : [...newClient.assetClasses, ac]
+                    setNewClient(prev => ({ ...prev, assetClasses: updated }))
+                  }}
                   className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                     newClient.assetClasses.includes(ac)
                       ? "bg-[#00e5ff] text-[#0a1628]"
@@ -698,19 +715,113 @@ export default function BCometPlatform() {
                 </button>
               ))}
             </div>
-            {newClient.assetClasses.length > 0 && (
-              <p className={`mt-2 text-xs ${textSecondary}`}>
-                Selected: {newClient.assetClasses.join(", ")}
-              </p>
-            )}
+          </div>
+
+          {/* Onboarding Tracks */}
+          <div className={`p-4 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}>
+            <p className={`text-xs font-semibold uppercase tracking-wider ${textSecondary} mb-3`}>Onboarding Tracks</p>
+            <div className="space-y-2">
+              {[
+                { id: "spec", label: "FIX Specification Baseline" },
+                { id: "atdl", label: "ATDL Strategy Definition" },
+                { id: "connectivity", label: "Integration & Connectivity" },
+                { id: "testing", label: "Testing & Certification" },
+                { id: "golive", label: "Go-Live & Hypercare" },
+              ].map(track => (
+                <label key={track.id} className="flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    className="accent-[#00e5ff]"
+                    defaultChecked={["spec","testing"].includes(track.id)}
+                    onChange={(e) => {
+                      const updated = e.target.checked
+                        ? [...newClient.onboardingTracks, track.id]
+                        : newClient.onboardingTracks.filter(t => t !== track.id)
+                      setNewClient(prev => ({ ...prev, onboardingTracks: updated }))
+                    }}
+                  />
+                  <span className={`text-sm ${textPrimary}`}>{track.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* ATDL & SLA Section */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className={`p-4 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  className="accent-[#00e5ff]"
+                  checked={newClient.includesAtdl}
+                  onChange={(e) => setNewClient(prev => ({ ...prev, includesAtdl: e.target.checked }))}
+                />
+                <div>
+                  <p className={`text-sm font-medium ${textPrimary}`}>Include ATDL Analysis</p>
+                  <p className={`text-xs ${textSecondary}`}>Algo strategy validation</p>
+                </div>
+              </label>
+            </div>
+            <div className={`p-4 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}>
+              <label className={`text-sm font-medium ${textPrimary}`}>Target SLA (days)</label>
+              <select 
+                className={`w-full mt-2 p-2 rounded border ${borderColor} text-sm ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"}`}
+                value={newClient.slaDays}
+                onChange={(e) => setNewClient(prev => ({ ...prev, slaDays: parseInt(e.target.value) }))}
+              >
+                <option value={15}>15 days</option>
+                <option value={22}>22 days</option>
+                <option value={30}>30 days</option>
+                <option value={45}>45 days</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Ownership Assignment */}
+          <div className={`p-4 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}>
+            <p className={`text-xs font-semibold uppercase tracking-wider ${textSecondary} mb-4`}>Case Ownership</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={`text-sm font-medium ${textPrimary}`}>Onboarding Manager</label>
+                <select 
+                  className={`w-full mt-1 p-2 rounded border ${borderColor} text-sm ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"}`}
+                  value={newClient.onboardingManager}
+                  onChange={(e) => setNewClient(prev => ({ ...prev, onboardingManager: e.target.value }))}
+                >
+                  <option value="">Select manager</option>
+                  <option value="Sarah Chen">Sarah Chen</option>
+                  <option value="Mike Johnson">Mike Johnson</option>
+                  <option value="R. Patel">R. Patel</option>
+                  <option value="Unassigned">Unassigned</option>
+                </select>
+              </div>
+              <div>
+                <label className={`text-sm font-medium ${textPrimary}`}>Technical Lead</label>
+                <select 
+                  className={`w-full mt-1 p-2 rounded border ${borderColor} text-sm ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"}`}
+                  value={newClient.technicalLead}
+                  onChange={(e) => setNewClient(prev => ({ ...prev, technicalLead: e.target.value }))}
+                >
+                  <option value="">Select lead</option>
+                  <option value="J. Smith">J. Smith</option>
+                  <option value="R. Patel">R. Patel</option>
+                  <option value="Alex Wong">Alex Wong</option>
+                  <option value="Unassigned">Unassigned</option>
+                </select>
+              </div>
+            </div>
           </div>
           
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3 pt-2">
             <Button variant="outline" className="flex-1" onClick={() => setShowAddClientModal(false)}>
               Cancel
             </Button>
-            <Button className="flex-1" onClick={handleAddClient}>
-              Add Client
+            <Button 
+              className="flex-1" 
+              onClick={handleAddClient}
+              disabled={!newClient.name || !newClient.legalEntity || newClient.assetClasses.length === 0 || !newClient.onboardingManager || !newClient.technicalLead}
+            >
+              Create Onboarding Case
             </Button>
           </div>
         </div>
