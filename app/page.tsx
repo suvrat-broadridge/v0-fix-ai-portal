@@ -2,7 +2,7 @@
 
 // B- COMET Platform - FIX Protocol Testing Suite v2
 import React, { useState } from "react"
-import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, Stamp, Code, ScrollText, Navigation } from "lucide-react"
+import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, Stamp, Code, ScrollText, Navigation, MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -817,7 +817,7 @@ export default function BCometPlatform() {
   {atdlToolsExpanded && (
                     <div className="ml-7 mt-1 space-y-0.5">
                       {[
-                        { icon: Layers, label: "ATDL Workbench", screen: "atdl-workbench" },
+                        { icon: Briefcase, label: "Onboarding Cases", screen: "atdl-workbench" },
                         { icon: Navigation, label: "Guided Run", screen: "atdl-wizard" },
                         { icon: Wrench, label: "Remediation Queue", screen: "atdl-remediation" },
                         { icon: GitCompare, label: "FIX to ATDL Compare", screen: "fix-atdl-compare" },
@@ -4654,35 +4654,41 @@ const specCompareResults = [
   }
 
   // ATDL Validate Structure Screen
-  // ATDL Workbench Home
+  // Onboarding Cases Home
   if (currentScreen === "atdl-workbench") {
-    const workOrders = [
-      { id: "WO-ATDL-001", client: "Nexus Trading Group", caseId: "OB-2024-001", assetClass: "Equities", fixVersion: "FIX 4.4", strategies: ["VWAP","TWAP","POV"], status: "in-progress", gateA: "complete", gateB: "complete", gateC: "in-progress", gateD: "todo", gateE: "todo", gateF: "todo", blockers: 2, warnings: 5, lastRun: "Jan 14, 2024", createdDate: "Jan 5, 2024" },
-      { id: "WO-ATDL-002", client: "Apex Capital Partners", caseId: "OB-2024-002", assetClass: "Options", fixVersion: "FIX 4.4", strategies: ["VWAP","IS","MOC"], status: "blocked", gateA: "complete", gateB: "failed", gateC: "todo", gateD: "todo", gateE: "todo", gateF: "todo", blockers: 6, warnings: 3, lastRun: "Jan 13, 2024", createdDate: "Dec 28, 2023" },
-      { id: "WO-ATDL-003", client: "Velocity Securities", caseId: "OB-2024-004", assetClass: "Equities", fixVersion: "FIX 4.4", strategies: ["TWAP","POV","IS","MOC"], status: "ready-for-approval", gateA: "complete", gateB: "complete", gateC: "complete", gateD: "complete", gateE: "in-progress", gateF: "todo", blockers: 0, warnings: 2, lastRun: "Jan 12, 2024", createdDate: "Dec 15, 2023" },
-      { id: "WO-ATDL-004", client: "Horizon Investments", caseId: "OB-2024-003", assetClass: "Futures", fixVersion: "FIX 5.0 SP2", strategies: ["VWAP","TWAP"], status: "not-started", gateA: "todo", gateB: "todo", gateC: "todo", gateD: "todo", gateE: "todo", gateF: "todo", blockers: 0, warnings: 0, lastRun: null, createdDate: "Jan 10, 2024" },
-      { id: "WO-ATDL-005", client: "Nexus Trading Group", caseId: "OB-2024-001", assetClass: "Options", fixVersion: "FIX 4.4", strategies: ["IS","MOC"], status: "certified", gateA: "complete", gateB: "complete", gateC: "complete", gateD: "complete", gateE: "complete", gateF: "complete", blockers: 0, warnings: 0, lastRun: "Dec 20, 2023", createdDate: "Dec 1, 2023" },
+    const onboardingCases = [
+      { id: "OB-2024-001", client: "Nexus Trading Group", legalEntity: "Nexus Trading LLC", assetClass: "Equities", fixVersion: "FIX 4.4", strategies: ["VWAP","TWAP","POV"], status: "in-progress", gateA: "complete", gateB: "complete", gateC: "in-progress", gateD: "todo", gateE: "todo", gateF: "todo", blockers: 2, warnings: 5, readinessScore: 72, riskLevel: "medium", daysToSla: 8, onboardingManager: "Sarah Chen", technicalLead: "J. Smith", nextAction: "Complete Mapping Review", lastRun: "Jan 14, 2024", createdDate: "Jan 5, 2024" },
+      { id: "OB-2024-002", client: "Apex Capital Partners", legalEntity: "Apex Capital LLC", assetClass: "Options", fixVersion: "FIX 4.4", strategies: ["VWAP","IS","MOC"], status: "blocked", gateA: "complete", gateB: "failed", gateC: "todo", gateD: "todo", gateE: "todo", gateF: "todo", blockers: 6, warnings: 3, readinessScore: 45, riskLevel: "high", daysToSla: -2, onboardingManager: "Mike Johnson", technicalLead: "J. Smith", nextAction: "Resolve Schema Errors", lastRun: "Jan 13, 2024", createdDate: "Dec 28, 2023" },
+      { id: "OB-2024-003", client: "Velocity Securities", legalEntity: "Velocity Securities Inc", assetClass: "Equities", fixVersion: "FIX 4.4", strategies: ["TWAP","POV","IS","MOC"], status: "ready-for-approval", gateA: "complete", gateB: "complete", gateC: "complete", gateD: "complete", gateE: "in-progress", gateF: "todo", blockers: 0, warnings: 2, readinessScore: 92, riskLevel: "low", daysToSla: 12, onboardingManager: "Sarah Chen", technicalLead: "R. Patel", nextAction: "Business Sign-off", lastRun: "Jan 12, 2024", createdDate: "Dec 15, 2023" },
+      { id: "OB-2024-004", client: "Horizon Investments", legalEntity: "Horizon Fund Services", assetClass: "Futures", fixVersion: "FIX 5.0 SP2", strategies: ["VWAP","TWAP"], status: "not-started", gateA: "todo", gateB: "todo", gateC: "todo", gateD: "todo", gateE: "todo", gateF: "todo", blockers: 0, warnings: 0, readinessScore: 25, riskLevel: "medium", daysToSla: 22, onboardingManager: "Unassigned", technicalLead: "Unassigned", nextAction: "Assign Owners", lastRun: null, createdDate: "Jan 10, 2024" },
+      { id: "OB-2024-005", client: "Nexus Trading Group", legalEntity: "Nexus Trading LLC", assetClass: "Options", fixVersion: "FIX 4.4", strategies: ["IS","MOC"], status: "certified", gateA: "complete", gateB: "complete", gateC: "complete", gateD: "complete", gateE: "complete", gateF: "complete", blockers: 0, warnings: 0, readinessScore: 100, riskLevel: "low", daysToSla: 0, onboardingManager: "Sarah Chen", technicalLead: "J. Smith", nextAction: "Completed", lastRun: "Dec 20, 2023", createdDate: "Dec 1, 2023" },
     ]
 
     const statusConfig: Record<string, { label: string; color: string; bg: string; border: string }> = {
-      "not-started":       { label: "Not Started",        color: "text-slate-400",   bg: "bg-slate-400/10",    border: "border-slate-400/30" },
-      "in-progress":       { label: "In Progress",        color: "text-[#2196f3]",   bg: "bg-[#2196f3]/10",    border: "border-[#2196f3]/30" },
+      "not-started":       { label: "Draft",              color: "text-slate-400",   bg: "bg-slate-400/10",    border: "border-slate-400/30" },
+      "in-progress":       { label: "Active",             color: "text-[#2196f3]",   bg: "bg-[#2196f3]/10",    border: "border-[#2196f3]/30" },
       "blocked":           { label: "Blocked",            color: "text-[#f44336]",   bg: "bg-[#f44336]/10",    border: "border-[#f44336]/40" },
-      "ready-for-approval":{ label: "Ready for Approval", color: "text-[#ff9800]",   bg: "bg-[#ff9800]/10",    border: "border-[#ff9800]/30" },
+      "ready-for-approval":{ label: "Pending Approval",   color: "text-[#ff9800]",   bg: "bg-[#ff9800]/10",    border: "border-[#ff9800]/30" },
       "certified":         { label: "Certified",          color: "text-[#4caf50]",   bg: "bg-[#4caf50]/10",    border: "border-[#4caf50]/30" },
     }
 
+    const riskConfig: Record<string, { label: string; color: string; bg: string }> = {
+      "low":    { label: "Low Risk",    color: "text-[#4caf50]", bg: "bg-[#4caf50]/20" },
+      "medium": { label: "Medium Risk", color: "text-[#ff9800]", bg: "bg-[#ff9800]/20" },
+      "high":   { label: "High Risk",   color: "text-[#f44336]", bg: "bg-[#f44336]/20" },
+    }
+
     const gateConfig = [
-      { key: "gateA", label: "A", title: "Inputs Locked" },
-      { key: "gateB", label: "B", title: "Structural Compliance" },
-      { key: "gateC", label: "C", title: "Mapping Integrity" },
-      { key: "gateD", label: "D", title: "Strategy Qualification" },
-      { key: "gateE", label: "E", title: "Approval Complete" },
-      { key: "gateF", label: "F", title: "Certified" },
+      { key: "gateA", label: "A", title: "Case Intake" },
+      { key: "gateB", label: "B", title: "Scope Lock" },
+      { key: "gateC", label: "C", title: "Spec Analysis" },
+      { key: "gateD", label: "D", title: "Testing" },
+      { key: "gateE", label: "E", title: "Certification" },
+      { key: "gateF", label: "F", title: "Go-Live" },
     ]
 
     const pipeline = ["not-started","in-progress","blocked","ready-for-approval","certified"]
-    const pipelineCounts = pipeline.reduce((acc, s) => { acc[s] = workOrders.filter(w => w.status === s).length; return acc }, {} as Record<string,number>)
+    const pipelineCounts = pipeline.reduce((acc, s) => { acc[s] = onboardingCases.filter(w => w.status === s).length; return acc }, {} as Record<string,number>)
 
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
@@ -4691,18 +4697,26 @@ const specCompareResults = [
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Layers className="h-8 w-8 text-[#00e5ff]" />
+                <Briefcase className="h-8 w-8 text-[#00e5ff]" />
                 <div>
-                  <h1 className={`text-2xl font-bold ${textPrimary}`}>ATDL Workbench</h1>
-                  <p className={`text-sm ${textSecondary}`}>Manage ATDL work orders from intake to certification</p>
+                  <h1 className={`text-2xl font-bold ${textPrimary}`}>Onboarding Cases</h1>
+                  <p className={`text-sm ${textSecondary}`}>Client onboarding management from intake to certification</p>
                 </div>
               </div>
-              <Button
-                onClick={() => { setAtdlWizardStep(0); setAtdlWizardWorkOrder(null); setCurrentScreen("atdl-wizard" as any); }}
-                className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80"
-              >
-                <Plus className="h-4 w-4 mr-2" /> New Work Order
-              </Button>
+              <div className="flex items-center gap-3">
+                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/60" : "bg-gray-50"}`}>
+                  <span className={`text-xs ${textSecondary}`}>Total Cases:</span>
+                  <span className={`text-sm font-bold ${textPrimary}`}>{onboardingCases.length}</span>
+                  <span className={`text-xs ${textSecondary} ml-2`}>Avg Readiness:</span>
+                  <span className={`text-sm font-bold text-[#00e5ff]`}>{Math.round(onboardingCases.reduce((a,c) => a + c.readinessScore, 0) / onboardingCases.length)}%</span>
+                </div>
+                <Button
+                  onClick={() => { setAtdlWizardStep(0); setAtdlWizardWorkOrder(null); setCurrentScreen("atdl-wizard" as any); }}
+                  className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80"
+                >
+                  <Plus className="h-4 w-4 mr-2" /> Create Onboarding Case
+                </Button>
+              </div>
             </div>
           </header>
 
@@ -4716,49 +4730,80 @@ const specCompareResults = [
                     <div className={`text-2xl font-bold ${cfg.color}`}>{pipelineCounts[s]}</div>
                     <div>
                       <p className={`text-xs font-medium ${cfg.color}`}>{cfg.label}</p>
-                      <p className={`text-xs ${textSecondary}`}>work order{pipelineCounts[s] !== 1 ? "s" : ""}</p>
+                      <p className={`text-xs ${textSecondary}`}>case{pipelineCounts[s] !== 1 ? "s" : ""}</p>
                     </div>
                   </div>
                 )
               })}
             </div>
 
-            {/* Work order cards */}
+            {/* Onboarding case cards */}
             <div className="space-y-3">
-              {workOrders.map(wo => {
-                const cfg = statusConfig[wo.status]
+              {onboardingCases.map(caseItem => {
+                const cfg = statusConfig[caseItem.status]
+                const risk = riskConfig[caseItem.riskLevel]
                 return (
-                  <Card key={wo.id} className={`${bgCard} border ${borderColor} overflow-hidden`}>
+                  <Card key={caseItem.id} className={`${bgCard} border ${borderColor} overflow-hidden`}>
                     <div className="p-5">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex items-start gap-4 flex-1 min-w-0">
                           <div className={`p-2.5 rounded-lg ${cfg.bg} flex-shrink-0`}>
-                            <Layers className={`h-5 w-5 ${cfg.color}`} />
+                            <Briefcase className={`h-5 w-5 ${cfg.color}`} />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <span className={`font-mono text-xs ${textSecondary}`}>{wo.id}</span>
+                              <span className={`font-mono text-xs ${textSecondary}`}>{caseItem.id}</span>
                               <span className={`px-2 py-0.5 rounded text-xs font-medium border ${cfg.bg} ${cfg.color} ${cfg.border}`}>{cfg.label}</span>
-                              {wo.blockers > 0 && (
+                              <span className={`px-2 py-0.5 rounded text-xs ${risk.bg} ${risk.color}`}>{risk.label}</span>
+                              {caseItem.blockers > 0 && (
                                 <span className="px-2 py-0.5 rounded text-xs bg-[#f44336]/20 text-[#f44336] flex items-center gap-1">
-                                  <AlertCircle className="h-3 w-3" /> {wo.blockers} blocker{wo.blockers !== 1 ? "s" : ""}
+                                  <AlertCircle className="h-3 w-3" /> {caseItem.blockers} blocker{caseItem.blockers !== 1 ? "s" : ""}
                                 </span>
                               )}
-                              {wo.warnings > 0 && wo.blockers === 0 && (
-                                <span className="px-2 py-0.5 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">{wo.warnings} warnings</span>
+                              {caseItem.daysToSla < 0 && (
+                                <span className="px-2 py-0.5 rounded text-xs bg-[#f44336]/20 text-[#f44336] flex items-center gap-1">
+                                  <Clock className="h-3 w-3" /> SLA Breached
+                                </span>
+                              )}
+                              {caseItem.warnings > 0 && caseItem.blockers === 0 && (
+                                <span className="px-2 py-0.5 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">{caseItem.warnings} warnings</span>
                               )}
                             </div>
                             <div className="flex items-center gap-2 mb-1">
-                              <span className={`font-bold ${textPrimary}`}>{wo.client}</span>
+                              <span className={`font-bold ${textPrimary}`}>{caseItem.client}</span>
                               <span className={`text-xs ${textSecondary}`}>·</span>
-                              <span className={`text-xs ${textSecondary}`}>{wo.assetClass}</span>
-                              <span className={`text-xs ${textSecondary}`}>·</span>
-                              <span className={`text-xs ${textSecondary}`}>{wo.fixVersion}</span>
+                              <span className={`text-xs ${textSecondary}`}>{caseItem.legalEntity}</span>
                             </div>
-                            <div className="flex items-center gap-2 flex-wrap">
-                              {wo.strategies.map(s => (
-                                <span key={s} className={`px-1.5 py-0.5 rounded text-xs ${isDarkMode ? "bg-[#1e4976]/50 text-slate-300" : "bg-gray-100 text-gray-600"}`}>{s}</span>
-                              ))}
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className={`text-xs ${textSecondary}`}>{caseItem.assetClass}</span>
+                              <span className={`text-xs ${textSecondary}`}>·</span>
+                              <span className={`text-xs ${textSecondary}`}>{caseItem.fixVersion}</span>
+                              <span className={`text-xs ${textSecondary}`}>·</span>
+                              <span className={`text-xs ${textSecondary}`}>{caseItem.strategies.length} strategies</span>
+                            </div>
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-1.5">
+                                <span className={`text-xs ${textSecondary}`}>Readiness:</span>
+                                <div className={`w-20 h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"} overflow-hidden`}>
+                                  <div className={`h-full rounded-full ${caseItem.readinessScore >= 70 ? "bg-[#4caf50]" : caseItem.readinessScore >= 40 ? "bg-[#ff9800]" : "bg-[#f44336]"}`} style={{ width: `${caseItem.readinessScore}%` }} />
+                                </div>
+                                <span className={`text-xs font-medium ${caseItem.readinessScore >= 70 ? "text-[#4caf50]" : caseItem.readinessScore >= 40 ? "text-[#ff9800]" : "text-[#f44336]"}`}>{caseItem.readinessScore}%</span>
+                              </div>
+                              {caseItem.daysToSla > 0 && (
+                                <div className="flex items-center gap-1.5">
+                                  <Clock className={`h-3 w-3 ${textSecondary}`} />
+                                  <span className={`text-xs ${textSecondary}`}>{caseItem.daysToSla} days to SLA</span>
+                                </div>
+                              )}
+                              <div className="flex items-center gap-1.5">
+                                <Users className={`h-3 w-3 ${textSecondary}`} />
+                                <span className={`text-xs ${textSecondary}`}>{caseItem.onboardingManager}</span>
+                              </div>
+                            </div>
+                            <div className={`mt-2 px-2 py-1 rounded text-xs inline-flex items-center gap-1.5 ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"}`}>
+                              <ArrowRight className={`h-3 w-3 ${textSecondary}`} />
+                              <span className={textSecondary}>Next:</span>
+                              <span className={textPrimary}>{caseItem.nextAction}</span>
                             </div>
                           </div>
                         </div>
@@ -4767,7 +4812,7 @@ const specCompareResults = [
                         <div className="flex-shrink-0 flex flex-col items-end gap-3">
                           <div className="flex items-center gap-1">
                             {gateConfig.map(g => {
-                              const state = (wo as any)[g.key] as string
+                              const state = (caseItem as any)[g.key] as string
                               return (
                                 <div key={g.key} title={`Gate ${g.label}: ${g.title}`} className="flex flex-col items-center gap-0.5">
                                   <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
@@ -4781,26 +4826,29 @@ const specCompareResults = [
                             })}
                           </div>
                           <div className="flex gap-2">
-                            {wo.status !== "certified" && (
+                            {caseItem.status !== "certified" && (
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => { setAtdlWizardWorkOrder(wo.id); setAtdlWizardStep(0); setCurrentScreen("atdl-wizard" as any); }}
+                                onClick={() => { setAtdlWizardWorkOrder(caseItem.id); setAtdlWizardStep(0); setCurrentScreen("atdl-wizard" as any); }}
                               >
-                                <Play className="h-3.5 w-3.5 mr-1" /> {wo.status === "not-started" ? "Start" : "Continue"}
+                                <Play className="h-3.5 w-3.5 mr-1" /> {caseItem.status === "not-started" ? "Start Case" : "Continue"}
                               </Button>
                             )}
-                            {wo.blockers > 0 && (
+                            {caseItem.blockers > 0 && (
                               <Button size="sm" variant="outline" className="text-[#f44336] border-[#f44336]/30 hover:bg-[#f44336]/10"
                                 onClick={() => setCurrentScreen("atdl-remediation" as any)}>
-                                <AlertCircle className="h-3.5 w-3.5 mr-1" /> Remediate
+                                <AlertCircle className="h-3.5 w-3.5 mr-1" /> Resolve Blockers
                               </Button>
                             )}
-                            {wo.status === "certified" && (
+                            {caseItem.status === "certified" && (
                               <Button size="sm" variant="outline" className="text-[#4caf50] border-[#4caf50]/30">
-                                <Download className="h-3.5 w-3.5 mr-1" /> Cert Pack
+                                <Download className="h-3.5 w-3.5 mr-1" /> Certification Pack
                               </Button>
                             )}
+                            <Button size="sm" variant="ghost" className={textSecondary}>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
                           </div>
                         </div>
                       </div>
@@ -4809,18 +4857,19 @@ const specCompareResults = [
                     {/* Progress bar footer */}
                     <div className={`px-5 py-2 border-t ${borderColor} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"} flex items-center justify-between`}>
                       <p className={`text-xs ${textSecondary}`}>
-                        Created {wo.createdDate}
-                        {wo.lastRun ? ` · Last run ${wo.lastRun}` : " · Not yet run"}
+                        Created {caseItem.createdDate}
+                        {caseItem.lastRun ? ` · Last activity ${caseItem.lastRun}` : " · Awaiting start"}
                       </p>
                       <div className="flex items-center gap-2">
+                        <span className={`text-xs ${textSecondary}`}>Stage Progress</span>
                         <div className={`h-1.5 w-32 rounded-full overflow-hidden ${isDarkMode ? "bg-[#1e4976]/40" : "bg-gray-200"}`}>
                           <div
                             className="h-full bg-[#4caf50] rounded-full transition-all"
-                            style={{ width: `${gateConfig.filter(g => (wo as any)[g.key] === "complete").length / gateConfig.length * 100}%` }}
+                            style={{ width: `${gateConfig.filter(g => (caseItem as any)[g.key] === "complete").length / gateConfig.length * 100}%` }}
                           />
                         </div>
                         <span className={`text-xs ${textSecondary}`}>
-                          {gateConfig.filter(g => (wo as any)[g.key] === "complete").length}/{gateConfig.length} gates
+                          {gateConfig.filter(g => (caseItem as any)[g.key] === "complete").length}/{gateConfig.length} stages
                         </span>
                       </div>
                     </div>
@@ -4837,41 +4886,41 @@ const specCompareResults = [
   // ATDL Guided Wizard
   if (currentScreen === "atdl-wizard") {
     const steps = [
-      { id: 0, label: "Scope",    icon: Target,       desc: "Define objective and target strategies" },
-      { id: 1, label: "Inputs",   icon: Upload,       desc: "Lock source files and versions" },
-      { id: 2, label: "Validate", icon: CheckCircle,  desc: "Structural schema validation" },
-      { id: 3, label: "Compare",  icon: GitCompare,   desc: "FIX ↔ ATDL semantic comparison" },
-      { id: 4, label: "Simulate", icon: Zap,          desc: "Strategy UI render and FIX generation" },
-      { id: 5, label: "Review",   icon: ClipboardCheck, desc: "Remediation and finding triage" },
-      { id: 6, label: "Approve",  icon: Stamp,        desc: "Sign-off and certification pack" },
+      { id: 0, label: "Case Setup",      icon: Briefcase,     desc: "Define scope, owners, and SLAs" },
+      { id: 1, label: "Source Files",    icon: Upload,        desc: "Lock input files and versions" },
+      { id: 2, label: "Analysis",        icon: CheckCircle,   desc: "Structural and semantic validation" },
+      { id: 3, label: "Comparison",      icon: GitCompare,    desc: "Side-by-side diff with decisions" },
+      { id: 4, label: "Testing",         icon: TestTube,      desc: "UI render and FIX message validation" },
+      { id: 5, label: "Remediation",     icon: ClipboardCheck, desc: "Issue triage and resolution" },
+      { id: 6, label: "Certification",   icon: Award,         desc: "Approval and evidence pack" },
     ]
 
     const gateForStep = ["A","B","C","D","E","F"]
-    const gateLabel = ["Inputs Locked","Structural Compliance","Mapping Integrity","Strategy Qualification","Approval Complete","Certified"]
+    const gateLabel = ["Case Intake","Scope Lock","Spec Analysis","Testing","Certification","Go-Live"]
 
     const workflowOptions = [
       {
         id: "create-from-spec" as const,
-        title: "Create ATDL from Algo Spec",
-        desc: "Generate new ATDL from updated FIX Algo specification. Identifies spec changes, generates ATDL, and validates.",
-        icon: Zap,
+        title: "New Algo Onboarding",
+        desc: "Onboard client to new algorithm strategies. Generate ATDL from FIX Algo spec, validate, and certify.",
+        icon: Rocket,
         color: "text-[#4caf50]",
         bg: "bg-[#4caf50]/10",
         border: "border-[#4caf50]/40",
       },
       {
         id: "validate-update" as const,
-        title: "Validate Counterparty ATDL Update",
-        desc: "Counterparty shared a newer ATDL version. Validate structure, verify spec changes are reflected correctly.",
-        icon: Shield,
+        title: "Counterparty Spec Update",
+        desc: "Counterparty shared updated specs. Validate changes, verify compliance, and recertify if needed.",
+        icon: RefreshCw,
         color: "text-[#2196f3]",
         bg: "bg-[#2196f3]/10",
         border: "border-[#2196f3]/40",
       },
       {
         id: "compare-atdl" as const,
-        title: "Compare Two ATDLs",
-        desc: "Compare client-side and admin-side ATDL files to identify discrepancies and alignment issues.",
+        title: "Configuration Alignment Check",
+        desc: "Compare client-side and admin-side configurations to identify discrepancies before go-live.",
         icon: GitCompare,
         color: "text-[#ff9800]",
         bg: "bg-[#ff9800]/10",
@@ -4941,16 +4990,64 @@ const specCompareResults = [
             </div>
           </div>
 
-          {/* Target Strategies */}
+          {/* Onboarding Tracks */}
           <div>
-            <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Target Strategies</label>
+            <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Onboarding Tracks</label>
             <div className="flex gap-2 flex-wrap">
-              {["VWAP","TWAP","POV","IS","MOC"].map(s => (
-                <label key={s} className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor} cursor-pointer hover:border-[#00e5ff] ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
-                  <input type="checkbox" defaultChecked={["VWAP","TWAP"].includes(s)} className="accent-[#00e5ff]" />
-                  <span className={`text-sm ${textPrimary}`}>{s}</span>
+              {[
+                { id: "spec", label: "FIX Specification Baseline" },
+                { id: "atdl", label: "ATDL Strategy Definition" },
+                { id: "connectivity", label: "Integration & Connectivity" },
+                { id: "testing", label: "Testing & Certification" },
+                { id: "golive", label: "Go-Live & Hypercare" },
+              ].map(track => (
+                <label key={track.id} className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor} cursor-pointer hover:border-[#00e5ff] ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
+                  <input type="checkbox" defaultChecked={["spec","atdl","testing"].includes(track.id)} className="accent-[#00e5ff]" />
+                  <span className={`text-sm ${textPrimary}`}>{track.label}</span>
                 </label>
               ))}
+            </div>
+          </div>
+
+          {/* Ownership Assignment */}
+          <div>
+            <label className={`block text-sm font-semibold mb-3 ${textPrimary}`}>Case Ownership</label>
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { role: "Onboarding Manager", desc: "Owns overall case health and SLA tracking", default: "Sarah Chen" },
+                { role: "Technical Lead", desc: "Owns spec, rules, and testing decisions", default: "J. Smith" },
+                { role: "QA/Cert Lead", desc: "Owns test strategy and certification readiness", default: "R. Patel" },
+                { role: "Business Approver", desc: "Owns business sign-off and go-live decision", default: "M. Thompson" },
+              ].map(owner => (
+                <div key={owner.role} className={`p-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/10" : "bg-gray-50"}`}>
+                  <p className={`text-sm font-medium ${textPrimary}`}>{owner.role}</p>
+                  <p className={`text-xs ${textSecondary} mb-2`}>{owner.desc}</p>
+                  <select className={`w-full p-1.5 rounded border ${borderColor} text-sm ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"}`}>
+                    <option>{owner.default}</option>
+                    <option>Unassigned</option>
+                  </select>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* SLA Target */}
+          <div className={`p-4 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/10" : "bg-gray-50"}`}>
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className={`text-sm font-semibold ${textPrimary}`}>Target SLA</p>
+                <p className={`text-xs ${textSecondary}`}>Estimated time to certification based on scope</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-[#00e5ff]" />
+                <span className={`text-lg font-bold text-[#00e5ff]`}>22 days</span>
+              </div>
+            </div>
+            <div className="flex gap-4 text-xs">
+              <div><span className={textSecondary}>Spec Analysis:</span> <span className={textPrimary}>5-7 days</span></div>
+              <div><span className={textSecondary}>ATDL:</span> <span className={textPrimary}>3-5 days</span></div>
+              <div><span className={textSecondary}>Testing:</span> <span className={textPrimary}>7-10 days</span></div>
+              <div><span className={textSecondary}>Certification:</span> <span className={textPrimary}>3-5 days</span></div>
             </div>
           </div>
         </div>
@@ -5559,12 +5656,25 @@ Strategy: TWAP
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => setCurrentScreen("atdl-workbench" as any)} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff] text-sm`}>
-              <ArrowLeft className="h-4 w-4" /> Back to Workbench
+              <ArrowLeft className="h-4 w-4" /> Back to Onboarding Cases
             </button>
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className={`text-2xl font-bold ${textPrimary}`}>ATDL Guided Run</h1>
-                <p className={`text-sm ${textSecondary}`}>{atdlWizardWorkOrder ? `Work Order: ${atdlWizardWorkOrder}` : "New Work Order"}</p>
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-lg bg-[#00e5ff]/10">
+                  <Briefcase className="h-6 w-6 text-[#00e5ff]" />
+                </div>
+                <div>
+                  <h1 className={`text-2xl font-bold ${textPrimary}`}>Onboarding Case Workflow</h1>
+                  <p className={`text-sm ${textSecondary}`}>{atdlWizardWorkOrder ? `Case: ${atdlWizardWorkOrder}` : "New Onboarding Case"}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button variant="outline" size="sm">
+                  <History className="h-4 w-4 mr-1.5" /> Save Draft
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Users className="h-4 w-4 mr-1.5" /> Assign Owners
+                </Button>
               </div>
             </div>
           </header>
