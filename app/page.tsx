@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "approvals" | "evidence-vault" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "approvals" | "evidence-vault" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance">("home")
   const [settingsTab, setSettingsTab] = useState<"look-feel" | "general" | "security" | "mail" | "questionnaires" | "license">("general")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -1665,7 +1665,7 @@ export default function BCometPlatform() {
                         <Button variant="outline" size="sm" onClick={() => setCurrentScreen("spec-compare-overview")}>
                           <GitCompare className="h-4 w-4 mr-1" /> Spec Compare
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("log-analysis")}>
+                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("test-case-gen")}>
                           <FileSearch className="h-4 w-4 mr-1" /> Log Analysis
                         </Button>
                         <Button variant="outline" size="sm" onClick={() => setCurrentScreen("scenario-creation")}>
@@ -2731,7 +2731,7 @@ const clientProgressData = [
   variant="outline" 
   size="sm" 
   className="flex-1"
-  onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.version); setCurrentScreen("log-analysis"); setIsAdHocMode(false); }}
+                  onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.version); setCurrentScreen("test-case-gen"); setIsAdHocMode(false); }}
   >
   <FileSearch className="h-3 w-3 mr-1" /> Analyze
   </Button>
@@ -3583,7 +3583,7 @@ const specCompareResults = [
                 {/* Navigation */}
                 <div className={`mt-6 pt-4 border-t ${borderColor}`}>
                   <div className="flex justify-between items-center">
-                    <Button variant="outline" onClick={() => setCurrentScreen("log-analysis")}>
+                    <Button variant="outline" onClick={() => setCurrentScreen("test-case-gen")}>
                       <ChevronLeft className="h-4 w-4 mr-2" /> Back: Log Analysis
                     </Button>
                     <div className="flex gap-3">
