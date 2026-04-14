@@ -279,6 +279,14 @@ export default function BCometPlatform() {
   // Rule Library filter state
   const [ruleFilter, setRuleFilter] = useState("All")
   const [ruleSearch, setRuleSearch] = useState("")
+  const [expandedRuleSections, setExpandedRuleSections] = useState<Record<string, boolean>>({
+    "session": true,
+    "business": true,
+    "execution": true,
+    "market-data": true,
+    "venue": true,
+    "custom": true
+  })
 
   // FIX MSG Creator state
   const [fixMsgSelectedSpec, setFixMsgSelectedSpec] = useState("")
@@ -7927,25 +7935,138 @@ const copyToClipboard = () => {
 
   // Rule Library Screen
   if (currentScreen === "rule-library") {
-    const categoryColors: Record<string, string> = {
-      "Session": "#2196f3",
-      "Session State": "#00bcd4",
-      "Dictionary": "#9c27b0",
-      "Business": "#4caf50", 
-      "Execution": "#e91e63",
-      "Market Data": "#ff5722",
-      "Venue": "#ff9800",
-      "Custom": "#795548"
+    // Rule sections with hierarchy
+    const ruleSections = [
+      {
+        id: "session",
+        title: "Session Level Rules",
+        color: "#2196f3",
+        icon: Wifi,
+        description: "Core FIX session protocol validation",
+        source: "FIX 4.2 Protocol Specification, Session Layer",
+        subsections: [
+          { id: "session-core", title: "Core Message Structure", rules: ruleLibrary.filter(r => r.category === "Session" && r.id.startsWith("S-0")) },
+          { id: "session-state", title: "Session State & Sequence", rules: ruleLibrary.filter(r => r.category === "Session State") },
+          { id: "session-dict", title: "Message Dictionary", rules: ruleLibrary.filter(r => r.category === "Dictionary") },
+        ]
+      },
+      {
+        id: "business",
+        title: "Business Level Rules",
+        color: "#4caf50",
+        icon: Briefcase,
+        description: "Order flow and business message validation",
+        source: "FIX 4.2 Application Messages, Trading Guidelines",
+        subsections: [
+          { id: "order-new", title: "New Order Rules", rules: ruleLibrary.filter(r => r.category === "Business" && ["B-001","B-002","B-003","B-004","B-005","B-006","B-007","B-008","B-009","B-010","B-011"].includes(r.id)) },
+          { id: "order-modify", title: "Order Modify & Cancel Rules", rules: ruleLibrary.filter(r => r.category === "Business" && ["B-012","B-013","B-014","B-015"].includes(r.id)) },
+        ]
+      },
+      {
+        id: "execution",
+        title: "Execution Rules",
+        color: "#e91e63",
+        icon: Zap,
+        description: "Execution reports and order lifecycle validation",
+        source: "FIX 4.2 Execution Report (35=8), Order State Model",
+        subsections: [
+          { id: "exec-report", title: "Execution Report Validation", rules: ruleLibrary.filter(r => r.category === "Execution" && r.id.startsWith("EX-00")) },
+          { id: "exec-cancel", title: "Cancel/Replace Flow", rules: ruleLibrary.filter(r => r.category === "Execution" && ["EX-006","EX-007","EX-008","EX-009","EX-010"].includes(r.id)) },
+        ]
+      },
+      {
+        id: "market-data",
+        title: "Market Data Rules",
+        color: "#ff5722",
+        icon: BarChart3,
+        description: "Market data request and snapshot validation",
+        source: "FIX 4.2 Market Data Messages (35=V,W,X)",
+        subsections: [
+          { id: "md-all", title: "Market Data Validation", rules: ruleLibrary.filter(r => r.category === "Market Data") },
+        ]
+      },
+      {
+        id: "venue",
+        title: "Venue Rules",
+        color: "#ff9800",
+        icon: Building,
+        description: "Exchange and venue-specific constraints",
+        source: "Exchange Rule Books, Market Microstructure",
+        subsections: [
+          { id: "venue-all", title: "Venue Constraints", rules: ruleLibrary.filter(r => r.category === "Venue") },
+        ]
+      },
+      {
+        id: "custom",
+        title: "Custom Client Rules",
+        color: "#795548",
+        icon: Users,
+        description: "Client-specific custom field and behavior rules",
+        source: "Client Onboarding Specifications, Custom Tag Registry",
+        subsections: [
+          { id: "custom-all", title: "Client-Specific Rules", rules: ruleLibrary.filter(r => r.category === "Custom") },
+        ]
+      },
+    ]
+
+    const toggleSection = (sectionId: string) => {
+      setExpandedRuleSections(prev => ({ ...prev, [sectionId]: !prev[sectionId] }))
     }
-    
-    const filteredRules = ruleLibrary.filter(r => {
-      const matchesCategory = ruleFilter === "All" || r.category === ruleFilter
-      const matchesSearch = ruleSearch === "" || 
-        r.name.toLowerCase().includes(ruleSearch.toLowerCase()) ||
-        r.id.toLowerCase().includes(ruleSearch.toLowerCase()) ||
-        r.description.toLowerCase().includes(ruleSearch.toLowerCase())
-      return matchesCategory && matchesSearch
-    })
+
+    const filteredSections = ruleSections.map(section => ({
+      ...section,
+      subsections: section.subsections.map(sub => ({
+        ...sub,
+        rules: sub.rules.filter(r => 
+          ruleSearch === "" || 
+          r.name.toLowerCase().includes(ruleSearch.toLowerCase()) ||
+          r.id.toLowerCase().includes(ruleSearch.toLowerCase()) ||
+          r.description.toLowerCase().includes(ruleSearch.toLowerCase())
+        )
+      })).filter(sub => sub.rules.length > 0)
+    })).filter(section => section.subsections.length > 0)
+
+    const totalFilteredRules = filteredSections.reduce((acc, s) => acc + s.subsections.reduce((a, sub) => a + sub.rules.length, 0), 0)
+
+    const RuleTable = ({ rules }: { rules: typeof ruleLibrary }) => (
+      <table className="w-full text-sm">
+        <thead>
+          <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#0a1628]/50" : "bg-gray-50"}`}>
+            <th className={`px-4 py-2 text-left font-medium ${textSecondary} text-xs`}>ID</th>
+            <th className={`px-4 py-2 text-left font-medium ${textSecondary} text-xs`}>Name</th>
+            <th className={`px-4 py-2 text-left font-medium ${textSecondary} text-xs`}>Description</th>
+            <th className={`px-4 py-2 text-left font-medium ${textSecondary} text-xs`}>Severity</th>
+            <th className={`px-4 py-2 text-left font-medium ${textSecondary} text-xs`}>Scope</th>
+            <th className={`px-4 py-2 text-left font-medium ${textSecondary} text-xs`}>Enabled</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rules.map((rule) => (
+            <tr key={rule.id} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
+              <td className={`px-4 py-2 font-mono text-[#00e5ff] text-xs`}>{rule.id}</td>
+              <td className={`px-4 py-2 font-medium ${textPrimary} text-xs`}>{rule.name}</td>
+              <td className={`px-4 py-2 ${textSecondary} text-xs max-w-sm`}>{rule.description}</td>
+              <td className={`px-4 py-2`}>
+                <span className={`px-2 py-0.5 rounded text-xs ${
+                  rule.severity === "Error" ? "bg-[#f44336]/20 text-[#f44336]" :
+                  rule.severity === "Warning" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                  "bg-[#2196f3]/20 text-[#2196f3]"
+                }`}>
+                  {rule.severity}
+                </span>
+              </td>
+              <td className={`px-4 py-2 ${textSecondary} text-xs`}>{rule.scope}</td>
+              <td className={`px-4 py-2`}>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" defaultChecked={rule.enabled} className="sr-only peer" />
+                  <div className="w-7 h-4 bg-gray-500 peer-checked:bg-[#4caf50] rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all"></div>
+                </label>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )
     
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
@@ -7961,7 +8082,18 @@ const copyToClipboard = () => {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className={`text-sm ${textSecondary}`}>{ruleLibrary.length} total rules</span>
+                <Input 
+                  placeholder="Search all rules..." 
+                  value={ruleSearch}
+                  onChange={(e) => setRuleSearch(e.target.value)}
+                  className={`w-72 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} 
+                />
+                <Button variant="outline" onClick={() => setExpandedRuleSections(Object.fromEntries(ruleSections.map(s => [s.id, true])))}>
+                  Expand All
+                </Button>
+                <Button variant="outline" onClick={() => setExpandedRuleSections(Object.fromEntries(ruleSections.map(s => [s.id, false])))}>
+                  Collapse All
+                </Button>
                 <Button className="bg-[#4caf50] hover:bg-[#4caf50]/80">
                   <Plus className="h-4 w-4 mr-2" /> Add Rule
                 </Button>
@@ -7970,142 +8102,113 @@ const copyToClipboard = () => {
           </header>
 
           <div className="p-6">
-            {/* Category Stats - 2 rows of 4 */}
-            <div className="grid grid-cols-4 gap-3 mb-6">
-              {Object.entries(categoryColors).map(([category, color]) => {
-                const count = ruleLibrary.filter(r => r.category === category).length
-                const errorCount = ruleLibrary.filter(r => r.category === category && r.severity === "Error").length
+            {/* Summary Stats */}
+            <div className="grid grid-cols-6 gap-3 mb-6">
+              {ruleSections.map((section) => {
+                const totalRules = section.subsections.reduce((acc, sub) => acc + sub.rules.length, 0)
+                const errorCount = section.subsections.reduce((acc, sub) => acc + sub.rules.filter(r => r.severity === "Error").length, 0)
+                const SectionIcon = section.icon
                 return (
                   <Card 
-                    key={category} 
-                    className={`${bgCard} border ${borderColor} p-3 cursor-pointer transition-all hover:border-[#00e5ff]/50 ${ruleFilter === category ? "border-[#00e5ff] ring-1 ring-[#00e5ff]/30" : ""}`}
-                    onClick={() => setRuleFilter(ruleFilter === category ? "All" : category)}
+                    key={section.id} 
+                    className={`${bgCard} border ${borderColor} p-3 cursor-pointer transition-all hover:border-[#00e5ff]/50`}
+                    onClick={() => toggleSection(section.id)}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg" style={{ backgroundColor: `${color}20` }}>
-                        <BookOpen className="h-4 w-4" style={{ color }} />
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded" style={{ backgroundColor: `${section.color}20` }}>
+                        <SectionIcon className="h-4 w-4" style={{ color: section.color }} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-lg font-bold ${textPrimary}`}>{count}</p>
-                        <p className={`text-xs ${textSecondary} truncate`}>{category}</p>
+                        <p className={`text-lg font-bold ${textPrimary}`}>{totalRules}</p>
+                        <p className={`text-[10px] ${textSecondary} truncate`}>{section.title.replace(" Rules", "")}</p>
                       </div>
-                      <div className="text-right">
-                        <span className="text-xs text-[#f44336]">{errorCount} err</span>
-                      </div>
+                      <span className="text-[10px] text-[#f44336]">{errorCount} err</span>
                     </div>
                   </Card>
                 )
               })}
             </div>
 
-            {/* Severity Policy Legend */}
-            <Card className={`${bgCard} border ${borderColor} p-4 mb-6`}>
-              <div className="flex items-center gap-6">
-                <span className={`text-sm font-medium ${textPrimary}`}>Severity Policy:</span>
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-1 rounded text-xs bg-[#f44336]/20 text-[#f44336]">Error</span>
-                  <span className={`text-xs ${textSecondary}`}>Protocol violation, message rejected or session action required</span>
+            {/* Severity Legend */}
+            <Card className={`${bgCard} border ${borderColor} p-3 mb-6`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-6">
+                  <span className={`text-sm font-medium ${textPrimary}`}>Severity:</span>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded text-xs bg-[#f44336]/20 text-[#f44336]">Error</span>
+                    <span className={`text-xs ${textSecondary}`}>Reject/Session action</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">Warning</span>
+                    <span className={`text-xs ${textSecondary}`}>Alert only</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded text-xs bg-[#2196f3]/20 text-[#2196f3]">Info</span>
+                    <span className={`text-xs ${textSecondary}`}>Diagnostic</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-1 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">Warning</span>
-                  <span className={`text-xs ${textSecondary}`}>Valid but suspicious, allow with alert</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-1 rounded text-xs bg-[#2196f3]/20 text-[#2196f3]">Info</span>
-                  <span className={`text-xs ${textSecondary}`}>Advisory only, for diagnostics</span>
-                </div>
+                <span className={`text-sm ${textSecondary}`}>{totalFilteredRules} rules {ruleSearch && "matching search"}</span>
               </div>
             </Card>
 
-            {/* Rules Table */}
-            <Card className={`${bgCard} border ${borderColor}`}>
-              <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
-                <div className="flex items-center gap-3">
-                  <h3 className={`font-bold ${textPrimary}`}>Validation Rules</h3>
-                  {ruleFilter !== "All" && (
-                    <span className="px-2 py-1 rounded text-xs" style={{ backgroundColor: `${categoryColors[ruleFilter]}20`, color: categoryColors[ruleFilter] }}>
-                      {ruleFilter}
-                    </span>
-                  )}
-                  <span className={`text-sm ${textSecondary}`}>({filteredRules.length} rules)</span>
-                </div>
-                <div className="flex gap-2">
-                  <select 
-                    value={ruleFilter}
-                    onChange={(e) => setRuleFilter(e.target.value)}
-                    className={`px-3 py-1.5 rounded border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}
-                  >
-                    <option value="All">All Categories</option>
-                    {Object.keys(categoryColors).map(cat => (
-                      <option key={cat} value={cat}>{cat} ({ruleLibrary.filter(r => r.category === cat).length})</option>
-                    ))}
-                  </select>
-                  <Input 
-                    placeholder="Search rules..." 
-                    value={ruleSearch}
-                    onChange={(e) => setRuleSearch(e.target.value)}
-                    className={`w-64 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} 
-                  />
-                  {(ruleFilter !== "All" || ruleSearch) && (
-                    <Button variant="outline" size="sm" onClick={() => { setRuleFilter("All"); setRuleSearch("") }}>
-                      Clear
-                    </Button>
-                  )}
-                </div>
-              </div>
-              <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
-                <table className="w-full text-sm">
-                  <thead className="sticky top-0">
-                    <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/40" : "bg-gray-100"}`}>
-                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Rule ID</th>
-                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Category</th>
-                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Name</th>
-                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Description</th>
-                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Severity</th>
-                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Scope</th>
-                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Status</th>
-                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredRules.map((rule) => (
-                      <tr key={rule.id} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
-                        <td className={`px-4 py-2.5 font-mono text-[#00e5ff] text-xs`}>{rule.id}</td>
-                        <td className={`px-4 py-2.5`}>
-                          <span className="px-2 py-0.5 rounded text-xs whitespace-nowrap" style={{ backgroundColor: `${categoryColors[rule.category] || "#666"}20`, color: categoryColors[rule.category] || "#666" }}>
-                            {rule.category}
-                          </span>
-                        </td>
-                        <td className={`px-4 py-2.5 font-medium ${textPrimary} whitespace-nowrap`}>{rule.name}</td>
-                        <td className={`px-4 py-2.5 ${textSecondary} max-w-md`}>{rule.description}</td>
-                        <td className={`px-4 py-2.5`}>
-                          <span className={`px-2 py-0.5 rounded text-xs ${
-                            rule.severity === "Error" ? "bg-[#f44336]/20 text-[#f44336]" :
-                            rule.severity === "Warning" ? "bg-[#ff9800]/20 text-[#ff9800]" :
-                            "bg-[#2196f3]/20 text-[#2196f3]"
-                          }`}>
-                            {rule.severity}
-                          </span>
-                        </td>
-                        <td className={`px-4 py-2.5 ${textSecondary} text-xs`}>{rule.scope}</td>
-                        <td className={`px-4 py-2.5`}>
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" defaultChecked={rule.enabled} className="sr-only peer" />
-                            <div className="w-8 h-4 bg-gray-500 peer-checked:bg-[#4caf50] rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all"></div>
-                          </label>
-                        </td>
-                        <td className={`px-4 py-2.5`}>
-                          <div className="flex gap-1">
-                            <Button size="sm" variant="outline" className="h-6 w-6 p-0"><Eye className="h-3 w-3" /></Button>
-                            <Button size="sm" variant="outline" className="h-6 w-6 p-0"><Wrench className="h-3 w-3" /></Button>
+            {/* Collapsible Rule Sections */}
+            <div className="space-y-4">
+              {filteredSections.map((section) => {
+                const isExpanded = expandedRuleSections[section.id]
+                const totalRules = section.subsections.reduce((acc, sub) => acc + sub.rules.length, 0)
+                const SectionIcon = section.icon
+                
+                return (
+                  <Card key={section.id} className={`${bgCard} border ${borderColor} overflow-hidden`}>
+                    {/* Section Header */}
+                    <button
+                      onClick={() => toggleSection(section.id)}
+                      className={`w-full px-5 py-4 flex items-center justify-between hover:bg-[#1e4976]/10 transition-colors`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="p-2 rounded-lg" style={{ backgroundColor: `${section.color}20` }}>
+                          <SectionIcon className="h-5 w-5" style={{ color: section.color }} />
+                        </div>
+                        <div className="text-left">
+                          <div className="flex items-center gap-3">
+                            <h3 className={`font-bold ${textPrimary}`}>{section.title}</h3>
+                            <span className={`text-xs px-2 py-0.5 rounded ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-100"} ${textSecondary}`}>
+                              {totalRules} rules
+                            </span>
                           </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
+                          <p className={`text-xs ${textSecondary}`}>{section.description}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <p className={`text-xs ${textSecondary}`}>Source:</p>
+                          <p className={`text-xs ${textPrimary}`}>{section.source}</p>
+                        </div>
+                        <ChevronDown className={`h-5 w-5 ${textSecondary} transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                      </div>
+                    </button>
+
+                    {/* Section Content */}
+                    {isExpanded && (
+                      <div className={`border-t ${borderColor}`}>
+                        {section.subsections.map((subsection, idx) => (
+                          <div key={subsection.id} className={idx > 0 ? `border-t ${borderColor}` : ""}>
+                            <div className={`px-5 py-2 ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"} flex items-center gap-2`}>
+                              <ChevronRight className={`h-4 w-4 ${textSecondary}`} />
+                              <span className={`text-sm font-medium ${textPrimary}`}>{subsection.title}</span>
+                              <span className={`text-xs ${textSecondary}`}>({subsection.rules.length})</span>
+                            </div>
+                            <div className="overflow-x-auto">
+                              <RuleTable rules={subsection.rules} />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </Card>
+                )
+              })}
+            </div>
           </div>
         </div>
       </div>
