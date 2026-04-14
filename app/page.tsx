@@ -168,12 +168,92 @@ export default function BCometPlatform() {
 
   // Rule library data
   const [ruleLibrary] = useState([
-    { id: "RULE-001", category: "Session", name: "Heartbeat Validation", description: "Validate heartbeat interval is within acceptable range (10-60 seconds)", severity: "Error", scope: "All", enabled: true, version: "1.0" },
-    { id: "RULE-002", category: "Session", name: "Sequence Number Reset", description: "Detect unexpected sequence number resets during active session", severity: "Warning", scope: "All", enabled: true, version: "1.2" },
-    { id: "RULE-003", category: "Business", name: "Order Quantity Validation", description: "Ensure OrderQty (38) is positive and within client limits", severity: "Error", scope: "Equities", enabled: true, version: "2.0" },
-    { id: "RULE-004", category: "Business", name: "Price Precision Check", description: "Validate price precision matches instrument specification", severity: "Warning", scope: "All", enabled: true, version: "1.1" },
-    { id: "RULE-005", category: "Venue", name: "NYSE Market Hours", description: "Reject orders outside NYSE trading hours unless GTC", severity: "Error", scope: "Equities", enabled: true, version: "1.0" },
-    { id: "RULE-006", category: "Custom", name: "Nexus Custom Tag 5001", description: "Client-specific validation for custom reference field", severity: "Info", scope: "Nexus Trading", enabled: true, version: "1.0" },
+    // Section A: Session Level Rules
+    { id: "S-001", category: "Session", name: "BeginString Must Be FIX.4.2", description: "Tag 8 must equal FIX.4.2", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "S-002", category: "Session", name: "BodyLength Valid", description: "Tag 9 must match actual body byte length", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "S-003", category: "Session", name: "CheckSum Valid", description: "Tag 10 must match computed checksum", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "S-004", category: "Session", name: "Header Required Fields", description: "Tags 8,9,35,49,56,34,52,10 must exist", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "S-005", category: "Session", name: "Sender/Target Present", description: "Tags 49 and 56 cannot be blank", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "S-006", category: "Session", name: "MsgSeqNum Positive", description: "Tag 34 must be integer greater than 0", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "S-007", category: "Session", name: "SendingTime Format", description: "Tag 52 must be valid UTC timestamp", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "S-008", category: "Session", name: "Duplicate Tag Not Allowed", description: "Same tag cannot appear twice unless in repeating group", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "S-009", category: "Session", name: "SOH Delimiter Integrity", description: "Message must use valid field delimiter and parse cleanly", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "S-010", category: "Session", name: "Unknown Admin MsgType", description: "Unknown admin MsgType in session flow", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "S-011", category: "Session", name: "Invalid Field Type", description: "Field value type mismatch (int/char/price/UTCTimestamp)", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "S-012", category: "Session", name: "Field Outside Group", description: "Group member appears without group counter", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "S-013", category: "Session", name: "Group Count Mismatch", description: "NoXXX count differs from actual entries", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "S-014", category: "Session", name: "PossDup Requires OrigSendingTime", description: "If 43=Y then 122 required", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "S-015", category: "Session", name: "PossDup Without Gap Context", description: "43=Y but no resend context", severity: "Warning", scope: "All", enabled: true, version: "1.0" },
+    { id: "S-016", category: "Session", name: "CompID Direction Validation", description: "Incoming 49/56 must match expected session direction", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "S-017", category: "Session", name: "EncryptMethod on Logon", description: "Logon must include 98 and supported value", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "S-018", category: "Session", name: "HeartBtInt on Logon", description: "Logon must include 108 and positive value", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    // Section B: Session State and Sequence Rules
+    { id: "SS-001", category: "Session State", name: "Inbound Sequence Too Low", description: "Received 34 less than expected (non-dup path)", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "SS-002", category: "Session State", name: "Inbound Sequence Gap", description: "Received 34 greater than expected, resend logic required", severity: "Warning", scope: "All", enabled: true, version: "1.0" },
+    { id: "SS-003", category: "Session State", name: "Sequence Reset GapFill", description: "SeqReset GapFill must include 123=Y and valid 36", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "SS-004", category: "Session State", name: "Sequence Reset NewSeqNo Valid", description: "Tag 36 must be greater than current expected inbound", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "SS-005", category: "Session State", name: "Resend Request Range Valid", description: "Tags 7 and 16 must define valid range", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "SS-006", category: "Session State", name: "TestRequest Requires TestReqID", description: "MsgType 1 must include 112", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "SS-007", category: "Session State", name: "Heartbeat Echo TestReqID", description: "Heartbeat responding to TestRequest should include 112", severity: "Warning", scope: "All", enabled: true, version: "1.0" },
+    { id: "SS-008", category: "Session State", name: "Logout Flow Integrity", description: "Unexpected Logout reason or abrupt close without Logout", severity: "Warning", scope: "All", enabled: true, version: "1.0" },
+    { id: "SS-009", category: "Session State", name: "ResetSeqNumFlag Handling", description: "Logon with 141=Y must follow bilateral reset policy", severity: "Warning", scope: "All", enabled: true, version: "1.0" },
+    { id: "SS-010", category: "Session State", name: "Admin During Logout Window", description: "New app messages after logout initiated", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    // Section C: Message Dictionary Rules
+    { id: "D-001", category: "Dictionary", name: "MsgType Supported", description: "Tag 35 must be known in FIX 4.2 or registered custom", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "D-002", category: "Dictionary", name: "Required Tags Per MsgType", description: "Enforce FIX 4.2 required fields for each MsgType", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "D-003", category: "Dictionary", name: "Conditional Required Tags", description: "Enforce if-then rules (e.g., price required for limit)", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "D-004", category: "Dictionary", name: "Enum Value Validity", description: "Enum tags must be valid FIX 4.2 values", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "D-005", category: "Dictionary", name: "Data Length Pair Integrity", description: "Length/data paired tags must be consistent", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "D-006", category: "Dictionary", name: "Unknown Standard Tag", description: "Unknown standard-range tag not in dictionary", severity: "Warning", scope: "All", enabled: true, version: "1.0" },
+    { id: "D-007", category: "Dictionary", name: "Custom Tag Policy", description: "Custom tags allowed only in approved ranges/prefixes", severity: "Warning", scope: "All", enabled: true, version: "1.0" },
+    { id: "D-008", category: "Dictionary", name: "Tag Ordering Policy", description: "Non-critical ordering deviations for body fields", severity: "Info", scope: "All", enabled: true, version: "1.0" },
+    // Section D: Business Rules
+    { id: "B-001", category: "Business", name: "ClOrdID Required", description: "New/Cancel/Replace must include tag 11", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "B-002", category: "Business", name: "ClOrdID Uniqueness", description: "Tag 11 must be unique per client scope/policy window", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "B-003", category: "Business", name: "Symbol Required", description: "Instrument identifier required for venue policy", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "B-004", category: "Business", name: "Side Valid", description: "Tag 54 must be valid and allowed", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "B-005", category: "Business", name: "TransactTime Required", description: "Tag 60 required on order flow messages", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "B-006", category: "Business", name: "OrderQty Positive", description: "Tag 38 must be greater than 0", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "B-007", category: "Business", name: "OrdType Required", description: "Tag 40 required and valid", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "B-008", category: "Business", name: "Limit Price Required", description: "If 40=2 then 44 required and greater than 0", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "B-009", category: "Business", name: "StopPx Required", description: "If stop/stop-limit then 99 required", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "B-010", category: "Business", name: "TimeInForce Conditional", description: "Tag 59 must be valid; GTD requires 126", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "B-011", category: "Business", name: "ExpireTime Logic", description: "Tag 126 should be future relative to 60/52", severity: "Warning", scope: "All", enabled: true, version: "1.0" },
+    { id: "B-012", category: "Business", name: "Currency/Instrument Consistency", description: "Currency valid for instrument/venue mapping", severity: "Warning", scope: "All", enabled: true, version: "1.0" },
+    { id: "B-013", category: "Business", name: "Account Policy", description: "If account mandatory for client, tag 1 required", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "B-014", category: "Business", name: "Capacity Rule", description: "Tag 47 must be present/allowed where required", severity: "Warning", scope: "All", enabled: true, version: "1.0" },
+    { id: "B-015", category: "Business", name: "MinQty/DisplayQty Logic", description: "Tags 110/111 constraints and not greater than OrderQty", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    // Section E: Execution Report and Cancel Flow Rules
+    { id: "EX-001", category: "Execution", name: "ExecReport Core Required", description: "MsgType 8 must include key tags (37,17,150,39,54,38) per policy", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "EX-002", category: "Execution", name: "ExecType OrdStatus Matrix", description: "Tags 150 and 39 combinations must be valid", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "EX-003", category: "Execution", name: "CumQty LeavesQty Math", description: "Tag 14 + 151 equals 38 for active lifecycle states", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "EX-004", category: "Execution", name: "LastQty/LastPx Pair", description: "If fill reported, tags 32 and 31 must be coherent", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "EX-005", category: "Execution", name: "AvgPx Consistency", description: "Tag 6 must be coherent with fills/cumqty", severity: "Warning", scope: "All", enabled: true, version: "1.0" },
+    { id: "EX-006", category: "Execution", name: "Cancel Request Original ID", description: "MsgType F must include 41 and map to existing live order", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "EX-007", category: "Execution", name: "Replace Request Original ID", description: "MsgType G must include 41 and valid replace chain", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "EX-008", category: "Execution", name: "Cancel Reject Integrity", description: "MsgType 9 includes 11,41,39,434 with valid reason", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "EX-009", category: "Execution", name: "Terminal State Guard", description: "Fills/cancels after terminal status without reopen event", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "EX-010", category: "Execution", name: "Out-of-Order Lifecycle", description: "Business state transition invalid for order lifecycle", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    // Section F: Market Data Rules
+    { id: "MD-001", category: "Market Data", name: "MDReqID Required", description: "MsgType V/W/X rules enforce required request IDs", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "MD-002", category: "Market Data", name: "MDEntry Group Integrity", description: "NoMDEntries count and entry fields consistent", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "MD-003", category: "Market Data", name: "MD Entry Type Enum", description: "Tag 269 values valid", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "MD-004", category: "Market Data", name: "MD Entry Price/Size Coherence", description: "Tags 270/271 fields required as per entry type", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "MD-005", category: "Market Data", name: "Subscription Type Valid", description: "Tag 263 enum and behavior valid", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "MD-006", category: "Market Data", name: "MarketDepth Valid", description: "Tag 264 positive integer and policy-compliant", severity: "Warning", scope: "All", enabled: true, version: "1.0" },
+    // Section G: Venue Rules
+    { id: "V-001", category: "Venue", name: "Trading Hours Constraint", description: "Reject outside venue hours unless TIF exception", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "V-002", category: "Venue", name: "Tick Size Enforcement", description: "Price aligns to instrument tick table", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "V-003", category: "Venue", name: "Max Order Qty", description: "Exceeds risk/venue limit", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "V-004", category: "Venue", name: "Short Sale Rule", description: "Locate/marking fields required by market", severity: "Error", scope: "Equities", enabled: true, version: "1.0" },
+    { id: "V-005", category: "Venue", name: "Instrument Eligibility", description: "Symbol not enabled for client/session", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "V-006", category: "Venue", name: "Throttle/Burst Limits", description: "Too many messages per window", severity: "Warning", scope: "All", enabled: true, version: "1.0" },
+    // Section H: Custom Client Rules
+    { id: "C-001", category: "Custom", name: "Custom Tag Mandatory by Client", description: "Client-specific required custom tags", severity: "Error", scope: "Per Client", enabled: true, version: "1.0" },
+    { id: "C-002", category: "Custom", name: "Client Reference Mapping Validation", description: "Client reference field format and mapping rules", severity: "Error", scope: "Per Client", enabled: true, version: "1.0" },
+    { id: "C-003", category: "Custom", name: "Strategy Parameter Cross-Field Rules", description: "Client algo/strategy parameter validation", severity: "Warning", scope: "Per Client", enabled: true, version: "1.0" },
+    { id: "C-004", category: "Custom", name: "Client-Specific Allowed MsgTypes", description: "Restrict MsgTypes per client agreement", severity: "Error", scope: "Per Client", enabled: true, version: "1.0" },
+    { id: "C-005", category: "Custom", name: "Proprietary OrdType Extensions", description: "Client proprietary order type validation", severity: "Warning", scope: "Per Client", enabled: true, version: "1.0" },
   ])
 
   // AI Review queue data
@@ -7845,10 +7925,26 @@ const copyToClipboard = () => {
   if (currentScreen === "rule-library") {
     const categoryColors: Record<string, string> = {
       "Session": "#2196f3",
+      "Session State": "#00bcd4",
+      "Dictionary": "#9c27b0",
       "Business": "#4caf50", 
+      "Execution": "#e91e63",
+      "Market Data": "#ff5722",
       "Venue": "#ff9800",
-      "Custom": "#9c27b0"
+      "Custom": "#795548"
     }
+    
+    const [ruleFilter, setRuleFilter] = React.useState("All")
+    const [ruleSearch, setRuleSearch] = React.useState("")
+    
+    const filteredRules = ruleLibrary.filter(r => {
+      const matchesCategory = ruleFilter === "All" || r.category === ruleFilter
+      const matchesSearch = ruleSearch === "" || 
+        r.name.toLowerCase().includes(ruleSearch.toLowerCase()) ||
+        r.id.toLowerCase().includes(ruleSearch.toLowerCase()) ||
+        r.description.toLowerCase().includes(ruleSearch.toLowerCase())
+      return matchesCategory && matchesSearch
+    })
     
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
@@ -7860,52 +7956,106 @@ const copyToClipboard = () => {
                 <BookOpen className="h-8 w-8 text-[#00e5ff]" />
                 <div>
                   <h1 className={`text-2xl font-bold ${textPrimary}`}>Rule Library</h1>
-                  <p className={`text-sm ${textSecondary}`}>Validation rules for specs, logs, and scenarios</p>
+                  <p className={`text-sm ${textSecondary}`}>FIX 4.2 validation rules for specs, logs, and certification</p>
                 </div>
               </div>
-              <Button className="bg-[#4caf50] hover:bg-[#4caf50]/80">
-                <Plus className="h-4 w-4 mr-2" /> Add Rule
-              </Button>
+              <div className="flex items-center gap-3">
+                <span className={`text-sm ${textSecondary}`}>{ruleLibrary.length} total rules</span>
+                <Button className="bg-[#4caf50] hover:bg-[#4caf50]/80">
+                  <Plus className="h-4 w-4 mr-2" /> Add Rule
+                </Button>
+              </div>
             </div>
           </header>
 
           <div className="p-6">
-            {/* Category Stats */}
-            <div className="grid grid-cols-4 gap-4 mb-6">
-              {Object.entries(categoryColors).map(([category, color]) => (
-                <Card key={category} className={`${bgCard} border ${borderColor} p-4`}>
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg" style={{ backgroundColor: `${color}20` }}>
-                      <BookOpen className="h-5 w-5" style={{ color }} />
+            {/* Category Stats - 2 rows of 4 */}
+            <div className="grid grid-cols-4 gap-3 mb-6">
+              {Object.entries(categoryColors).map(([category, color]) => {
+                const count = ruleLibrary.filter(r => r.category === category).length
+                const errorCount = ruleLibrary.filter(r => r.category === category && r.severity === "Error").length
+                return (
+                  <Card 
+                    key={category} 
+                    className={`${bgCard} border ${borderColor} p-3 cursor-pointer transition-all hover:border-[#00e5ff]/50 ${ruleFilter === category ? "border-[#00e5ff] ring-1 ring-[#00e5ff]/30" : ""}`}
+                    onClick={() => setRuleFilter(ruleFilter === category ? "All" : category)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg" style={{ backgroundColor: `${color}20` }}>
+                        <BookOpen className="h-4 w-4" style={{ color }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-lg font-bold ${textPrimary}`}>{count}</p>
+                        <p className={`text-xs ${textSecondary} truncate`}>{category}</p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs text-[#f44336]">{errorCount} err</span>
+                      </div>
                     </div>
-                    <div>
-                      <p className={`text-2xl font-bold ${textPrimary}`}>{ruleLibrary.filter(r => r.category === category).length}</p>
-                      <p className={`text-xs ${textSecondary}`}>{category} Rules</p>
-                    </div>
-                  </div>
-                </Card>
-              ))}
+                  </Card>
+                )
+              })}
             </div>
+
+            {/* Severity Policy Legend */}
+            <Card className={`${bgCard} border ${borderColor} p-4 mb-6`}>
+              <div className="flex items-center gap-6">
+                <span className={`text-sm font-medium ${textPrimary}`}>Severity Policy:</span>
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-1 rounded text-xs bg-[#f44336]/20 text-[#f44336]">Error</span>
+                  <span className={`text-xs ${textSecondary}`}>Protocol violation, message rejected or session action required</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-1 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">Warning</span>
+                  <span className={`text-xs ${textSecondary}`}>Valid but suspicious, allow with alert</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-1 rounded text-xs bg-[#2196f3]/20 text-[#2196f3]">Info</span>
+                  <span className={`text-xs ${textSecondary}`}>Advisory only, for diagnostics</span>
+                </div>
+              </div>
+            </Card>
 
             {/* Rules Table */}
             <Card className={`${bgCard} border ${borderColor}`}>
               <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
-                <h3 className={`font-bold ${textPrimary}`}>Validation Rules</h3>
+                <div className="flex items-center gap-3">
+                  <h3 className={`font-bold ${textPrimary}`}>Validation Rules</h3>
+                  {ruleFilter !== "All" && (
+                    <span className="px-2 py-1 rounded text-xs" style={{ backgroundColor: `${categoryColors[ruleFilter]}20`, color: categoryColors[ruleFilter] }}>
+                      {ruleFilter}
+                    </span>
+                  )}
+                  <span className={`text-sm ${textSecondary}`}>({filteredRules.length} rules)</span>
+                </div>
                 <div className="flex gap-2">
-                  <select className={`px-3 py-1.5 rounded border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}>
-                    <option>All Categories</option>
-                    <option>Session</option>
-                    <option>Business</option>
-                    <option>Venue</option>
-                    <option>Custom</option>
+                  <select 
+                    value={ruleFilter}
+                    onChange={(e) => setRuleFilter(e.target.value)}
+                    className={`px-3 py-1.5 rounded border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}
+                  >
+                    <option value="All">All Categories</option>
+                    {Object.keys(categoryColors).map(cat => (
+                      <option key={cat} value={cat}>{cat} ({ruleLibrary.filter(r => r.category === cat).length})</option>
+                    ))}
                   </select>
-                  <Input placeholder="Search rules..." className={`w-64 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
+                  <Input 
+                    placeholder="Search rules..." 
+                    value={ruleSearch}
+                    onChange={(e) => setRuleSearch(e.target.value)}
+                    className={`w-64 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} 
+                  />
+                  {(ruleFilter !== "All" || ruleSearch) && (
+                    <Button variant="outline" size="sm" onClick={() => { setRuleFilter("All"); setRuleSearch("") }}>
+                      Clear
+                    </Button>
+                  )}
                 </div>
               </div>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
                 <table className="w-full text-sm">
-                  <thead>
-                    <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
+                  <thead className="sticky top-0">
+                    <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/40" : "bg-gray-100"}`}>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Rule ID</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Category</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Name</th>
@@ -7917,18 +8067,18 @@ const copyToClipboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {ruleLibrary.map((rule) => (
+                    {filteredRules.map((rule) => (
                       <tr key={rule.id} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
-                        <td className={`px-4 py-3 font-mono text-[#00e5ff]`}>{rule.id}</td>
-                        <td className={`px-4 py-3`}>
-                          <span className="px-2 py-1 rounded text-xs" style={{ backgroundColor: `${categoryColors[rule.category]}20`, color: categoryColors[rule.category] }}>
+                        <td className={`px-4 py-2.5 font-mono text-[#00e5ff] text-xs`}>{rule.id}</td>
+                        <td className={`px-4 py-2.5`}>
+                          <span className="px-2 py-0.5 rounded text-xs whitespace-nowrap" style={{ backgroundColor: `${categoryColors[rule.category] || "#666"}20`, color: categoryColors[rule.category] || "#666" }}>
                             {rule.category}
                           </span>
                         </td>
-                        <td className={`px-4 py-3 font-medium ${textPrimary}`}>{rule.name}</td>
-                        <td className={`px-4 py-3 ${textSecondary} max-w-xs truncate`}>{rule.description}</td>
-                        <td className={`px-4 py-3`}>
-                          <span className={`px-2 py-1 rounded text-xs ${
+                        <td className={`px-4 py-2.5 font-medium ${textPrimary} whitespace-nowrap`}>{rule.name}</td>
+                        <td className={`px-4 py-2.5 ${textSecondary} max-w-md`}>{rule.description}</td>
+                        <td className={`px-4 py-2.5`}>
+                          <span className={`px-2 py-0.5 rounded text-xs ${
                             rule.severity === "Error" ? "bg-[#f44336]/20 text-[#f44336]" :
                             rule.severity === "Warning" ? "bg-[#ff9800]/20 text-[#ff9800]" :
                             "bg-[#2196f3]/20 text-[#2196f3]"
@@ -7936,17 +8086,17 @@ const copyToClipboard = () => {
                             {rule.severity}
                           </span>
                         </td>
-                        <td className={`px-4 py-3 ${textSecondary}`}>{rule.scope}</td>
-                        <td className={`px-4 py-3`}>
+                        <td className={`px-4 py-2.5 ${textSecondary} text-xs`}>{rule.scope}</td>
+                        <td className={`px-4 py-2.5`}>
                           <label className="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" defaultChecked={rule.enabled} className="sr-only peer" />
-                            <div className="w-9 h-5 bg-gray-500 peer-checked:bg-[#4caf50] rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                            <div className="w-8 h-4 bg-gray-500 peer-checked:bg-[#4caf50] rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all"></div>
                           </label>
                         </td>
-                        <td className={`px-4 py-3`}>
+                        <td className={`px-4 py-2.5`}>
                           <div className="flex gap-1">
-                            <Button size="sm" variant="outline" className="h-7"><Eye className="h-3 w-3" /></Button>
-                            <Button size="sm" variant="outline" className="h-7"><Wrench className="h-3 w-3" /></Button>
+                            <Button size="sm" variant="outline" className="h-6 w-6 p-0"><Eye className="h-3 w-3" /></Button>
+                            <Button size="sm" variant="outline" className="h-6 w-6 p-0"><Wrench className="h-3 w-3" /></Button>
                           </div>
                         </td>
                       </tr>
