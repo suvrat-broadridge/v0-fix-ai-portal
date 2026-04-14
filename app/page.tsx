@@ -4657,11 +4657,11 @@ const specCompareResults = [
   // Onboarding Cases Home
   if (currentScreen === "atdl-workbench") {
     const onboardingCases = [
-      { id: "OB-2024-001", client: "Nexus Trading Group", legalEntity: "Nexus Trading LLC", assetClass: "Equities", fixVersion: "FIX 4.4", strategies: ["VWAP","TWAP","POV"], status: "in-progress", gateA: "complete", gateB: "complete", gateC: "in-progress", gateD: "todo", gateE: "todo", gateF: "todo", blockers: 2, warnings: 5, readinessScore: 72, riskLevel: "medium", daysToSla: 8, onboardingManager: "Sarah Chen", technicalLead: "J. Smith", nextAction: "Complete Mapping Review", lastRun: "Jan 14, 2024", createdDate: "Jan 5, 2024" },
-      { id: "OB-2024-002", client: "Apex Capital Partners", legalEntity: "Apex Capital LLC", assetClass: "Options", fixVersion: "FIX 4.4", strategies: ["VWAP","IS","MOC"], status: "blocked", gateA: "complete", gateB: "failed", gateC: "todo", gateD: "todo", gateE: "todo", gateF: "todo", blockers: 6, warnings: 3, readinessScore: 45, riskLevel: "high", daysToSla: -2, onboardingManager: "Mike Johnson", technicalLead: "J. Smith", nextAction: "Resolve Schema Errors", lastRun: "Jan 13, 2024", createdDate: "Dec 28, 2023" },
-      { id: "OB-2024-003", client: "Velocity Securities", legalEntity: "Velocity Securities Inc", assetClass: "Equities", fixVersion: "FIX 4.4", strategies: ["TWAP","POV","IS","MOC"], status: "ready-for-approval", gateA: "complete", gateB: "complete", gateC: "complete", gateD: "complete", gateE: "in-progress", gateF: "todo", blockers: 0, warnings: 2, readinessScore: 92, riskLevel: "low", daysToSla: 12, onboardingManager: "Sarah Chen", technicalLead: "R. Patel", nextAction: "Business Sign-off", lastRun: "Jan 12, 2024", createdDate: "Dec 15, 2023" },
-      { id: "OB-2024-004", client: "Horizon Investments", legalEntity: "Horizon Fund Services", assetClass: "Futures", fixVersion: "FIX 5.0 SP2", strategies: ["VWAP","TWAP"], status: "not-started", gateA: "todo", gateB: "todo", gateC: "todo", gateD: "todo", gateE: "todo", gateF: "todo", blockers: 0, warnings: 0, readinessScore: 25, riskLevel: "medium", daysToSla: 22, onboardingManager: "Unassigned", technicalLead: "Unassigned", nextAction: "Assign Owners", lastRun: null, createdDate: "Jan 10, 2024" },
-      { id: "OB-2024-005", client: "Nexus Trading Group", legalEntity: "Nexus Trading LLC", assetClass: "Options", fixVersion: "FIX 4.4", strategies: ["IS","MOC"], status: "certified", gateA: "complete", gateB: "complete", gateC: "complete", gateD: "complete", gateE: "complete", gateF: "complete", blockers: 0, warnings: 0, readinessScore: 100, riskLevel: "low", daysToSla: 0, onboardingManager: "Sarah Chen", technicalLead: "J. Smith", nextAction: "Completed", lastRun: "Dec 20, 2023", createdDate: "Dec 1, 2023" },
+      { id: "OB-2026-0147", client: "Nexus Trading Group", legalEntity: "Nexus Trading LLC", assetClass: "Equities", fixVersion: "FIX 4.4", strategies: ["VWAP","TWAP","POV"], status: "in-progress", gateA: "complete", gateB: "complete", gateC: "in-progress", gateD: "todo", gateE: "todo", gateF: "todo", gateG: "todo", blockers: 2, warnings: 5, readinessScore: 72, riskLevel: "medium", daysToSla: 8, onboardingManager: "Sarah Chen", technicalLead: "J. Smith", nextAction: "Complete Mapping Review", lastRun: "Apr 12, 2026", createdDate: "Mar 28, 2026", includesAtdl: true },
+      { id: "OB-2026-0142", client: "Apex Capital Partners", legalEntity: "Apex Capital LLC", assetClass: "Options", fixVersion: "FIX 4.4", strategies: ["VWAP","IS","MOC"], status: "blocked", gateA: "complete", gateB: "failed", gateC: "todo", gateD: "todo", gateE: "todo", gateF: "todo", gateG: "todo", blockers: 6, warnings: 3, readinessScore: 45, riskLevel: "high", daysToSla: -2, onboardingManager: "Mike Johnson", technicalLead: "J. Smith", nextAction: "Resolve Schema Errors", lastRun: "Apr 10, 2026", createdDate: "Mar 15, 2026", includesAtdl: true },
+      { id: "OB-2026-0138", client: "Velocity Securities", legalEntity: "Velocity Securities Inc", assetClass: "Equities", fixVersion: "FIX 4.4", strategies: ["TWAP","POV","IS","MOC"], status: "ready-for-approval", gateA: "complete", gateB: "complete", gateC: "complete", gateD: "complete", gateE: "complete", gateF: "in-progress", gateG: "todo", blockers: 0, warnings: 2, readinessScore: 92, riskLevel: "low", daysToSla: 12, onboardingManager: "Sarah Chen", technicalLead: "R. Patel", nextAction: "Business Sign-off", lastRun: "Apr 11, 2026", createdDate: "Feb 20, 2026", includesAtdl: true },
+      { id: "OB-2026-0151", client: "Horizon Investments", legalEntity: "Horizon Fund Services", assetClass: "Futures", fixVersion: "FIX 5.0 SP2", strategies: ["VWAP","TWAP"], status: "not-started", gateA: "todo", gateB: "todo", gateC: "todo", gateD: "todo", gateE: "na", gateF: "todo", gateG: "todo", blockers: 0, warnings: 0, readinessScore: 25, riskLevel: "medium", daysToSla: 22, onboardingManager: "Unassigned", technicalLead: "Unassigned", nextAction: "Assign Owners", lastRun: null, createdDate: "Apr 8, 2026", includesAtdl: false },
+      { id: "OB-2026-0129", client: "Nexus Trading Group", legalEntity: "Nexus Trading LLC", assetClass: "Options", fixVersion: "FIX 4.4", strategies: ["IS","MOC"], status: "certified", gateA: "complete", gateB: "complete", gateC: "complete", gateD: "complete", gateE: "complete", gateF: "complete", gateG: "complete", blockers: 0, warnings: 0, readinessScore: 100, riskLevel: "low", daysToSla: 0, onboardingManager: "Sarah Chen", technicalLead: "J. Smith", nextAction: "Completed", lastRun: "Apr 5, 2026", createdDate: "Feb 1, 2026", includesAtdl: true },
     ]
 
     const statusConfig: Record<string, { label: string; color: string; bg: string; border: string }> = {
@@ -4682,9 +4682,10 @@ const specCompareResults = [
       { key: "gateA", label: "A", title: "Case Intake" },
       { key: "gateB", label: "B", title: "Scope Lock" },
       { key: "gateC", label: "C", title: "Spec Analysis" },
-      { key: "gateD", label: "D", title: "Testing" },
-      { key: "gateE", label: "E", title: "Certification" },
-      { key: "gateF", label: "F", title: "Go-Live" },
+      { key: "gateD", label: "D", title: "Connectivity" },
+      { key: "gateE", label: "E", title: "ATDL Analysis", optional: true },
+      { key: "gateF", label: "F", title: "Certification" },
+      { key: "gateG", label: "G", title: "Go-Live" },
     ]
 
     const pipeline = ["not-started","in-progress","blocked","ready-for-approval","certified"]
@@ -4813,14 +4814,16 @@ const specCompareResults = [
                           <div className="flex items-center gap-1">
                             {gateConfig.map(g => {
                               const state = (caseItem as any)[g.key] as string
+                              const isOptional = (g as any).optional
                               return (
-                                <div key={g.key} title={`Gate ${g.label}: ${g.title}`} className="flex flex-col items-center gap-0.5">
+                                <div key={g.key} title={`${isOptional ? "(Optional) " : ""}Gate ${g.label}: ${g.title}${state === "na" ? " - N/A" : ""}`} className="flex flex-col items-center gap-0.5">
                                   <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
                                     state === "complete" ? "bg-[#4caf50] text-white" :
                                     state === "in-progress" ? "bg-[#2196f3] text-white" :
                                     state === "failed" ? "bg-[#f44336] text-white" :
+                                    state === "na" ? "bg-slate-500/30 text-slate-400 line-through" :
                                     isDarkMode ? "bg-[#1e4976]/40 text-slate-500" : "bg-gray-200 text-gray-400"
-                                  }`}>{g.label}</div>
+                                  }`}>{state === "na" ? "—" : g.label}</div>
                                 </div>
                               )
                             })}
@@ -4888,15 +4891,16 @@ const specCompareResults = [
     const steps = [
       { id: 0, label: "Case Setup",      icon: Briefcase,     desc: "Define scope, owners, and SLAs" },
       { id: 1, label: "Source Files",    icon: Upload,        desc: "Lock input files and versions" },
-      { id: 2, label: "Analysis",        icon: CheckCircle,   desc: "Structural and semantic validation" },
-      { id: 3, label: "Comparison",      icon: GitCompare,    desc: "Side-by-side diff with decisions" },
-      { id: 4, label: "Testing",         icon: TestTube,      desc: "UI render and FIX message validation" },
-      { id: 5, label: "Remediation",     icon: ClipboardCheck, desc: "Issue triage and resolution" },
-      { id: 6, label: "Certification",   icon: Award,         desc: "Approval and evidence pack" },
+      { id: 2, label: "Spec Analysis",   icon: CheckCircle,   desc: "Structural and semantic validation" },
+      { id: 3, label: "Connectivity",    icon: Wifi,          desc: "Integration and connection testing" },
+      { id: 4, label: "ATDL Analysis",   icon: Layers,        desc: "Algo trading strategy validation", optional: true },
+      { id: 5, label: "Testing",         icon: TestTube,      desc: "UI render and FIX message validation" },
+      { id: 6, label: "Remediation",     icon: ClipboardCheck, desc: "Issue triage and resolution" },
+      { id: 7, label: "Certification",   icon: Award,         desc: "Approval and evidence pack" },
     ]
 
-    const gateForStep = ["A","B","C","D","E","F"]
-    const gateLabel = ["Case Intake","Scope Lock","Spec Analysis","Testing","Certification","Go-Live"]
+    const gateForStep = ["A","B","C","D","E","F","G"]
+    const gateLabel = ["Case Intake","Scope Lock","Spec Analysis","Connectivity","ATDL Analysis","Certification","Go-Live"]
 
     const workflowOptions = [
       {
@@ -5429,6 +5433,150 @@ Strategy: TWAP
       ),
       4: (
         <div className="space-y-5">
+          {/* ATDL Analysis step with N/A option */}
+          <div className={`p-4 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/10" : "bg-gray-50"} flex items-center justify-between`}>
+            <div className="flex items-center gap-3">
+              <Layers className="h-5 w-5 text-[#00e5ff]" />
+              <div>
+                <p className={`text-sm font-semibold ${textPrimary}`}>ATDL Analysis Required?</p>
+                <p className={`text-xs ${textSecondary}`}>Not all clients require algo trading strategy validation</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant={atdlWorkflowType === "create-from-spec" ? "default" : "outline"}
+                onClick={() => setAtdlWorkflowType("create-from-spec")}
+                className={atdlWorkflowType === "create-from-spec" ? "bg-[#4caf50] hover:bg-[#4caf50]/80" : ""}
+              >
+                <CheckCircle className="h-3.5 w-3.5 mr-1.5" /> Yes, Include ATDL
+              </Button>
+              <Button
+                size="sm"
+                variant={atdlWorkflowType === "compare-atdl" ? "default" : "outline"}
+                onClick={() => setAtdlWorkflowType("compare-atdl")}
+                className={atdlWorkflowType === "compare-atdl" ? "bg-slate-500 hover:bg-slate-500/80" : ""}
+              >
+                <X className="h-3.5 w-3.5 mr-1.5" /> Mark as N/A
+              </Button>
+            </div>
+          </div>
+
+          {atdlWorkflowType !== "compare-atdl" ? (
+            <>
+              {/* Strategy selector tabs */}
+              <div className="flex items-center gap-2">
+                <span className={`text-xs font-medium ${textSecondary} mr-1`}>Strategy:</span>
+                {["VWAP","TWAP","POV"].map((s, i) => (
+                  <button
+                    key={s}
+                    onClick={() => setAtdlSelectedStrategy(s)}
+                    className={`px-3 py-1.5 rounded text-sm font-medium border transition-colors flex items-center gap-1.5 ${
+                      atdlSelectedStrategy === s
+                        ? "bg-[#00e5ff]/20 text-[#00e5ff] border-[#00e5ff]/40"
+                        : `${borderColor} ${textSecondary} hover:border-[#00e5ff]`
+                    }`}
+                  >
+                    {s}
+                    {i === 2 ? <AlertCircle className="h-3 w-3 text-[#f44336]" /> : <CheckCircle className="h-3 w-3 text-[#4caf50]" />}
+                  </button>
+                ))}
+              </div>
+
+              {/* ATDL comparison view */}
+              <div className={`border ${borderColor} rounded-lg overflow-hidden`}>
+                <div className={`px-4 py-2.5 ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"} flex items-center gap-2`}>
+                  <GitCompare className="h-4 w-4 text-[#00e5ff]" />
+                  <span className={`text-sm font-semibold ${textPrimary}`}>ATDL Side-by-Side Comparison</span>
+                  <span className="px-2 py-0.5 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">2 Added</span>
+                  <span className="px-2 py-0.5 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">1 Modified</span>
+                  <span className="px-2 py-0.5 rounded text-xs bg-[#f44336]/20 text-[#f44336]">1 Missing</span>
+                </div>
+                <div className="grid grid-cols-2 divide-x divide-[#1e4976]">
+                  <div className={`p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
+                    <p className={`text-xs font-semibold ${textSecondary} mb-2`}>Client-Side ATDL</p>
+                    <pre className={`text-xs ${textSecondary} font-mono overflow-x-auto whitespace-pre-wrap`}>{`<Strategy name="VWAP" wireValue="V">
+  <Parameter name="StartTime" .../>
+  <Parameter name="EndTime" .../>
+  <Parameter name="ParticipationRate"
+    xsi:type="Percentage_t"/>
+</Strategy>
+<Strategy name="TWAP" wireValue="T">
+  ...
+</Strategy>`}</pre>
+                  </div>
+                  <div className={`p-4 ${isDarkMode ? "bg-[#0a1628]/60" : "bg-[#f8fafc]"}`}>
+                    <p className={`text-xs font-semibold ${textSecondary} mb-2`}>Admin/Sell-Side ATDL</p>
+                    <pre className={`text-xs ${textSecondary} font-mono overflow-x-auto whitespace-pre-wrap`}>{`<Strategy name="VWAP" wireValue="V">
+  <Parameter name="StartTime" .../>
+  <Parameter name="EndTime" .../>
+  <Parameter name="ParticipationRate"
+    xsi:type="`}<span className="text-[#ff9800]">Decimal_t</span>{`"/>
+</Strategy>
+<Strategy name="TWAP" wireValue="T">
+  ...
+</Strategy>
+`}<span className="text-[#4caf50]">{`<Strategy name="POV" wireValue="P">
+  <Parameter name="ParticipationRate"/>
+  <Parameter name="MaxFloor"/>
+</Strategy>`}</span></pre>
+                  </div>
+                </div>
+              </div>
+
+              {/* ATDL validation findings */}
+              <div className="space-y-2">
+                <p className={`text-xs font-semibold ${textSecondary} uppercase tracking-wider`}>ATDL Validation Findings</p>
+                {[
+                  { id: "atdl-1", rule: "Parameter Type Mismatch", desc: "ParticipationRate: Percentage_t vs Decimal_t", severity: "error" },
+                  { id: "atdl-2", rule: "New Strategy Detected", desc: "POV strategy added in admin ATDL", severity: "warning" },
+                  { id: "atdl-3", rule: "Wire Value Consistency", desc: "All strategies have matching wireValue attributes", severity: "pass" },
+                ].map(finding => (
+                  <div key={finding.id} className={`flex items-center gap-3 p-3 rounded-lg border ${finding.severity === "error" ? "border-[#f44336]/40 bg-[#f44336]/5" : finding.severity === "warning" ? "border-[#ff9800]/30 bg-[#ff9800]/5" : `${borderColor} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}`}>
+                    {finding.severity === "pass" && <CheckCircle className="h-4 w-4 text-[#4caf50] flex-shrink-0" />}
+                    {finding.severity === "warning" && <AlertTriangle className="h-4 w-4 text-[#ff9800] flex-shrink-0" />}
+                    {finding.severity === "error" && <AlertCircle className="h-4 w-4 text-[#f44336] flex-shrink-0" />}
+                    <span className={`text-sm font-medium ${textPrimary}`}>{finding.rule}</span>
+                    <span className={`text-xs flex-1 ${textSecondary}`}>{finding.desc}</span>
+                    {finding.severity !== "pass" && (
+                      <div className="flex gap-1">
+                        {["Acknowledge","Defer","Escalate"].map(a => {
+                          const isSelected = atdlValidationActions[`atdl-${finding.id}`] === a
+                          return (
+                            <button
+                              key={a}
+                              onClick={() => setAtdlValidationActions(prev => ({ ...prev, [`atdl-${finding.id}`]: a }))}
+                              className={`px-2 py-0.5 rounded text-xs border transition-colors ${
+                                isSelected
+                                  ? a === "Acknowledge" ? "bg-[#4caf50]/20 border-[#4caf50] text-[#4caf50]"
+                                  : a === "Defer" ? "bg-[#ff9800]/20 border-[#ff9800] text-[#ff9800]"
+                                  : "bg-[#f44336]/20 border-[#f44336] text-[#f44336]"
+                                  : `${borderColor} ${textSecondary} hover:border-[#00e5ff] hover:text-[#00e5ff]`
+                              }`}
+                            >
+                              {a}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className={`p-8 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"} text-center`}>
+              <div className="p-3 rounded-full bg-slate-500/20 w-fit mx-auto mb-3">
+                <X className="h-6 w-6 text-slate-400" />
+              </div>
+              <p className={`text-sm font-medium ${textPrimary} mb-1`}>ATDL Analysis Marked as N/A</p>
+              <p className={`text-xs ${textSecondary}`}>This onboarding case does not require algo trading strategy validation. Click &quot;Next&quot; to continue to Testing.</p>
+            </div>
+          )}
+        </div>
+      ),
+      5: (
+        <div className="space-y-5">
           {/* Strategy selector tabs */}
           <div className="flex items-center gap-2">
             <span className={`text-xs font-medium ${textSecondary} mr-1`}>Strategy:</span>
@@ -5598,7 +5746,7 @@ Strategy: TWAP
           </div>
         </div>
       ),
-      5: (
+      6: (
         <div className="space-y-3">
           <p className={`text-sm ${textSecondary} mb-3`}>2 open findings require remediation before approval.</p>
           {[
@@ -5616,7 +5764,7 @@ Strategy: TWAP
           ))}
         </div>
       ),
-      6: (
+      7: (
         <div className="space-y-4">
           <div className={`p-4 rounded-lg border border-[#4caf50]/40 bg-[#4caf50]/5 flex items-start gap-3`}>
             <CheckCircle className="h-5 w-5 text-[#4caf50] flex-shrink-0 mt-0.5" />
@@ -5627,8 +5775,8 @@ Strategy: TWAP
           </div>
           <div className="space-y-2">
             {[
-              { role: "Technical Lead", name: "Sarah Johnson", signed: true, date: "Jan 14, 2024" },
-              { role: "Compliance",     name: "David Park",    signed: true, date: "Jan 14, 2024" },
+              { role: "Technical Lead", name: "Sarah Johnson", signed: true, date: "Apr 12, 2026" },
+              { role: "Compliance",     name: "David Park",    signed: true, date: "Apr 13, 2026" },
               { role: "Management",     name: "Karen Mitchell", signed: false, date: null },
             ].map(a => (
               <div key={a.role} className={`flex items-center gap-3 p-3 rounded-lg border ${a.signed ? "border-[#4caf50]/40" : borderColor} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}>
@@ -5685,9 +5833,10 @@ Strategy: TWAP
               {steps.map((step, idx) => {
                 const isActive = atdlWizardStep === idx
                 const isDone = atdlWizardStep > idx
+                const isOptional = (step as any).optional
                 return (
                   <div key={step.id} className="flex items-start flex-1 min-w-0">
-                    <div className="flex flex-col items-center flex-shrink-0">
+                    <div className="flex flex-col items-center flex-shrink-0 relative">
                       <button
                         onClick={() => setAtdlWizardStep(idx)}
                         className={`w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all ${
@@ -5698,7 +5847,10 @@ Strategy: TWAP
                       >
                         {isDone ? <CheckCircle className="h-4 w-4" /> : <step.icon className="h-4 w-4" />}
                       </button>
-                      <span className={`text-xs mt-1.5 font-medium text-center w-16 ${isActive ? "text-[#00e5ff]" : isDone ? "text-[#4caf50]" : textSecondary}`}>{step.label}</span>
+                      <span className={`text-xs mt-1.5 font-medium text-center w-20 ${isActive ? "text-[#00e5ff]" : isDone ? "text-[#4caf50]" : textSecondary}`}>
+                        {step.label}
+                        {isOptional && <span className="block text-[10px] opacity-60">(Optional)</span>}
+                      </span>
                     </div>
                     {idx < steps.length - 1 && (
                       <div className={`flex-1 h-0.5 mt-4 mx-1 ${atdlWizardStep > idx ? "bg-[#4caf50]" : isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"}`} />
