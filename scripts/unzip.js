@@ -1,8 +1,8 @@
 const { execSync } = require('child_process');
 const path = require('path');
 
-const zipPath = path.join(__dirname, '..', 'b_WixtMLFN7gp.zip');
-const extractPath = path.join(__dirname, '..', 'extracted');
+const zipPath = path.join('/vercel/share/v0-project', 'b_WixtMLFN7gp.zip');
+const extractPath = path.join('/vercel/share/v0-project', 'extracted');
 
 try {
   execSync(`unzip -o "${zipPath}" -d "${extractPath}"`, { stdio: 'inherit' });
