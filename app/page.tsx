@@ -160,10 +160,10 @@ export default function BCometPlatform() {
 
   // Evidence vault data
   const [evidenceItems] = useState([
-    { id: "EV-001", caseId: "OB-2024-001", type: "Test Report", name: "EQ_FIX42_RegTest_Results_v1.2.pdf", stage: 5, generatedDate: "Jan 15, 2024", generatedBy: "System", signed: true, signedBy: "John Smith", signedDate: "Jan 15, 2024", size: "1.2 MB" },
-    { id: "EV-002", caseId: "OB-2024-001", type: "Spec Diff", name: "Nexus_SpecComparison_Report.pdf", stage: 2, generatedDate: "Jan 5, 2024", generatedBy: "System", signed: true, signedBy: "John Smith", signedDate: "Jan 6, 2024", size: "890 KB" },
-    { id: "EV-003", caseId: "OB-2024-004", type: "Certification Pack", name: "Velocity_Certification_Package.zip", stage: 6, generatedDate: "Jan 18, 2024", generatedBy: "System", signed: false, signedBy: null, signedDate: null, size: "4.5 MB" },
-    { id: "EV-004", caseId: "OB-2024-002", type: "Approval Record", name: "Apex_ExceptionWaiver_5001.pdf", stage: 3, generatedDate: "Jan 13, 2024", generatedBy: "Sarah Johnson", signed: false, signedBy: null, signedDate: null, size: "156 KB" },
+    { id: "EV-001", caseId: "OB-2024-001", client: "Nexus Trading Group", type: "Test Report", name: "EQ_FIX42_RegTest_Results_v1.2.pdf", stage: 5, generatedDate: "Jan 15, 2024", generatedBy: "System", signed: true, signedBy: "John Smith", signedDate: "Jan 15, 2024", size: "1.2 MB" },
+    { id: "EV-002", caseId: "OB-2024-001", client: "Nexus Trading Group", type: "Spec Diff", name: "Nexus_SpecComparison_Report.pdf", stage: 2, generatedDate: "Jan 5, 2024", generatedBy: "System", signed: true, signedBy: "John Smith", signedDate: "Jan 6, 2024", size: "890 KB" },
+    { id: "EV-003", caseId: "OB-2024-004", client: "Velocity Securities", type: "Certification Pack", name: "Velocity_Certification_Package.zip", stage: 6, generatedDate: "Jan 18, 2024", generatedBy: "System", signed: false, signedBy: null, signedDate: null, size: "4.5 MB" },
+    { id: "EV-004", caseId: "OB-2024-002", client: "Apex Capital Partners", type: "Approval Record", name: "Apex_ExceptionWaiver_5001.pdf", stage: 3, generatedDate: "Jan 13, 2024", generatedBy: "Sarah Johnson", signed: false, signedBy: null, signedDate: null, size: "156 KB" },
   ])
 
   // Rule library data
@@ -178,10 +178,10 @@ export default function BCometPlatform() {
 
   // AI Review queue data
   const [aiReviewItems] = useState([
-    { id: "AIR-001", caseId: "OB-2024-001", source: "Spec Comparison", finding: "Field 49 (SenderCompID) format mismatch - client uses alphanumeric, standard expects alpha only", confidence: 0.92, severity: "Medium", aiReason: "Pattern analysis shows 15% of client messages contain numeric characters in SenderCompID", status: "pending", createdDate: "Jan 14, 2024" },
-    { id: "AIR-002", caseId: "OB-2024-002", source: "Log Analysis", finding: "Unusual reject pattern detected - 23% of NewOrderSingle messages rejected with reason code 0", confidence: 0.78, severity: "High", aiReason: "Historical baseline shows <5% reject rate for similar clients", status: "pending", createdDate: "Jan 13, 2024" },
-    { id: "AIR-003", caseId: "OB-2024-003", source: "Scenario Generation", finding: "Missing test coverage for partial fill scenarios with multiple execution reports", confidence: 0.85, severity: "Low", aiReason: "Coverage analysis indicates 0 scenarios test multi-leg partial fills", status: "accepted", createdDate: "Jan 12, 2024" },
-    { id: "AIR-004", caseId: "OB-2024-001", source: "Spec Comparison", finding: "Optional field 58 (Text) always populated by client - may indicate custom usage", confidence: 0.65, severity: "Info", aiReason: "Field appears in 100% of client messages vs 12% industry average", status: "rejected", createdDate: "Jan 11, 2024" },
+    { id: "AIR-001", caseId: "OB-2024-001", client: "Nexus Trading Group", source: "Spec Comparison", finding: "Field 49 (SenderCompID) format mismatch - client uses alphanumeric, standard expects alpha only", confidence: 0.92, severity: "Medium", aiReason: "Pattern analysis shows 15% of client messages contain numeric characters in SenderCompID", status: "pending", createdDate: "Jan 14, 2024" },
+    { id: "AIR-002", caseId: "OB-2024-002", client: "Apex Capital Partners", source: "Log Analysis", finding: "Unusual reject pattern detected - 23% of NewOrderSingle messages rejected with reason code 0", confidence: 0.78, severity: "High", aiReason: "Historical baseline shows <5% reject rate for similar clients", status: "pending", createdDate: "Jan 13, 2024" },
+    { id: "AIR-003", caseId: "OB-2024-003", client: "Horizon Investments", source: "Scenario Generation", finding: "Missing test coverage for partial fill scenarios with multiple execution reports", confidence: 0.85, severity: "Low", aiReason: "Coverage analysis indicates 0 scenarios test multi-leg partial fills", status: "accepted", createdDate: "Jan 12, 2024" },
+    { id: "AIR-004", caseId: "OB-2024-001", client: "Nexus Trading Group", source: "Spec Comparison", finding: "Optional field 58 (Text) always populated by client - may indicate custom usage", confidence: 0.65, severity: "Info", aiReason: "Field appears in 100% of client messages vs 12% industry average", status: "rejected", createdDate: "Jan 11, 2024" },
   ])
 
   // SLA Analytics data
@@ -7633,10 +7633,12 @@ const copyToClipboard = () => {
                               </span>
                             )}
                           </div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <Building2 className="h-4 w-4 text-[#00e5ff]" />
+                            <span className={`font-bold text-[#00e5ff]`}>{approval.client}</span>
+                            <span className={`font-mono text-xs ${textSecondary}`}>({approval.caseId})</span>
+                          </div>
                           <h3 className={`font-bold ${textPrimary} mb-1`}>{approval.description}</h3>
-                          <p className={`text-sm ${textSecondary}`}>
-                            <span className="text-[#00e5ff]">{approval.caseId}</span> - {approval.client}
-                          </p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -7751,7 +7753,7 @@ const copyToClipboard = () => {
                   <thead>
                     <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Evidence ID</th>
-                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Case</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Client</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Type</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Document</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Stage</th>
@@ -7764,7 +7766,15 @@ const copyToClipboard = () => {
                     {evidenceItems.map((evidence) => (
                       <tr key={evidence.id} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
                         <td className={`px-4 py-3 font-mono text-[#00e5ff]`}>{evidence.id}</td>
-                        <td className={`px-4 py-3 font-mono ${textSecondary}`}>{evidence.caseId}</td>
+                        <td className={`px-4 py-3`}>
+                          <div className="flex items-center gap-2">
+                            <Building2 className="h-4 w-4 text-[#00e5ff]" />
+                            <div>
+                              <p className={`font-medium ${textPrimary}`}>{evidence.client}</p>
+                              <p className={`text-xs font-mono ${textSecondary}`}>{evidence.caseId}</p>
+                            </div>
+                          </div>
+                        </td>
                         <td className={`px-4 py-3`}>
                           <span className={`px-2 py-1 rounded text-xs ${
                             evidence.type === "Test Report" ? "bg-[#2196f3]/20 text-[#2196f3]" :
@@ -8043,10 +8053,13 @@ const copyToClipboard = () => {
                               {item.severity}
                             </span>
                           </div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <Building2 className="h-4 w-4 text-[#00e5ff]" />
+                            <span className={`font-bold text-[#00e5ff]`}>{item.client}</span>
+                            <span className={`font-mono text-xs ${textSecondary}`}>({item.caseId})</span>
+                          </div>
                           <h3 className={`font-bold ${textPrimary} mb-1`}>{item.finding}</h3>
-                          <p className={`text-sm ${textSecondary}`}>
-                            <span className="text-[#00e5ff]">{item.caseId}</span> - {item.createdDate}
-                          </p>
+                          <p className={`text-xs ${textSecondary}`}>{item.createdDate}</p>
                         </div>
                       </div>
                       <div className="text-right">
