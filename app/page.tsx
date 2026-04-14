@@ -98,26 +98,26 @@ export default function BCometPlatform() {
   const [certLogTab, setCertLogTab] = useState<"upload" | "existing">("upload")
   const [generatingRegTest, setGeneratingRegTest] = useState<string | null>(null)
   const [generatedRegSuites, setGeneratedRegSuites] = useState<Record<string, {suiteName: string, testCount: number, lastGenerated: string}>>({
-    "Equities-FIX 4.2": { suiteName: "EQ_FIX42_RegTests_v1.2", testCount: 24, lastGenerated: "Jan 15, 2024" },
-    "Options-FIX 4.4": { suiteName: "OPT_FIX44_RegTests_v2.0", testCount: 18, lastGenerated: "Jan 10, 2024" },
+    "Equities-FIX 4.2": { suiteName: "EQ_FIX42_RegTests_v1.2", testCount: 24, lastGenerated: "Apr 12, 2026" },
+    "Options-FIX 4.4": { suiteName: "OPT_FIX44_RegTests_v2.0", testCount: 18, lastGenerated: "Apr 9, 2026" },
   })
   const [generatingCertTest, setGeneratingCertTest] = useState<string | null>(null)
   const [generatedCertSuites, setGeneratedCertSuites] = useState<Record<string, {suiteName: string, testCount: number, lastGenerated: string}>>({
-    "Equities-FIX 4.2": { suiteName: "EQ_FIX42_CertTests_v1.2", testCount: 32, lastGenerated: "Jan 15, 2024" },
-    "Options-FIX 4.4": { suiteName: "OPT_FIX44_CertTests_v2.0", testCount: 28, lastGenerated: "Jan 10, 2024" },
+    "Equities-FIX 4.2": { suiteName: "EQ_FIX42_CertTests_v1.2", testCount: 32, lastGenerated: "Apr 12, 2026" },
+    "Options-FIX 4.4": { suiteName: "OPT_FIX44_CertTests_v2.0", testCount: 28, lastGenerated: "Apr 9, 2026" },
   })
   const [showContactPanel, setShowContactPanel] = useState(false)
   const [showDemoForm, setShowDemoForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   // Session configuration state
   const [sessionConfigs, setSessionConfigs] = useState<Record<string, {host: string, port: string, senderCompId: string, targetCompId: string, protocol: string, ssl: boolean, heartbeat: number, connected: boolean, lastTested: string | null}>>({
-    "Equities-FIX 4.2": { host: "fix.nexustrading.com", port: "9876", senderCompId: "NEXUS_EQ", targetCompId: "BROADRIDGE", protocol: "FIX 4.2", ssl: true, heartbeat: 30, connected: true, lastTested: "Jan 15, 2024 10:30 AM" },
+    "Equities-FIX 4.2": { host: "fix.nexustrading.com", port: "9876", senderCompId: "NEXUS_EQ", targetCompId: "BROADRIDGE", protocol: "FIX 4.2", ssl: true, heartbeat: 30, connected: true, lastTested: "Apr 13, 2026 10:30 AM" },
   })
   // Test execution results state
   const [testRunHistory, setTestRunHistory] = useState<Array<{id: string, suite: string, asset: string, protocol: string, runDate: string, status: "passed" | "failed" | "running", passed: number, failed: number, total: number}>>([
-    { id: "TR001", suite: "EQ_FIX42_RegTests_v1.2", asset: "Equities", protocol: "FIX 4.2", runDate: "Jan 15, 2024 10:45 AM", status: "passed", passed: 24, failed: 0, total: 24 },
-    { id: "TR002", suite: "OPT_FIX44_RegTests_v2.0", asset: "Options", protocol: "FIX 4.4", runDate: "Jan 14, 2024 3:20 PM", status: "failed", passed: 15, failed: 3, total: 18 },
-    { id: "TR003", suite: "EQ_FIX42_CertTests_v1.2", asset: "Equities", protocol: "FIX 4.2", runDate: "Jan 13, 2024 9:00 AM", status: "passed", passed: 32, failed: 0, total: 32 },
+    { id: "TR001", suite: "EQ_FIX42_RegTests_v1.2", asset: "Equities", protocol: "FIX 4.2", runDate: "Apr 13, 2026 10:45 AM", status: "passed", passed: 24, failed: 0, total: 24 },
+    { id: "TR002", suite: "OPT_FIX44_RegTests_v2.0", asset: "Options", protocol: "FIX 4.4", runDate: "Apr 12, 2026 3:20 PM", status: "failed", passed: 15, failed: 3, total: 18 },
+    { id: "TR003", suite: "EQ_FIX42_CertTests_v1.2", asset: "Equities", protocol: "FIX 4.2", runDate: "Apr 11, 2026 9:00 AM", status: "passed", passed: 32, failed: 0, total: 32 },
   ])
   // Client workflow stage tracking
   const [clientStages, setClientStages] = useState<Record<string, {stage: number, stageStatus: Record<number, "completed" | "in-progress" | "blocked" | "pending">}>>({
@@ -144,33 +144,33 @@ export default function BCometPlatform() {
   
   // Onboarding Cases data
   const [onboardingCases] = useState([
-    { id: "OB-2024-001", client: "Nexus Trading Group", legalEntity: "Nexus Trading LLC", region: "AMER", assetClass: "Equities", protocol: "FIX 4.2", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Medium", owner: "John Smith", slaDate: "Feb 15, 2024", blockers: 0, status: "on-track", createdDate: "Jan 2, 2024" },
-    { id: "OB-2024-002", client: "Apex Capital Partners", legalEntity: "Apex Capital Inc", region: "EMEA", assetClass: "Options", protocol: "FIX 4.4", environment: "Cert", stage: 3, stageLabel: "Connectivity", priority: "Critical", riskRating: "High", owner: "Sarah Johnson", slaDate: "Jan 30, 2024", blockers: 2, status: "at-risk", createdDate: "Dec 15, 2023" },
-    { id: "OB-2024-003", client: "Horizon Investments", legalEntity: "Horizon Fund Management", region: "APAC", assetClass: "Futures", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "Medium", riskRating: "Low", owner: "Mike Chen", slaDate: "Mar 1, 2024", blockers: 0, status: "on-track", createdDate: "Jan 8, 2024" },
-    { id: "OB-2024-004", client: "Velocity Securities", legalEntity: "Velocity Trading Ltd", region: "AMER", assetClass: "Equities", protocol: "FIX 4.4", environment: "Prod", stage: 6, stageLabel: "Certification", priority: "High", riskRating: "Low", owner: "Lisa Wang", slaDate: "Jan 20, 2024", blockers: 0, status: "on-track", createdDate: "Nov 20, 2023" },
-    { id: "OB-2024-005", client: "Summit Financial", legalEntity: "Summit Advisory Group", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.2", environment: "UAT", stage: 1, stageLabel: "Setup", priority: "Low", riskRating: "Medium", owner: "Tom Brown", slaDate: "Apr 1, 2024", blockers: 1, status: "blocked", createdDate: "Jan 10, 2024" },
+    { id: "OB-2026-0147", client: "Nexus Trading Group", legalEntity: "Nexus Trading LLC", region: "AMER", assetClass: "Equities", protocol: "FIX 4.2", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Medium", owner: "John Smith", slaDate: "Apr 22, 2026", blockers: 0, status: "on-track", createdDate: "Mar 28, 2026" },
+    { id: "OB-2026-0142", client: "Apex Capital Partners", legalEntity: "Apex Capital Inc", region: "EMEA", assetClass: "Options", protocol: "FIX 4.4", environment: "Cert", stage: 3, stageLabel: "Connectivity", priority: "Critical", riskRating: "High", owner: "Sarah Johnson", slaDate: "Apr 12, 2026", blockers: 2, status: "at-risk", createdDate: "Mar 15, 2026" },
+    { id: "OB-2026-0151", client: "Horizon Investments", legalEntity: "Horizon Fund Management", region: "APAC", assetClass: "Futures", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "Medium", riskRating: "Low", owner: "Mike Chen", slaDate: "May 2, 2026", blockers: 0, status: "on-track", createdDate: "Apr 8, 2026" },
+    { id: "OB-2026-0138", client: "Velocity Securities", legalEntity: "Velocity Trading Ltd", region: "AMER", assetClass: "Equities", protocol: "FIX 4.4", environment: "Prod", stage: 6, stageLabel: "Certification", priority: "High", riskRating: "Low", owner: "Lisa Wang", slaDate: "Apr 18, 2026", blockers: 0, status: "on-track", createdDate: "Feb 20, 2026" },
+    { id: "OB-2026-0155", client: "Summit Financial", legalEntity: "Summit Advisory Group", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.2", environment: "UAT", stage: 1, stageLabel: "Setup", priority: "Low", riskRating: "Medium", owner: "Tom Brown", slaDate: "May 9, 2026", blockers: 1, status: "blocked", createdDate: "Apr 10, 2026" },
   ])
 
   // Approvals data
   const [allApprovals] = useState([
     // Nexus Trading Group
-    { id: "APR-001", type: "Stage Gate", caseId: "OB-2024-001", client: "Nexus Trading Group", description: "Approve progression from Testing to Certification", requiredApprovers: ["Ops", "Technical"], currentApprovers: ["Ops"], submittedBy: "John Smith", submittedDate: "Jan 14, 2024", dueDate: "Jan 16, 2024", status: "pending", notes: "All test cases passed. One minor field mapping discrepancy noted but waived per APR-004." },
-    { id: "APR-004", type: "Exception", caseId: "OB-2024-001", client: "Nexus Trading Group", description: "Waiver for optional field 58 custom usage pattern", requiredApprovers: ["Compliance", "Technical"], currentApprovers: ["Compliance", "Technical"], submittedBy: "John Smith", submittedDate: "Jan 8, 2024", dueDate: "Jan 10, 2024", status: "approved", resolvedDate: "Jan 9, 2024", resolvedBy: "David Park", notes: "Field usage confirmed as non-breaking. Client workflow depends on it. Approved with monitoring clause." },
-    { id: "APR-007", type: "Stage Gate", caseId: "OB-2024-001", client: "Nexus Trading Group", description: "Approve progression from Spec Analysis to Connectivity", requiredApprovers: ["Technical"], currentApprovers: ["Technical"], submittedBy: "John Smith", submittedDate: "Dec 28, 2023", dueDate: "Dec 30, 2023", status: "approved", resolvedDate: "Dec 29, 2023", resolvedBy: "Technical Lead", notes: "Spec comparison completed with 3 minor discrepancies. All documented and accepted." },
-    { id: "APR-010", type: "Exception", caseId: "OB-2024-001", client: "Nexus Trading Group", description: "SLA extension request for UAT phase due to holiday period", requiredApprovers: ["Management", "Ops"], currentApprovers: [], submittedBy: "John Smith", submittedDate: "Dec 20, 2023", dueDate: "Dec 22, 2023", status: "rejected", resolvedDate: "Dec 21, 2023", resolvedBy: "Karen Mitchell", notes: "Extension not approved. Client advised to use existing buffer in schedule. Alternative timeline provided." },
+    { id: "APR-001", type: "Stage Gate", caseId: "OB-2026-0147", client: "Nexus Trading Group", description: "Approve progression from Testing to Certification", requiredApprovers: ["Ops", "Technical"], currentApprovers: ["Ops"], submittedBy: "John Smith", submittedDate: "Apr 12, 2026", dueDate: "Apr 16, 2026", status: "pending", notes: "All test cases passed. One minor field mapping discrepancy noted but waived per APR-004." },
+    { id: "APR-004", type: "Exception", caseId: "OB-2026-0147", client: "Nexus Trading Group", description: "Waiver for optional field 58 custom usage pattern", requiredApprovers: ["Compliance", "Technical"], currentApprovers: ["Compliance", "Technical"], submittedBy: "John Smith", submittedDate: "Apr 7, 2026", dueDate: "Apr 9, 2026", status: "approved", resolvedDate: "Apr 8, 2026", resolvedBy: "David Park", notes: "Field usage confirmed as non-breaking. Client workflow depends on it. Approved with monitoring clause." },
+    { id: "APR-007", type: "Stage Gate", caseId: "OB-2026-0147", client: "Nexus Trading Group", description: "Approve progression from Spec Analysis to Connectivity", requiredApprovers: ["Technical"], currentApprovers: ["Technical"], submittedBy: "John Smith", submittedDate: "Apr 2, 2026", dueDate: "Apr 4, 2026", status: "approved", resolvedDate: "Apr 3, 2026", resolvedBy: "Technical Lead", notes: "Spec comparison completed with 3 minor discrepancies. All documented and accepted." },
+    { id: "APR-010", type: "Exception", caseId: "OB-2026-0147", client: "Nexus Trading Group", description: "SLA extension request for UAT phase due to infra migration window", requiredApprovers: ["Management", "Ops"], currentApprovers: [], submittedBy: "John Smith", submittedDate: "Mar 31, 2026", dueDate: "Apr 2, 2026", status: "rejected", resolvedDate: "Apr 1, 2026", resolvedBy: "Karen Mitchell", notes: "Extension not approved. Client advised to use existing buffer in schedule. Alternative timeline provided." },
     // Apex Capital Partners
-    { id: "APR-002", type: "Exception", caseId: "OB-2024-002", client: "Apex Capital Partners", description: "Waiver for custom field 5001 mapping", requiredApprovers: ["Compliance", "Technical"], currentApprovers: [], submittedBy: "Sarah Johnson", submittedDate: "Jan 13, 2024", dueDate: "Jan 15, 2024", status: "overdue", notes: "Field 5001 is proprietary and not part of standard FIX spec. Risk assessment required before approval." },
-    { id: "APR-005", type: "Stage Gate", caseId: "OB-2024-002", client: "Apex Capital Partners", description: "Approve progression from Setup to Spec Analysis", requiredApprovers: ["Ops", "Technical"], currentApprovers: ["Ops", "Technical"], submittedBy: "Sarah Johnson", submittedDate: "Jan 2, 2024", dueDate: "Jan 5, 2024", status: "approved", resolvedDate: "Jan 3, 2024", resolvedBy: "Ops Team", notes: "Environment setup confirmed. FIX engine version validated. Credentials tested." },
-    { id: "APR-008", type: "Exception", caseId: "OB-2024-002", client: "Apex Capital Partners", description: "Protocol downgrade request from FIX 4.4 to FIX 4.2 for legacy system", requiredApprovers: ["Technical", "Compliance", "Management"], currentApprovers: ["Technical"], submittedBy: "Sarah Johnson", submittedDate: "Jan 10, 2024", dueDate: "Jan 12, 2024", status: "pending", notes: "Client legacy OMS cannot support FIX 4.4 features. Requesting temporary downgrade with upgrade plan." },
-    { id: "APR-011", type: "Stage Gate", caseId: "OB-2024-002", client: "Apex Capital Partners", description: "Connectivity sign-off for primary and failover sessions", requiredApprovers: ["Technical", "Ops"], currentApprovers: ["Technical"], submittedBy: "Sarah Johnson", submittedDate: "Jan 11, 2024", dueDate: "Jan 14, 2024", status: "pending", notes: "Primary session stable. Failover testing scheduled for Jan 13." },
+    { id: "APR-002", type: "Exception", caseId: "OB-2026-0142", client: "Apex Capital Partners", description: "Waiver for custom field 5001 mapping", requiredApprovers: ["Compliance", "Technical"], currentApprovers: [], submittedBy: "Sarah Johnson", submittedDate: "Apr 10, 2026", dueDate: "Apr 13, 2026", status: "overdue", notes: "Field 5001 is proprietary and not part of standard FIX spec. Risk assessment required before approval." },
+    { id: "APR-005", type: "Stage Gate", caseId: "OB-2026-0142", client: "Apex Capital Partners", description: "Approve progression from Setup to Spec Analysis", requiredApprovers: ["Ops", "Technical"], currentApprovers: ["Ops", "Technical"], submittedBy: "Sarah Johnson", submittedDate: "Mar 20, 2026", dueDate: "Mar 24, 2026", status: "approved", resolvedDate: "Mar 22, 2026", resolvedBy: "Ops Team", notes: "Environment setup confirmed. FIX engine version validated. Credentials tested." },
+    { id: "APR-008", type: "Exception", caseId: "OB-2026-0142", client: "Apex Capital Partners", description: "Protocol downgrade request from FIX 4.4 to FIX 4.2 for legacy system", requiredApprovers: ["Technical", "Compliance", "Management"], currentApprovers: ["Technical"], submittedBy: "Sarah Johnson", submittedDate: "Apr 8, 2026", dueDate: "Apr 11, 2026", status: "pending", notes: "Client legacy OMS cannot support FIX 4.4 features. Requesting temporary downgrade with upgrade plan." },
+    { id: "APR-011", type: "Stage Gate", caseId: "OB-2026-0142", client: "Apex Capital Partners", description: "Connectivity sign-off for primary and failover sessions", requiredApprovers: ["Technical", "Ops"], currentApprovers: ["Technical"], submittedBy: "Sarah Johnson", submittedDate: "Apr 9, 2026", dueDate: "Apr 14, 2026", status: "pending", notes: "Primary session stable. Failover testing scheduled for Apr 13." },
     // Velocity Securities
-    { id: "APR-003", type: "Go-Live", caseId: "OB-2024-004", client: "Velocity Securities", description: "Final go-live approval for production cutover", requiredApprovers: ["Ops", "Compliance", "Technical", "Management"], currentApprovers: ["Ops", "Technical"], submittedBy: "Lisa Wang", submittedDate: "Jan 12, 2024", dueDate: "Jan 18, 2024", status: "pending", notes: "All certification tests passed. Production environment configured. Runbook reviewed and approved." },
-    { id: "APR-006", type: "Stage Gate", caseId: "OB-2024-004", client: "Velocity Securities", description: "Certification package sign-off", requiredApprovers: ["Compliance", "Technical", "Management"], currentApprovers: ["Compliance", "Technical", "Management"], submittedBy: "Lisa Wang", submittedDate: "Jan 5, 2024", dueDate: "Jan 8, 2024", status: "approved", resolvedDate: "Jan 7, 2024", resolvedBy: "QA Lead", notes: "All 48 test cases executed with 100% pass rate. Certification package complete." },
-    { id: "APR-009", type: "Exception", caseId: "OB-2024-004", client: "Velocity Securities", description: "Waiver for missing CumQty on cancel acknowledgements", requiredApprovers: ["Technical", "Compliance"], currentApprovers: ["Technical"], submittedBy: "Lisa Wang", submittedDate: "Dec 30, 2023", dueDate: "Jan 2, 2024", status: "approved", resolvedDate: "Jan 1, 2024", resolvedBy: "Compliance Team", notes: "Venue-specific behavior. Documented in onboarding notes. No functional impact confirmed." },
-    { id: "APR-012", type: "Exception", caseId: "OB-2024-004", client: "Velocity Securities", description: "Request to skip regression suite for patch release", requiredApprovers: ["Technical", "Management"], currentApprovers: [], submittedBy: "Lisa Wang", submittedDate: "Jan 14, 2024", dueDate: "Jan 15, 2024", status: "rejected", resolvedDate: "Jan 14, 2024", resolvedBy: "Head of QA", notes: "Regression suite mandatory per policy. Expedited 4-hour regression window offered as alternative." },
+    { id: "APR-003", type: "Go-Live", caseId: "OB-2026-0138", client: "Velocity Securities", description: "Final go-live approval for production cutover", requiredApprovers: ["Ops", "Compliance", "Technical", "Management"], currentApprovers: ["Ops", "Technical"], submittedBy: "Lisa Wang", submittedDate: "Apr 11, 2026", dueDate: "Apr 18, 2026", status: "pending", notes: "All certification tests passed. Production environment configured. Runbook reviewed and approved." },
+    { id: "APR-006", type: "Stage Gate", caseId: "OB-2026-0138", client: "Velocity Securities", description: "Certification package sign-off", requiredApprovers: ["Compliance", "Technical", "Management"], currentApprovers: ["Compliance", "Technical", "Management"], submittedBy: "Lisa Wang", submittedDate: "Apr 5, 2026", dueDate: "Apr 8, 2026", status: "approved", resolvedDate: "Apr 7, 2026", resolvedBy: "QA Lead", notes: "All 48 test cases executed with 100% pass rate. Certification package complete." },
+    { id: "APR-009", type: "Exception", caseId: "OB-2026-0138", client: "Velocity Securities", description: "Waiver for missing CumQty on cancel acknowledgements", requiredApprovers: ["Technical", "Compliance"], currentApprovers: ["Technical"], submittedBy: "Lisa Wang", submittedDate: "Mar 28, 2026", dueDate: "Apr 1, 2026", status: "approved", resolvedDate: "Mar 30, 2026", resolvedBy: "Compliance Team", notes: "Venue-specific behavior. Documented in onboarding notes. No functional impact confirmed." },
+    { id: "APR-012", type: "Exception", caseId: "OB-2026-0138", client: "Velocity Securities", description: "Request to skip regression suite for patch release", requiredApprovers: ["Technical", "Management"], currentApprovers: [], submittedBy: "Lisa Wang", submittedDate: "Apr 13, 2026", dueDate: "Apr 14, 2026", status: "rejected", resolvedDate: "Apr 13, 2026", resolvedBy: "Head of QA", notes: "Regression suite mandatory per policy. Expedited 4-hour regression window offered as alternative." },
     // Horizon Investments
-    { id: "APR-013", type: "Stage Gate", caseId: "OB-2024-003", client: "Horizon Investments", description: "Approve progression from Setup to Spec Analysis", requiredApprovers: ["Technical"], currentApprovers: [], submittedBy: "Mike Chen", submittedDate: "Jan 13, 2024", dueDate: "Jan 17, 2024", status: "pending", notes: "FIX 5.0 SP2 environment configured. Waiting for client spec documents." },
-    { id: "APR-014", type: "Exception", caseId: "OB-2024-003", client: "Horizon Investments", description: "Approval for use of non-standard MsgSeqNum reset on daily reconnect", requiredApprovers: ["Technical", "Ops"], currentApprovers: ["Technical", "Ops"], submittedBy: "Mike Chen", submittedDate: "Jan 9, 2024", dueDate: "Jan 11, 2024", status: "approved", resolvedDate: "Jan 10, 2024", resolvedBy: "Ops Lead", notes: "Sequence reset confirmed safe for this venue. Documented and monitoring alerts configured." },
+    { id: "APR-013", type: "Stage Gate", caseId: "OB-2026-0151", client: "Horizon Investments", description: "Approve progression from Setup to Spec Analysis", requiredApprovers: ["Technical"], currentApprovers: [], submittedBy: "Mike Chen", submittedDate: "Apr 12, 2026", dueDate: "Apr 17, 2026", status: "pending", notes: "FIX 5.0 SP2 environment configured. Waiting for client spec documents." },
+    { id: "APR-014", type: "Exception", caseId: "OB-2026-0151", client: "Horizon Investments", description: "Approval for use of non-standard MsgSeqNum reset on daily reconnect", requiredApprovers: ["Technical", "Ops"], currentApprovers: ["Technical", "Ops"], submittedBy: "Mike Chen", submittedDate: "Apr 10, 2026", dueDate: "Apr 12, 2026", status: "approved", resolvedDate: "Apr 11, 2026", resolvedBy: "Ops Lead", notes: "Sequence reset confirmed safe for this venue. Documented and monitoring alerts configured." },
   ])
 
   const pendingApprovals = allApprovals.filter(a => a.status === "pending" || a.status === "overdue")
@@ -182,10 +182,10 @@ export default function BCometPlatform() {
 
   // Evidence vault data
   const [evidenceItems] = useState([
-    { id: "EV-001", caseId: "OB-2024-001", client: "Nexus Trading Group", type: "Test Report", name: "EQ_FIX42_RegTest_Results_v1.2.pdf", stage: 5, generatedDate: "Jan 15, 2024", generatedBy: "System", signed: true, signedBy: "John Smith", signedDate: "Jan 15, 2024", size: "1.2 MB" },
-    { id: "EV-002", caseId: "OB-2024-001", client: "Nexus Trading Group", type: "Spec Diff", name: "Nexus_SpecComparison_Report.pdf", stage: 2, generatedDate: "Jan 5, 2024", generatedBy: "System", signed: true, signedBy: "John Smith", signedDate: "Jan 6, 2024", size: "890 KB" },
-    { id: "EV-003", caseId: "OB-2024-004", client: "Velocity Securities", type: "Certification Pack", name: "Velocity_Certification_Package.zip", stage: 6, generatedDate: "Jan 18, 2024", generatedBy: "System", signed: false, signedBy: null, signedDate: null, size: "4.5 MB" },
-    { id: "EV-004", caseId: "OB-2024-002", client: "Apex Capital Partners", type: "Approval Record", name: "Apex_ExceptionWaiver_5001.pdf", stage: 3, generatedDate: "Jan 13, 2024", generatedBy: "Sarah Johnson", signed: false, signedBy: null, signedDate: null, size: "156 KB" },
+    { id: "EV-001", caseId: "OB-2026-0147", client: "Nexus Trading Group", type: "Test Report", name: "EQ_FIX42_RegTest_Results_v1.2.pdf", stage: 5, generatedDate: "Apr 13, 2026", generatedBy: "System", signed: true, signedBy: "John Smith", signedDate: "Apr 13, 2026", size: "1.2 MB" },
+    { id: "EV-002", caseId: "OB-2026-0147", client: "Nexus Trading Group", type: "Spec Diff", name: "Nexus_SpecComparison_Report.pdf", stage: 2, generatedDate: "Apr 3, 2026", generatedBy: "System", signed: true, signedBy: "John Smith", signedDate: "Apr 4, 2026", size: "890 KB" },
+    { id: "EV-003", caseId: "OB-2026-0138", client: "Velocity Securities", type: "Certification Pack", name: "Velocity_Certification_Package.zip", stage: 6, generatedDate: "Apr 11, 2026", generatedBy: "System", signed: false, signedBy: null, signedDate: null, size: "4.5 MB" },
+    { id: "EV-004", caseId: "OB-2026-0142", client: "Apex Capital Partners", type: "Approval Record", name: "Apex_ExceptionWaiver_5001.pdf", stage: 3, generatedDate: "Apr 10, 2026", generatedBy: "Sarah Johnson", signed: false, signedBy: null, signedDate: null, size: "156 KB" },
   ])
 
   // Rule library data
@@ -195,15 +195,15 @@ export default function BCometPlatform() {
     { id: "SRC-002", name: "FIX 4.4 Protocol Specification", type: "Standard", format: "PDF", version: "4.4", publisher: "FIX Trading Community", date: "Apr 2003", size: "3.1 MB", url: "fixprotocol.org" },
     { id: "SRC-003", name: "FIX 5.0 SP2 Protocol Specification", type: "Standard", format: "PDF", version: "5.0 SP2", publisher: "FIX Trading Community", date: "Oct 2011", size: "4.8 MB", url: "fixprotocol.org" },
     { id: "SRC-004", name: "FIXT 1.1 Transport Specification", type: "Standard", format: "PDF", version: "1.1", publisher: "FIX Trading Community", date: "Mar 2009", size: "1.2 MB", url: "fixprotocol.org" },
-    { id: "SRC-005", name: "NYSE Arca Equities FIX Specification", type: "Exchange", format: "PDF", version: "2024.1", publisher: "NYSE", date: "Jan 2024", size: "1.8 MB", url: "nyse.com" },
-    { id: "SRC-006", name: "NASDAQ OUCH Protocol Specification", type: "Exchange", format: "PDF", version: "5.0", publisher: "NASDAQ", date: "Nov 2023", size: "890 KB", url: "nasdaq.com" },
-    { id: "SRC-007", name: "CME Globex FIX Specification", type: "Exchange", format: "PDF", version: "2024.2", publisher: "CME Group", date: "Feb 2024", size: "2.2 MB", url: "cmegroup.com" },
-    { id: "SRC-008", name: "LSE FIX Gateway Specification", type: "Exchange", format: "PDF", version: "12.0", publisher: "London Stock Exchange", date: "Dec 2023", size: "1.5 MB", url: "lseg.com" },
-    { id: "SRC-009", name: "Eurex FIX Interface Specification", type: "Exchange", format: "PDF", version: "9.1", publisher: "Deutsche Börse", date: "Oct 2023", size: "2.0 MB", url: "eurex.com" },
-    { id: "SRC-010", name: "QuickFIX Engine Data Dictionary", type: "Library", format: "XML", version: "1.15.1", publisher: "QuickFIX/J", date: "Aug 2023", size: "450 KB", url: "quickfixj.org" },
-    { id: "SRC-011", name: "FIX Orchestra Repository", type: "Library", format: "XML", version: "1.0", publisher: "FIX Trading Community", date: "Jun 2023", size: "12 MB", url: "fixtrading.org" },
-    { id: "SRC-012", name: "Reg NMS Rule 611 Guidelines", type: "Regulatory", format: "PDF", version: "2024", publisher: "SEC", date: "Jan 2024", size: "320 KB", url: "sec.gov" },
-    { id: "SRC-013", name: "MiFID II RTS 25 Technical Standards", type: "Regulatory", format: "PDF", version: "2023", publisher: "ESMA", date: "Sep 2023", size: "580 KB", url: "esma.europa.eu" },
+    { id: "SRC-005", name: "NYSE Arca Equities FIX Specification", type: "Exchange", format: "PDF", version: "2026.1", publisher: "NYSE", date: "Jan 2026", size: "1.8 MB", url: "nyse.com" },
+    { id: "SRC-006", name: "NASDAQ OUCH Protocol Specification", type: "Exchange", format: "PDF", version: "5.2", publisher: "NASDAQ", date: "Nov 2025", size: "890 KB", url: "nasdaq.com" },
+    { id: "SRC-007", name: "CME Globex FIX Specification", type: "Exchange", format: "PDF", version: "2026.1", publisher: "CME Group", date: "Feb 2026", size: "2.2 MB", url: "cmegroup.com" },
+    { id: "SRC-008", name: "LSE FIX Gateway Specification", type: "Exchange", format: "PDF", version: "13.0", publisher: "London Stock Exchange", date: "Dec 2025", size: "1.5 MB", url: "lseg.com" },
+    { id: "SRC-009", name: "Eurex FIX Interface Specification", type: "Exchange", format: "PDF", version: "9.3", publisher: "Deutsche Börse", date: "Oct 2025", size: "2.0 MB", url: "eurex.com" },
+    { id: "SRC-010", name: "QuickFIX Engine Data Dictionary", type: "Library", format: "XML", version: "1.16.0", publisher: "QuickFIX/J", date: "Aug 2025", size: "450 KB", url: "quickfixj.org" },
+    { id: "SRC-011", name: "FIX Orchestra Repository", type: "Library", format: "XML", version: "1.2", publisher: "FIX Trading Community", date: "Mar 2026", size: "12 MB", url: "fixtrading.org" },
+    { id: "SRC-012", name: "Reg NMS Rule 611 Guidelines", type: "Regulatory", format: "PDF", version: "2026", publisher: "SEC", date: "Jan 2026", size: "320 KB", url: "sec.gov" },
+    { id: "SRC-013", name: "MiFID II RTS 25 Technical Standards", type: "Regulatory", format: "PDF", version: "2025", publisher: "ESMA", date: "Sep 2025", size: "580 KB", url: "esma.europa.eu" },
   ])
 
   const [ruleLibrary] = useState([
@@ -299,29 +299,29 @@ export default function BCometPlatform() {
   // AI Review queue data - grouped by client and review type
   const [aiReviewItems] = useState([
     // Nexus Trading Group
-    { id: "AIR-001", caseId: "OB-2024-001", client: "Nexus Trading Group", reviewType: "Spec Review", finding: "Field 49 (SenderCompID) format mismatch - client uses alphanumeric, standard expects alpha only", confidence: 0.92, severity: "Medium", aiReason: "Pattern analysis shows 15% of client messages contain numeric characters in SenderCompID", status: "pending", createdDate: "Jan 14, 2024" },
-    { id: "AIR-002", caseId: "OB-2024-001", client: "Nexus Trading Group", reviewType: "Spec Review", finding: "Custom tag 5001 not documented in client spec but present in 78% of messages", confidence: 0.88, severity: "Low", aiReason: "Tag appears consistently but has no corresponding specification entry", status: "pending", createdDate: "Jan 14, 2024" },
-    { id: "AIR-003", caseId: "OB-2024-001", client: "Nexus Trading Group", reviewType: "ATDL Review", finding: "Strategy parameter MinQty has no validation constraint defined", confidence: 0.95, severity: "High", aiReason: "ATDL definition allows any value but venue requires MinQty <= OrderQty", status: "pending", createdDate: "Jan 13, 2024" },
-    { id: "AIR-004", caseId: "OB-2024-001", client: "Nexus Trading Group", reviewType: "ATDL Review", finding: "DisplayQty parameter missing from VWAP strategy definition", confidence: 0.72, severity: "Medium", aiReason: "Similar strategies from other clients include DisplayQty as optional parameter", status: "pending", createdDate: "Jan 13, 2024" },
-    { id: "AIR-005", caseId: "OB-2024-001", client: "Nexus Trading Group", reviewType: "Log Analysis", finding: "Sequence gap detected between messages 1045-1048 with no resend request", confidence: 0.89, severity: "High", aiReason: "Gap occurred during peak trading hours, may indicate connectivity issue", status: "pending", createdDate: "Jan 12, 2024" },
-    { id: "AIR-006", caseId: "OB-2024-001", client: "Nexus Trading Group", reviewType: "Log Analysis", finding: "Heartbeat interval inconsistent - varying between 28-35 seconds", confidence: 0.67, severity: "Low", aiReason: "Agreed interval is 30 seconds, variance may cause false timeout detection", status: "accepted", createdDate: "Jan 11, 2024" },
+    { id: "AIR-001", caseId: "OB-2026-0147", client: "Nexus Trading Group", reviewType: "Spec Review", finding: "Field 49 (SenderCompID) format mismatch - client uses alphanumeric, standard expects alpha only", confidence: 0.92, severity: "Medium", aiReason: "Pattern analysis shows 15% of client messages contain numeric characters in SenderCompID", status: "pending", createdDate: "Apr 12, 2026" },
+    { id: "AIR-002", caseId: "OB-2026-0147", client: "Nexus Trading Group", reviewType: "Spec Review", finding: "Custom tag 5001 not documented in client spec but present in 78% of messages", confidence: 0.88, severity: "Low", aiReason: "Tag appears consistently but has no corresponding specification entry", status: "pending", createdDate: "Apr 12, 2026" },
+    { id: "AIR-003", caseId: "OB-2026-0147", client: "Nexus Trading Group", reviewType: "ATDL Review", finding: "Strategy parameter MinQty has no validation constraint defined", confidence: 0.95, severity: "High", aiReason: "ATDL definition allows any value but venue requires MinQty <= OrderQty", status: "pending", createdDate: "Apr 11, 2026" },
+    { id: "AIR-004", caseId: "OB-2026-0147", client: "Nexus Trading Group", reviewType: "ATDL Review", finding: "DisplayQty parameter missing from VWAP strategy definition", confidence: 0.72, severity: "Medium", aiReason: "Similar strategies from other clients include DisplayQty as optional parameter", status: "pending", createdDate: "Apr 11, 2026" },
+    { id: "AIR-005", caseId: "OB-2026-0147", client: "Nexus Trading Group", reviewType: "Log Analysis", finding: "Sequence gap detected between messages 1045-1048 with no resend request", confidence: 0.89, severity: "High", aiReason: "Gap occurred during peak trading hours, may indicate connectivity issue", status: "pending", createdDate: "Apr 10, 2026" },
+    { id: "AIR-006", caseId: "OB-2026-0147", client: "Nexus Trading Group", reviewType: "Log Analysis", finding: "Heartbeat interval inconsistent - varying between 28-35 seconds", confidence: 0.67, severity: "Low", aiReason: "Agreed interval is 30 seconds, variance may cause false timeout detection", status: "accepted", createdDate: "Apr 9, 2026" },
     // Apex Capital Partners
-    { id: "AIR-007", caseId: "OB-2024-002", client: "Apex Capital Partners", reviewType: "Spec Review", finding: "TimeInForce (59) enum values include unsupported value '7' (AtTheClose)", confidence: 0.94, severity: "High", aiReason: "Venue does not support AtTheClose orders, will result in rejects", status: "pending", createdDate: "Jan 14, 2024" },
-    { id: "AIR-008", caseId: "OB-2024-002", client: "Apex Capital Partners", reviewType: "Spec Review", finding: "SecurityType (167) not included in spec but required for multi-asset trading", confidence: 0.81, severity: "Medium", aiReason: "Client enabled for equities and options, SecurityType needed for routing", status: "pending", createdDate: "Jan 13, 2024" },
-    { id: "AIR-009", caseId: "OB-2024-002", client: "Apex Capital Partners", reviewType: "Log Analysis", finding: "Unusual reject pattern - 23% of NewOrderSingle rejected with reason code 0", confidence: 0.78, severity: "High", aiReason: "Historical baseline shows <5% reject rate for similar clients", status: "pending", createdDate: "Jan 13, 2024" },
-    { id: "AIR-010", caseId: "OB-2024-002", client: "Apex Capital Partners", reviewType: "Log Analysis", finding: "Cancel requests sent before order acknowledgment received", confidence: 0.91, severity: "Medium", aiReason: "Race condition detected in 12 instances, may cause orphaned orders", status: "pending", createdDate: "Jan 12, 2024" },
-    { id: "AIR-011", caseId: "OB-2024-002", client: "Apex Capital Partners", reviewType: "Test Scenario", finding: "No test coverage for order replacement during partial fill state", confidence: 0.86, severity: "Medium", aiReason: "Coverage analysis shows gap in replace scenarios for OrdStatus=1", status: "pending", createdDate: "Jan 11, 2024" },
+    { id: "AIR-007", caseId: "OB-2026-0142", client: "Apex Capital Partners", reviewType: "Spec Review", finding: "TimeInForce (59) enum values include unsupported value '7' (AtTheClose)", confidence: 0.94, severity: "High", aiReason: "Venue does not support AtTheClose orders, will result in rejects", status: "pending", createdDate: "Apr 12, 2026" },
+    { id: "AIR-008", caseId: "OB-2026-0142", client: "Apex Capital Partners", reviewType: "Spec Review", finding: "SecurityType (167) not included in spec but required for multi-asset trading", confidence: 0.81, severity: "Medium", aiReason: "Client enabled for equities and options, SecurityType needed for routing", status: "pending", createdDate: "Apr 11, 2026" },
+    { id: "AIR-009", caseId: "OB-2026-0142", client: "Apex Capital Partners", reviewType: "Log Analysis", finding: "Unusual reject pattern - 23% of NewOrderSingle rejected with reason code 0", confidence: 0.78, severity: "High", aiReason: "Historical baseline shows <5% reject rate for similar clients", status: "pending", createdDate: "Apr 11, 2026" },
+    { id: "AIR-010", caseId: "OB-2026-0142", client: "Apex Capital Partners", reviewType: "Log Analysis", finding: "Cancel requests sent before order acknowledgment received", confidence: 0.91, severity: "Medium", aiReason: "Race condition detected in 12 instances, may cause orphaned orders", status: "pending", createdDate: "Apr 10, 2026" },
+    { id: "AIR-011", caseId: "OB-2026-0142", client: "Apex Capital Partners", reviewType: "Test Scenario", finding: "No test coverage for order replacement during partial fill state", confidence: 0.86, severity: "Medium", aiReason: "Coverage analysis shows gap in replace scenarios for OrdStatus=1", status: "pending", createdDate: "Apr 9, 2026" },
     // Horizon Investments
-    { id: "AIR-012", caseId: "OB-2024-003", client: "Horizon Investments", reviewType: "Spec Review", finding: "Price precision set to 4 decimals but venue supports only 2 for equities", confidence: 0.97, severity: "High", aiReason: "Mismatch will cause price truncation or rejects on sub-penny orders", status: "pending", createdDate: "Jan 14, 2024" },
-    { id: "AIR-013", caseId: "OB-2024-003", client: "Horizon Investments", reviewType: "ATDL Review", finding: "Iceberg strategy missing required parameter StartTime", confidence: 0.83, severity: "Medium", aiReason: "Comparison with standard Iceberg template shows missing time constraint", status: "pending", createdDate: "Jan 13, 2024" },
-    { id: "AIR-014", caseId: "OB-2024-003", client: "Horizon Investments", reviewType: "ATDL Review", finding: "ParticipationRate parameter allows values >100%", confidence: 0.96, severity: "High", aiReason: "No upper bound constraint defined, invalid values could be submitted", status: "pending", createdDate: "Jan 13, 2024" },
-    { id: "AIR-015", caseId: "OB-2024-003", client: "Horizon Investments", reviewType: "Log Analysis", finding: "ExecType/OrdStatus mismatch in 3 execution reports", confidence: 0.74, severity: "Low", aiReason: "ExecType=F (Trade) paired with OrdStatus=0 (New) instead of 1 or 2", status: "accepted", createdDate: "Jan 12, 2024" },
-    { id: "AIR-016", caseId: "OB-2024-003", client: "Horizon Investments", reviewType: "Test Scenario", finding: "Missing test coverage for partial fill scenarios with multiple execution reports", confidence: 0.85, severity: "Low", aiReason: "Coverage analysis indicates 0 scenarios test multi-leg partial fills", status: "accepted", createdDate: "Jan 12, 2024" },
+    { id: "AIR-012", caseId: "OB-2026-0151", client: "Horizon Investments", reviewType: "Spec Review", finding: "Price precision set to 4 decimals but venue supports only 2 for equities", confidence: 0.97, severity: "High", aiReason: "Mismatch will cause price truncation or rejects on sub-penny orders", status: "pending", createdDate: "Apr 12, 2026" },
+    { id: "AIR-013", caseId: "OB-2026-0151", client: "Horizon Investments", reviewType: "ATDL Review", finding: "Iceberg strategy missing required parameter StartTime", confidence: 0.83, severity: "Medium", aiReason: "Comparison with standard Iceberg template shows missing time constraint", status: "pending", createdDate: "Apr 11, 2026" },
+    { id: "AIR-014", caseId: "OB-2026-0151", client: "Horizon Investments", reviewType: "ATDL Review", finding: "ParticipationRate parameter allows values >100%", confidence: 0.96, severity: "High", aiReason: "No upper bound constraint defined, invalid values could be submitted", status: "pending", createdDate: "Apr 11, 2026" },
+    { id: "AIR-015", caseId: "OB-2026-0151", client: "Horizon Investments", reviewType: "Log Analysis", finding: "ExecType/OrdStatus mismatch in 3 execution reports", confidence: 0.74, severity: "Low", aiReason: "ExecType=F (Trade) paired with OrdStatus=0 (New) instead of 1 or 2", status: "accepted", createdDate: "Apr 10, 2026" },
+    { id: "AIR-016", caseId: "OB-2026-0151", client: "Horizon Investments", reviewType: "Test Scenario", finding: "Missing test coverage for partial fill scenarios with multiple execution reports", confidence: 0.85, severity: "Low", aiReason: "Coverage analysis indicates 0 scenarios test multi-leg partial fills", status: "accepted", createdDate: "Apr 10, 2026" },
     // Meridian Securities
-    { id: "AIR-017", caseId: "OB-2024-004", client: "Meridian Securities", reviewType: "Spec Review", finding: "Account field (1) marked optional but required by compliance policy", confidence: 0.89, severity: "High", aiReason: "Regulatory requirement mandates account on all order flow messages", status: "pending", createdDate: "Jan 14, 2024" },
-    { id: "AIR-018", caseId: "OB-2024-004", client: "Meridian Securities", reviewType: "Spec Review", finding: "ClOrdID format allows special characters not permitted by OMS", confidence: 0.77, severity: "Medium", aiReason: "Pattern [A-Za-z0-9-]+ required but spec allows underscores and dots", status: "pending", createdDate: "Jan 13, 2024" },
-    { id: "AIR-019", caseId: "OB-2024-004", client: "Meridian Securities", reviewType: "Log Analysis", finding: "Logout messages missing Text (58) field with disconnect reason", confidence: 0.62, severity: "Info", aiReason: "Best practice to include reason, aids in debugging session issues", status: "rejected", createdDate: "Jan 12, 2024" },
-    { id: "AIR-020", caseId: "OB-2024-004", client: "Meridian Securities", reviewType: "Test Scenario", finding: "Insufficient coverage for market data subscription edge cases", confidence: 0.71, severity: "Low", aiReason: "Only 2 of 8 MDReqRejReason codes tested in scenarios", status: "pending", createdDate: "Jan 11, 2024" },
+    { id: "AIR-017", caseId: "OB-2026-0138", client: "Velocity Securities", reviewType: "Spec Review", finding: "Account field (1) marked optional but required by compliance policy", confidence: 0.89, severity: "High", aiReason: "Regulatory requirement mandates account on all order flow messages", status: "pending", createdDate: "Apr 12, 2026" },
+    { id: "AIR-018", caseId: "OB-2026-0138", client: "Velocity Securities", reviewType: "Spec Review", finding: "ClOrdID format allows special characters not permitted by OMS", confidence: 0.77, severity: "Medium", aiReason: "Pattern [A-Za-z0-9-]+ required but spec allows underscores and dots", status: "pending", createdDate: "Apr 11, 2026" },
+    { id: "AIR-019", caseId: "OB-2026-0138", client: "Velocity Securities", reviewType: "Log Analysis", finding: "Logout messages missing Text (58) field with disconnect reason", confidence: 0.62, severity: "Info", aiReason: "Best practice to include reason, aids in debugging session issues", status: "rejected", createdDate: "Apr 10, 2026" },
+    { id: "AIR-020", caseId: "OB-2026-0138", client: "Velocity Securities", reviewType: "Test Scenario", finding: "Insufficient coverage for market data subscription edge cases", confidence: 0.71, severity: "Low", aiReason: "Only 2 of 8 MDReqRejReason codes tested in scenarios", status: "pending", createdDate: "Apr 9, 2026" },
   ])
   
   // AI Review expanded sections state
@@ -2980,8 +2980,8 @@ const specCompareResults = [
                       <label className={`text-xs ${textSecondary} mb-1 block`}>Version</label>
                       <select className={`w-full p-2 rounded border ${borderColor} text-sm ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
                         <option value="v1.2">client_eq_44_v1.2.xml (Current)</option>
-                        <option value="v1.1">client_eq_44_v1.1.xml (Jan 10)</option>
-                        <option value="v1.0">client_eq_44_v1.0.xml (Dec 20)</option>
+<option value="v1.1">client_eq_44_v1.1.xml (Apr 9)</option>
+              <option value="v1.0">client_eq_44_v1.0.xml (Apr 2)</option>
                       </select>
                     </div>
                   </div>
@@ -3363,8 +3363,8 @@ const specCompareResults = [
   <label className={`text-xs ${textSecondary} mb-1 block`}>Standardized Spec Version</label>
   <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
   <option value="">Select standardized spec...</option>
-  <option value="v1.2-std">client_eq_44_v1.2_Standardized.xlsx (Jan 15, 2024)</option>
-  <option value="v1.1-std">client_eq_44_v1.1_Standardized.xlsx (Jan 10, 2024)</option>
+<option value="v1.2-std">client_eq_44_v1.2_Standardized.xlsx (Apr 13, 2026)</option>
+              <option value="v1.1-std">client_eq_44_v1.1_Standardized.xlsx (Apr 9, 2026)</option>
   </select>
   </div>
   </div>
@@ -3762,21 +3762,31 @@ const specCompareResults = [
                       {selectedRole === "client" ? (
                         <>
                           <optgroup label="Equities - FIX 4.2">
-                            <option value="eq42-1">eq_fix42_20240115.log (2.4 MB)</option>
-                            <option value="eq42-2">eq_fix42_20240110.log (1.8 MB)</option>
+<option value="eq42-1">eq_fix42_20260413.log (2.4 MB)</option>
+              <option value="eq42-2">eq_fix42_20260409.log (1.8 MB)</option>
                           </optgroup>
                           <optgroup label="Equities - FIX 4.4">
-                            <option value="eq44-1">eq_fix44_20240112.log (3.1 MB)</option>
+                            <option value="eq44-1">eq_fix44_20260412.log (3.1 MB)</option>
                           </optgroup>
                           <optgroup label="Options - FIX 4.4">
-                            <option value="opt44-1">opt_fix44_20240108.log (1.1 MB)</option>
+                            <option value="opt44-1">opt_fix44_20260409.log (1.1 MB)</option>
                           </optgroup>
                         </>
                       ) : (
                         <>
-                          <option value="log1">{selectedClient?.name || "Client"}_session_20240115.log</option>
-                          <option value="log2">{selectedClient?.name || "Client"}_session_20240110.log</option>
-                          <option value="log3">{selectedClient?.name || "Client"}_session_20240105.log</option>
+              <option value="log1">{selectedClient?.name || "Client"}_session_20260413.log</option>
+              <option value="log2">{selectedClient?.name || "Client"}_session_20260409.log</option>
+              <option value="log3">{selectedClient?.name || "Client"}_session_20260404.log</option>
+            </select>
+          </div>
+          {/* right column content */}
+          <div className="space-y-4">
+            <div>
+              <label className={`text-sm font-medium ${textPrimary} mb-1 block`}>Log Files</label>
+              <select className={`w-full p-2 border ${borderColor} rounded ${isDarkMode ? "bg-[#0d2137]" : "bg-white"} ${textPrimary} text-sm`}>
+                <option value="log1">{selectedClient?.name || "Client"}_session_20260413.log</option>
+                <option value="log2">{selectedClient?.name || "Client"}_session_20260409.log</option>
+                <option value="log3">{selectedClient?.name || "Client"}_session_20260404.log</option>
                         </>
                       )}
                     </select>
@@ -3951,9 +3961,9 @@ const specCompareResults = [
                       </div>
                       <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"}`}>
                         <option value="">Choose a log file...</option>
-                        <option value="log1">{selectedClient?.name || "Client"}_session_20240115.log</option>
-                        <option value="log2">{selectedClient?.name || "Client"}_session_20240110.log</option>
-                        <option value="log3">{selectedClient?.name || "Client"}_session_20240105.log</option>
+              <option value="log1">{selectedClient?.name || "Client"}_session_20260413.log</option>
+              <option value="log2">{selectedClient?.name || "Client"}_session_20260409.log</option>
+              <option value="log3">{selectedClient?.name || "Client"}_session_20260404.log</option>
                       </select>
                       <div className="mt-3 pt-3 border-t border-dashed border-[#1e4976]/50">
                         <Button variant="outline" size="sm" className="w-full text-xs">
@@ -4052,7 +4062,7 @@ const specCompareResults = [
         asset: "Equities",
         versions: [
           { protocol: "FIX 4.2", spec: "client_eq_42_standardized.xlsx", logs: [] },
-          { protocol: "FIX 4.4", spec: "client_eq_44_standardized.xlsx", logs: ["eq_fix44_20240112.log"] },
+          { protocol: "FIX 4.4", spec: "client_eq_44_standardized.xlsx", logs: ["eq_fix44_20260412.log"] },
         ]
       },
       {
@@ -4065,13 +4075,13 @@ const specCompareResults = [
         asset: "Futures",
         versions: [
           { protocol: "FIX 4.2", spec: null, logs: [] },
-          { protocol: "FIX 5.0 SP2", spec: "client_fut_50sp2_standardized.xlsx", logs: ["fut_fix50_20240105.log"] },
+          { protocol: "FIX 5.0 SP2", spec: "client_fut_50sp2_standardized.xlsx", logs: ["fut_fix50_20260404.log"] },
         ]
       },
       {
         asset: "Fixed Income",
         versions: [
-          { protocol: "FIX 4.4", spec: null, logs: ["fi_fix44_20240108.log"] },
+          { protocol: "FIX 4.4", spec: null, logs: ["fi_fix44_20260409.log"] },
         ]
       },
       {
@@ -4526,7 +4536,7 @@ const specCompareResults = [
         asset: "Equities",
         versions: [
           { protocol: "FIX 4.2", spec: "client_eq_42_standardized.xlsx", logs: [] },
-          { protocol: "FIX 4.4", spec: "client_eq_44_standardized.xlsx", logs: ["eq_fix44_20240112.log"] },
+          { protocol: "FIX 4.4", spec: "client_eq_44_standardized.xlsx", logs: ["eq_fix44_20260412.log"] },
         ]
       },
       {
@@ -4539,13 +4549,13 @@ const specCompareResults = [
         asset: "Futures",
         versions: [
           { protocol: "FIX 4.2", spec: null, logs: [] },
-          { protocol: "FIX 5.0 SP2", spec: "client_fut_50sp2_standardized.xlsx", logs: ["fut_fix50_20240105.log"] },
+          { protocol: "FIX 5.0 SP2", spec: "client_fut_50sp2_standardized.xlsx", logs: ["fut_fix50_20260404.log"] },
         ]
       },
       {
         asset: "Fixed Income",
         versions: [
-          { protocol: "FIX 4.4", spec: null, logs: ["fi_fix44_20240108.log"] },
+          { protocol: "FIX 4.4", spec: null, logs: ["fi_fix44_20260409.log"] },
         ]
       },
       {
@@ -6015,7 +6025,7 @@ Strategy: TWAP
                 </div>
               ) : (
                 <div className={`font-mono text-xs p-3 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/60" : "bg-[#f8fafc]"} overflow-x-auto`}>
-                  <span className={textPrimary}>8=FIX.4.4|9=256|35=D|49=SENDER|56=TARGET|34=1|52=20240115-14:30:00.000|11=ORDER123|21=1|55=AAPL|54=1|60=20240115-14:30:00.000|38=10000|40=2|44=150.00|59=0|</span>
+                  <span className={textPrimary}>8=FIX.4.4|9=256|35=D|49=SENDER|56=TARGET|34=1|52=20260413-14:30:00.000|11=ORDER123|21=1|55=AAPL|54=1|60=20260413-14:30:00.000|38=10000|40=2|44=150.00|59=0|</span>
                   <span className="text-[#00e5ff]">847={atdlSelectedStrategy}|7940=09:30:00|7941=16:00:00|7942=15|7943=100|7944=500|7945=200|7946=M|</span>
                   <span className={textPrimary}>10=128|</span>
                 </div>
@@ -6610,7 +6620,7 @@ Strategy: TWAP
               </div>
               
               <div className={`font-mono text-sm p-4 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"} overflow-x-auto`}>
-                <span className={textPrimary}>8=FIX.4.4|9=256|35=D|49=SENDER|56=TARGET|34=1|52=20240115-14:30:00.000| 11=ORDER123|21=1|55=AAPL|54=1|60=20240115-14:30:00.000|38=10000|40=2|44=150.00| 59=0|</span>
+                <span className={textPrimary}>8=FIX.4.4|9=256|35=D|49=SENDER|56=TARGET|34=1|52=20260413-14:30:00.000| 11=ORDER123|21=1|55=AAPL|54=1|60=20260413-14:30:00.000|38=10000|40=2|44=150.00| 59=0|</span>
                 <span className="text-[#00e5ff]">847=VWAP|7940=09:30:00|7941=16:00:00|7942=15|7943=100|7944=500|7945=200|7946=M|</span>
                 <span className={textPrimary}>10=128|</span>
               </div>
@@ -7183,13 +7193,13 @@ Strategy: TWAP
   // ATDL Remediation Queue
   if (currentScreen === "atdl-remediation") {
     const findings = [
-      { id: "R-001", woId: "WO-ATDL-001", severity: "Error",   source: "Structural Validation", strategy: "POV",   finding: "wireValue attribute missing on POV strategy",            owner: "J. Smith",   status: "in-progress", rootCause: "Missing Attribute", dueDate: "Jan 16, 2024" },
-      { id: "R-002", woId: "WO-ATDL-001", severity: "Error",   source: "FIX–ATDL Compare",      strategy: "All",   finding: "ParticipationRate type mismatch: Percentage vs Decimal",  owner: "Unassigned", status: "open",        rootCause: "Type Mismatch",     dueDate: "Jan 17, 2024" },
-      { id: "R-003", woId: "WO-ATDL-001", severity: "Warning", source: "Structural Validation", strategy: "VWAP",  finding: "2 parameters use deprecated type annotations",            owner: "M. Chen",    status: "open",        rootCause: "Deprecated Usage",  dueDate: "Jan 18, 2024" },
-      { id: "R-004", woId: "WO-ATDL-001", severity: "Warning", source: "FIX–ATDL Compare",      strategy: "IS",    finding: "EndTime parameter missing from ATDL definition",          owner: "M. Chen",    status: "resolved",    rootCause: "Missing Parameter", dueDate: "Jan 15, 2024" },
-      { id: "R-005", woId: "WO-ATDL-002", severity: "Error",   source: "Structural Validation", strategy: "TWAP",  finding: "Schema validation failed — unexpected element order",     owner: "J. Smith",   status: "open",        rootCause: "Schema Error",      dueDate: "Jan 16, 2024" },
-      { id: "R-006", woId: "WO-ATDL-002", severity: "Error",   source: "ATDL–ATDL Compare",     strategy: "VWAP",  finding: "StartTime type divergence: UTCTimestamp vs LocalMktTime", owner: "Unassigned", status: "open",        rootCause: "Type Mismatch",     dueDate: "Jan 17, 2024" },
-      { id: "R-007", woId: "WO-ATDL-002", severity: "Error",   source: "ATDL–ATDL Compare",     strategy: "POV",   finding: "POV strategy absent in sell-side ATDL",                   owner: "S. Johnson", status: "in-progress", rootCause: "Missing Strategy",  dueDate: "Jan 16, 2024" },
+    { id: "R-001", woId: "WO-ATDL-001", severity: "Error",   source: "Structural Validation", strategy: "POV",   finding: "wireValue attribute missing on POV strategy",            owner: "J. Smith",   status: "in-progress", rootCause: "Missing Attribute", dueDate: "Apr 16, 2026" },
+    { id: "R-002", woId: "WO-ATDL-001", severity: "Error",   source: "FIX–ATDL Compare",      strategy: "All",   finding: "ParticipationRate type mismatch: Percentage vs Decimal",  owner: "Unassigned", status: "open",        rootCause: "Type Mismatch",     dueDate: "Apr 17, 2026" },
+    { id: "R-003", woId: "WO-ATDL-001", severity: "Warning", source: "Structural Validation", strategy: "VWAP",  finding: "2 parameters use deprecated type annotations",            owner: "M. Chen",    status: "open",        rootCause: "Deprecated Usage",  dueDate: "Apr 18, 2026" },
+    { id: "R-004", woId: "WO-ATDL-001", severity: "Warning", source: "FIX–ATDL Compare",      strategy: "IS",    finding: "EndTime parameter missing from ATDL definition",          owner: "M. Chen",    status: "resolved",    rootCause: "Missing Parameter", dueDate: "Apr 14, 2026" },
+    { id: "R-005", woId: "WO-ATDL-002", severity: "Error",   source: "Structural Validation", strategy: "TWAP",  finding: "Schema validation failed — unexpected element order",     owner: "J. Smith",   status: "open",        rootCause: "Schema Error",      dueDate: "Apr 16, 2026" },
+    { id: "R-006", woId: "WO-ATDL-002", severity: "Error",   source: "ATDL–ATDL Compare",     strategy: "VWAP",  finding: "StartTime type divergence: UTCTimestamp vs LocalMktTime", owner: "Unassigned", status: "open",        rootCause: "Type Mismatch",     dueDate: "Apr 17, 2026" },
+    { id: "R-007", woId: "WO-ATDL-002", severity: "Error",   source: "ATDL–ATDL Compare",     strategy: "POV",   finding: "POV strategy absent in sell-side ATDL",                   owner: "S. Johnson", status: "in-progress", rootCause: "Missing Strategy",  dueDate: "Apr 16, 2026" },
     ]
 
     const filtered = findings.filter(f => atdlRemediationFilter === "all" || f.status === atdlRemediationFilter)
@@ -7639,8 +7649,8 @@ Strategy: TWAP
       {
         asset: "Equities",
         versions: [
-          { protocol: "FIX 4.2", specs: [{ name: "client_eq_42_v1.xml", uploaded: "2024-01-10", status: "active" }] },
-          { protocol: "FIX 4.4", specs: [{ name: "client_eq_44_v2.xml", uploaded: "2024-01-12", status: "active" }] },
+    { protocol: "FIX 4.2", specs: [{ name: "client_eq_42_v1.xml", uploaded: "2026-04-09", status: "active" }] },
+        { protocol: "FIX 4.4", specs: [{ name: "client_eq_44_v2.xml", uploaded: "2026-04-12", status: "active" }] },
           { protocol: "FIX 5.0", specs: [] },
         ]
       },
@@ -7648,7 +7658,7 @@ Strategy: TWAP
         asset: "Options",
         versions: [
           { protocol: "FIX 4.2", specs: [] },
-          { protocol: "FIX 4.4", specs: [{ name: "client_opt_44_v1.xml", uploaded: "2024-01-08", status: "active" }] },
+          { protocol: "FIX 4.4", specs: [{ name: "client_opt_44_v1.xml", uploaded: "2026-04-09", status: "active" }] },
         ]
       },
       {
@@ -7656,7 +7666,7 @@ Strategy: TWAP
         versions: [
           { protocol: "FIX 4.2", specs: [] },
           { protocol: "FIX 4.4", specs: [] },
-          { protocol: "FIX 5.0 SP2", specs: [{ name: "client_fut_50sp2_v1.xml", uploaded: "2024-01-15", status: "active" }] },
+          { protocol: "FIX 5.0 SP2", specs: [{ name: "client_fut_50sp2_v1.xml", uploaded: "2026-04-13", status: "active" }] },
         ]
       },
     ]
@@ -7770,11 +7780,11 @@ Strategy: TWAP
         asset: "Equities",
         versions: [
           { protocol: "FIX 4.2", logs: [
-            { name: "eq_fix42_20240115.log", uploaded: "2024-01-15", size: "2.4 MB", status: "active" },
-            { name: "eq_fix42_20240110.log", uploaded: "2024-01-10", size: "1.8 MB", status: "archived" },
+{ name: "eq_fix42_20260413.log", uploaded: "2026-04-13", size: "2.4 MB", status: "active" },
+        { name: "eq_fix42_20260409.log", uploaded: "2026-04-09", size: "1.8 MB", status: "archived" },
           ]},
           { protocol: "FIX 4.4", logs: [
-            { name: "eq_fix44_20240112.log", uploaded: "2024-01-12", size: "3.1 MB", status: "active" },
+            { name: "eq_fix44_20260412.log", uploaded: "2026-04-12", size: "3.1 MB", status: "active" },
           ]},
         ]
       },
@@ -7782,7 +7792,7 @@ Strategy: TWAP
         asset: "Options",
         versions: [
           { protocol: "FIX 4.4", logs: [
-            { name: "opt_fix44_20240108.log", uploaded: "2024-01-08", size: "1.1 MB", status: "active" },
+            { name: "opt_fix44_20260409.log", uploaded: "2026-04-09", size: "1.1 MB", status: "active" },
           ]},
         ]
       },
@@ -8148,7 +8158,7 @@ Strategy: TWAP
                     </div>
                     <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
                       <span className={textSecondary}>License Key:</span>
-                      <span className={`font-mono text-sm ${textPrimary}`}>BCOMET-ENT-2024-XXXX-XXXX</span>
+                      <span className={`font-mono text-sm ${textPrimary}`}>BCOMET-ENT-2026-XXXX-XXXX</span>
                     </div>
                     <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
                       <span className={textSecondary}>Expiry Date:</span>
@@ -9347,9 +9357,9 @@ const copyToClipboard = () => {
               </div>
               <div className="divide-y divide-[#1e4976]/30">
                 {[
-                  { name: "Nexus_Onboarding_Summary_2024-01-15.pdf", type: "Onboarding Summary", date: "Jan 15, 2024", size: "245 KB" },
-                  { name: "Nexus_EQ_FIX42_TestResults_2024-01-15.pdf", type: "Test Execution Report", date: "Jan 15, 2024", size: "1.2 MB" },
-                  { name: "Nexus_SpecComparison_2024-01-10.xlsx", type: "Spec Comparison Report", date: "Jan 10, 2024", size: "890 KB" },
+{ name: "Nexus_Onboarding_Summary_2026-04-13.pdf", type: "Onboarding Summary", date: "Apr 13, 2026", size: "245 KB" },
+          { name: "Nexus_EQ_FIX42_TestResults_2026-04-13.pdf", type: "Test Execution Report", date: "Apr 13, 2026", size: "1.2 MB" },
+          { name: "Nexus_SpecComparison_2026-04-09.xlsx", type: "Spec Comparison Report", date: "Apr 9, 2026", size: "890 KB" },
                 ].map((report, i) => (
                   <div key={i} className="px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
