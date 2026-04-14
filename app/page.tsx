@@ -385,6 +385,8 @@ export default function BCometPlatform() {
   const [atdlDecisions, setAtdlDecisions] = useState<Record<string, string>>({})
   const [atdlRemediationFilter, setAtdlRemediationFilter] = useState<"all" | "open" | "in-progress" | "resolved">("all")
   const [atdlWorkflowType, setAtdlWorkflowType] = useState<"create-from-spec" | "validate-update" | "compare-atdl">("create-from-spec")
+  const [atdlValidationActions, setAtdlValidationActions] = useState<Record<string, string>>({})
+  const [atdlSimulationErrors, setAtdlSimulationErrors] = useState<Record<string, string>>({})
   const [demoFormData, setDemoFormData] = useState({
     name: "",
     email: "",
@@ -5064,10 +5066,94 @@ const specCompareResults = [
             </div>
           )}
           {atdlWorkflowType === "validate-update" && (
-            <div className={`p-3 rounded-lg border border-[#2196f3]/30 bg-[#2196f3]/5`}>
-              <p className={`text-sm font-medium text-[#2196f3]`}>Step: Structural ATDL Validation</p>
-              <p className={`text-xs ${textSecondary} mt-0.5`}>Validating new ATDL against FIXatdl standard schema. Highlighting breaking changes.</p>
-            </div>
+            <>
+              <div className={`p-3 rounded-lg border border-[#2196f3]/30 bg-[#2196f3]/5`}>
+                <p className={`text-sm font-medium text-[#2196f3]`}>Step: Side-by-Side Comparison + Structural Validation</p>
+                <p className={`text-xs ${textSecondary} mt-0.5`}>Comparing old vs new FIX specs and ATDLs with changes highlighted, then validating structure.</p>
+              </div>
+
+              {/* Side-by-side comparison for validate-update workflow */}
+              <div className={`border ${borderColor} rounded-lg overflow-hidden`}>
+                <div className={`px-4 py-2.5 ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"} flex items-center gap-2`}>
+                  <Eye className="h-4 w-4 text-[#2196f3]" />
+                  <span className={`text-sm font-semibold ${textPrimary}`}>FIX Algo Spec Comparison</span>
+                  <span className="px-2 py-0.5 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">2 Added</span>
+                  <span className="px-2 py-0.5 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">1 Modified</span>
+                </div>
+                <div className="grid grid-cols-2 divide-x divide-[#1e4976]">
+                  <div className={`p-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
+                    <p className={`text-xs font-semibold ${textSecondary} mb-2`}>Old FIX Spec (v2.0)</p>
+                    <pre className={`text-xs ${textSecondary} font-mono overflow-x-auto whitespace-pre-wrap`}>{`Strategy: VWAP
+  - StartTime (7940): Time
+  - EndTime (7941): Time
+  - ParticipationRate (7942): Percentage
+
+Strategy: TWAP
+  - StartTime (7940): Time
+  - EndTime (7941): Time`}</pre>
+                  </div>
+                  <div className={`p-3 ${isDarkMode ? "bg-[#0a1628]/60" : "bg-[#f8fafc]"}`}>
+                    <p className={`text-xs font-semibold ${textSecondary} mb-2`}>New FIX Spec (v2.1)</p>
+                    <pre className={`text-xs ${textSecondary} font-mono overflow-x-auto whitespace-pre-wrap`}>{`Strategy: VWAP
+  - StartTime (7940): Time
+  - EndTime (7941): Time
+  - `}<span className="bg-[#ff9800]/30 text-[#ff9800]">ParticipationRate (7942): Decimal</span>{`
+
+Strategy: TWAP
+  - StartTime (7940): Time
+  - EndTime (7941): Time
+
+`}<span className="bg-[#4caf50]/30 text-[#4caf50]">{`Strategy: POV (NEW)
+  - ParticipationRate (7942): Decimal
+  - MaxFloor (7944): Qty`}</span></pre>
+                  </div>
+                </div>
+              </div>
+
+              <div className={`border ${borderColor} rounded-lg overflow-hidden`}>
+                <div className={`px-4 py-2.5 ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"} flex items-center gap-2`}>
+                  <FileText className="h-4 w-4 text-[#2196f3]" />
+                  <span className={`text-sm font-semibold ${textPrimary}`}>ATDL File Comparison</span>
+                  <span className="px-2 py-0.5 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">1 Added</span>
+                  <span className="px-2 py-0.5 rounded text-xs bg-[#f44336]/20 text-[#f44336]">1 Missing</span>
+                </div>
+                <div className="grid grid-cols-2 divide-x divide-[#1e4976]">
+                  <div className={`p-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
+                    <p className={`text-xs font-semibold ${textSecondary} mb-2`}>Old ATDL (v1.4)</p>
+                    <pre className={`text-xs ${textSecondary} font-mono overflow-x-auto whitespace-pre-wrap`}>{`<Strategy name="VWAP" wireValue="V">
+  <Parameter name="StartTime" .../>
+  <Parameter name="EndTime" .../>
+  <Parameter name="ParticipationRate"
+    xsi:type="Percentage_t"/>
+</Strategy>
+<Strategy name="TWAP" wireValue="T">
+  ...
+</Strategy>`}</pre>
+                  </div>
+                  <div className={`p-3 ${isDarkMode ? "bg-[#0a1628]/60" : "bg-[#f8fafc]"}`}>
+                    <p className={`text-xs font-semibold ${textSecondary} mb-2`}>New ATDL (v1.5)</p>
+                    <pre className={`text-xs ${textSecondary} font-mono overflow-x-auto whitespace-pre-wrap`}>{`<Strategy name="VWAP" wireValue="V">
+  <Parameter name="StartTime" .../>
+  <Parameter name="EndTime" .../>
+  <Parameter name="ParticipationRate"
+    xsi:type="Percentage_t"/> `}<span className="bg-[#f44336]/30 text-[#f44336]">← Should be Decimal</span>{`
+</Strategy>
+<Strategy name="TWAP" wireValue="T">
+  ...
+</Strategy>
+`}<span className="bg-[#4caf50]/30 text-[#4caf50]">{`<Strategy name="POV">
+  <Parameter name="ParticipationRate"
+    xsi:type="Decimal_t"/>
+</Strategy>`}</span>{` `}<span className="bg-[#f44336]/30 text-[#f44336]">← Missing wireValue</span></pre>
+                  </div>
+                </div>
+              </div>
+
+              <div className={`p-3 rounded-lg border border-[#2196f3]/30 bg-[#2196f3]/5`}>
+                <p className={`text-sm font-medium text-[#2196f3]`}>Structural Validation</p>
+                <p className={`text-xs ${textSecondary} mt-0.5`}>Validating new ATDL against FIXatdl standard schema.</p>
+              </div>
+            </>
           )}
           {atdlWorkflowType === "compare-atdl" && (
             <div className={`p-3 rounded-lg border border-[#ff9800]/30 bg-[#ff9800]/5`}>
@@ -5103,9 +5189,25 @@ const specCompareResults = [
                 {r.owner && <span className={`text-xs ${textSecondary}`}>{r.owner}</span>}
                 {r.status !== "pass" && (
                   <div className="flex gap-1">
-                    {["Acknowledge","Defer","Escalate"].map(a => (
-                      <button key={a} className={`px-2 py-0.5 rounded text-xs border ${borderColor} ${textSecondary} hover:border-[#00e5ff] hover:text-[#00e5ff]`}>{a}</button>
-                    ))}
+                    {["Acknowledge","Defer","Escalate"].map(a => {
+                      const actionKey = `val-${i}-${a}`
+                      const isSelected = atdlValidationActions[`val-${i}`] === a
+                      return (
+                        <button
+                          key={a}
+                          onClick={() => setAtdlValidationActions(prev => ({ ...prev, [`val-${i}`]: a }))}
+                          className={`px-2 py-0.5 rounded text-xs border transition-colors ${
+                            isSelected
+                              ? a === "Acknowledge" ? "bg-[#4caf50]/20 border-[#4caf50] text-[#4caf50]"
+                              : a === "Defer" ? "bg-[#ff9800]/20 border-[#ff9800] text-[#ff9800]"
+                              : "bg-[#f44336]/20 border-[#f44336] text-[#f44336]"
+                              : `${borderColor} ${textSecondary} hover:border-[#00e5ff] hover:text-[#00e5ff]`
+                          }`}
+                        >
+                          {a}
+                        </button>
+                      )
+                    })}
                   </div>
                 )}
               </div>
@@ -5311,18 +5413,64 @@ const specCompareResults = [
             </div>
             <div className={`p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
               <p className={`text-xs font-semibold ${textSecondary} mb-2`}>Generated FIX Message</p>
-              <div className={`font-mono text-xs p-3 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/60" : "bg-[#f8fafc]"} overflow-x-auto`}>
-                <span className={textPrimary}>8=FIX.4.4|9=256|35=D|49=SENDER|56=TARGET|34=1|52=20240115-14:30:00.000|11=ORDER123|21=1|55=AAPL|54=1|60=20240115-14:30:00.000|38=10000|40=2|44=150.00|59=0|</span>
-                <span className="text-[#00e5ff]">847={atdlSelectedStrategy}|7940=09:30:00|7941=16:00:00|7942=15|7943=100|7944=500|7945=200|7946=M|</span>
-                <span className={textPrimary}>10=128|</span>
-              </div>
+              {!atdlFixMessageGenerated ? (
+                <div className={`p-6 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/60" : "bg-[#f8fafc]"} text-center`}>
+                  <Zap className={`h-8 w-8 mx-auto mb-2 ${textSecondary} opacity-50`} />
+                  <p className={`text-sm ${textSecondary}`}>Click &quot;Generate FIX&quot; to create FIX message from UI parameters</p>
+                </div>
+              ) : (
+                <div className={`font-mono text-xs p-3 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/60" : "bg-[#f8fafc]"} overflow-x-auto`}>
+                  <span className={textPrimary}>8=FIX.4.4|9=256|35=D|49=SENDER|56=TARGET|34=1|52=20240115-14:30:00.000|11=ORDER123|21=1|55=AAPL|54=1|60=20240115-14:30:00.000|38=10000|40=2|44=150.00|59=0|</span>
+                  <span className="text-[#00e5ff]">847={atdlSelectedStrategy}|7940=09:30:00|7941=16:00:00|7942=15|7943=100|7944=500|7945=200|7946=M|</span>
+                  <span className={textPrimary}>10=128|</span>
+                </div>
+              )}
               {atdlFixValidationResults && (
-                <div className="mt-3">
-                  <p className={`text-xs font-semibold ${textSecondary} mb-2`}>Validation Result</p>
-                  <div className="flex items-center gap-3">
-                    <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">4 Matches</span>
-                    <span className="px-2 py-1 rounded text-xs bg-[#f44336]/20 text-[#f44336]">3 Mismatches</span>
-                    <span className={`text-xs ${textSecondary}`}>against Equities FIX 4.4 v2.1</span>
+                <div className="mt-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className={`text-xs font-semibold ${textSecondary}`}>Validation Result</p>
+                    <div className="flex items-center gap-3">
+                      <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">4 Matches</span>
+                      <span className="px-2 py-1 rounded text-xs bg-[#f44336]/20 text-[#f44336]">3 Mismatches</span>
+                      <span className={`text-xs ${textSecondary}`}>against Equities FIX 4.4 v2.1</span>
+                    </div>
+                  </div>
+                  {/* Validation errors with action buttons */}
+                  <div className="space-y-2">
+                    {[
+                      { id: "sim-1", field: "Tag 7942 (ParticipationRate)", issue: "Value 15 exceeds max 1.0 for Decimal type", severity: "error" },
+                      { id: "sim-2", field: "Tag 7944 (MaxFloor)", issue: "Missing required attribute in POV strategy", severity: "error" },
+                      { id: "sim-3", field: "Tag 7946 (Urgency)", issue: "Value 'M' not in allowed enum values", severity: "warning" },
+                    ].map(err => {
+                      const selectedAction = atdlSimulationErrors[err.id]
+                      return (
+                        <div key={err.id} className={`flex items-center gap-3 p-2.5 rounded border ${err.severity === "error" ? "border-[#f44336]/40 bg-[#f44336]/5" : "border-[#ff9800]/30 bg-[#ff9800]/5"}`}>
+                          {err.severity === "error" ? <AlertCircle className="h-3.5 w-3.5 text-[#f44336] flex-shrink-0" /> : <AlertTriangle className="h-3.5 w-3.5 text-[#ff9800] flex-shrink-0" />}
+                          <span className={`text-xs font-medium ${textPrimary}`}>{err.field}</span>
+                          <span className={`text-xs flex-1 ${textSecondary}`}>{err.issue}</span>
+                          <div className="flex gap-1">
+                            {["Ignore","Raise","Fix"].map(a => {
+                              const isSelected = selectedAction === a
+                              return (
+                                <button
+                                  key={a}
+                                  onClick={() => setAtdlSimulationErrors(prev => ({ ...prev, [err.id]: a }))}
+                                  className={`px-2 py-0.5 rounded text-xs border transition-colors ${
+                                    isSelected
+                                      ? a === "Ignore" ? "bg-[#9e9e9e]/20 border-[#9e9e9e] text-[#9e9e9e]"
+                                      : a === "Raise" ? "bg-[#f44336]/20 border-[#f44336] text-[#f44336]"
+                                      : "bg-[#4caf50]/20 border-[#4caf50] text-[#4caf50]"
+                                      : `${borderColor} ${textSecondary} hover:border-[#00e5ff] hover:text-[#00e5ff]`
+                                  }`}
+                                >
+                                  {a}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               )}
