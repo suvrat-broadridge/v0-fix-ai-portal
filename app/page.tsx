@@ -8624,7 +8624,7 @@ const copyToClipboard = () => {
 
                     {/* Client Content - Review Type Sections */}
                     {isClientExpanded && (
-                      <div className={`border-t ${borderColor}`}>
+                      <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
                         {Object.entries(reviewTypes).map(([reviewType, items]) => {
                           const typeKey = `${client}-${reviewType}`
                           const isTypeExpanded = expandedReviewTypes[typeKey] !== false
@@ -8633,33 +8633,35 @@ const copyToClipboard = () => {
                           const typePendingCount = items.filter(i => i.status === "pending").length
                           
                           return (
-                            <div key={reviewType} className={`border-t ${borderColor} first:border-t-0`}>
+                            <div key={reviewType} className={`border-t-2 ${borderColor}`}>
                               {/* Review Type Header */}
                               <button
                                 onClick={() => toggleReviewType(typeKey)}
-                                className={`w-full px-5 py-3 flex items-center justify-between hover:bg-[#1e4976]/5 transition-colors ${isDarkMode ? "bg-[#1e4976]/10" : "bg-gray-50"}`}
+                                className={`w-full px-5 py-4 flex items-center justify-between transition-all ${isDarkMode ? "bg-[#1e4976]/50 hover:bg-[#1e4976]/70" : "bg-gray-100 hover:bg-gray-150"}`}
                               >
                                 <div className="flex items-center gap-3">
-                                  <TypeIcon className="h-4 w-4" style={{ color: typeColor }} />
-                                  <span className={`font-medium ${textPrimary}`}>{reviewType}</span>
-                                  <span className={`text-xs ${textSecondary}`}>({items.length} findings)</span>
+                                  <div className="p-1.5 rounded" style={{ backgroundColor: `${typeColor}20` }}>
+                                    <TypeIcon className="h-4 w-4" style={{ color: typeColor }} />
+                                  </div>
+                                  <span className={`font-semibold text-sm ${textPrimary}`}>{reviewType}</span>
+                                  <span className={`text-xs ${textSecondary}`}>({items.length})</span>
                                   {typePendingCount > 0 && (
-                                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#ff9800]/20 text-[#ff9800]">
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#ff9800]/20 text-[#ff9800] font-medium">
                                       {typePendingCount} pending
                                     </span>
                                   )}
                                 </div>
-                                <ChevronRight className={`h-4 w-4 ${textSecondary} transition-transform ${isTypeExpanded ? "rotate-90" : ""}`} />
+                                <ChevronRight className={`h-5 w-5 ${textSecondary} transition-transform ${isTypeExpanded ? "rotate-90" : ""}`} />
                               </button>
 
                               {/* Review Items */}
                               {isTypeExpanded && (
-                                <div className="divide-y divide-[#1e4976]/30">
+                                <div className={`divide-y ${isDarkMode ? "divide-[#1e4976]/40 bg-[#0f1e2e]" : "divide-gray-200 bg-gray-50"}`}>
                                   {items.map((item) => (
-                                    <div key={item.id} className={`px-5 py-4 ${item.status !== "pending" ? "opacity-60" : ""}`}>
-                                      <div className="flex items-start justify-between">
-                                        <div className="flex items-start gap-3 flex-1">
-                                          <div className={`p-2 rounded-lg ${
+                                    <div key={item.id} className={`px-5 py-4 ${item.status !== "pending" ? "opacity-65" : ""}`}>
+                                      <div className="flex items-start justify-between gap-4">
+                                        <div className="flex items-start gap-3 flex-1 min-w-0">
+                                          <div className={`p-2 rounded-lg flex-shrink-0 ${
                                             item.severity === "High" ? "bg-[#f44336]/20" :
                                             item.severity === "Medium" ? "bg-[#ff9800]/20" :
                                             item.severity === "Low" ? "bg-[#2196f3]/20" :
@@ -8672,10 +8674,10 @@ const copyToClipboard = () => {
                                               "text-[#4caf50]"
                                             }`} />
                                           </div>
-                                          <div className="flex-1">
-                                            <div className="flex items-center gap-2 mb-1">
-                                              <span className={`font-mono text-xs ${textSecondary}`}>{item.id}</span>
-                                              <span className={`px-1.5 py-0.5 rounded text-[10px] ${
+                                          <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                              <span className={`font-mono text-xs ${textSecondary} flex-shrink-0`}>{item.id}</span>
+                                              <span className={`px-2 py-0.5 rounded text-xs font-medium flex-shrink-0 ${
                                                 item.severity === "High" ? "bg-[#f44336]/20 text-[#f44336]" :
                                                 item.severity === "Medium" ? "bg-[#ff9800]/20 text-[#ff9800]" :
                                                 item.severity === "Low" ? "bg-[#2196f3]/20 text-[#2196f3]" :
@@ -8684,39 +8686,39 @@ const copyToClipboard = () => {
                                                 {item.severity}
                                               </span>
                                               {item.status !== "pending" && (
-                                                <span className={`px-1.5 py-0.5 rounded text-[10px] ${
+                                                <span className={`px-2 py-0.5 rounded text-xs font-medium flex-shrink-0 ${
                                                   item.status === "accepted" ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#f44336]/20 text-[#f44336]"
                                                 }`}>
-                                                  {item.status}
+                                                  {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
                                                 </span>
                                               )}
-                                              <span className={`text-[10px] ${textSecondary}`}>{item.createdDate}</span>
+                                              <span className={`text-xs ${textSecondary} flex-shrink-0`}>{item.createdDate}</span>
                                             </div>
-                                            <p className={`text-sm ${textPrimary} mb-2`}>{item.finding}</p>
-                                            <div className={`p-2 rounded ${isDarkMode ? "bg-[#0a1628]/50" : "bg-gray-100"}`}>
-                                              <p className={`text-xs ${textSecondary}`}>
-                                                <span className="font-medium">AI Reasoning:</span> {item.aiReason}
+                                            <p className={`text-sm ${textPrimary} mb-2.5 font-medium leading-snug`}>{item.finding}</p>
+                                            <div className={`p-2.5 rounded-md border ${isDarkMode ? "bg-[#0a1628]/60 border-[#1e4976]/60" : "bg-white border-gray-200"}`}>
+                                              <p className={`text-xs ${textSecondary} leading-relaxed`}>
+                                                <span className="font-semibold text-[#00e5ff]">Reasoning:</span> {item.aiReason}
                                               </p>
                                             </div>
                                           </div>
                                         </div>
-                                        <div className="flex flex-col items-end gap-2 ml-4">
-                                          <div className="text-right">
-                                            <span className={`text-xs ${textSecondary}`}>Confidence</span>
-                                            <p className={`font-bold ${item.confidence >= 0.8 ? "text-[#4caf50]" : item.confidence >= 0.6 ? "text-[#ff9800]" : "text-[#f44336]"}`}>
+                                        <div className="flex flex-col items-end gap-3 flex-shrink-0">
+                                          <div className="text-center">
+                                            <span className={`text-xs ${textSecondary} block`}>Confidence</span>
+                                            <p className={`text-lg font-bold ${item.confidence >= 0.8 ? "text-[#4caf50]" : item.confidence >= 0.6 ? "text-[#ff9800]" : "text-[#f44336]"}`}>
                                               {Math.round(item.confidence * 100)}%
                                             </p>
                                           </div>
                                           {item.status === "pending" && (
-                                            <div className="flex gap-1">
-                                              <Button variant="outline" size="sm" className="h-7 px-2">
-                                                <Eye className="h-3 w-3" />
+                                            <div className="flex gap-1.5">
+                                              <Button variant="outline" size="sm" className="h-8 px-2 text-xs">
+                                                <Eye className="h-3.5 w-3.5" />
                                               </Button>
-                                              <Button variant="outline" size="sm" className="h-7 px-2 text-[#f44336] border-[#f44336]/30 hover:bg-[#f44336]/10">
-                                                <ThumbsDown className="h-3 w-3" />
+                                              <Button variant="outline" size="sm" className="h-8 px-2 text-[#f44336] border-[#f44336]/40 hover:bg-[#f44336]/10">
+                                                <ThumbsDown className="h-3.5 w-3.5" />
                                               </Button>
-                                              <Button size="sm" className="h-7 px-2 bg-[#4caf50] hover:bg-[#4caf50]/80">
-                                                <ThumbsUp className="h-3 w-3" />
+                                              <Button size="sm" className="h-8 px-2 bg-[#4caf50] hover:bg-[#4caf50]/80 text-white">
+                                                <ThumbsUp className="h-3.5 w-3.5" />
                                               </Button>
                                             </div>
                                           )}
