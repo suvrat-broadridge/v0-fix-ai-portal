@@ -397,13 +397,48 @@ export default function BCometPlatform() {
     message: ""
   })
 
-  // Theme colors
+  // Theme colors - B-COMET Design System
   const bgPrimary = isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"
   const bgSecondary = isDarkMode ? "bg-[#0d2137]" : "bg-white"
   const bgCard = isDarkMode ? "bg-[#132f4c]" : "bg-white"
+  const bgCardHover = isDarkMode ? "hover:bg-[#1a3a5c]" : "hover:bg-gray-50"
+  const bgSurface = isDarkMode ? "bg-[#0a1628]/60" : "bg-gray-50"
   const textPrimary = isDarkMode ? "text-white" : "text-[#0a1628]"
   const textSecondary = isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"
+  const textMuted = isDarkMode ? "text-[#64748b]" : "text-[#94a3b8]"
   const borderColor = isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"
+  const borderSubtle = isDarkMode ? "border-[#1e4976]/50" : "border-[#e2e8f0]/70"
+  
+  // Status colors - semantic palette
+  const statusColors = {
+    success: { bg: "bg-[#4caf50]/20", text: "text-[#4caf50]", border: "border-[#4caf50]/30", solid: "bg-[#4caf50]" },
+    warning: { bg: "bg-[#ff9800]/20", text: "text-[#ff9800]", border: "border-[#ff9800]/30", solid: "bg-[#ff9800]" },
+    error: { bg: "bg-[#f44336]/20", text: "text-[#f44336]", border: "border-[#f44336]/30", solid: "bg-[#f44336]" },
+    info: { bg: "bg-[#2196f3]/20", text: "text-[#2196f3]", border: "border-[#2196f3]/30", solid: "bg-[#2196f3]" },
+    neutral: { bg: isDarkMode ? "bg-slate-500/20" : "bg-slate-100", text: isDarkMode ? "text-slate-400" : "text-slate-600", border: "border-slate-500/30", solid: "bg-slate-500" },
+    cyan: { bg: "bg-[#00e5ff]/20", text: "text-[#00e5ff]", border: "border-[#00e5ff]/30", solid: "bg-[#00e5ff]" },
+    purple: { bg: "bg-[#9c27b0]/20", text: "text-[#9c27b0]", border: "border-[#9c27b0]/30", solid: "bg-[#9c27b0]" },
+  }
+  
+  // Stage colors for pipeline visualization
+  const stageColors: Record<string, string> = {
+    "Intake": "#2196f3",
+    "Setup": "#2196f3",
+    "Spec Analysis": "#9c27b0",
+    "Connectivity": "#00bcd4",
+    "Testing": "#ff9800",
+    "Certification": "#e91e63",
+    "Approval": "#4caf50",
+    "Go-Live": "#00e5ff",
+  }
+  
+  // Priority/Severity visual mapping
+  const priorityStyles: Record<string, { bg: string, text: string }> = {
+    critical: { bg: "bg-[#f44336]/20", text: "text-[#f44336]" },
+    high: { bg: "bg-[#ff9800]/20", text: "text-[#ff9800]" },
+    medium: { bg: "bg-[#2196f3]/20", text: "text-[#2196f3]" },
+    low: { bg: isDarkMode ? "bg-slate-500/20" : "bg-slate-100", text: isDarkMode ? "text-slate-400" : "text-slate-600" },
+  }
 
   const assetClassesList = ["Equities", "Fixed Income", "Options", "Futures", "FX", "Commodities"]
 
@@ -828,6 +863,248 @@ export default function BCometPlatform() {
       </Card>
     </div>
   ) : null
+
+  // ========== REUSABLE DESIGN SYSTEM COMPONENTS ==========
+  
+  // Status Badge - consistent status indicator across the app
+  const StatusBadge = ({ status, size = "sm" }: { status: string, size?: "xs" | "sm" | "md" }) => {
+    const config: Record<string, { bg: string, text: string, label: string }> = {
+      "on-track": { bg: statusColors.success.bg, text: statusColors.success.text, label: "On Track" },
+      "at-risk": { bg: statusColors.warning.bg, text: statusColors.warning.text, label: "At Risk" },
+      "blocked": { bg: statusColors.error.bg, text: statusColors.error.text, label: "Blocked" },
+      "breached": { bg: statusColors.error.bg, text: statusColors.error.text, label: "Breached" },
+      "completed": { bg: statusColors.success.bg, text: statusColors.success.text, label: "Completed" },
+      "in-progress": { bg: statusColors.info.bg, text: statusColors.info.text, label: "In Progress" },
+      "pending": { bg: statusColors.warning.bg, text: statusColors.warning.text, label: "Pending" },
+      "overdue": { bg: statusColors.error.bg, text: statusColors.error.text, label: "Overdue" },
+      "approved": { bg: statusColors.success.bg, text: statusColors.success.text, label: "Approved" },
+      "rejected": { bg: statusColors.error.bg, text: statusColors.error.text, label: "Rejected" },
+      "open": { bg: statusColors.info.bg, text: statusColors.info.text, label: "Open" },
+      "resolved": { bg: statusColors.success.bg, text: statusColors.success.text, label: "Resolved" },
+    }
+    const c = config[status] || { bg: statusColors.neutral.bg, text: statusColors.neutral.text, label: status }
+    const sizeClass = size === "xs" ? "px-1.5 py-0.5 text-[10px]" : size === "sm" ? "px-2 py-0.5 text-xs" : "px-2.5 py-1 text-sm"
+    return <span className={`${c.bg} ${c.text} ${sizeClass} rounded font-medium capitalize`}>{c.label}</span>
+  }
+
+  // Priority Badge - severity/priority indicator
+  const PriorityBadge = ({ priority, size = "sm" }: { priority: string, size?: "xs" | "sm" | "md" }) => {
+    const styles = priorityStyles[priority.toLowerCase()] || priorityStyles.low
+    const sizeClass = size === "xs" ? "px-1.5 py-0.5 text-[10px]" : size === "sm" ? "px-2 py-0.5 text-xs" : "px-2.5 py-1 text-sm"
+    return <span className={`${styles.bg} ${styles.text} ${sizeClass} rounded font-medium capitalize`}>{priority}</span>
+  }
+
+  // Stage Badge - pipeline stage indicator with color coding
+  const StageBadge = ({ stage }: { stage: string }) => {
+    const color = stageColors[stage] || "#64748b"
+    return (
+      <span 
+        className="px-2 py-0.5 text-xs rounded font-medium" 
+        style={{ backgroundColor: `${color}20`, color: color }}
+      >
+        {stage}
+      </span>
+    )
+  }
+
+  // KPI Card - consistent metric display
+  const KPICard = ({ 
+    label, 
+    value, 
+    icon: Icon, 
+    color = "#2196f3",
+    trend,
+    onClick,
+    alert = false,
+  }: { 
+    label: string
+    value: string | number
+    icon: any
+    color?: string
+    trend?: { direction: "up" | "down", value: string }
+    onClick?: () => void
+    alert?: boolean
+  }) => (
+    <Card 
+      className={`${bgCard} border ${alert ? `border-[${color}]/40` : borderColor} p-4 ${onClick ? `cursor-pointer ${bgCardHover} transition-colors` : ""}`}
+      onClick={onClick}
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <p className={`text-xs ${textSecondary} mb-1`}>{label}</p>
+          <p className={`text-2xl font-bold ${alert ? "" : textPrimary}`} style={alert ? { color } : undefined}>{value}</p>
+          {trend && (
+            <p className={`text-xs mt-1 ${trend.direction === "up" ? "text-[#4caf50]" : "text-[#f44336]"}`}>
+              {trend.direction === "up" ? "+" : "-"}{trend.value}
+            </p>
+          )}
+        </div>
+        <div className="p-2.5 rounded-lg" style={{ backgroundColor: `${color}20` }}>
+          <Icon className="h-5 w-5" style={{ color }} />
+        </div>
+      </div>
+    </Card>
+  )
+
+  // Section Header - consistent section titling
+  const SectionHeader = ({ 
+    title, 
+    subtitle,
+    icon: Icon,
+    action,
+    badge,
+  }: { 
+    title: string
+    subtitle?: string
+    icon?: any
+    action?: React.ReactNode
+    badge?: { label: string, color: "success" | "warning" | "error" | "info" | "neutral" }
+  }) => (
+    <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center gap-2">
+        {Icon && <Icon className="h-4 w-4 text-[#00e5ff]" />}
+        <div>
+          <h3 className={`text-sm font-semibold ${textPrimary}`}>{title}</h3>
+          {subtitle && <p className={`text-xs ${textSecondary}`}>{subtitle}</p>}
+        </div>
+        {badge && (
+          <span className={`ml-2 px-2 py-0.5 rounded text-xs ${statusColors[badge.color].bg} ${statusColors[badge.color].text}`}>
+            {badge.label}
+          </span>
+        )}
+      </div>
+      {action}
+    </div>
+  )
+
+  // Filter Chip - for filter bars
+  const FilterChip = ({ 
+    label, 
+    active, 
+    onClick,
+    count,
+  }: { 
+    label: string
+    active: boolean
+    onClick: () => void
+    count?: number
+  }) => (
+    <button
+      onClick={onClick}
+      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 ${
+        active 
+          ? "bg-[#00e5ff] text-[#0a1628]" 
+          : `${isDarkMode ? "bg-[#1e4976]/30 text-[#b0bec5] hover:bg-[#1e4976]/50" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`
+      }`}
+    >
+      {label}
+      {count !== undefined && (
+        <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${active ? "bg-[#0a1628]/20" : isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`}>
+          {count}
+        </span>
+      )}
+    </button>
+  )
+
+  // Data Row - clickable list item with consistent styling
+  const DataRow = ({ 
+    children, 
+    onClick,
+    highlighted = false,
+  }: { 
+    children: React.ReactNode
+    onClick?: () => void
+    highlighted?: boolean
+  }) => (
+    <div 
+      onClick={onClick}
+      className={`px-4 py-3 flex items-center gap-3 ${onClick ? `cursor-pointer ${bgCardHover}` : ""} ${highlighted ? "bg-[#f44336]/5" : ""} transition-colors`}
+    >
+      {children}
+    </div>
+  )
+
+  // Empty State - consistent empty state display
+  const EmptyState = ({ 
+    icon: Icon, 
+    title, 
+    description,
+    action,
+  }: { 
+    icon: any
+    title: string
+    description: string
+    action?: React.ReactNode
+  }) => (
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+      <div className={`p-4 rounded-full ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"} mb-4`}>
+        <Icon className={`h-8 w-8 ${textSecondary}`} />
+      </div>
+      <h3 className={`text-lg font-semibold ${textPrimary} mb-1`}>{title}</h3>
+      <p className={`text-sm ${textSecondary} max-w-md mb-4`}>{description}</p>
+      {action}
+    </div>
+  )
+
+  // Progress Stepper - for multi-step workflows
+  const ProgressStepper = ({ 
+    steps, 
+    currentStep,
+    onStepClick,
+  }: { 
+    steps: { label: string, status: "completed" | "current" | "upcoming" }[]
+    currentStep: number
+    onStepClick?: (index: number) => void
+  }) => (
+    <div className="flex items-center gap-2">
+      {steps.map((step, i) => (
+        <React.Fragment key={i}>
+          <button
+            onClick={() => onStepClick?.(i)}
+            disabled={!onStepClick || step.status === "upcoming"}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+              step.status === "completed" 
+                ? "bg-[#4caf50]/20 text-[#4caf50] cursor-pointer hover:bg-[#4caf50]/30" 
+                : step.status === "current" 
+                  ? "bg-[#00e5ff] text-[#0a1628]" 
+                  : `${isDarkMode ? "bg-[#1e4976]/30 text-[#64748b]" : "bg-gray-100 text-gray-400"}`
+            }`}
+          >
+            {step.status === "completed" ? (
+              <CheckCircle2 className="h-3.5 w-3.5" />
+            ) : (
+              <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                step.status === "current" ? "bg-[#0a1628]/20" : isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"
+              }`}>
+                {i + 1}
+              </span>
+            )}
+            {step.label}
+          </button>
+          {i < steps.length - 1 && (
+            <div className={`w-8 h-0.5 ${step.status === "completed" ? "bg-[#4caf50]" : isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`} />
+          )}
+        </React.Fragment>
+      ))}
+    </div>
+  )
+
+  // Risk Score Bar - visual risk indicator
+  const RiskScoreBar = ({ score, size = "md" }: { score: number, size?: "sm" | "md" }) => {
+    const color = score > 60 ? "#f44336" : score > 30 ? "#ff9800" : "#4caf50"
+    const width = size === "sm" ? "w-12" : "w-16"
+    const height = size === "sm" ? "h-1" : "h-1.5"
+    return (
+      <div className="flex items-center gap-1.5">
+        <div className={`${width} ${height} rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"} overflow-hidden`}>
+          <div className="h-full rounded-full transition-all" style={{ width: `${score}%`, backgroundColor: color }} />
+        </div>
+        <span className="text-xs font-medium" style={{ color }}>{score}</span>
+      </div>
+    )
+  }
+
+  // ========== END DESIGN SYSTEM COMPONENTS ==========
 
   // Sidebar Component with Tools
   const Sidebar = () => (
@@ -1865,61 +2142,11 @@ export default function BCometPlatform() {
 
               {/* Top Metrics - Case and Risk Focused */}
               <div className="grid grid-cols-5 gap-4">
-                <Card className={`${bgCard} border ${borderColor} p-4`}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className={`text-xs ${textSecondary}`}>Active Cases</p>
-                      <p className={`text-2xl font-bold ${textPrimary}`}>{activeCases}</p>
-                    </div>
-                    <div className={`p-2.5 rounded-lg ${isDarkMode ? "bg-[#2196f3]/20" : "bg-[#2196f3]/10"}`}>
-                      <Briefcase className="h-5 w-5 text-[#2196f3]" />
-                    </div>
-                  </div>
-                </Card>
-                <Card className={`${bgCard} border border-[#f44336]/30 p-4`}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className={`text-xs ${textSecondary}`}>Cases At Risk</p>
-                      <p className={`text-2xl font-bold text-[#f44336]`}>{casesAtRisk}</p>
-                    </div>
-                    <div className={`p-2.5 rounded-lg bg-[#f44336]/20`}>
-                      <AlertOctagon className="h-5 w-5 text-[#f44336]" />
-                    </div>
-                  </div>
-                </Card>
-                <Card className={`${bgCard} border border-[#ff9800]/30 p-4`}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className={`text-xs ${textSecondary}`}>Approvals Pending</p>
-                      <p className={`text-2xl font-bold text-[#ff9800]`}>{approvalsPending}</p>
-                    </div>
-                    <div className={`p-2.5 rounded-lg bg-[#ff9800]/20`}>
-                      <ClipboardCheck className="h-5 w-5 text-[#ff9800]" />
-                    </div>
-                  </div>
-                </Card>
-                <Card className={`${bgCard} border ${borderColor} p-4`}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className={`text-xs ${textSecondary}`}>Evidence Complete</p>
-                      <p className={`text-2xl font-bold ${textPrimary}`}>{evidenceCompleteness}%</p>
-                    </div>
-                    <div className={`p-2.5 rounded-lg ${isDarkMode ? "bg-[#9c27b0]/20" : "bg-[#9c27b0]/10"}`}>
-                      <FileCheck className="h-5 w-5 text-[#9c27b0]" />
-                    </div>
-                  </div>
-                </Card>
-                <Card className={`${bgCard} border border-[#4caf50]/30 p-4`}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className={`text-xs ${textSecondary}`}>Ready for Go-Live</p>
-                      <p className={`text-2xl font-bold text-[#4caf50]`}>{readyForGoLive}</p>
-                    </div>
-                    <div className={`p-2.5 rounded-lg bg-[#4caf50]/20`}>
-                      <Rocket className="h-5 w-5 text-[#4caf50]" />
-                    </div>
-                  </div>
-                </Card>
+                <KPICard label="Active Cases" value={activeCases} icon={Briefcase} color="#2196f3" onClick={() => setCurrentScreen("onboarding-cases")} />
+                <KPICard label="Cases At Risk" value={casesAtRisk} icon={AlertOctagon} color="#f44336" alert onClick={() => setCurrentScreen("onboarding-cases")} />
+                <KPICard label="Approvals Pending" value={approvalsPending} icon={ClipboardCheck} color="#ff9800" alert onClick={() => setCurrentScreen("approvals")} />
+                <KPICard label="Evidence Complete" value={`${evidenceCompleteness}%`} icon={FileCheck} color="#9c27b0" onClick={() => setCurrentScreen("evidence-vault")} />
+                <KPICard label="Ready for Go-Live" value={readyForGoLive} icon={Rocket} color="#4caf50" alert onClick={() => setCurrentScreen("onboarding-cases")} />
               </div>
 
               {/* Stage Funnel Widget */}
@@ -2075,12 +2302,7 @@ export default function BCometPlatform() {
                             <span className={`text-xs font-mono ${textSecondary}`}>{task.caseId}</span>
                             <span className={`text-sm font-medium ${textPrimary}`}>{task.task}</span>
                           </div>
-                          <span className={`text-xs px-1.5 py-0.5 rounded ${
-                            task.priority === "critical" ? "bg-[#f44336]/20 text-[#f44336]" :
-                            task.priority === "high" ? "bg-[#ff9800]/20 text-[#ff9800]" :
-                            task.priority === "medium" ? "bg-[#2196f3]/20 text-[#2196f3]" :
-                            "bg-slate-500/20 text-slate-400"
-                          }`}>{task.priority}</span>
+                          <PriorityBadge priority={task.priority} size="xs" />
                         </div>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3 text-xs">
@@ -2170,11 +2392,11 @@ export default function BCometPlatform() {
                     </thead>
                     <tbody>
                       {caseHealth.map((c) => (
-                        <tr key={c.caseId} className={`border-t ${borderColor} cursor-pointer hover:bg-[#1e4976]/10`} onClick={() => setCurrentScreen("atdl-workbench" as any)}>
+                        <tr key={c.caseId} className={`border-t ${borderColor} cursor-pointer ${bgCardHover} transition-colors`} onClick={() => setCurrentScreen("onboarding-cases")}>
                           <td className={`px-4 py-2.5 font-mono text-xs ${textPrimary}`}>{c.caseId}</td>
                           <td className={`px-4 py-2.5 text-sm ${textPrimary}`}>{c.client}</td>
                           <td className="px-4 py-2.5 text-center">
-                            <span className={`text-xs px-2 py-0.5 rounded ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-100"} ${textSecondary}`}>{c.stage}</span>
+                            <StageBadge stage={c.stage} />
                           </td>
                           <td className="px-4 py-2.5 text-center">
                             {c.blockers > 0 ? (
@@ -2182,12 +2404,9 @@ export default function BCometPlatform() {
                             ) : <span className={textSecondary}>-</span>}
                           </td>
                           <td className={`px-4 py-2.5 text-center text-xs ${textSecondary}`}>{c.lastUpdate}</td>
-                          <td className="px-4 py-2.5 text-center">
-                            <div className="flex items-center justify-center gap-1.5">
-                              <div className={`w-16 h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"} overflow-hidden`}>
-                                <div className={`h-full rounded-full ${c.riskScore > 60 ? "bg-[#f44336]" : c.riskScore > 30 ? "bg-[#ff9800]" : "bg-[#4caf50]"}`} style={{ width: `${c.riskScore}%` }} />
-                              </div>
-                              <span className={`text-xs ${c.riskScore > 60 ? "text-[#f44336]" : c.riskScore > 30 ? "text-[#ff9800]" : "text-[#4caf50]"}`}>{c.riskScore}</span>
+                          <td className="px-4 py-2.5">
+                            <div className="flex justify-center">
+                              <RiskScoreBar score={c.riskScore} />
                             </div>
                           </td>
                           <td className={`px-4 py-2.5 text-xs ${textPrimary}`}>{c.nextAction}</td>
@@ -9459,51 +9678,11 @@ const copyToClipboard = () => {
 
             {/* Summary Stats */}
             <div className="grid grid-cols-5 gap-4 mb-6">
-              <Card className={`${bgCard} border ${borderColor} p-4`}>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-[#2196f3]/20"><Briefcase className="h-5 w-5 text-[#2196f3]" /></div>
-                  <div>
-                    <p className={`text-2xl font-bold ${textPrimary}`}>{onboardingCases.length}</p>
-                    <p className={`text-xs ${textSecondary}`}>Active Cases</p>
-                  </div>
-                </div>
-              </Card>
-              <Card className={`${bgCard} border ${borderColor} p-4`}>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-[#4caf50]/20"><CheckCircle className="h-5 w-5 text-[#4caf50]" /></div>
-                  <div>
-                    <p className={`text-2xl font-bold ${textPrimary}`}>{onboardingCases.filter(c => c.status === "on-track").length}</p>
-                    <p className={`text-xs ${textSecondary}`}>On Track</p>
-                  </div>
-                </div>
-              </Card>
-              <Card className={`${bgCard} border ${borderColor} p-4`}>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-[#ff9800]/20"><AlertTriangle className="h-5 w-5 text-[#ff9800]" /></div>
-                  <div>
-                    <p className={`text-2xl font-bold ${textPrimary}`}>{onboardingCases.filter(c => c.status === "at-risk").length}</p>
-                    <p className={`text-xs ${textSecondary}`}>At Risk</p>
-                  </div>
-                </div>
-              </Card>
-              <Card className={`${bgCard} border ${borderColor} p-4`}>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-[#f44336]/20"><Lock className="h-5 w-5 text-[#f44336]" /></div>
-                  <div>
-                    <p className={`text-2xl font-bold ${textPrimary}`}>{onboardingCases.filter(c => c.status === "blocked").length}</p>
-                    <p className={`text-xs ${textSecondary}`}>Blocked</p>
-                  </div>
-                </div>
-              </Card>
-              <Card className={`${bgCard} border ${borderColor} p-4`}>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-[#e91e63]/20"><AlertOctagon className="h-5 w-5 text-[#e91e63]" /></div>
-                  <div>
-                    <p className={`text-2xl font-bold ${textPrimary}`}>{onboardingCases.reduce((acc, c) => acc + c.blockers, 0)}</p>
-                    <p className={`text-xs ${textSecondary}`}>Total Blockers</p>
-                  </div>
-                </div>
-              </Card>
+              <KPICard label="Active Cases" value={onboardingCases.length} icon={Briefcase} color="#2196f3" />
+              <KPICard label="On Track" value={onboardingCases.filter(c => c.status === "on-track").length} icon={CheckCircle} color="#4caf50" />
+              <KPICard label="At Risk" value={onboardingCases.filter(c => c.status === "at-risk").length} icon={AlertTriangle} color="#ff9800" alert />
+              <KPICard label="Blocked" value={onboardingCases.filter(c => c.status === "blocked").length} icon={Lock} color="#f44336" alert />
+              <KPICard label="Total Blockers" value={onboardingCases.reduce((acc, c) => acc + c.blockers, 0)} icon={AlertOctagon} color="#e91e63" alert />
             </div>
 
             {/* Cases Table */}
@@ -9542,44 +9721,19 @@ const copyToClipboard = () => {
                         </td>
                         <td className={`px-4 py-3 ${textSecondary}`}>{caseItem.assetClass} / {caseItem.protocol}</td>
                         <td className={`px-4 py-3`}>
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: stageColors[caseItem.stage] }} />
-                            <span className={textPrimary}>{caseItem.stageLabel}</span>
-                          </div>
+                          <StageBadge stage={caseItem.stageLabel} />
                         </td>
                         <td className={`px-4 py-3`}>
-                          <span className={`px-2 py-1 rounded text-xs ${
-                            caseItem.priority === "Critical" ? "bg-[#f44336]/20 text-[#f44336]" :
-                            caseItem.priority === "High" ? "bg-[#ff9800]/20 text-[#ff9800]" :
-                            caseItem.priority === "Medium" ? "bg-[#2196f3]/20 text-[#2196f3]" :
-                            "bg-[#4caf50]/20 text-[#4caf50]"
-                          }`}>
-                            {caseItem.priority}
-                          </span>
+                          <PriorityBadge priority={caseItem.priority} />
                         </td>
                         <td className={`px-4 py-3`}>
-                          <span className={`px-2 py-1 rounded text-xs ${
-                            caseItem.riskRating === "High" ? "bg-[#f44336]/20 text-[#f44336]" :
-                            caseItem.riskRating === "Medium" ? "bg-[#ff9800]/20 text-[#ff9800]" :
-                            "bg-[#4caf50]/20 text-[#4caf50]"
-                          }`}>
-                            {caseItem.riskRating}
-                          </span>
+                          <PriorityBadge priority={caseItem.riskRating.toLowerCase()} />
                         </td>
                         <td className={`px-4 py-3 ${textSecondary}`}>{caseItem.owner}</td>
                         <td className={`px-4 py-3 ${textSecondary}`}>{caseItem.slaDate}</td>
                         <td className={`px-4 py-3`}>
                           <div className="flex items-center gap-2">
-                            <span className={`px-2 py-1 rounded text-xs flex items-center gap-1 ${
-                              caseItem.status === "on-track" ? "bg-[#4caf50]/20 text-[#4caf50]" :
-                              caseItem.status === "at-risk" ? "bg-[#ff9800]/20 text-[#ff9800]" :
-                              "bg-[#f44336]/20 text-[#f44336]"
-                            }`}>
-                              {caseItem.status === "on-track" && <CheckCircle className="h-3 w-3" />}
-                              {caseItem.status === "at-risk" && <AlertTriangle className="h-3 w-3" />}
-                              {caseItem.status === "blocked" && <Lock className="h-3 w-3" />}
-                              {caseItem.status.replace("-", " ").replace(/\b\w/g, l => l.toUpperCase())}
-                            </span>
+                            <StatusBadge status={caseItem.status} />
                             {caseItem.blockers > 0 && (
                               <span className="w-5 h-5 rounded-full bg-[#f44336]/20 text-[#f44336] text-xs flex items-center justify-center">
                                 {caseItem.blockers}
@@ -9766,21 +9920,7 @@ const copyToClipboard = () => {
                                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                                       <span className={`font-mono text-xs ${textSecondary}`}>{approval.id}</span>
                                       <span className={`px-1.5 py-0.5 rounded text-xs ${s.badge}`}>{approval.type}</span>
-                                      {approval.status === "overdue" && (
-                                        <span className="px-1.5 py-0.5 rounded text-xs bg-[#f44336]/20 text-[#f44336] flex items-center gap-1">
-                                          <Clock className="h-3 w-3" /> Overdue
-                                        </span>
-                                      )}
-                                      {approval.status === "approved" && (
-                                        <span className="px-1.5 py-0.5 rounded text-xs bg-[#4caf50]/20 text-[#4caf50] flex items-center gap-1">
-                                          <CheckCircle className="h-3 w-3" /> Approved
-                                        </span>
-                                      )}
-                                      {approval.status === "rejected" && (
-                                        <span className="px-1.5 py-0.5 rounded text-xs bg-[#f44336]/20 text-[#f44336] flex items-center gap-1">
-                                          <X className="h-3 w-3" /> Rejected
-                                        </span>
-                                      )}
+                                      <StatusBadge status={approval.status} size="xs" />
                                       <span className={`text-xs ${textSecondary}`}>{approval.submittedDate}</span>
                                     </div>
                                     <p className={`text-sm font-medium ${textPrimary} truncate`}>{approval.description}</p>
@@ -9993,7 +10133,9 @@ const copyToClipboard = () => {
                             </div>
                           </div>
                         </td>
-                        <td className={`px-4 py-3 ${textSecondary}`}>Stage {evidence.stage}</td>
+                        <td className={`px-4 py-3`}>
+                          <StageBadge stage={["Setup", "Spec Analysis", "Connectivity", "Testing", "Certification", "Approval", "Go-Live"][evidence.stage - 1] || `Stage ${evidence.stage}`} />
+                        </td>
                         <td className={`px-4 py-3`}>
                           <div>
                             <p className={textSecondary}>{evidence.generatedDate}</p>
@@ -10192,13 +10334,7 @@ const copyToClipboard = () => {
                   </span>
                 </td>
                 <td className={`px-3 py-2`}>
-                  <span className={`px-2 py-0.5 rounded text-xs ${
-                    rule.severity === "Error" ? "bg-[#f44336]/20 text-[#f44336]" :
-                    rule.severity === "Warning" ? "bg-[#ff9800]/20 text-[#ff9800]" :
-                    "bg-[#2196f3]/20 text-[#2196f3]"
-                  }`}>
-                    {rule.severity}
-                  </span>
+                  <PriorityBadge priority={rule.severity === "Error" ? "critical" : rule.severity === "Warning" ? "high" : "low"} size="xs" />
                 </td>
                 <td className={`px-3 py-2`}>
                   {sourceDoc ? (
