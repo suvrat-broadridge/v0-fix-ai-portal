@@ -12,7 +12,7 @@ import {
   Calendar, Eye, ThumbsUp, ThumbsDown, MessageSquare, Lock, Package,
   Rocket, Award, TestTube, ArrowRight, GitCompare, Activity, Gauge, Shield,
   Play, Upload, RefreshCw, ChevronDown, Wrench, FileSearch, Database,
-  Layers, ClipboardCheck, Send, Mail
+  Layers, ClipboardCheck, Send, Mail, Brain
 } from "lucide-react"
 
 // Screen type definition with all screens
@@ -31,7 +31,7 @@ export default function Page() {
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [approvalsTab, setApprovalsTab] = useState("pending")
   const [demoEmail, setDemoEmail] = useState("")
-  const [expandedSection, setExpandedSection] = useState<string | null>("tools")
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(["workflow", "governance"]))
 
   // Theme colors
   const bgPrimary = isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"
@@ -57,18 +57,25 @@ export default function Page() {
         label: "Main",
         items: [
           { label: "Dashboard", icon: Home, screen: "dashboard" as ScreenType },
+          { label: "Clients", icon: Users, screen: "dashboard" as ScreenType },
           { label: "Onboarding Cases", icon: Briefcase, screen: "onboarding-cases" as ScreenType },
         ]
       },
       {
-        id: "tools",
-        label: "ATDL Tools",
+        id: "queue",
+        label: "Queue",
         items: [
-          { label: "FIX to ATDL Compare", icon: GitCompare, screen: "atdl-fix-compare" as ScreenType },
-          { label: "ATDL to ATDL Compare", icon: Layers, screen: "atdl-atdl-compare" as ScreenType },
-          { label: "FIX to ATDL Convert", icon: RefreshCw, screen: "atdl-convert" as ScreenType },
-          { label: "Validate Structure", icon: CheckSquare, screen: "atdl-validate" as ScreenType },
-          { label: "Usage Preview", icon: Eye, screen: "atdl-preview" as ScreenType },
+          { label: "Approvals", icon: ClipboardCheck, screen: "approvals" as ScreenType, badge: true },
+          { label: "AI Review Queue", icon: Brain, screen: "approvals" as ScreenType, badge: true },
+        ]
+      },
+      {
+        id: "governance",
+        label: "Governance",
+        items: [
+          { label: "Evidence Vault", icon: Archive, screen: "evidence-vault" as ScreenType },
+          { label: "Rule Library", icon: BookOpen, screen: "rule-library" as ScreenType },
+          { label: "SLA Analytics", icon: BarChart3, screen: "sla-analytics" as ScreenType },
         ]
       },
       {
@@ -78,21 +85,43 @@ export default function Page() {
           { label: "Spec Compare", icon: FileSearch, screen: "spec-compare" as ScreenType },
           { label: "Log Analysis", icon: Activity, screen: "log-analysis" as ScreenType },
           { label: "Scenario Creation", icon: FileText, screen: "scenario-creation" as ScreenType },
+          { label: "FIX MSG Creator", icon: Wrench, screen: "scenario-creation" as ScreenType },
+          { 
+            label: "ATDL Validation", 
+            icon: CheckSquare, 
+            screen: "atdl-validate" as ScreenType,
+            subsection: true,
+            subId: "atdl",
+            items: [
+              { label: "FIX to ATDL Compare", icon: GitCompare, screen: "atdl-fix-compare" as ScreenType },
+              { label: "ATDL to ATDL Compare", icon: Layers, screen: "atdl-atdl-compare" as ScreenType },
+              { label: "FIX to ATDL Convert", icon: RefreshCw, screen: "atdl-convert" as ScreenType },
+              { label: "Validate Structure", icon: CheckSquare, screen: "atdl-validate" as ScreenType },
+              { label: "Usage Preview", icon: Eye, screen: "atdl-preview" as ScreenType },
+            ]
+          },
           { label: "Testing", icon: TestTube, screen: "testing" as ScreenType },
           { label: "Certification", icon: Award, screen: "certification" as ScreenType },
         ]
       },
       {
-        id: "governance",
-        label: "Governance",
+        id: "admin",
+        label: "Admin",
         items: [
-          { label: "Approvals", icon: ClipboardCheck, screen: "approvals" as ScreenType },
-          { label: "Evidence Vault", icon: Archive, screen: "evidence-vault" as ScreenType },
-          { label: "Rule Library", icon: BookOpen, screen: "rule-library" as ScreenType },
-          { label: "SLA Analytics", icon: BarChart3, screen: "sla-analytics" as ScreenType },
+          { label: "Admin Specs", icon: Settings, screen: "dashboard" as ScreenType },
         ]
       }
     ]
+
+    const toggleSection = (sectionId: string) => {
+      const newExpanded = new Set(expandedSections)
+      if (newExpanded.has(sectionId)) {
+        newExpanded.delete(sectionId)
+      } else {
+        newExpanded.add(sectionId)
+      }
+      setExpandedSections(newExpanded)
+    }
 
     return (
       <div className={`${sidebarOpen ? "w-64" : "w-16"} ${bgSecondary} border-r ${borderColor} transition-all duration-300 flex flex-col h-screen sticky top-0`}>
@@ -108,35 +137,63 @@ export default function Page() {
             <div key={section.id} className="mb-2">
               {sidebarOpen && (
                 <button
-                  onClick={() => setExpandedSection(expandedSection === section.id ? null : section.id)}
+                  onClick={() => toggleSection(section.id)}
                   className="w-full flex items-center justify-between px-4 py-2 text-xs font-semibold text-[#64748b] uppercase tracking-wider hover:text-white"
                 >
                   {section.label}
-                  <ChevronDown className={`h-3 w-3 transition-transform ${expandedSection === section.id ? "rotate-180" : ""}`} />
+                  <ChevronDown className={`h-3 w-3 transition-transform ${expandedSections.has(section.id) ? "rotate-180" : ""}`} />
                 </button>
               )}
               
-              {(expandedSection === section.id || !sidebarOpen) && (
+              {(expandedSections.has(section.id) || !sidebarOpen) && (
                 <div className="space-y-1 px-2">
                   {section.items.map((item) => (
-                    <button
-                      key={item.screen}
-                      onClick={() => setCurrentScreen(item.screen)}
-                      className={`w-full flex items-center gap-3 px-3 py-2 rounded transition-colors ${
-                        currentScreen === item.screen 
-                          ? "bg-[#00e5ff]/20 text-[#00e5ff]" 
-                          : "text-[#e0e0e0] hover:text-white hover:bg-[#1e4976]"
-                      }`}
-                      title={!sidebarOpen ? item.label : undefined}
-                    >
-                      <item.icon className="h-4 w-4 flex-shrink-0" />
-                      {sidebarOpen && <span className="text-sm">{item.label}</span>}
-                    </button>
+                    <div key={item.screen}>
+                      <button
+                        onClick={() => item.subsection ? toggleSection(item.subId) : setCurrentScreen(item.screen)}
+                        className={`w-full flex items-center gap-3 px-3 py-2 rounded transition-colors ${
+                          currentScreen === item.screen 
+                            ? "bg-[#00e5ff]/20 text-[#00e5ff]" 
+                            : "text-[#e0e0e0] hover:text-white hover:bg-[#1e4976]"
+                        }`}
+                        title={!sidebarOpen ? item.label : undefined}
+                      >
+                        <item.icon className="h-4 w-4 flex-shrink-0" />
+                        {sidebarOpen && (
+                          <div className="flex-1 flex items-center justify-between">
+                            <span className="text-sm">{item.label}</span>
+                            {item.subsection && <ChevronDown className={`h-3 w-3 transition-transform ${expandedSections.has(item.subId) ? "rotate-180" : ""}`} />}
+                            {item.badge && <span className="w-2 h-2 bg-red-500 rounded-full" />}
+                          </div>
+                        )}
+                      </button>
+
+                      {item.subsection && (expandedSections.has(item.subId) || !sidebarOpen) && (
+                        <div className="space-y-1 ml-2 pl-2 border-l border-[#1e4976]">
+                          {item.items.map((subitem) => (
+                            <button
+                              key={subitem.screen}
+                              onClick={() => setCurrentScreen(subitem.screen)}
+                              className={`w-full flex items-center gap-3 px-3 py-2 rounded text-xs transition-colors ${
+                                currentScreen === subitem.screen 
+                                  ? "bg-[#00e5ff]/20 text-[#00e5ff]" 
+                                  : "text-[#b0bec5] hover:text-white hover:bg-[#1e4976]"
+                              }`}
+                              title={!sidebarOpen ? subitem.label : undefined}
+                            >
+                              <subitem.icon className="h-3 w-3 flex-shrink-0" />
+                              {sidebarOpen && <span>{subitem.label}</span>}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}
             </div>
           ))}
+        </nav>
         </nav>
 
         <div className="p-4 border-t border-[#1e4976]">
