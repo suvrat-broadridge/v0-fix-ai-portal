@@ -2,14 +2,14 @@
 
 // B- COMET Platform - FIX Protocol Testing Suite v2
 import { useState } from "react"
-import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink } from "lucide-react"
+import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, Stamp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "approvals" | "evidence-vault" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance">("home")
   const [settingsTab, setSettingsTab] = useState<"look-feel" | "general" | "security" | "mail" | "questionnaires" | "license">("general")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -141,6 +141,61 @@ export default function BCometPlatform() {
     "broadridge-signoff": false,
     "production-config": false,
   })
+  
+  // Onboarding Cases data
+  const [onboardingCases] = useState([
+    { id: "OB-2024-001", client: "Nexus Trading Group", legalEntity: "Nexus Trading LLC", region: "AMER", assetClass: "Equities", protocol: "FIX 4.2", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Medium", owner: "John Smith", slaDate: "Feb 15, 2024", blockers: 0, status: "on-track", createdDate: "Jan 2, 2024" },
+    { id: "OB-2024-002", client: "Apex Capital Partners", legalEntity: "Apex Capital Inc", region: "EMEA", assetClass: "Options", protocol: "FIX 4.4", environment: "Cert", stage: 3, stageLabel: "Connectivity", priority: "Critical", riskRating: "High", owner: "Sarah Johnson", slaDate: "Jan 30, 2024", blockers: 2, status: "at-risk", createdDate: "Dec 15, 2023" },
+    { id: "OB-2024-003", client: "Horizon Investments", legalEntity: "Horizon Fund Management", region: "APAC", assetClass: "Futures", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "Medium", riskRating: "Low", owner: "Mike Chen", slaDate: "Mar 1, 2024", blockers: 0, status: "on-track", createdDate: "Jan 8, 2024" },
+    { id: "OB-2024-004", client: "Velocity Securities", legalEntity: "Velocity Trading Ltd", region: "AMER", assetClass: "Equities", protocol: "FIX 4.4", environment: "Prod", stage: 6, stageLabel: "Certification", priority: "High", riskRating: "Low", owner: "Lisa Wang", slaDate: "Jan 20, 2024", blockers: 0, status: "on-track", createdDate: "Nov 20, 2023" },
+    { id: "OB-2024-005", client: "Summit Financial", legalEntity: "Summit Advisory Group", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.2", environment: "UAT", stage: 1, stageLabel: "Setup", priority: "Low", riskRating: "Medium", owner: "Tom Brown", slaDate: "Apr 1, 2024", blockers: 1, status: "blocked", createdDate: "Jan 10, 2024" },
+  ])
+
+  // Approvals data
+  const [pendingApprovals] = useState([
+    { id: "APR-001", type: "Stage Gate", caseId: "OB-2024-001", client: "Nexus Trading Group", description: "Approve progression from Testing to Certification", requiredApprovers: ["Ops", "Technical"], currentApprovers: ["Ops"], submittedBy: "John Smith", submittedDate: "Jan 14, 2024", dueDate: "Jan 16, 2024", status: "pending" },
+    { id: "APR-002", type: "Exception", caseId: "OB-2024-002", client: "Apex Capital Partners", description: "Waiver for custom field 5001 mapping", requiredApprovers: ["Compliance", "Technical"], currentApprovers: [], submittedBy: "Sarah Johnson", submittedDate: "Jan 13, 2024", dueDate: "Jan 15, 2024", status: "overdue" },
+    { id: "APR-003", type: "Go-Live", caseId: "OB-2024-004", client: "Velocity Securities", description: "Final go-live approval for production cutover", requiredApprovers: ["Ops", "Compliance", "Technical", "Management"], currentApprovers: ["Ops", "Technical"], submittedBy: "Lisa Wang", submittedDate: "Jan 12, 2024", dueDate: "Jan 18, 2024", status: "pending" },
+  ])
+
+  // Evidence vault data
+  const [evidenceItems] = useState([
+    { id: "EV-001", caseId: "OB-2024-001", type: "Test Report", name: "EQ_FIX42_RegTest_Results_v1.2.pdf", stage: 5, generatedDate: "Jan 15, 2024", generatedBy: "System", signed: true, signedBy: "John Smith", signedDate: "Jan 15, 2024", size: "1.2 MB" },
+    { id: "EV-002", caseId: "OB-2024-001", type: "Spec Diff", name: "Nexus_SpecComparison_Report.pdf", stage: 2, generatedDate: "Jan 5, 2024", generatedBy: "System", signed: true, signedBy: "John Smith", signedDate: "Jan 6, 2024", size: "890 KB" },
+    { id: "EV-003", caseId: "OB-2024-004", type: "Certification Pack", name: "Velocity_Certification_Package.zip", stage: 6, generatedDate: "Jan 18, 2024", generatedBy: "System", signed: false, signedBy: null, signedDate: null, size: "4.5 MB" },
+    { id: "EV-004", caseId: "OB-2024-002", type: "Approval Record", name: "Apex_ExceptionWaiver_5001.pdf", stage: 3, generatedDate: "Jan 13, 2024", generatedBy: "Sarah Johnson", signed: false, signedBy: null, signedDate: null, size: "156 KB" },
+  ])
+
+  // Rule library data
+  const [ruleLibrary] = useState([
+    { id: "RULE-001", category: "Session", name: "Heartbeat Validation", description: "Validate heartbeat interval is within acceptable range (10-60 seconds)", severity: "Error", scope: "All", enabled: true, version: "1.0" },
+    { id: "RULE-002", category: "Session", name: "Sequence Number Reset", description: "Detect unexpected sequence number resets during active session", severity: "Warning", scope: "All", enabled: true, version: "1.2" },
+    { id: "RULE-003", category: "Business", name: "Order Quantity Validation", description: "Ensure OrderQty (38) is positive and within client limits", severity: "Error", scope: "Equities", enabled: true, version: "2.0" },
+    { id: "RULE-004", category: "Business", name: "Price Precision Check", description: "Validate price precision matches instrument specification", severity: "Warning", scope: "All", enabled: true, version: "1.1" },
+    { id: "RULE-005", category: "Venue", name: "NYSE Market Hours", description: "Reject orders outside NYSE trading hours unless GTC", severity: "Error", scope: "Equities", enabled: true, version: "1.0" },
+    { id: "RULE-006", category: "Custom", name: "Nexus Custom Tag 5001", description: "Client-specific validation for custom reference field", severity: "Info", scope: "Nexus Trading", enabled: true, version: "1.0" },
+  ])
+
+  // AI Review queue data
+  const [aiReviewItems] = useState([
+    { id: "AIR-001", caseId: "OB-2024-001", source: "Spec Comparison", finding: "Field 49 (SenderCompID) format mismatch - client uses alphanumeric, standard expects alpha only", confidence: 0.92, severity: "Medium", aiReason: "Pattern analysis shows 15% of client messages contain numeric characters in SenderCompID", status: "pending", createdDate: "Jan 14, 2024" },
+    { id: "AIR-002", caseId: "OB-2024-002", source: "Log Analysis", finding: "Unusual reject pattern detected - 23% of NewOrderSingle messages rejected with reason code 0", confidence: 0.78, severity: "High", aiReason: "Historical baseline shows <5% reject rate for similar clients", status: "pending", createdDate: "Jan 13, 2024" },
+    { id: "AIR-003", caseId: "OB-2024-003", source: "Scenario Generation", finding: "Missing test coverage for partial fill scenarios with multiple execution reports", confidence: 0.85, severity: "Low", aiReason: "Coverage analysis indicates 0 scenarios test multi-leg partial fills", status: "accepted", createdDate: "Jan 12, 2024" },
+    { id: "AIR-004", caseId: "OB-2024-001", source: "Spec Comparison", finding: "Optional field 58 (Text) always populated by client - may indicate custom usage", confidence: 0.65, severity: "Info", aiReason: "Field appears in 100% of client messages vs 12% industry average", status: "rejected", createdDate: "Jan 11, 2024" },
+  ])
+
+  // SLA Analytics data
+  const [slaMetrics] = useState({
+    avgTimeToOnboard: 42,
+    avgTimeToOnboardTrend: -8,
+    onTrackPercentage: 72,
+    atRiskPercentage: 20,
+    blockedPercentage: 8,
+    defectLeakage: 3.2,
+    reopenRate: 8.5,
+    certReadinessScore: 78,
+  })
+
   // FIX MSG Creator state
   const [fixMsgSelectedSpec, setFixMsgSelectedSpec] = useState("")
   const [fixMsgSelectedType, setFixMsgSelectedType] = useState("")
@@ -519,7 +574,13 @@ export default function BCometPlatform() {
   {[
   { icon: LayoutDashboard, label: "Dashboard", screen: "dashboard", roles: ["admin", "client"] },
   { icon: Users, label: "Clients", screen: "clients", roles: ["admin"] },
-  ].filter(item => item.roles.includes(selectedRole || "")).map((item) => (
+  { icon: Briefcase, label: "Onboarding Cases", screen: "onboarding-cases", roles: ["admin"] },
+  { icon: Scale, label: "Approvals", screen: "approvals", roles: ["admin"], badge: 3 },
+  { icon: Archive, label: "Evidence Vault", screen: "evidence-vault", roles: ["admin"] },
+  { icon: BookOpen, label: "Rule Library", screen: "rule-library", roles: ["admin"] },
+  { icon: Brain, label: "AI Review Queue", screen: "ai-review-queue", roles: ["admin"], badge: 2 },
+  { icon: Gauge, label: "SLA Analytics", screen: "sla-analytics", roles: ["admin"] },
+  ].filter(item => item.roles.includes(selectedRole || "")).map((item: any) => (
   <button
   key={item.label}
   onClick={() => { setCurrentScreen(item.screen as any); setIsAdHocMode(false); }}
@@ -530,7 +591,12 @@ export default function BCometPlatform() {
   }`}
   >
   <item.icon className="h-5 w-5" />
-  {!sidebarCollapsed && <span>{item.label}</span>}
+  {!sidebarCollapsed && (
+    <span className="flex-1 flex items-center justify-between">
+      {item.label}
+      {item.badge && <span className="px-1.5 py-0.5 text-[10px] rounded-full bg-[#f44336] text-white">{item.badge}</span>}
+    </span>
+  )}
   </button>
   ))}
   </nav>
@@ -7277,6 +7343,918 @@ const copyToClipboard = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Onboarding Cases Management Screen
+  if (currentScreen === "onboarding-cases") {
+    const stageColors: Record<number, string> = { 1: "#2196f3", 2: "#9c27b0", 3: "#00bcd4", 4: "#ff9800", 5: "#e91e63", 6: "#4caf50", 7: "#00e5ff" }
+    
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Briefcase className="h-8 w-8 text-[#00e5ff]" />
+                <div>
+                  <h1 className={`text-2xl font-bold ${textPrimary}`}>Onboarding Cases</h1>
+                  <p className={`text-sm ${textSecondary}`}>Manage client onboarding lifecycle from setup to go-live</p>
+                </div>
+              </div>
+              <Button className="bg-[#4caf50] hover:bg-[#4caf50]/80">
+                <Plus className="h-4 w-4 mr-2" /> New Case
+              </Button>
+            </div>
+          </header>
+
+          <div className="p-6">
+            {/* Filters */}
+            <Card className={`${bgCard} border ${borderColor} p-4 mb-6`}>
+              <div className="flex items-center gap-4 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <span className={`text-sm ${textSecondary}`}>Stage:</span>
+                  <select className={`px-3 py-1.5 rounded border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}>
+                    <option>All Stages</option>
+                    <option>Setup</option>
+                    <option>Spec Analysis</option>
+                    <option>Connectivity</option>
+                    <option>Testing</option>
+                    <option>Certification</option>
+                    <option>Go-Live</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-sm ${textSecondary}`}>Region:</span>
+                  <select className={`px-3 py-1.5 rounded border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}>
+                    <option>All Regions</option>
+                    <option>AMER</option>
+                    <option>EMEA</option>
+                    <option>APAC</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-sm ${textSecondary}`}>Priority:</span>
+                  <select className={`px-3 py-1.5 rounded border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}>
+                    <option>All Priorities</option>
+                    <option>Critical</option>
+                    <option>High</option>
+                    <option>Medium</option>
+                    <option>Low</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-sm ${textSecondary}`}>Status:</span>
+                  <select className={`px-3 py-1.5 rounded border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}>
+                    <option>All Status</option>
+                    <option>On Track</option>
+                    <option>At Risk</option>
+                    <option>Blocked</option>
+                  </select>
+                </div>
+                <div className="flex-1" />
+                <Input placeholder="Search cases..." className={`w-64 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
+              </div>
+            </Card>
+
+            {/* Summary Stats */}
+            <div className="grid grid-cols-5 gap-4 mb-6">
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#2196f3]/20"><Briefcase className="h-5 w-5 text-[#2196f3]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{onboardingCases.length}</p>
+                    <p className={`text-xs ${textSecondary}`}>Active Cases</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#4caf50]/20"><CheckCircle className="h-5 w-5 text-[#4caf50]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{onboardingCases.filter(c => c.status === "on-track").length}</p>
+                    <p className={`text-xs ${textSecondary}`}>On Track</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#ff9800]/20"><AlertTriangle className="h-5 w-5 text-[#ff9800]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{onboardingCases.filter(c => c.status === "at-risk").length}</p>
+                    <p className={`text-xs ${textSecondary}`}>At Risk</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#f44336]/20"><Lock className="h-5 w-5 text-[#f44336]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{onboardingCases.filter(c => c.status === "blocked").length}</p>
+                    <p className={`text-xs ${textSecondary}`}>Blocked</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#e91e63]/20"><AlertOctagon className="h-5 w-5 text-[#e91e63]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{onboardingCases.reduce((acc, c) => acc + c.blockers, 0)}</p>
+                    <p className={`text-xs ${textSecondary}`}>Total Blockers</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Cases Table */}
+            <Card className={`${bgCard} border ${borderColor}`}>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Case ID</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Client</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Region</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Asset / Protocol</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Stage</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Priority</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Risk</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Owner</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>SLA Date</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Status</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {onboardingCases.map((caseItem) => (
+                      <tr key={caseItem.id} className={`border-b ${borderColor} hover:bg-[#1e4976]/10 cursor-pointer`}>
+                        <td className={`px-4 py-3 font-mono font-medium text-[#00e5ff]`}>{caseItem.id}</td>
+                        <td className={`px-4 py-3`}>
+                          <div>
+                            <p className={`font-medium ${textPrimary}`}>{caseItem.client}</p>
+                            <p className={`text-xs ${textSecondary}`}>{caseItem.legalEntity}</p>
+                          </div>
+                        </td>
+                        <td className={`px-4 py-3`}>
+                          <span className={`px-2 py-1 rounded text-xs ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-100"} ${textSecondary}`}>
+                            {caseItem.region}
+                          </span>
+                        </td>
+                        <td className={`px-4 py-3 ${textSecondary}`}>{caseItem.assetClass} / {caseItem.protocol}</td>
+                        <td className={`px-4 py-3`}>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: stageColors[caseItem.stage] }} />
+                            <span className={textPrimary}>{caseItem.stageLabel}</span>
+                          </div>
+                        </td>
+                        <td className={`px-4 py-3`}>
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            caseItem.priority === "Critical" ? "bg-[#f44336]/20 text-[#f44336]" :
+                            caseItem.priority === "High" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                            caseItem.priority === "Medium" ? "bg-[#2196f3]/20 text-[#2196f3]" :
+                            "bg-[#4caf50]/20 text-[#4caf50]"
+                          }`}>
+                            {caseItem.priority}
+                          </span>
+                        </td>
+                        <td className={`px-4 py-3`}>
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            caseItem.riskRating === "High" ? "bg-[#f44336]/20 text-[#f44336]" :
+                            caseItem.riskRating === "Medium" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                            "bg-[#4caf50]/20 text-[#4caf50]"
+                          }`}>
+                            {caseItem.riskRating}
+                          </span>
+                        </td>
+                        <td className={`px-4 py-3 ${textSecondary}`}>{caseItem.owner}</td>
+                        <td className={`px-4 py-3 ${textSecondary}`}>{caseItem.slaDate}</td>
+                        <td className={`px-4 py-3`}>
+                          <div className="flex items-center gap-2">
+                            <span className={`px-2 py-1 rounded text-xs flex items-center gap-1 ${
+                              caseItem.status === "on-track" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                              caseItem.status === "at-risk" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                              "bg-[#f44336]/20 text-[#f44336]"
+                            }`}>
+                              {caseItem.status === "on-track" && <CheckCircle className="h-3 w-3" />}
+                              {caseItem.status === "at-risk" && <AlertTriangle className="h-3 w-3" />}
+                              {caseItem.status === "blocked" && <Lock className="h-3 w-3" />}
+                              {caseItem.status.replace("-", " ").replace(/\b\w/g, l => l.toUpperCase())}
+                            </span>
+                            {caseItem.blockers > 0 && (
+                              <span className="w-5 h-5 rounded-full bg-[#f44336]/20 text-[#f44336] text-xs flex items-center justify-center">
+                                {caseItem.blockers}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className={`px-4 py-3`}>
+                          <div className="flex gap-1">
+                            <Button size="sm" variant="outline" className="h-7" onClick={() => {
+                              const client = clients.find(c => c.name === caseItem.client)
+                              if (client) { setSelectedClient(client); setCurrentScreen("client-detail") }
+                            }}>
+                              <Eye className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Approvals & Exceptions Screen
+  if (currentScreen === "approvals") {
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <div className="flex items-center gap-3">
+              <Scale className="h-8 w-8 text-[#00e5ff]" />
+              <div>
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>Approvals & Exceptions</h1>
+                <p className={`text-sm ${textSecondary}`}>Review and approve stage gates, exceptions, and go-live requests</p>
+              </div>
+            </div>
+          </header>
+
+          <div className="p-6">
+            {/* Tabs */}
+            <div className={`flex gap-1 p-1 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-100"} w-fit mb-6`}>
+              {["Pending", "Approved", "Rejected", "All"].map(tab => (
+                <button key={tab} className={`px-4 py-2 rounded text-sm font-medium transition-colors ${tab === "Pending" ? "bg-[#00e5ff] text-[#0a1628]" : textSecondary}`}>
+                  {tab} {tab === "Pending" && <span className="ml-1 px-1.5 py-0.5 rounded-full text-xs bg-[#f44336] text-white">{pendingApprovals.length}</span>}
+                </button>
+              ))}
+            </div>
+
+            {/* Pending Approvals */}
+            <div className="space-y-4">
+              {pendingApprovals.map((approval) => (
+                <Card key={approval.id} className={`${bgCard} border ${borderColor} ${approval.status === "overdue" ? "border-[#f44336]/50" : ""}`}>
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-start gap-4">
+                        <div className={`p-3 rounded-lg ${
+                          approval.type === "Stage Gate" ? "bg-[#2196f3]/20" :
+                          approval.type === "Exception" ? "bg-[#ff9800]/20" :
+                          "bg-[#4caf50]/20"
+                        }`}>
+                          {approval.type === "Stage Gate" && <Layers className="h-6 w-6 text-[#2196f3]" />}
+                          {approval.type === "Exception" && <FileWarning className="h-6 w-6 text-[#ff9800]" />}
+                          {approval.type === "Go-Live" && <Rocket className="h-6 w-6 text-[#4caf50]" />}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-3 mb-1">
+                            <span className={`font-mono text-sm ${textSecondary}`}>{approval.id}</span>
+                            <span className={`px-2 py-0.5 rounded text-xs ${
+                              approval.type === "Stage Gate" ? "bg-[#2196f3]/20 text-[#2196f3]" :
+                              approval.type === "Exception" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                              "bg-[#4caf50]/20 text-[#4caf50]"
+                            }`}>
+                              {approval.type}
+                            </span>
+                            {approval.status === "overdue" && (
+                              <span className="px-2 py-0.5 rounded text-xs bg-[#f44336]/20 text-[#f44336] flex items-center gap-1">
+                                <Clock className="h-3 w-3" /> Overdue
+                              </span>
+                            )}
+                          </div>
+                          <h3 className={`font-bold ${textPrimary} mb-1`}>{approval.description}</h3>
+                          <p className={`text-sm ${textSecondary}`}>
+                            <span className="text-[#00e5ff]">{approval.caseId}</span> - {approval.client}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className={`text-xs ${textSecondary}`}>Submitted by {approval.submittedBy}</p>
+                        <p className={`text-xs ${textSecondary}`}>{approval.submittedDate}</p>
+                      </div>
+                    </div>
+
+                    {/* Approval Progress */}
+                    <div className={`p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]/50" : "bg-gray-50"} mb-4`}>
+                      <p className={`text-xs font-medium ${textSecondary} mb-2`}>Required Approvals</p>
+                      <div className="flex items-center gap-3">
+                        {approval.requiredApprovers.map((approver, i) => {
+                          const isApproved = approval.currentApprovers.includes(approver)
+                          return (
+                            <div key={i} className="flex items-center gap-2">
+                              <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isApproved ? "bg-[#4caf50] text-white" : isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"}`}>
+                                {isApproved ? <CheckCircle className="h-4 w-4" /> : <Clock className="h-3 w-3" />}
+                              </div>
+                              <span className={`text-sm ${isApproved ? "text-[#4caf50]" : textSecondary}`}>{approver}</span>
+                              {i < approval.requiredApprovers.length - 1 && <ArrowRight className={`h-4 w-4 ${textSecondary}`} />}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center justify-between">
+                      <p className={`text-sm ${textSecondary}`}>Due: <span className={approval.status === "overdue" ? "text-[#f44336]" : textPrimary}>{approval.dueDate}</span></p>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm">
+                          <Eye className="h-4 w-4 mr-2" /> View Details
+                        </Button>
+                        <Button variant="outline" size="sm" className="text-[#f44336] border-[#f44336]/30 hover:bg-[#f44336]/10">
+                          <ThumbsDown className="h-4 w-4 mr-2" /> Reject
+                        </Button>
+                        <Button size="sm" className="bg-[#4caf50] hover:bg-[#4caf50]/80">
+                          <ThumbsUp className="h-4 w-4 mr-2" /> Approve
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Evidence Vault Screen
+  if (currentScreen === "evidence-vault") {
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Archive className="h-8 w-8 text-[#00e5ff]" />
+                <div>
+                  <h1 className={`text-2xl font-bold ${textPrimary}`}>Evidence Vault</h1>
+                  <p className={`text-sm ${textSecondary}`}>Immutable audit trail and certification evidence packages</p>
+                </div>
+              </div>
+              <Button>
+                <Download className="h-4 w-4 mr-2" /> Export Certification Pack
+              </Button>
+            </div>
+          </header>
+
+          <div className="p-6">
+            {/* Filters */}
+            <Card className={`${bgCard} border ${borderColor} p-4 mb-6`}>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <span className={`text-sm ${textSecondary}`}>Case:</span>
+                  <select className={`px-3 py-1.5 rounded border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}>
+                    <option>All Cases</option>
+                    {onboardingCases.map(c => <option key={c.id}>{c.id} - {c.client}</option>)}
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-sm ${textSecondary}`}>Type:</span>
+                  <select className={`px-3 py-1.5 rounded border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}>
+                    <option>All Types</option>
+                    <option>Test Report</option>
+                    <option>Spec Diff</option>
+                    <option>Certification Pack</option>
+                    <option>Approval Record</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-sm ${textSecondary}`}>Signed:</span>
+                  <select className={`px-3 py-1.5 rounded border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}>
+                    <option>All</option>
+                    <option>Signed</option>
+                    <option>Unsigned</option>
+                  </select>
+                </div>
+                <div className="flex-1" />
+                <Input placeholder="Search evidence..." className={`w-64 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
+              </div>
+            </Card>
+
+            {/* Evidence Table */}
+            <Card className={`${bgCard} border ${borderColor}`}>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Evidence ID</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Case</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Type</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Document</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Stage</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Generated</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Signature</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {evidenceItems.map((evidence) => (
+                      <tr key={evidence.id} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
+                        <td className={`px-4 py-3 font-mono text-[#00e5ff]`}>{evidence.id}</td>
+                        <td className={`px-4 py-3 font-mono ${textSecondary}`}>{evidence.caseId}</td>
+                        <td className={`px-4 py-3`}>
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            evidence.type === "Test Report" ? "bg-[#2196f3]/20 text-[#2196f3]" :
+                            evidence.type === "Spec Diff" ? "bg-[#9c27b0]/20 text-[#9c27b0]" :
+                            evidence.type === "Certification Pack" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                            "bg-[#ff9800]/20 text-[#ff9800]"
+                          }`}>
+                            {evidence.type}
+                          </span>
+                        </td>
+                        <td className={`px-4 py-3`}>
+                          <div className="flex items-center gap-2">
+                            <FileText className={`h-4 w-4 ${textSecondary}`} />
+                            <div>
+                              <p className={textPrimary}>{evidence.name}</p>
+                              <p className={`text-xs ${textSecondary}`}>{evidence.size}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className={`px-4 py-3 ${textSecondary}`}>Stage {evidence.stage}</td>
+                        <td className={`px-4 py-3`}>
+                          <div>
+                            <p className={textSecondary}>{evidence.generatedDate}</p>
+                            <p className={`text-xs ${textSecondary}`}>by {evidence.generatedBy}</p>
+                          </div>
+                        </td>
+                        <td className={`px-4 py-3`}>
+                          {evidence.signed ? (
+                            <div className="flex items-center gap-2">
+                              <Stamp className="h-4 w-4 text-[#4caf50]" />
+                              <div>
+                                <p className="text-[#4caf50] text-xs">Signed</p>
+                                <p className={`text-xs ${textSecondary}`}>{evidence.signedBy} - {evidence.signedDate}</p>
+                              </div>
+                            </div>
+                          ) : (
+                            <span className={`text-xs ${textSecondary}`}>Unsigned</span>
+                          )}
+                        </td>
+                        <td className={`px-4 py-3`}>
+                          <div className="flex gap-1">
+                            <Button size="sm" variant="outline" className="h-7">
+                              <Eye className="h-3 w-3" />
+                            </Button>
+                            <Button size="sm" variant="outline" className="h-7">
+                              <Download className="h-3 w-3" />
+                            </Button>
+                            {!evidence.signed && (
+                              <Button size="sm" variant="outline" className="h-7 text-[#4caf50] border-[#4caf50]/30">
+                                <Stamp className="h-3 w-3" />
+                              </Button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Rule Library Screen
+  if (currentScreen === "rule-library") {
+    const categoryColors: Record<string, string> = {
+      "Session": "#2196f3",
+      "Business": "#4caf50", 
+      "Venue": "#ff9800",
+      "Custom": "#9c27b0"
+    }
+    
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <BookOpen className="h-8 w-8 text-[#00e5ff]" />
+                <div>
+                  <h1 className={`text-2xl font-bold ${textPrimary}`}>Rule Library</h1>
+                  <p className={`text-sm ${textSecondary}`}>Validation rules for specs, logs, and scenarios</p>
+                </div>
+              </div>
+              <Button className="bg-[#4caf50] hover:bg-[#4caf50]/80">
+                <Plus className="h-4 w-4 mr-2" /> Add Rule
+              </Button>
+            </div>
+          </header>
+
+          <div className="p-6">
+            {/* Category Stats */}
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              {Object.entries(categoryColors).map(([category, color]) => (
+                <Card key={category} className={`${bgCard} border ${borderColor} p-4`}>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg" style={{ backgroundColor: `${color}20` }}>
+                      <BookOpen className="h-5 w-5" style={{ color }} />
+                    </div>
+                    <div>
+                      <p className={`text-2xl font-bold ${textPrimary}`}>{ruleLibrary.filter(r => r.category === category).length}</p>
+                      <p className={`text-xs ${textSecondary}`}>{category} Rules</p>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+
+            {/* Rules Table */}
+            <Card className={`${bgCard} border ${borderColor}`}>
+              <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
+                <h3 className={`font-bold ${textPrimary}`}>Validation Rules</h3>
+                <div className="flex gap-2">
+                  <select className={`px-3 py-1.5 rounded border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}>
+                    <option>All Categories</option>
+                    <option>Session</option>
+                    <option>Business</option>
+                    <option>Venue</option>
+                    <option>Custom</option>
+                  </select>
+                  <Input placeholder="Search rules..." className={`w-64 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Rule ID</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Category</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Name</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Description</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Severity</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Scope</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Status</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ruleLibrary.map((rule) => (
+                      <tr key={rule.id} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
+                        <td className={`px-4 py-3 font-mono text-[#00e5ff]`}>{rule.id}</td>
+                        <td className={`px-4 py-3`}>
+                          <span className="px-2 py-1 rounded text-xs" style={{ backgroundColor: `${categoryColors[rule.category]}20`, color: categoryColors[rule.category] }}>
+                            {rule.category}
+                          </span>
+                        </td>
+                        <td className={`px-4 py-3 font-medium ${textPrimary}`}>{rule.name}</td>
+                        <td className={`px-4 py-3 ${textSecondary} max-w-xs truncate`}>{rule.description}</td>
+                        <td className={`px-4 py-3`}>
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            rule.severity === "Error" ? "bg-[#f44336]/20 text-[#f44336]" :
+                            rule.severity === "Warning" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                            "bg-[#2196f3]/20 text-[#2196f3]"
+                          }`}>
+                            {rule.severity}
+                          </span>
+                        </td>
+                        <td className={`px-4 py-3 ${textSecondary}`}>{rule.scope}</td>
+                        <td className={`px-4 py-3`}>
+                          <label className="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" defaultChecked={rule.enabled} className="sr-only peer" />
+                            <div className="w-9 h-5 bg-gray-500 peer-checked:bg-[#4caf50] rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                          </label>
+                        </td>
+                        <td className={`px-4 py-3`}>
+                          <div className="flex gap-1">
+                            <Button size="sm" variant="outline" className="h-7"><Eye className="h-3 w-3" /></Button>
+                            <Button size="sm" variant="outline" className="h-7"><Wrench className="h-3 w-3" /></Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // AI Review Queue Screen
+  if (currentScreen === "ai-review-queue") {
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <div className="flex items-center gap-3">
+              <Brain className="h-8 w-8 text-[#00e5ff]" />
+              <div>
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>AI Review Queue</h1>
+                <p className={`text-sm ${textSecondary}`}>Human-in-the-loop review of AI findings and recommendations</p>
+              </div>
+            </div>
+          </header>
+
+          <div className="p-6">
+            {/* Stats */}
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#ff9800]/20"><Clock className="h-5 w-5 text-[#ff9800]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{aiReviewItems.filter(i => i.status === "pending").length}</p>
+                    <p className={`text-xs ${textSecondary}`}>Pending Review</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#4caf50]/20"><ThumbsUp className="h-5 w-5 text-[#4caf50]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{aiReviewItems.filter(i => i.status === "accepted").length}</p>
+                    <p className={`text-xs ${textSecondary}`}>Accepted</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#f44336]/20"><ThumbsDown className="h-5 w-5 text-[#f44336]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{aiReviewItems.filter(i => i.status === "rejected").length}</p>
+                    <p className={`text-xs ${textSecondary}`}>Rejected</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#2196f3]/20"><Target className="h-5 w-5 text-[#2196f3]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>84%</p>
+                    <p className={`text-xs ${textSecondary}`}>Avg Confidence</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Review Items */}
+            <div className="space-y-4">
+              {aiReviewItems.filter(i => i.status === "pending").map((item) => (
+                <Card key={item.id} className={`${bgCard} border ${borderColor}`}>
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-start gap-4">
+                        <div className={`p-3 rounded-lg ${
+                          item.severity === "High" ? "bg-[#f44336]/20" :
+                          item.severity === "Medium" ? "bg-[#ff9800]/20" :
+                          item.severity === "Low" ? "bg-[#2196f3]/20" :
+                          "bg-[#4caf50]/20"
+                        }`}>
+                          <Brain className={`h-6 w-6 ${
+                            item.severity === "High" ? "text-[#f44336]" :
+                            item.severity === "Medium" ? "text-[#ff9800]" :
+                            item.severity === "Low" ? "text-[#2196f3]" :
+                            "text-[#4caf50]"
+                          }`} />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-3 mb-1">
+                            <span className={`font-mono text-sm ${textSecondary}`}>{item.id}</span>
+                            <span className={`px-2 py-0.5 rounded text-xs ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-100"} ${textSecondary}`}>
+                              {item.source}
+                            </span>
+                            <span className={`px-2 py-0.5 rounded text-xs ${
+                              item.severity === "High" ? "bg-[#f44336]/20 text-[#f44336]" :
+                              item.severity === "Medium" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                              item.severity === "Low" ? "bg-[#2196f3]/20 text-[#2196f3]" :
+                              "bg-[#4caf50]/20 text-[#4caf50]"
+                            }`}>
+                              {item.severity}
+                            </span>
+                          </div>
+                          <h3 className={`font-bold ${textPrimary} mb-1`}>{item.finding}</h3>
+                          <p className={`text-sm ${textSecondary}`}>
+                            <span className="text-[#00e5ff]">{item.caseId}</span> - {item.createdDate}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={`text-sm ${textSecondary}`}>Confidence:</span>
+                          <span className={`font-bold ${item.confidence >= 0.8 ? "text-[#4caf50]" : item.confidence >= 0.6 ? "text-[#ff9800]" : "text-[#f44336]"}`}>
+                            {Math.round(item.confidence * 100)}%
+                          </span>
+                        </div>
+                        <div className={`w-24 h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"} overflow-hidden`}>
+                          <div 
+                            className={`h-full ${item.confidence >= 0.8 ? "bg-[#4caf50]" : item.confidence >= 0.6 ? "bg-[#ff9800]" : "bg-[#f44336]"}`}
+                            style={{ width: `${item.confidence * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* AI Reasoning */}
+                    <div className={`p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]/50" : "bg-gray-50"} mb-4`}>
+                      <p className={`text-xs font-medium ${textSecondary} mb-1`}>AI Reasoning</p>
+                      <p className={`text-sm ${textPrimary}`}>{item.aiReason}</p>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center justify-end gap-2">
+                      <Button variant="outline" size="sm">
+                        <Eye className="h-4 w-4 mr-2" /> View Context
+                      </Button>
+                      <Button variant="outline" size="sm" className="text-[#f44336] border-[#f44336]/30 hover:bg-[#f44336]/10">
+                        <ThumbsDown className="h-4 w-4 mr-2" /> Reject
+                      </Button>
+                      <Button size="sm" className="bg-[#4caf50] hover:bg-[#4caf50]/80">
+                        <ThumbsUp className="h-4 w-4 mr-2" /> Accept
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // SLA Analytics Dashboard
+  if (currentScreen === "sla-analytics") {
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <div className="flex items-center gap-3">
+              <Gauge className="h-8 w-8 text-[#00e5ff]" />
+              <div>
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>SLA Analytics</h1>
+                <p className={`text-sm ${textSecondary}`}>Operational intelligence and delivery metrics</p>
+              </div>
+            </div>
+          </header>
+
+          <div className="p-6">
+            {/* Key Metrics */}
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              <Card className={`${bgCard} border ${borderColor} p-6`}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className={`text-sm ${textSecondary}`}>Avg Time to Onboard</p>
+                  <Timer className="h-5 w-5 text-[#00e5ff]" />
+                </div>
+                <p className={`text-3xl font-bold ${textPrimary}`}>{slaMetrics.avgTimeToOnboard} <span className="text-lg font-normal">days</span></p>
+                <div className="flex items-center gap-1 mt-2">
+                  <TrendingUp className={`h-4 w-4 ${slaMetrics.avgTimeToOnboardTrend < 0 ? "text-[#4caf50]" : "text-[#f44336]"}`} />
+                  <span className={`text-sm ${slaMetrics.avgTimeToOnboardTrend < 0 ? "text-[#4caf50]" : "text-[#f44336]"}`}>
+                    {slaMetrics.avgTimeToOnboardTrend}% vs last quarter
+                  </span>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-6`}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className={`text-sm ${textSecondary}`}>Certification Readiness</p>
+                  <Target className="h-5 w-5 text-[#4caf50]" />
+                </div>
+                <p className={`text-3xl font-bold ${textPrimary}`}>{slaMetrics.certReadinessScore}%</p>
+                <div className={`w-full h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"} overflow-hidden mt-3`}>
+                  <div className="h-full bg-[#4caf50]" style={{ width: `${slaMetrics.certReadinessScore}%` }} />
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-6`}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className={`text-sm ${textSecondary}`}>Defect Leakage</p>
+                  <AlertOctagon className="h-5 w-5 text-[#ff9800]" />
+                </div>
+                <p className={`text-3xl font-bold ${textPrimary}`}>{slaMetrics.defectLeakage}%</p>
+                <p className={`text-xs ${textSecondary} mt-2`}>Target: &lt;5%</p>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-6`}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className={`text-sm ${textSecondary}`}>Reopen Rate</p>
+                  <RefreshCw className="h-5 w-5 text-[#f44336]" />
+                </div>
+                <p className={`text-3xl font-bold ${textPrimary}`}>{slaMetrics.reopenRate}%</p>
+                <p className={`text-xs ${textSecondary} mt-2`}>Target: &lt;10%</p>
+              </Card>
+            </div>
+
+            {/* Status Distribution */}
+            <div className="grid grid-cols-2 gap-6 mb-6">
+              <Card className={`${bgCard} border ${borderColor} p-6`}>
+                <h3 className={`font-bold ${textPrimary} mb-4`}>Case Status Distribution</h3>
+                <div className="flex items-center gap-4">
+                  <div className="relative w-32 h-32">
+                    <svg viewBox="0 0 36 36" className="w-full h-full">
+                      <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#4caf50" strokeWidth="3" strokeDasharray={`${slaMetrics.onTrackPercentage}, 100`} />
+                      <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#ff9800" strokeWidth="3" strokeDasharray={`${slaMetrics.atRiskPercentage}, 100`} strokeDashoffset={`-${slaMetrics.onTrackPercentage}`} />
+                      <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f44336" strokeWidth="3" strokeDasharray={`${slaMetrics.blockedPercentage}, 100`} strokeDashoffset={`-${slaMetrics.onTrackPercentage + slaMetrics.atRiskPercentage}`} />
+                    </svg>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 rounded-full bg-[#4caf50]" />
+                      <span className={textSecondary}>On Track</span>
+                      <span className={`font-bold ${textPrimary}`}>{slaMetrics.onTrackPercentage}%</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 rounded-full bg-[#ff9800]" />
+                      <span className={textSecondary}>At Risk</span>
+                      <span className={`font-bold ${textPrimary}`}>{slaMetrics.atRiskPercentage}%</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 rounded-full bg-[#f44336]" />
+                      <span className={textSecondary}>Blocked</span>
+                      <span className={`font-bold ${textPrimary}`}>{slaMetrics.blockedPercentage}%</span>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className={`${bgCard} border ${borderColor} p-6`}>
+                <h3 className={`font-bold ${textPrimary} mb-4`}>Stage Aging (Days)</h3>
+                <div className="space-y-3">
+                  {[
+                    { stage: "Setup", avg: 3, target: 5 },
+                    { stage: "Spec Analysis", avg: 8, target: 10 },
+                    { stage: "Connectivity", avg: 12, target: 7 },
+                    { stage: "Testing", avg: 10, target: 14 },
+                    { stage: "Certification", avg: 5, target: 7 },
+                  ].map((s, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <span className={`text-sm ${textSecondary} w-28`}>{s.stage}</span>
+                      <div className={`flex-1 h-4 rounded ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-200"} overflow-hidden`}>
+                        <div 
+                          className={`h-full ${s.avg <= s.target ? "bg-[#4caf50]" : "bg-[#f44336]"}`}
+                          style={{ width: `${Math.min((s.avg / 20) * 100, 100)}%` }}
+                        />
+                      </div>
+                      <span className={`text-sm font-medium w-16 ${s.avg <= s.target ? "text-[#4caf50]" : "text-[#f44336]"}`}>
+                        {s.avg}d / {s.target}d
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </div>
+
+            {/* SLA Breach Forecast */}
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`font-bold ${textPrimary} mb-4`}>Upcoming SLA Deadlines</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className={`border-b ${borderColor}`}>
+                      <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Case</th>
+                      <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Client</th>
+                      <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Current Stage</th>
+                      <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>SLA Date</th>
+                      <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Days Remaining</th>
+                      <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Risk</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {onboardingCases.slice(0, 4).map((c, i) => {
+                      const daysRemaining = [6, 2, 45, 4][i]
+                      return (
+                        <tr key={c.id} className={`border-b ${borderColor}`}>
+                          <td className={`px-4 py-3 font-mono text-[#00e5ff]`}>{c.id}</td>
+                          <td className={`px-4 py-3 ${textPrimary}`}>{c.client}</td>
+                          <td className={`px-4 py-3 ${textSecondary}`}>{c.stageLabel}</td>
+                          <td className={`px-4 py-3 ${textSecondary}`}>{c.slaDate}</td>
+                          <td className={`px-4 py-3`}>
+                            <span className={`font-bold ${daysRemaining <= 3 ? "text-[#f44336]" : daysRemaining <= 7 ? "text-[#ff9800]" : "text-[#4caf50]"}`}>
+                              {daysRemaining} days
+                            </span>
+                          </td>
+                          <td className={`px-4 py-3`}>
+                            <span className={`px-2 py-1 rounded text-xs ${
+                              daysRemaining <= 3 ? "bg-[#f44336]/20 text-[#f44336]" :
+                              daysRemaining <= 7 ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                              "bg-[#4caf50]/20 text-[#4caf50]"
+                            }`}>
+                              {daysRemaining <= 3 ? "Critical" : daysRemaining <= 7 ? "Warning" : "On Track"}
+                            </span>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
               </div>
             </Card>
           </div>
