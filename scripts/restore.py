@@ -1,28 +1,29 @@
 #!/usr/bin/env python3
-import subprocess
-import os
+import urllib.request
+import ssl
 
-# Use current directory (scripts run from project root)
-cwd = '.'
+# Fetch from GitHub raw URL
+url = "https://raw.githubusercontent.com/suvrat-broadridge/v0-fix-ai-portal/v0/suvratdandekar-2328-2c8b4e70/app/page.tsx"
 
-# Restore app/page.tsx from git HEAD (last commit)
-result = subprocess.run(['git', 'checkout', 'HEAD', 'app/page.tsx'], capture_output=True, text=True, cwd=cwd)
-print("STDOUT:", result.stdout)
-print("STDERR:", result.stderr)
-print("Return code:", result.returncode)
+print(f"Fetching from: {url}")
 
-if result.returncode == 0:
-    print("\n✓ Successfully restored app/page.tsx from git")
-else:
-    print("\n✗ Failed to restore from git, trying alternative method...")
-    # Try pulling from main branch
-    result2 = subprocess.run(['git', 'show', 'main:app/page.tsx'], capture_output=True, text=True, cwd=cwd)
-    if result2.returncode == 0:
-        with open('app/page.tsx', 'w') as f:
-            f.write(result2.stdout)
-        print("✓ Restored from main branch")
-    else:
-        print("✗ Could not restore file")
+try:
+    # Create SSL context that doesn't verify (for corporate networks)
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    
+    with urllib.request.urlopen(url, context=ctx) as response:
+        content = response.read().decode('utf-8')
+        
+    # Write to file
+    with open('app/page.tsx', 'w') as f:
+        f.write(content)
+    
+    print(f"✓ Successfully restored app/page.tsx ({len(content)} bytes)")
+    print(f"  Lines: {content.count(chr(10))}")
+except Exception as e:
+    print(f"✗ Error: {e}")
 
 
 
