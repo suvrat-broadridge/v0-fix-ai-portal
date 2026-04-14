@@ -398,47 +398,13 @@ export default function BCometPlatform() {
   })
 
   // Theme colors - B-COMET Design System
+  // Theme colors
   const bgPrimary = isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"
   const bgSecondary = isDarkMode ? "bg-[#0d2137]" : "bg-white"
   const bgCard = isDarkMode ? "bg-[#132f4c]" : "bg-white"
-  const bgCardHover = isDarkMode ? "hover:bg-[#1a3a5c]" : "hover:bg-gray-50"
-  const bgSurface = isDarkMode ? "bg-[#0a1628]/60" : "bg-gray-50"
   const textPrimary = isDarkMode ? "text-white" : "text-[#0a1628]"
   const textSecondary = isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"
-  const textMuted = isDarkMode ? "text-[#64748b]" : "text-[#94a3b8]"
   const borderColor = isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"
-  const borderSubtle = isDarkMode ? "border-[#1e4976]/50" : "border-[#e2e8f0]/70"
-  
-  // Status colors - semantic palette
-  const statusColors = {
-    success: { bg: "bg-[#4caf50]/20", text: "text-[#4caf50]", border: "border-[#4caf50]/30", solid: "bg-[#4caf50]" },
-    warning: { bg: "bg-[#ff9800]/20", text: "text-[#ff9800]", border: "border-[#ff9800]/30", solid: "bg-[#ff9800]" },
-    error: { bg: "bg-[#f44336]/20", text: "text-[#f44336]", border: "border-[#f44336]/30", solid: "bg-[#f44336]" },
-    info: { bg: "bg-[#2196f3]/20", text: "text-[#2196f3]", border: "border-[#2196f3]/30", solid: "bg-[#2196f3]" },
-    neutral: { bg: isDarkMode ? "bg-slate-500/20" : "bg-slate-100", text: isDarkMode ? "text-slate-400" : "text-slate-600", border: "border-slate-500/30", solid: "bg-slate-500" },
-    cyan: { bg: "bg-[#00e5ff]/20", text: "text-[#00e5ff]", border: "border-[#00e5ff]/30", solid: "bg-[#00e5ff]" },
-    purple: { bg: "bg-[#9c27b0]/20", text: "text-[#9c27b0]", border: "border-[#9c27b0]/30", solid: "bg-[#9c27b0]" },
-  }
-  
-  // Stage colors for pipeline visualization
-  const stageColors: Record<string, string> = {
-    "Intake": "#2196f3",
-    "Setup": "#2196f3",
-    "Spec Analysis": "#9c27b0",
-    "Connectivity": "#00bcd4",
-    "Testing": "#ff9800",
-    "Certification": "#e91e63",
-    "Approval": "#4caf50",
-    "Go-Live": "#00e5ff",
-  }
-  
-  // Priority/Severity visual mapping
-  const priorityStyles: Record<string, { bg: string, text: string }> = {
-    critical: { bg: "bg-[#f44336]/20", text: "text-[#f44336]" },
-    high: { bg: "bg-[#ff9800]/20", text: "text-[#ff9800]" },
-    medium: { bg: "bg-[#2196f3]/20", text: "text-[#2196f3]" },
-    low: { bg: isDarkMode ? "bg-slate-500/20" : "bg-slate-100", text: isDarkMode ? "text-slate-400" : "text-slate-600" },
-  }
 
   const assetClassesList = ["Equities", "Fixed Income", "Options", "Futures", "FX", "Commodities"]
 
