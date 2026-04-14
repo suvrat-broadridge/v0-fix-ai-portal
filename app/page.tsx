@@ -274,13 +274,37 @@ export default function BCometPlatform() {
     { id: "C-005", category: "Custom", name: "Proprietary OrdType Extensions", description: "Client proprietary order type validation", severity: "Warning", scope: "Per Client", enabled: true, fixVersions: ["4.4","5.0SP2"], market: "All", sourceRef: "Client Spec" },
   ])
 
-  // AI Review queue data
+  // AI Review queue data - grouped by client and review type
   const [aiReviewItems] = useState([
-    { id: "AIR-001", caseId: "OB-2024-001", client: "Nexus Trading Group", source: "Spec Comparison", finding: "Field 49 (SenderCompID) format mismatch - client uses alphanumeric, standard expects alpha only", confidence: 0.92, severity: "Medium", aiReason: "Pattern analysis shows 15% of client messages contain numeric characters in SenderCompID", status: "pending", createdDate: "Jan 14, 2024" },
-    { id: "AIR-002", caseId: "OB-2024-002", client: "Apex Capital Partners", source: "Log Analysis", finding: "Unusual reject pattern detected - 23% of NewOrderSingle messages rejected with reason code 0", confidence: 0.78, severity: "High", aiReason: "Historical baseline shows <5% reject rate for similar clients", status: "pending", createdDate: "Jan 13, 2024" },
-    { id: "AIR-003", caseId: "OB-2024-003", client: "Horizon Investments", source: "Scenario Generation", finding: "Missing test coverage for partial fill scenarios with multiple execution reports", confidence: 0.85, severity: "Low", aiReason: "Coverage analysis indicates 0 scenarios test multi-leg partial fills", status: "accepted", createdDate: "Jan 12, 2024" },
-    { id: "AIR-004", caseId: "OB-2024-001", client: "Nexus Trading Group", source: "Spec Comparison", finding: "Optional field 58 (Text) always populated by client - may indicate custom usage", confidence: 0.65, severity: "Info", aiReason: "Field appears in 100% of client messages vs 12% industry average", status: "rejected", createdDate: "Jan 11, 2024" },
+    // Nexus Trading Group
+    { id: "AIR-001", caseId: "OB-2024-001", client: "Nexus Trading Group", reviewType: "Spec Review", finding: "Field 49 (SenderCompID) format mismatch - client uses alphanumeric, standard expects alpha only", confidence: 0.92, severity: "Medium", aiReason: "Pattern analysis shows 15% of client messages contain numeric characters in SenderCompID", status: "pending", createdDate: "Jan 14, 2024" },
+    { id: "AIR-002", caseId: "OB-2024-001", client: "Nexus Trading Group", reviewType: "Spec Review", finding: "Custom tag 5001 not documented in client spec but present in 78% of messages", confidence: 0.88, severity: "Low", aiReason: "Tag appears consistently but has no corresponding specification entry", status: "pending", createdDate: "Jan 14, 2024" },
+    { id: "AIR-003", caseId: "OB-2024-001", client: "Nexus Trading Group", reviewType: "ATDL Review", finding: "Strategy parameter MinQty has no validation constraint defined", confidence: 0.95, severity: "High", aiReason: "ATDL definition allows any value but venue requires MinQty <= OrderQty", status: "pending", createdDate: "Jan 13, 2024" },
+    { id: "AIR-004", caseId: "OB-2024-001", client: "Nexus Trading Group", reviewType: "ATDL Review", finding: "DisplayQty parameter missing from VWAP strategy definition", confidence: 0.72, severity: "Medium", aiReason: "Similar strategies from other clients include DisplayQty as optional parameter", status: "pending", createdDate: "Jan 13, 2024" },
+    { id: "AIR-005", caseId: "OB-2024-001", client: "Nexus Trading Group", reviewType: "Log Analysis", finding: "Sequence gap detected between messages 1045-1048 with no resend request", confidence: 0.89, severity: "High", aiReason: "Gap occurred during peak trading hours, may indicate connectivity issue", status: "pending", createdDate: "Jan 12, 2024" },
+    { id: "AIR-006", caseId: "OB-2024-001", client: "Nexus Trading Group", reviewType: "Log Analysis", finding: "Heartbeat interval inconsistent - varying between 28-35 seconds", confidence: 0.67, severity: "Low", aiReason: "Agreed interval is 30 seconds, variance may cause false timeout detection", status: "accepted", createdDate: "Jan 11, 2024" },
+    // Apex Capital Partners
+    { id: "AIR-007", caseId: "OB-2024-002", client: "Apex Capital Partners", reviewType: "Spec Review", finding: "TimeInForce (59) enum values include unsupported value '7' (AtTheClose)", confidence: 0.94, severity: "High", aiReason: "Venue does not support AtTheClose orders, will result in rejects", status: "pending", createdDate: "Jan 14, 2024" },
+    { id: "AIR-008", caseId: "OB-2024-002", client: "Apex Capital Partners", reviewType: "Spec Review", finding: "SecurityType (167) not included in spec but required for multi-asset trading", confidence: 0.81, severity: "Medium", aiReason: "Client enabled for equities and options, SecurityType needed for routing", status: "pending", createdDate: "Jan 13, 2024" },
+    { id: "AIR-009", caseId: "OB-2024-002", client: "Apex Capital Partners", reviewType: "Log Analysis", finding: "Unusual reject pattern - 23% of NewOrderSingle rejected with reason code 0", confidence: 0.78, severity: "High", aiReason: "Historical baseline shows <5% reject rate for similar clients", status: "pending", createdDate: "Jan 13, 2024" },
+    { id: "AIR-010", caseId: "OB-2024-002", client: "Apex Capital Partners", reviewType: "Log Analysis", finding: "Cancel requests sent before order acknowledgment received", confidence: 0.91, severity: "Medium", aiReason: "Race condition detected in 12 instances, may cause orphaned orders", status: "pending", createdDate: "Jan 12, 2024" },
+    { id: "AIR-011", caseId: "OB-2024-002", client: "Apex Capital Partners", reviewType: "Test Scenario", finding: "No test coverage for order replacement during partial fill state", confidence: 0.86, severity: "Medium", aiReason: "Coverage analysis shows gap in replace scenarios for OrdStatus=1", status: "pending", createdDate: "Jan 11, 2024" },
+    // Horizon Investments
+    { id: "AIR-012", caseId: "OB-2024-003", client: "Horizon Investments", reviewType: "Spec Review", finding: "Price precision set to 4 decimals but venue supports only 2 for equities", confidence: 0.97, severity: "High", aiReason: "Mismatch will cause price truncation or rejects on sub-penny orders", status: "pending", createdDate: "Jan 14, 2024" },
+    { id: "AIR-013", caseId: "OB-2024-003", client: "Horizon Investments", reviewType: "ATDL Review", finding: "Iceberg strategy missing required parameter StartTime", confidence: 0.83, severity: "Medium", aiReason: "Comparison with standard Iceberg template shows missing time constraint", status: "pending", createdDate: "Jan 13, 2024" },
+    { id: "AIR-014", caseId: "OB-2024-003", client: "Horizon Investments", reviewType: "ATDL Review", finding: "ParticipationRate parameter allows values >100%", confidence: 0.96, severity: "High", aiReason: "No upper bound constraint defined, invalid values could be submitted", status: "pending", createdDate: "Jan 13, 2024" },
+    { id: "AIR-015", caseId: "OB-2024-003", client: "Horizon Investments", reviewType: "Log Analysis", finding: "ExecType/OrdStatus mismatch in 3 execution reports", confidence: 0.74, severity: "Low", aiReason: "ExecType=F (Trade) paired with OrdStatus=0 (New) instead of 1 or 2", status: "accepted", createdDate: "Jan 12, 2024" },
+    { id: "AIR-016", caseId: "OB-2024-003", client: "Horizon Investments", reviewType: "Test Scenario", finding: "Missing test coverage for partial fill scenarios with multiple execution reports", confidence: 0.85, severity: "Low", aiReason: "Coverage analysis indicates 0 scenarios test multi-leg partial fills", status: "accepted", createdDate: "Jan 12, 2024" },
+    // Meridian Securities
+    { id: "AIR-017", caseId: "OB-2024-004", client: "Meridian Securities", reviewType: "Spec Review", finding: "Account field (1) marked optional but required by compliance policy", confidence: 0.89, severity: "High", aiReason: "Regulatory requirement mandates account on all order flow messages", status: "pending", createdDate: "Jan 14, 2024" },
+    { id: "AIR-018", caseId: "OB-2024-004", client: "Meridian Securities", reviewType: "Spec Review", finding: "ClOrdID format allows special characters not permitted by OMS", confidence: 0.77, severity: "Medium", aiReason: "Pattern [A-Za-z0-9-]+ required but spec allows underscores and dots", status: "pending", createdDate: "Jan 13, 2024" },
+    { id: "AIR-019", caseId: "OB-2024-004", client: "Meridian Securities", reviewType: "Log Analysis", finding: "Logout messages missing Text (58) field with disconnect reason", confidence: 0.62, severity: "Info", aiReason: "Best practice to include reason, aids in debugging session issues", status: "rejected", createdDate: "Jan 12, 2024" },
+    { id: "AIR-020", caseId: "OB-2024-004", client: "Meridian Securities", reviewType: "Test Scenario", finding: "Insufficient coverage for market data subscription edge cases", confidence: 0.71, severity: "Low", aiReason: "Only 2 of 8 MDReqRejReason codes tested in scenarios", status: "pending", createdDate: "Jan 11, 2024" },
   ])
+  
+  // AI Review expanded sections state
+  const [expandedReviewClients, setExpandedReviewClients] = useState<Record<string, boolean>>({})
+  const [expandedReviewTypes, setExpandedReviewTypes] = useState<Record<string, boolean>>({})
 
   // SLA Analytics data
   const [slaMetrics] = useState({
@@ -8430,29 +8454,93 @@ const copyToClipboard = () => {
 
   // AI Review Queue Screen
   if (currentScreen === "ai-review-queue") {
+    // Group items by client, then by review type
+    const clientGroups = aiReviewItems.reduce((acc, item) => {
+      if (!acc[item.client]) acc[item.client] = {}
+      if (!acc[item.client][item.reviewType]) acc[item.client][item.reviewType] = []
+      acc[item.client][item.reviewType].push(item)
+      return acc
+    }, {} as Record<string, Record<string, typeof aiReviewItems>>)
+
+    const reviewTypeIcons: Record<string, typeof FileText> = {
+      "Spec Review": FileSearch,
+      "ATDL Review": Code,
+      "Log Analysis": ScrollText,
+      "Test Scenario": TestTube,
+    }
+    
+    const reviewTypeColors: Record<string, string> = {
+      "Spec Review": "#2196f3",
+      "ATDL Review": "#9c27b0",
+      "Log Analysis": "#ff9800",
+      "Test Scenario": "#4caf50",
+    }
+
+    const toggleClient = (client: string) => {
+      setExpandedReviewClients(prev => ({ ...prev, [client]: !prev[client] }))
+    }
+    
+    const toggleReviewType = (key: string) => {
+      setExpandedReviewTypes(prev => ({ ...prev, [key]: !prev[key] }))
+    }
+
+    const pendingCount = aiReviewItems.filter(i => i.status === "pending").length
+    const acceptedCount = aiReviewItems.filter(i => i.status === "accepted").length
+    const rejectedCount = aiReviewItems.filter(i => i.status === "rejected").length
+    const avgConfidence = Math.round(aiReviewItems.reduce((acc, i) => acc + i.confidence, 0) / aiReviewItems.length * 100)
+
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-            <div className="flex items-center gap-3">
-              <Brain className="h-8 w-8 text-[#00e5ff]" />
-              <div>
-                <h1 className={`text-2xl font-bold ${textPrimary}`}>AI Review Queue</h1>
-                <p className={`text-sm ${textSecondary}`}>Human-in-the-loop review of AI findings and recommendations</p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Brain className="h-8 w-8 text-[#00e5ff]" />
+                <div>
+                  <h1 className={`text-2xl font-bold ${textPrimary}`}>AI Review Queue</h1>
+                  <p className={`text-sm ${textSecondary}`}>Human-in-the-loop review of AI findings grouped by client</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" onClick={() => {
+                  const allClients = Object.keys(clientGroups)
+                  setExpandedReviewClients(Object.fromEntries(allClients.map(c => [c, true])))
+                  const allKeys = Object.entries(clientGroups).flatMap(([client, types]) => 
+                    Object.keys(types).map(type => `${client}-${type}`)
+                  )
+                  setExpandedReviewTypes(Object.fromEntries(allKeys.map(k => [k, true])))
+                }}>
+                  Expand All
+                </Button>
+                <Button variant="outline" onClick={() => {
+                  setExpandedReviewClients({})
+                  setExpandedReviewTypes({})
+                }}>
+                  Collapse All
+                </Button>
               </div>
             </div>
           </header>
 
           <div className="p-6">
             {/* Stats */}
-            <div className="grid grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-5 gap-4 mb-6">
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#00e5ff]/20"><Building2 className="h-5 w-5 text-[#00e5ff]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{Object.keys(clientGroups).length}</p>
+                    <p className={`text-xs ${textSecondary}`}>Clients</p>
+                  </div>
+                </div>
+              </Card>
               <Card className={`${bgCard} border ${borderColor} p-4`}>
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-[#ff9800]/20"><Clock className="h-5 w-5 text-[#ff9800]" /></div>
                   <div>
-                    <p className={`text-2xl font-bold ${textPrimary}`}>{aiReviewItems.filter(i => i.status === "pending").length}</p>
-                    <p className={`text-xs ${textSecondary}`}>Pending Review</p>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{pendingCount}</p>
+                    <p className={`text-xs ${textSecondary}`}>Pending</p>
                   </div>
                 </div>
               </Card>
@@ -8460,7 +8548,7 @@ const copyToClipboard = () => {
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-[#4caf50]/20"><ThumbsUp className="h-5 w-5 text-[#4caf50]" /></div>
                   <div>
-                    <p className={`text-2xl font-bold ${textPrimary}`}>{aiReviewItems.filter(i => i.status === "accepted").length}</p>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{acceptedCount}</p>
                     <p className={`text-xs ${textSecondary}`}>Accepted</p>
                   </div>
                 </div>
@@ -8469,7 +8557,7 @@ const copyToClipboard = () => {
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-[#f44336]/20"><ThumbsDown className="h-5 w-5 text-[#f44336]" /></div>
                   <div>
-                    <p className={`text-2xl font-bold ${textPrimary}`}>{aiReviewItems.filter(i => i.status === "rejected").length}</p>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{rejectedCount}</p>
                     <p className={`text-xs ${textSecondary}`}>Rejected</p>
                   </div>
                 </div>
@@ -8478,94 +8566,174 @@ const copyToClipboard = () => {
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-[#2196f3]/20"><Target className="h-5 w-5 text-[#2196f3]" /></div>
                   <div>
-                    <p className={`text-2xl font-bold ${textPrimary}`}>84%</p>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{avgConfidence}%</p>
                     <p className={`text-xs ${textSecondary}`}>Avg Confidence</p>
                   </div>
                 </div>
               </Card>
             </div>
 
-            {/* Review Items */}
+            {/* Client Sections */}
             <div className="space-y-4">
-              {aiReviewItems.filter(i => i.status === "pending").map((item) => (
-                <Card key={item.id} className={`${bgCard} border ${borderColor}`}>
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-start gap-4">
-                        <div className={`p-3 rounded-lg ${
-                          item.severity === "High" ? "bg-[#f44336]/20" :
-                          item.severity === "Medium" ? "bg-[#ff9800]/20" :
-                          item.severity === "Low" ? "bg-[#2196f3]/20" :
-                          "bg-[#4caf50]/20"
-                        }`}>
-                          <Brain className={`h-6 w-6 ${
-                            item.severity === "High" ? "text-[#f44336]" :
-                            item.severity === "Medium" ? "text-[#ff9800]" :
-                            item.severity === "Low" ? "text-[#2196f3]" :
-                            "text-[#4caf50]"
-                          }`} />
+              {Object.entries(clientGroups).map(([client, reviewTypes]) => {
+                const isClientExpanded = expandedReviewClients[client] !== false
+                const clientPendingCount = Object.values(reviewTypes).flat().filter(i => i.status === "pending").length
+                const totalItems = Object.values(reviewTypes).flat().length
+                const clientCaseId = Object.values(reviewTypes).flat()[0]?.caseId
+                
+                return (
+                  <Card key={client} className={`${bgCard} border ${borderColor} overflow-hidden`}>
+                    {/* Client Header */}
+                    <button
+                      onClick={() => toggleClient(client)}
+                      className={`w-full px-5 py-4 flex items-center justify-between hover:bg-[#1e4976]/10 transition-colors`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="p-2 rounded-lg bg-[#00e5ff]/20">
+                          <Building2 className="h-5 w-5 text-[#00e5ff]" />
                         </div>
-                        <div>
-                          <div className="flex items-center gap-3 mb-1">
-                            <span className={`font-mono text-sm ${textSecondary}`}>{item.id}</span>
-                            <span className={`px-2 py-0.5 rounded text-xs ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-100"} ${textSecondary}`}>
-                              {item.source}
-                            </span>
-                            <span className={`px-2 py-0.5 rounded text-xs ${
-                              item.severity === "High" ? "bg-[#f44336]/20 text-[#f44336]" :
-                              item.severity === "Medium" ? "bg-[#ff9800]/20 text-[#ff9800]" :
-                              item.severity === "Low" ? "bg-[#2196f3]/20 text-[#2196f3]" :
-                              "bg-[#4caf50]/20 text-[#4caf50]"
-                            }`}>
-                              {item.severity}
-                            </span>
+                        <div className="text-left">
+                          <div className="flex items-center gap-3">
+                            <h3 className={`font-bold ${textPrimary}`}>{client}</h3>
+                            <span className={`font-mono text-xs ${textSecondary}`}>{clientCaseId}</span>
+                            {clientPendingCount > 0 && (
+                              <span className="px-2 py-0.5 rounded-full text-xs bg-[#ff9800]/20 text-[#ff9800]">
+                                {clientPendingCount} pending
+                              </span>
+                            )}
                           </div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <Building2 className="h-4 w-4 text-[#00e5ff]" />
-                            <span className={`font-bold text-[#00e5ff]`}>{item.client}</span>
-                            <span className={`font-mono text-xs ${textSecondary}`}>({item.caseId})</span>
-                          </div>
-                          <h3 className={`font-bold ${textPrimary} mb-1`}>{item.finding}</h3>
-                          <p className={`text-xs ${textSecondary}`}>{item.createdDate}</p>
+                          <p className={`text-xs ${textSecondary}`}>{totalItems} total findings across {Object.keys(reviewTypes).length} review types</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className={`text-sm ${textSecondary}`}>Confidence:</span>
-                          <span className={`font-bold ${item.confidence >= 0.8 ? "text-[#4caf50]" : item.confidence >= 0.6 ? "text-[#ff9800]" : "text-[#f44336]"}`}>
-                            {Math.round(item.confidence * 100)}%
-                          </span>
+                      <div className="flex items-center gap-4">
+                        {/* Review type badges */}
+                        <div className="flex gap-2">
+                          {Object.entries(reviewTypes).map(([type, items]) => (
+                            <span 
+                              key={type} 
+                              className="px-2 py-0.5 rounded text-xs"
+                              style={{ backgroundColor: `${reviewTypeColors[type] || "#666"}20`, color: reviewTypeColors[type] || "#666" }}
+                            >
+                              {type.replace(" Review", "")}: {items.filter(i => i.status === "pending").length}
+                            </span>
+                          ))}
                         </div>
-                        <div className={`w-24 h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"} overflow-hidden`}>
-                          <div 
-                            className={`h-full ${item.confidence >= 0.8 ? "bg-[#4caf50]" : item.confidence >= 0.6 ? "bg-[#ff9800]" : "bg-[#f44336]"}`}
-                            style={{ width: `${item.confidence * 100}%` }}
-                          />
-                        </div>
+                        <ChevronDown className={`h-5 w-5 ${textSecondary} transition-transform ${isClientExpanded ? "rotate-180" : ""}`} />
                       </div>
-                    </div>
+                    </button>
 
-                    {/* AI Reasoning */}
-                    <div className={`p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]/50" : "bg-gray-50"} mb-4`}>
-                      <p className={`text-xs font-medium ${textSecondary} mb-1`}>AI Reasoning</p>
-                      <p className={`text-sm ${textPrimary}`}>{item.aiReason}</p>
-                    </div>
+                    {/* Client Content - Review Type Sections */}
+                    {isClientExpanded && (
+                      <div className={`border-t ${borderColor}`}>
+                        {Object.entries(reviewTypes).map(([reviewType, items]) => {
+                          const typeKey = `${client}-${reviewType}`
+                          const isTypeExpanded = expandedReviewTypes[typeKey] !== false
+                          const TypeIcon = reviewTypeIcons[reviewType] || FileText
+                          const typeColor = reviewTypeColors[reviewType] || "#666"
+                          const typePendingCount = items.filter(i => i.status === "pending").length
+                          
+                          return (
+                            <div key={reviewType} className={`border-t ${borderColor} first:border-t-0`}>
+                              {/* Review Type Header */}
+                              <button
+                                onClick={() => toggleReviewType(typeKey)}
+                                className={`w-full px-5 py-3 flex items-center justify-between hover:bg-[#1e4976]/5 transition-colors ${isDarkMode ? "bg-[#1e4976]/10" : "bg-gray-50"}`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <TypeIcon className="h-4 w-4" style={{ color: typeColor }} />
+                                  <span className={`font-medium ${textPrimary}`}>{reviewType}</span>
+                                  <span className={`text-xs ${textSecondary}`}>({items.length} findings)</span>
+                                  {typePendingCount > 0 && (
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#ff9800]/20 text-[#ff9800]">
+                                      {typePendingCount} pending
+                                    </span>
+                                  )}
+                                </div>
+                                <ChevronRight className={`h-4 w-4 ${textSecondary} transition-transform ${isTypeExpanded ? "rotate-90" : ""}`} />
+                              </button>
 
-                    {/* Actions */}
-                    <div className="flex items-center justify-end gap-2">
-                      <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4 mr-2" /> View Context
-                      </Button>
-                      <Button variant="outline" size="sm" className="text-[#f44336] border-[#f44336]/30 hover:bg-[#f44336]/10">
-                        <ThumbsDown className="h-4 w-4 mr-2" /> Reject
-                      </Button>
-                      <Button size="sm" className="bg-[#4caf50] hover:bg-[#4caf50]/80">
-                        <ThumbsUp className="h-4 w-4 mr-2" /> Accept
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
+                              {/* Review Items */}
+                              {isTypeExpanded && (
+                                <div className="divide-y divide-[#1e4976]/30">
+                                  {items.map((item) => (
+                                    <div key={item.id} className={`px-5 py-4 ${item.status !== "pending" ? "opacity-60" : ""}`}>
+                                      <div className="flex items-start justify-between">
+                                        <div className="flex items-start gap-3 flex-1">
+                                          <div className={`p-2 rounded-lg ${
+                                            item.severity === "High" ? "bg-[#f44336]/20" :
+                                            item.severity === "Medium" ? "bg-[#ff9800]/20" :
+                                            item.severity === "Low" ? "bg-[#2196f3]/20" :
+                                            "bg-[#4caf50]/20"
+                                          }`}>
+                                            <Brain className={`h-4 w-4 ${
+                                              item.severity === "High" ? "text-[#f44336]" :
+                                              item.severity === "Medium" ? "text-[#ff9800]" :
+                                              item.severity === "Low" ? "text-[#2196f3]" :
+                                              "text-[#4caf50]"
+                                            }`} />
+                                          </div>
+                                          <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-1">
+                                              <span className={`font-mono text-xs ${textSecondary}`}>{item.id}</span>
+                                              <span className={`px-1.5 py-0.5 rounded text-[10px] ${
+                                                item.severity === "High" ? "bg-[#f44336]/20 text-[#f44336]" :
+                                                item.severity === "Medium" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                                                item.severity === "Low" ? "bg-[#2196f3]/20 text-[#2196f3]" :
+                                                "bg-[#4caf50]/20 text-[#4caf50]"
+                                              }`}>
+                                                {item.severity}
+                                              </span>
+                                              {item.status !== "pending" && (
+                                                <span className={`px-1.5 py-0.5 rounded text-[10px] ${
+                                                  item.status === "accepted" ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#f44336]/20 text-[#f44336]"
+                                                }`}>
+                                                  {item.status}
+                                                </span>
+                                              )}
+                                              <span className={`text-[10px] ${textSecondary}`}>{item.createdDate}</span>
+                                            </div>
+                                            <p className={`text-sm ${textPrimary} mb-2`}>{item.finding}</p>
+                                            <div className={`p-2 rounded ${isDarkMode ? "bg-[#0a1628]/50" : "bg-gray-100"}`}>
+                                              <p className={`text-xs ${textSecondary}`}>
+                                                <span className="font-medium">AI Reasoning:</span> {item.aiReason}
+                                              </p>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div className="flex flex-col items-end gap-2 ml-4">
+                                          <div className="text-right">
+                                            <span className={`text-xs ${textSecondary}`}>Confidence</span>
+                                            <p className={`font-bold ${item.confidence >= 0.8 ? "text-[#4caf50]" : item.confidence >= 0.6 ? "text-[#ff9800]" : "text-[#f44336]"}`}>
+                                              {Math.round(item.confidence * 100)}%
+                                            </p>
+                                          </div>
+                                          {item.status === "pending" && (
+                                            <div className="flex gap-1">
+                                              <Button variant="outline" size="sm" className="h-7 px-2">
+                                                <Eye className="h-3 w-3" />
+                                              </Button>
+                                              <Button variant="outline" size="sm" className="h-7 px-2 text-[#f44336] border-[#f44336]/30 hover:bg-[#f44336]/10">
+                                                <ThumbsDown className="h-3 w-3" />
+                                              </Button>
+                                              <Button size="sm" className="h-7 px-2 bg-[#4caf50] hover:bg-[#4caf50]/80">
+                                                <ThumbsUp className="h-3 w-3" />
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </Card>
+                )
+              })}
             </div>
           </div>
         </div>
