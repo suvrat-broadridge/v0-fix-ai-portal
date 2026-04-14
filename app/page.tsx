@@ -18,6 +18,8 @@ export default function Page() {
   const [selectedRole, setSelectedRole] = useState<"client" | "admin" | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isDarkMode, setIsDarkMode] = useState(true)
+  const [approvalsTab, setApprovalsTab] = useState("pending")
+  const [atdlStep, setAtdlStep] = useState(1)
 
   // Theme colors
   const bgPrimary = isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"
@@ -53,12 +55,13 @@ export default function Page() {
             key={item.screen}
             onClick={() => setCurrentScreen(item.screen as any)}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded transition-colors ${
-              currentScreen === item.screen ? `bg-[${accentCyan}]/20` : ""
+              currentScreen === item.screen 
+                ? "bg-[#00e5ff]/20 text-[#00e5ff]" 
+                : "text-[#e0e0e0] hover:text-white"
             } hover:bg-[#1e4976]`}
-            style={currentScreen === item.screen ? { color: accentCyan } : {}}
           >
             <item.icon className="h-5 w-5 flex-shrink-0" />
-            {sidebarOpen && <span className="text-sm">{item.label}</span>}
+            {sidebarOpen && <span className="text-sm font-medium">{item.label}</span>}
           </button>
         ))}
       </nav>
@@ -373,8 +376,6 @@ export default function Page() {
 
   // ========== APPROVALS SCREEN ==========
   if (currentScreen === "approvals") {
-    const [activeTab, setActiveTab] = useState("pending")
-
     const approvals = [
       { id: "A001", case: "C001", type: "Spec Review", owner: "Client", daysWaiting: 3, priority: "high" },
       { id: "A002", case: "C002", type: "Legal Review", owner: "Legal", daysWaiting: 7, priority: "critical" },
@@ -412,11 +413,12 @@ export default function Page() {
               {["pending", "due-soon", "overdue", "approved"].map((tab) => (
                 <button
                   key={tab}
-                  onClick={() => setActiveTab(tab)}
+                  onClick={() => setApprovalsTab(tab)}
                   className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === tab ? `border-[${accentCyan}]` : borderColor
+                    approvalsTab === tab 
+                      ? "border-[#00e5ff] text-[#00e5ff]" 
+                      : "border-transparent text-[#b0bec5] hover:text-white"
                   }`}
-                  style={activeTab === tab ? { color: accentCyan } : {}}
                 >
                   {tab.replace("-", " ").toUpperCase()}
                 </button>
@@ -612,8 +614,6 @@ export default function Page() {
 
   // ========== ATDL SUITE SCREEN ==========
   if (currentScreen === "atdl-suite") {
-    const [step, setStep] = useState(1)
-
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
@@ -635,11 +635,11 @@ export default function Page() {
               ].map((item, idx) => (
                 <div key={item.num} className="flex items-center flex-1">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                    step >= item.num ? `bg-[${accentCyan}] text-[#0a1628]` : `bg-[#1e4976] ${textSecondary}`
+                    atdlStep >= item.num ? `bg-[${accentCyan}] text-[#0a1628]` : `bg-[#1e4976] ${textSecondary}`
                   }`}>
                     {item.num}
                   </div>
-                  {idx < 4 && <div className={`flex-1 h-1 mx-2 ${step > item.num ? `bg-[${accentCyan}]` : `bg-[#1e4976]`}`} />}
+                  {idx < 4 && <div className={`flex-1 h-1 mx-2 ${atdlStep > item.num ? `bg-[${accentCyan}]` : `bg-[#1e4976]`}`} />}
                 </div>
               ))}
             </div>
@@ -647,7 +647,7 @@ export default function Page() {
             {/* Content Area */}
             <Card className={`${bgCard} border ${borderColor} p-6`}>
               <div className="mb-6">
-                <p className={`text-lg font-semibold ${textPrimary}`}>Step {step}: Select Inputs</p>
+                <p className={`text-lg font-semibold ${textPrimary}`}>Step {atdlStep}: Select Inputs</p>
                 <p className={`text-sm ${textSecondary}`}>Choose ATDL version and file to process</p>
               </div>
 
@@ -669,9 +669,9 @@ export default function Page() {
               </div>
 
               <div className="flex justify-between">
-                <Button variant="outline" onClick={() => setStep(Math.max(1, step - 1))}>Previous</Button>
-                <Button style={{ backgroundColor: accentCyan, color: "#0a1628" }} onClick={() => setStep(Math.min(5, step + 1))}>
-                  {step === 5 ? "Complete" : "Next"}
+                <Button variant="outline" onClick={() => setAtdlStep(Math.max(1, atdlStep - 1))}>Previous</Button>
+                <Button style={{ backgroundColor: accentCyan, color: "#0a1628" }} onClick={() => setAtdlStep(Math.min(5, atdlStep + 1))}>
+                  {atdlStep === 5 ? "Complete" : "Next"}
                 </Button>
               </div>
             </Card>
