@@ -176,7 +176,7 @@ export default function BCometPlatform() {
   const pendingApprovals = allApprovals.filter(a => a.status === "pending" || a.status === "overdue")
 
   // Approvals screen state
-  const [approvalsTab, setApprovalsTab] = useState<"Pending" | "Approved" | "Rejected" | "All">("Pending")
+  const [approvalsTab, setApprovalsTab] = useState<"Pending" | "Due Soon" | "Overdue" | "Approved" | "Rejected" | "Waivers" | "All">("Pending")
   const [expandedApprovalClients, setExpandedApprovalClients] = useState<Record<string, boolean>>({})
   const [selectedApproval, setSelectedApproval] = useState<typeof allApprovals[0] | null>(null)
 
@@ -1600,16 +1600,47 @@ export default function BCometPlatform() {
         { client: "Quantum Asset Management", task: "Resolve configuration errors", priority: "high", asset: "Commodities" },
       ]
 
+      // Dashboard metrics calculations
+      const casesAtRisk = clients.filter(c => getTotalAlerts(c) > 0).length
+      const approvalsPending = 7 // Mock data - would come from approvals system
+      const evidenceCompleteness = 68 // Mock percentage
+      const readyForGoLive = clients.filter(c => c.assetClasses.every(a => a.certification === "completed")).length
+
       return (
         <div className={`min-h-screen ${bgPrimary} flex`}>
           <Sidebar />
           <div className="flex-1 overflow-auto">
+            {/* Header with title */}
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
               <div>
                 <h1 className={`text-xl font-bold ${textPrimary}`}>Dashboard</h1>
-                <p className={textSecondary}>Overview of client onboarding status</p>
+                <p className={textSecondary}>Operational control tower for urgency, risk, and next actions</p>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                <button className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 relative`}>
+                  <Bell className="h-5 w-5" />
+                  {totalAlerts > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#f44336] rounded-full text-[10px] text-white flex items-center justify-center">{totalAlerts}</span>}
+                </button>
+              </div>
+            </header>
+
+            {/* Sticky Controls Row */}
+            <div className={`sticky top-0 z-10 ${bgSecondary} border-b ${borderColor} px-6 py-3 flex items-center justify-between gap-4`}>
+              <div className="flex items-center gap-3">
+                {/* Date Range Selector */}
+                <select className={`px-3 py-2 rounded-lg text-sm border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"}`}>
+                  <option>Last 7 days</option>
+                  <option>Last 30 days</option>
+                  <option>Last 90 days</option>
+                  <option>This year</option>
+                </select>
+                {/* Global Search */}
+                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
+                  <Search className={`h-4 w-4 ${textSecondary}`} />
+                  <input type="text" placeholder="Search cases, clients..." className={`bg-transparent border-0 outline-none text-sm ${textPrimary} w-48`} />
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
                 {/* View Toggle */}
                 <div className={`flex gap-1 p-1 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-100"}`}>
                   <button 
@@ -1625,57 +1656,126 @@ export default function BCometPlatform() {
                     <TrendingUp className="h-3 w-3" /> Kanban
                   </button>
                 </div>
-                <button className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 relative`}>
-                  <Bell className="h-5 w-5" />
-                  {totalAlerts > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#f44336] rounded-full text-[10px] text-white flex items-center justify-center">{totalAlerts}</span>}
-                </button>
+                {/* Quick Actions */}
+                <Button size="sm" className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00d4ed]" onClick={() => setCurrentScreen("onboarding-cases")}>
+                  <Plus className="h-4 w-4 mr-1" /> New Case
+                </Button>
               </div>
-            </header>
+            </div>
 
             <div className="p-6 space-y-6">
-              {/* Metrics Cards - Always visible */}
-              <div className="grid grid-cols-4 gap-4">
-                <Card className={`${bgCard} border ${borderColor} p-4`}>
+              {/* KPI Cards Row - 5 cards per design brief */}
+              <div className="grid grid-cols-5 gap-4">
+                <Card className={`${bgCard} border ${borderColor} p-4 cursor-pointer hover:border-[#00e5ff]/50 transition-colors`} onClick={() => setCurrentScreen("onboarding-cases")}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className={`text-sm ${textSecondary}`}>Total Clients</p>
-                      <p className={`text-2xl font-bold ${textPrimary}`}>{totalClients}</p>
+                      <p className={`text-xs ${textSecondary} uppercase tracking-wide`}>Active Cases</p>
+                      <p className={`text-2xl font-bold ${textPrimary} mt-1`}>{totalClients}</p>
+                      <p className={`text-xs ${textSecondary} mt-1`}>+2 this week</p>
                     </div>
                     <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#2196f3]/20" : "bg-[#2196f3]/10"}`}>
-                      <Users className="h-6 w-6 text-[#2196f3]" />
+                      <Briefcase className="h-6 w-6 text-[#2196f3]" />
                     </div>
                   </div>
                 </Card>
-                <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <Card className={`${bgCard} border ${borderColor} p-4 cursor-pointer hover:border-[#f44336]/50 transition-colors`} onClick={() => setCurrentScreen("onboarding-cases")}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className={`text-sm ${textSecondary}`}>In Progress</p>
-                      <p className={`text-2xl font-bold ${textPrimary}`}>{inProgressClients}</p>
+                      <p className={`text-xs ${textSecondary} uppercase tracking-wide`}>Cases At Risk</p>
+                      <p className={`text-2xl font-bold text-[#f44336] mt-1`}>{casesAtRisk}</p>
+                      <p className={`text-xs text-[#f44336] mt-1`}>Needs attention</p>
                     </div>
-                    <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#ff9800]/20" : "bg-[#ff9800]/10"}`}>
-                      <Activity className="h-6 w-6 text-[#ff9800]" />
+                    <div className={`p-3 rounded-lg bg-[#f44336]/20`}>
+                      <AlertTriangle className="h-6 w-6 text-[#f44336]" />
                     </div>
                   </div>
                 </Card>
-                <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <Card className={`${bgCard} border ${borderColor} p-4 cursor-pointer hover:border-[#ff9800]/50 transition-colors`} onClick={() => setCurrentScreen("approvals")}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className={`text-sm ${textSecondary}`}>Certified</p>
-                      <p className={`text-2xl font-bold ${textPrimary}`}>{completedCertifications}</p>
+                      <p className={`text-xs ${textSecondary} uppercase tracking-wide`}>Approvals Pending</p>
+                      <p className={`text-2xl font-bold text-[#ff9800] mt-1`}>{approvalsPending}</p>
+                      <p className={`text-xs text-[#ff9800] mt-1`}>3 due today</p>
                     </div>
-                    <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#4caf50]/20" : "bg-[#4caf50]/10"}`}>
-                      <Award className="h-6 w-6 text-[#4caf50]" />
+                    <div className={`p-3 rounded-lg bg-[#ff9800]/20`}>
+                      <ClipboardCheck className="h-6 w-6 text-[#ff9800]" />
                     </div>
                   </div>
                 </Card>
-                <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <Card className={`${bgCard} border ${borderColor} p-4 cursor-pointer hover:border-[#9c27b0]/50 transition-colors`} onClick={() => setCurrentScreen("evidence-vault")}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className={`text-sm ${textSecondary}`}>Active Alerts</p>
-                      <p className={`text-2xl font-bold ${totalAlerts > 0 ? "text-[#f44336]" : textPrimary}`}>{totalAlerts}</p>
+                      <p className={`text-xs ${textSecondary} uppercase tracking-wide`}>Evidence Complete</p>
+                      <p className={`text-2xl font-bold text-[#9c27b0] mt-1`}>{evidenceCompleteness}%</p>
+                      <p className={`text-xs ${textSecondary} mt-1`}>Across all cases</p>
                     </div>
-                    <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#f44336]/20" : "bg-[#f44336]/10"}`}>
-                      <AlertCircle className="h-6 w-6 text-[#f44336]" />
+                    <div className={`p-3 rounded-lg bg-[#9c27b0]/20`}>
+                      <Archive className="h-6 w-6 text-[#9c27b0]" />
+                    </div>
+                  </div>
+                </Card>
+                <Card className={`${bgCard} border ${borderColor} p-4 cursor-pointer hover:border-[#4caf50]/50 transition-colors`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className={`text-xs ${textSecondary} uppercase tracking-wide`}>Ready for Go-Live</p>
+                      <p className={`text-2xl font-bold text-[#4caf50] mt-1`}>{readyForGoLive}</p>
+                      <p className={`text-xs text-[#4caf50] mt-1`}>Certification complete</p>
+                    </div>
+                    <div className={`p-3 rounded-lg bg-[#4caf50]/20`}>
+                      <Rocket className="h-6 w-6 text-[#4caf50]" />
+                    </div>
+                  </div>
+                </Card>
+              </div>
+
+              {/* Stage Funnel + SLA Forecast Strip */}
+              <div className="grid grid-cols-3 gap-4">
+                <Card className={`${bgCard} border ${borderColor} p-4 col-span-2`}>
+                  <h3 className={`font-semibold ${textPrimary} mb-4`}>Stage Funnel</h3>
+                  <div className="flex items-end justify-between gap-2 h-32">
+                    {[
+                      { stage: "Setup", count: 2, color: "#2196f3" },
+                      { stage: "Spec Analysis", count: 3, color: "#9c27b0" },
+                      { stage: "Connectivity", count: 1, color: "#00bcd4" },
+                      { stage: "Log Analysis", count: 2, color: "#ff9800" },
+                      { stage: "Testing", count: 1, color: "#e91e63" },
+                      { stage: "Certification", count: 1, color: "#4caf50" },
+                      { stage: "Live", count: 0, color: "#00e5ff" },
+                    ].map((s, i) => (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-2">
+                        <div 
+                          className="w-full rounded-t-sm transition-all hover:opacity-80 cursor-pointer"
+                          style={{ backgroundColor: s.color, height: `${Math.max(s.count * 25, 8)}px` }}
+                        />
+                        <span className={`text-[10px] ${textSecondary} text-center`}>{s.stage}</span>
+                        <span className={`text-xs font-semibold ${textPrimary}`}>{s.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+                <Card className={`${bgCard} border ${borderColor} p-4`}>
+                  <h3 className={`font-semibold ${textPrimary} mb-4`}>SLA Forecast</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className={`text-sm ${textSecondary}`}>On Track</span>
+                      <span className="text-sm font-semibold text-[#4caf50]">6 cases</span>
+                    </div>
+                    <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`}>
+                      <div className="h-full rounded-full bg-[#4caf50]" style={{ width: "60%" }} />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className={`text-sm ${textSecondary}`}>At Risk</span>
+                      <span className="text-sm font-semibold text-[#ff9800]">3 cases</span>
+                    </div>
+                    <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`}>
+                      <div className="h-full rounded-full bg-[#ff9800]" style={{ width: "30%" }} />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className={`text-sm ${textSecondary}`}>Breached</span>
+                      <span className="text-sm font-semibold text-[#f44336]">1 case</span>
+                    </div>
+                    <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`}>
+                      <div className="h-full rounded-full bg-[#f44336]" style={{ width: "10%" }} />
                     </div>
                   </div>
                 </Card>
@@ -1748,34 +1848,94 @@ export default function BCometPlatform() {
                 </div>
               )}
 
-              {/* Cards View - Original Dashboard Content */}
+              {/* Cards View - Enhanced Dashboard Content */}
               {dashboardView === "cards" && (
               <>
-              <div className="grid grid-cols-2 gap-6">
-                {/* Pending Tasks */}
-                <Card className={`${bgCard} border ${borderColor}`}>
+              {/* Priority Action Queue + Blockers Panel */}
+              <div className="grid grid-cols-3 gap-6">
+                {/* Priority Action Queue - 2/3 width */}
+                <Card className={`${bgCard} border ${borderColor} col-span-2`}>
                   <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
-                    <h2 className={`font-semibold ${textPrimary}`}>Pending Tasks</h2>
-                    <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#f44336]/10 text-[#f44336]"}`}>{pendingTasks.length} tasks</span>
+                    <div className="flex items-center gap-2">
+                      <Target className="h-4 w-4 text-[#00e5ff]" />
+                      <h2 className={`font-semibold ${textPrimary}`}>Priority Action Queue</h2>
+                    </div>
+                    <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#f44336]/10 text-[#f44336]"}`}>{pendingTasks.length + 4} actions</span>
                   </div>
-                  <div className="divide-y divide-[#1e4976]/30">
-                    {pendingTasks.map((task, i) => (
-                      <div key={i} className="px-4 py-3 flex items-center justify-between hover:bg-[#1e4976]/10 cursor-pointer" onClick={() => setCurrentScreen("clients")}>
-                        <div>
-                          <p className={`text-sm font-medium ${textPrimary}`}>{task.task}</p>
-                          <p className={`text-xs ${textSecondary}`}>{task.client} - {task.asset}</p>
+                  <div className="divide-y divide-[#1e4976]/30 max-h-72 overflow-y-auto">
+                    {[
+                      { task: "Review spec differences", client: "Nexus Trading Group", asset: "Options", priority: "critical", dueIn: "2 hours", type: "review" },
+                      { task: "Approve certification pack", client: "Apex Capital", asset: "Equities", priority: "high", dueIn: "Today", type: "approval" },
+                      { task: "Resolve configuration errors", client: "Quantum Asset Management", asset: "Commodities", priority: "high", dueIn: "Today", type: "fix" },
+                      { task: "Complete log analysis", client: "Horizon Investments", asset: "FX", priority: "medium", dueIn: "Tomorrow", type: "analysis" },
+                      { task: "Sign-off test results", client: "Velocity Securities", asset: "Fixed Income", priority: "medium", dueIn: "2 days", type: "approval" },
+                      { task: "Upload missing evidence", client: "Nexus Trading Group", asset: "Equities", priority: "low", dueIn: "3 days", type: "upload" },
+                    ].map((task, i) => (
+                      <div key={i} className="px-4 py-3 flex items-center justify-between hover:bg-[#1e4976]/10 cursor-pointer group" onClick={() => setCurrentScreen("onboarding-cases")}>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-1 h-10 rounded-full ${
+                            task.priority === "critical" ? "bg-[#f44336]" : 
+                            task.priority === "high" ? "bg-[#ff9800]" : 
+                            task.priority === "medium" ? "bg-[#2196f3]" : "bg-[#9e9e9e]"
+                          }`} />
+                          <div>
+                            <p className={`text-sm font-medium ${textPrimary} group-hover:text-[#00e5ff]`}>{task.task}</p>
+                            <p className={`text-xs ${textSecondary}`}>{task.client} &middot; {task.asset}</p>
+                          </div>
                         </div>
-                        <span className={`text-xs px-2 py-1 rounded ${task.priority === "high" ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>
-                          {task.priority}
-                        </span>
+                        <div className="flex items-center gap-3">
+                          <span className={`text-xs ${task.dueIn.includes("hour") ? "text-[#f44336]" : task.dueIn === "Today" ? "text-[#ff9800]" : textSecondary}`}>
+                            {task.dueIn}
+                          </span>
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            task.priority === "critical" ? "bg-[#f44336]/20 text-[#f44336]" : 
+                            task.priority === "high" ? "bg-[#ff9800]/20 text-[#ff9800]" : 
+                            task.priority === "medium" ? "bg-[#2196f3]/20 text-[#2196f3]" : "bg-[#9e9e9e]/20 text-[#9e9e9e]"
+                          }`}>
+                            {task.priority}
+                          </span>
+                        </div>
                       </div>
                     ))}
                   </div>
                   <div className={`px-4 py-3 border-t ${borderColor}`}>
-                    <Button variant="outline" size="sm" className="w-full" onClick={() => setCurrentScreen("clients")}>View All Clients</Button>
+                    <Button variant="outline" size="sm" className="w-full" onClick={() => setCurrentScreen("onboarding-cases")}>View All Actions</Button>
                   </div>
                 </Card>
 
+                {/* Blockers Panel - 1/3 width */}
+                <Card className={`${bgCard} border ${borderColor} border-l-4 border-l-[#f44336]`}>
+                  <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                    <div className="flex items-center gap-2">
+                      <AlertOctagon className="h-4 w-4 text-[#f44336]" />
+                      <h2 className={`font-semibold ${textPrimary}`}>Critical Blockers</h2>
+                    </div>
+                    <span className={`text-xs px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336]`}>3 blockers</span>
+                  </div>
+                  <div className="divide-y divide-[#1e4976]/30 max-h-72 overflow-y-auto">
+                    {[
+                      { blocker: "Missing client FIX spec", client: "Quantum Asset", days: 5, impact: "Blocks spec analysis" },
+                      { blocker: "UAT environment down", client: "Horizon Investments", days: 2, impact: "Blocks connectivity testing" },
+                      { blocker: "Pending legal approval", client: "Velocity Securities", days: 8, impact: "Blocks go-live" },
+                    ].map((b, i) => (
+                      <div key={i} className="px-4 py-3 hover:bg-[#1e4976]/10 cursor-pointer">
+                        <div className="flex items-start justify-between mb-1">
+                          <p className={`text-sm font-medium ${textPrimary}`}>{b.blocker}</p>
+                          <span className="text-xs text-[#f44336]">{b.days}d</span>
+                        </div>
+                        <p className={`text-xs ${textSecondary}`}>{b.client}</p>
+                        <p className={`text-xs text-[#ff9800] mt-1`}>{b.impact}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className={`px-4 py-3 border-t ${borderColor}`}>
+                    <Button variant="outline" size="sm" className="w-full text-[#f44336] border-[#f44336]/30 hover:bg-[#f44336]/10">Escalate All</Button>
+                  </div>
+                </Card>
+              </div>
+
+              {/* Recent Activity + Quality Metrics */}
+              <div className="grid grid-cols-2 gap-6">
                 {/* Recent Activity */}
                 <Card className={`${bgCard} border ${borderColor}`}>
                   <div className={`px-4 py-3 border-b ${borderColor}`}>
@@ -1793,51 +1953,126 @@ export default function BCometPlatform() {
                     ))}
                   </div>
                 </Card>
+
+                {/* Quality and Throughput */}
+                <Card className={`${bgCard} border ${borderColor}`}>
+                  <div className={`px-4 py-3 border-b ${borderColor}`}>
+                    <h2 className={`font-semibold ${textPrimary}`}>Quality & Throughput</h2>
+                  </div>
+                  <div className="p-4 grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <p className={`text-xs ${textSecondary} mb-1`}>First-Pass Rate</p>
+                      <p className="text-2xl font-bold text-[#4caf50]">87%</p>
+                      <p className={`text-xs ${textSecondary}`}>+3% vs last month</p>
+                    </div>
+                    <div className="text-center">
+                      <p className={`text-xs ${textSecondary} mb-1`}>Avg. Cycle Time</p>
+                      <p className="text-2xl font-bold text-[#2196f3]">18d</p>
+                      <p className={`text-xs ${textSecondary}`}>-2d vs target</p>
+                    </div>
+                    <div className="text-center">
+                      <p className={`text-xs ${textSecondary} mb-1`}>Test Pass Rate</p>
+                      <p className="text-2xl font-bold text-[#4caf50]">94%</p>
+                      <p className={`text-xs ${textSecondary}`}>All cases</p>
+                    </div>
+                    <div className="text-center">
+                      <p className={`text-xs ${textSecondary} mb-1`}>Compliance Score</p>
+                      <p className="text-2xl font-bold text-[#9c27b0]">98%</p>
+                      <p className={`text-xs ${textSecondary}`}>Audit ready</p>
+                    </div>
+                  </div>
+                </Card>
               </div>
 
-              {/* Client Status Summary */}
+              {/* Case Health Grid - Enhanced per design brief */}
               <Card className={`${bgCard} border ${borderColor}`}>
                 <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
-                  <h2 className={`font-semibold ${textPrimary}`}>Client Status Summary</h2>
-                  <Button variant="outline" size="sm" onClick={() => setCurrentScreen("clients")}>View All</Button>
+                  <div className="flex items-center gap-2">
+                    <Gauge className="h-4 w-4 text-[#00e5ff]" />
+                    <h2 className={`font-semibold ${textPrimary}`}>Case Health Grid</h2>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <select className={`px-2 py-1 rounded text-xs border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"}`}>
+                      <option>All Stages</option>
+                      <option>Setup</option>
+                      <option>Spec Analysis</option>
+                      <option>Testing</option>
+                      <option>Certification</option>
+                    </select>
+                    <Button variant="outline" size="sm" onClick={() => setCurrentScreen("onboarding-cases")}>View All</Button>
+                  </div>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className={`${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
                       <tr>
-                        <th className={`px-4 py-2 text-left text-sm font-medium ${textPrimary}`}>Client</th>
-                        <th className={`px-4 py-2 text-center text-sm font-medium ${textPrimary}`}>Progress</th>
-                        <th className={`px-4 py-2 text-center text-sm font-medium ${textPrimary}`}>Alerts</th>
-                        <th className={`px-4 py-2 text-center text-sm font-medium ${textPrimary}`}>Status</th>
+                        <th className={`px-4 py-2 text-left text-xs font-medium ${textSecondary} uppercase tracking-wide`}>Case / Client</th>
+                        <th className={`px-4 py-2 text-left text-xs font-medium ${textSecondary} uppercase tracking-wide`}>Asset Class</th>
+                        <th className={`px-4 py-2 text-center text-xs font-medium ${textSecondary} uppercase tracking-wide`}>Stage</th>
+                        <th className={`px-4 py-2 text-center text-xs font-medium ${textSecondary} uppercase tracking-wide`}>Progress</th>
+                        <th className={`px-4 py-2 text-center text-xs font-medium ${textSecondary} uppercase tracking-wide`}>Risk</th>
+                        <th className={`px-4 py-2 text-center text-xs font-medium ${textSecondary} uppercase tracking-wide`}>Blockers</th>
+                        <th className={`px-4 py-2 text-center text-xs font-medium ${textSecondary} uppercase tracking-wide`}>SLA Status</th>
+                        <th className={`px-4 py-2 text-left text-xs font-medium ${textSecondary} uppercase tracking-wide`}>Next Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {clients.slice(0, 3).map((client) => {
+                      {clients.slice(0, 5).map((client, idx) => {
                         const completedSteps = client.assetClasses.reduce((sum, a) => {
                           return sum + [a.specCompare, a.logAnalysis, a.scenario, a.testCase, a.certification, a.config].filter(s => s === "completed").length
                         }, 0)
                         const totalSteps = client.assetClasses.length * 6
                         const progress = Math.round((completedSteps / totalSteps) * 100)
+                        const stages = ["Setup", "Spec Analysis", "Connectivity", "Log Analysis", "Testing", "Certification"]
+                        const currentStage = stages[Math.min(Math.floor(progress / 17), 5)]
+                        const riskScore = getTotalAlerts(client) > 2 ? "High" : getTotalAlerts(client) > 0 ? "Medium" : "Low"
+                        const slaStatus = idx === 0 ? "At Risk" : idx === 2 ? "Breached" : "On Track"
+                        const nextActions = ["Review spec differences", "Complete log analysis", "Run test suite", "Sign certification pack", "Schedule go-live"]
                         return (
-                          <tr key={client.id} className={`border-t ${borderColor} cursor-pointer hover:bg-[#1e4976]/10`} onClick={() => { setSelectedClient(client); setCurrentScreen("client-detail"); }}>
+                          <tr key={client.id} className={`border-t ${borderColor} cursor-pointer hover:bg-[#1e4976]/10 group`} onClick={() => { setSelectedClient(client); setCurrentScreen("client-detail"); }}>
                             <td className={`px-4 py-3 ${textPrimary}`}>
-                              <div className="font-medium">{client.name}</div>
-                              <div className={`text-xs ${textSecondary}`}>{client.assetClasses.length} asset classes</div>
+                              <div className="font-medium group-hover:text-[#00e5ff]">{client.name}</div>
+                              <div className={`text-xs ${textSecondary}`}>CASE-{1000 + client.id}</div>
                             </td>
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-2">
-                                <div className={`flex-1 h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
-                                  <div className="h-full rounded-full bg-[#4caf50]" style={{ width: `${progress}%` }} />
-                                </div>
-                                <span className={`text-xs ${textSecondary}`}>{progress}%</span>
+                            <td className={`px-4 py-3 ${textSecondary}`}>
+                              <div className="flex flex-wrap gap-1">
+                                {client.assetClasses.slice(0, 2).map((ac, i) => (
+                                  <span key={i} className={`text-xs px-2 py-0.5 rounded ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"}`}>{ac.name}</span>
+                                ))}
+                                {client.assetClasses.length > 2 && <span className={`text-xs ${textSecondary}`}>+{client.assetClasses.length - 2}</span>}
                               </div>
                             </td>
                             <td className="px-4 py-3 text-center">
+                              <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#2196f3]/20 text-[#2196f3]" : "bg-[#2196f3]/10 text-[#2196f3]"}`}>{currentStage}</span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex items-center gap-2 min-w-24">
+                                <div className={`flex-1 h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
+                                  <div className="h-full rounded-full bg-[#4caf50]" style={{ width: `${progress}%` }} />
+                                </div>
+                                <span className={`text-xs ${textSecondary} w-8`}>{progress}%</span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <span className={`text-xs px-2 py-1 rounded ${
+                                riskScore === "High" ? "bg-[#f44336]/20 text-[#f44336]" :
+                                riskScore === "Medium" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                                "bg-[#4caf50]/20 text-[#4caf50]"
+                              }`}>{riskScore}</span>
+                            </td>
+                            <td className="px-4 py-3 text-center">
                               {getTotalAlerts(client) > 0 ? (
-                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336] text-xs">{getTotalAlerts(client)}</span>
+                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336] text-xs font-medium">{getTotalAlerts(client)}</span>
                               ) : <span className={textSecondary}>-</span>}
                             </td>
-                            <td className="px-4 py-3 text-center">{getStatusBadge(progress === 100 ? "completed" : progress > 50 ? "in-progress" : "not-started")}</td>
+                            <td className="px-4 py-3 text-center">
+                              <span className={`text-xs px-2 py-1 rounded ${
+                                slaStatus === "Breached" ? "bg-[#f44336]/20 text-[#f44336]" :
+                                slaStatus === "At Risk" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                                "bg-[#4caf50]/20 text-[#4caf50]"
+                              }`}>{slaStatus}</span>
+                            </td>
+                            <td className={`px-4 py-3 ${textSecondary} text-sm`}>{nextActions[idx % 5]}</td>
                           </tr>
                         )
                       })}
@@ -8539,26 +8774,83 @@ const copyToClipboard = () => {
           </header>
 
           <div className="p-6">
+            {/* KPI Strip */}
+            <div className="grid grid-cols-5 gap-4 mb-6">
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#ff9800]/20"><Clock className="h-5 w-5 text-[#ff9800]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{pendingCount}</p>
+                    <p className={`text-xs ${textSecondary}`}>Pending Review</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#f44336]/20"><AlertTriangle className="h-5 w-5 text-[#f44336]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold text-[#f44336]`}>{allApprovals.filter(a => a.status === "overdue").length}</p>
+                    <p className={`text-xs ${textSecondary}`}>Overdue</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#2196f3]/20"><Timer className="h-5 w-5 text-[#2196f3]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold text-[#2196f3]`}>3</p>
+                    <p className={`text-xs ${textSecondary}`}>Due Soon</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#4caf50]/20"><CheckCircle className="h-5 w-5 text-[#4caf50]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold text-[#4caf50]`}>{approvedCount}</p>
+                    <p className={`text-xs ${textSecondary}`}>Approved</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#9c27b0]/20"><FileWarning className="h-5 w-5 text-[#9c27b0]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold text-[#9c27b0]`}>2</p>
+                    <p className={`text-xs ${textSecondary}`}>Active Waivers</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
             {/* Stats + Tabs row */}
             <div className="flex items-center justify-between mb-6">
               <div className={`flex gap-1 p-1 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-100"}`}>
-                {(["Pending", "Approved", "Rejected", "All"] as const).map(tab => {
-                  const count = tab === "Pending" ? pendingCount : tab === "Approved" ? approvedCount : tab === "Rejected" ? rejectedCount : allApprovals.length
+                {(["Pending", "Due Soon", "Overdue", "Approved", "Rejected", "Waivers", "All"] as const).map(tab => {
+                  const count = tab === "Pending" ? pendingCount : 
+                    tab === "Due Soon" ? 3 : 
+                    tab === "Overdue" ? allApprovals.filter(a => a.status === "overdue").length : 
+                    tab === "Approved" ? approvedCount : 
+                    tab === "Rejected" ? rejectedCount : 
+                    tab === "Waivers" ? 2 :
+                    allApprovals.length
                   const isActive = approvalsTab === tab
                   return (
                     <button
                       key={tab}
-                      onClick={() => setApprovalsTab(tab)}
-                      className={`px-4 py-2 rounded text-sm font-medium transition-colors flex items-center gap-2 ${
+                      onClick={() => setApprovalsTab(tab as any)}
+                      className={`px-3 py-2 rounded text-sm font-medium transition-colors flex items-center gap-2 ${
                         isActive ? "bg-[#00e5ff] text-[#0a1628]" : `${textSecondary} hover:bg-[#1e4976]/30`
                       }`}
                     >
                       {tab}
                       <span className={`px-1.5 py-0.5 rounded-full text-xs font-bold ${
                         isActive ? "bg-[#0a1628]/20 text-[#0a1628]" :
-                        tab === "Pending" && count > 0 ? "bg-[#f44336] text-white" :
+                        tab === "Pending" && count > 0 ? "bg-[#ff9800] text-white" :
+                        tab === "Overdue" && count > 0 ? "bg-[#f44336] text-white" :
                         tab === "Rejected" ? "bg-[#f44336]/20 text-[#f44336]" :
                         tab === "Approved" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                        tab === "Waivers" ? "bg-[#9c27b0]/20 text-[#9c27b0]" :
                         isDarkMode ? "bg-[#1e4976]/50 text-slate-300" : "bg-gray-200 text-gray-600"
                       }`}>{count}</span>
                     </button>
@@ -8781,6 +9073,20 @@ const copyToClipboard = () => {
 
   // Evidence Vault Screen
   if (currentScreen === "evidence-vault") {
+    // Evidence completeness data
+    const evidenceMatrix = [
+      { stage: "Spec Analysis", required: 4, collected: 4, signed: 3 },
+      { stage: "Connectivity", required: 3, collected: 2, signed: 1 },
+      { stage: "Log Analysis", required: 5, collected: 5, signed: 5 },
+      { stage: "Testing", required: 8, collected: 6, signed: 4 },
+      { stage: "Certification", required: 6, collected: 3, signed: 1 },
+    ]
+    const totalRequired = evidenceMatrix.reduce((sum, s) => sum + s.required, 0)
+    const totalCollected = evidenceMatrix.reduce((sum, s) => sum + s.collected, 0)
+    const totalSigned = evidenceMatrix.reduce((sum, s) => sum + s.signed, 0)
+    const completionRate = Math.round((totalCollected / totalRequired) * 100)
+    const signatureRate = Math.round((totalSigned / totalCollected) * 100)
+
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
@@ -8794,15 +9100,103 @@ const copyToClipboard = () => {
                   <p className={`text-sm ${textSecondary}`}>Immutable audit trail and certification evidence packages</p>
                 </div>
               </div>
-              <Button>
-                <Download className="h-4 w-4 mr-2" /> Export Certification Pack
-              </Button>
+              <div className="flex items-center gap-3">
+                <Button variant="outline">
+                  <FileCheck className="h-4 w-4 mr-2" /> Build Cert Pack
+                </Button>
+                <Button>
+                  <Download className="h-4 w-4 mr-2" /> Export Pack
+                </Button>
+              </div>
             </div>
           </header>
 
-          <div className="p-6">
+          <div className="p-6 space-y-6">
+            {/* KPI Strip */}
+            <div className="grid grid-cols-4 gap-4">
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#2196f3]/20"><Archive className="h-5 w-5 text-[#2196f3]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{evidenceItems.length}</p>
+                    <p className={`text-xs ${textSecondary}`}>Total Artifacts</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#4caf50]/20"><CheckCircle className="h-5 w-5 text-[#4caf50]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold text-[#4caf50]`}>{completionRate}%</p>
+                    <p className={`text-xs ${textSecondary}`}>Collection Complete</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#9c27b0]/20"><Stamp className="h-5 w-5 text-[#9c27b0]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold text-[#9c27b0]`}>{signatureRate}%</p>
+                    <p className={`text-xs ${textSecondary}`}>Signatures Complete</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#ff9800]/20"><AlertTriangle className="h-5 w-5 text-[#ff9800]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold text-[#ff9800]`}>{totalRequired - totalCollected}</p>
+                    <p className={`text-xs ${textSecondary}`}>Missing Artifacts</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Evidence Completeness Matrix */}
+            <Card className={`${bgCard} border ${borderColor}`}>
+              <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                <h3 className={`font-semibold ${textPrimary}`}>Evidence Completeness Matrix</h3>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded bg-[#4caf50]" />
+                    <span className={`text-xs ${textSecondary}`}>Signed</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded bg-[#2196f3]" />
+                    <span className={`text-xs ${textSecondary}`}>Collected</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`} />
+                    <span className={`text-xs ${textSecondary}`}>Missing</span>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4">
+                <div className="space-y-3">
+                  {evidenceMatrix.map((stage, i) => (
+                    <div key={i} className="flex items-center gap-4">
+                      <span className={`text-sm ${textPrimary} w-28`}>{stage.stage}</span>
+                      <div className="flex-1 flex gap-1">
+                        {Array.from({ length: stage.required }).map((_, j) => (
+                          <div
+                            key={j}
+                            className={`h-6 flex-1 rounded ${
+                              j < stage.signed ? "bg-[#4caf50]" :
+                              j < stage.collected ? "bg-[#2196f3]" :
+                              isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className={`text-xs ${textSecondary} w-20 text-right`}>{stage.collected}/{stage.required}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Card>
+
             {/* Filters */}
-            <Card className={`${bgCard} border ${borderColor} p-4 mb-6`}>
+            <Card className={`${bgCard} border ${borderColor} p-4`}>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <span className={`text-sm ${textSecondary}`}>Case:</span>
