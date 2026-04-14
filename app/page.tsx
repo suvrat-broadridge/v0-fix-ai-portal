@@ -20,6 +20,7 @@ export default function Page() {
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [approvalsTab, setApprovalsTab] = useState("pending")
   const [atdlStep, setAtdlStep] = useState(1)
+  const [demoEmail, setDemoEmail] = useState("")
 
   // Theme colors
   const bgPrimary = isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"
@@ -81,8 +82,6 @@ export default function Page() {
 
   // ========== WELCOME SCREEN ==========
   if (currentScreen === "welcome") {
-    const [demoEmail, setDemoEmail] = useState("")
-
     return (
       <div className={`min-h-screen ${bgPrimary} overflow-hidden`}>
         {/* Navigation */}
