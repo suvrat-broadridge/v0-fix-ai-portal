@@ -4987,28 +4987,127 @@ const specCompareResults = [
         </div>
       ),
       4: (
-        <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-3">
+        <div className="space-y-5">
+          {/* Strategy selector tabs */}
+          <div className="flex items-center gap-2">
+            <span className={`text-xs font-medium ${textSecondary} mr-1`}>Strategy:</span>
             {["VWAP","TWAP","POV"].map((s, i) => (
-              <div key={s} className={`p-4 rounded-lg border ${i === 2 ? "border-[#f44336]/40 bg-[#f44336]/5" : "border-[#4caf50]/40 bg-[#4caf50]/5"}`}>
-                <div className="flex items-center justify-between mb-3">
-                  <span className={`font-semibold ${textPrimary}`}>{s}</span>
-                  {i === 2 ? <AlertCircle className="h-4 w-4 text-[#f44336]" /> : <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
-                </div>
-                <div className="space-y-1.5 text-xs">
-                  {["UI Render","FIX Generation","Mapping","Boundary Tests"].map((check, j) => (
-                    <div key={check} className="flex items-center gap-2">
-                      {(i === 2 && j === 2) ? <AlertCircle className="h-3 w-3 text-[#f44336]" /> : <CheckCircle className="h-3 w-3 text-[#4caf50]" />}
-                      <span className={textSecondary}>{check}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <button
+                key={s}
+                onClick={() => setAtdlSelectedStrategy(s)}
+                className={`px-3 py-1.5 rounded text-sm font-medium border transition-colors flex items-center gap-1.5 ${
+                  atdlSelectedStrategy === s
+                    ? "bg-[#00e5ff]/20 text-[#00e5ff] border-[#00e5ff]/40"
+                    : `${borderColor} ${textSecondary} hover:border-[#00e5ff]`
+                }`}
+              >
+                {s}
+                {i === 2 ? <AlertCircle className="h-3 w-3 text-[#f44336]" /> : <CheckCircle className="h-3 w-3 text-[#4caf50]" />}
+              </button>
             ))}
           </div>
-          <div className={`p-4 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/60" : "bg-gray-50"}`}>
-            <p className={`text-xs font-semibold ${textSecondary} mb-2 uppercase tracking-wider`}>Sample Generated FIX Message</p>
-            <p className="font-mono text-xs text-[#00e5ff]">847=VWAP|7940=09:30:00|7941=16:00:00|7942=15|7943=100|7944=500|</p>
+
+          {/* Visual UI Representation */}
+          <div className={`border ${borderColor} rounded-lg overflow-hidden`}>
+            <div className={`px-4 py-2.5 ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"} flex items-center justify-between`}>
+              <div className="flex items-center gap-2">
+                <Eye className="h-4 w-4 text-[#00e5ff]" />
+                <span className={`text-sm font-semibold ${textPrimary}`}>UI Representation — {atdlSelectedStrategy}</span>
+                <span className={`px-2 py-0.5 rounded text-xs ${atdlSelectedStrategy === "POV" ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#4caf50]/20 text-[#4caf50]"}`}>
+                  {atdlSelectedStrategy === "POV" ? "Has Issues" : "Valid"}
+                </span>
+              </div>
+              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => simulateTask(() => setAtdlUiVisible(true))}>
+                <Play className="h-3 w-3 mr-1" /> {isLoading ? "Loading..." : "Load UI"}
+              </Button>
+            </div>
+            <div className={`p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className={`block text-xs mb-1 ${textSecondary}`}>Start Time</label>
+                  <Input type="time" defaultValue="09:30" className={`h-8 text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white text-[#0a1628]"}`} />
+                </div>
+                <div>
+                  <label className={`block text-xs mb-1 ${textSecondary}`}>End Time</label>
+                  <Input type="time" defaultValue="16:00" className={`h-8 text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white text-[#0a1628]"}`} />
+                </div>
+                <div>
+                  <label className={`block text-xs mb-1 ${textSecondary}`}>Participation Rate (%)</label>
+                  <Input type="number" defaultValue="15" className={`h-8 text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white text-[#0a1628]"}`} />
+                </div>
+                <div>
+                  <label className={`block text-xs mb-1 ${textSecondary}`}>Min Quantity</label>
+                  <Input type="number" defaultValue="100" className={`h-8 text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white text-[#0a1628]"}`} />
+                </div>
+                <div>
+                  <label className={`block text-xs mb-1 ${textSecondary}`}>Max Floor</label>
+                  <Input type="number" defaultValue="500" className={`h-8 text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white text-[#0a1628]"}`} />
+                </div>
+                <div>
+                  <label className={`block text-xs mb-1 ${textSecondary}`}>Display Qty</label>
+                  <Input type="number" defaultValue="200" className={`h-8 text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white text-[#0a1628]"}`} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Test: FIX Generation + Validation */}
+          <div className={`border ${borderColor} rounded-lg overflow-hidden`}>
+            <div className={`px-4 py-2.5 ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"} flex items-center justify-between`}>
+              <div className="flex items-center gap-2">
+                <Zap className="h-4 w-4 text-[#00e5ff]" />
+                <span className={`text-sm font-semibold ${textPrimary}`}>Quick Test — FIX Generation</span>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => simulateTask(() => setAtdlFixMessageGenerated(true))}>
+                  <Zap className="h-3 w-3 mr-1" /> Generate FIX
+                </Button>
+                <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => simulateTask(() => setAtdlFixValidationResults(true))}>
+                  <CheckCircle className="h-3 w-3 mr-1" /> Validate
+                </Button>
+              </div>
+            </div>
+            <div className={`p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
+              <p className={`text-xs font-semibold ${textSecondary} mb-2`}>Generated FIX Message</p>
+              <div className={`font-mono text-xs p-3 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/60" : "bg-[#f8fafc]"} overflow-x-auto`}>
+                <span className={textPrimary}>8=FIX.4.4|9=256|35=D|49=SENDER|56=TARGET|34=1|52=20240115-14:30:00.000|11=ORDER123|21=1|55=AAPL|54=1|60=20240115-14:30:00.000|38=10000|40=2|44=150.00|59=0|</span>
+                <span className="text-[#00e5ff]">847={atdlSelectedStrategy}|7940=09:30:00|7941=16:00:00|7942=15|7943=100|7944=500|7945=200|7946=M|</span>
+                <span className={textPrimary}>10=128|</span>
+              </div>
+              {atdlFixValidationResults && (
+                <div className="mt-3">
+                  <p className={`text-xs font-semibold ${textSecondary} mb-2`}>Validation Result</p>
+                  <div className="flex items-center gap-3">
+                    <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">4 Matches</span>
+                    <span className="px-2 py-1 rounded text-xs bg-[#f44336]/20 text-[#f44336]">3 Mismatches</span>
+                    <span className={`text-xs ${textSecondary}`}>against Equities FIX 4.4 v2.1</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Strategy Qualification Summary */}
+          <div>
+            <p className={`text-xs font-semibold ${textSecondary} mb-2 uppercase tracking-wider`}>Strategy Qualification Summary</p>
+            <div className="grid grid-cols-3 gap-3">
+              {["VWAP","TWAP","POV"].map((s, i) => (
+                <div key={s} className={`p-3 rounded-lg border ${i === 2 ? "border-[#f44336]/40 bg-[#f44336]/5" : "border-[#4caf50]/40 bg-[#4caf50]/5"}`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={`font-semibold text-sm ${textPrimary}`}>{s}</span>
+                    {i === 2 ? <AlertCircle className="h-4 w-4 text-[#f44336]" /> : <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
+                  </div>
+                  <div className="space-y-1 text-xs">
+                    {["UI Render","FIX Generation","Mapping","Boundary Tests"].map((check, j) => (
+                      <div key={check} className="flex items-center gap-1.5">
+                        {(i === 2 && j === 2) ? <AlertCircle className="h-3 w-3 text-[#f44336]" /> : <CheckCircle className="h-3 w-3 text-[#4caf50]" />}
+                        <span className={textSecondary}>{check}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       ),
