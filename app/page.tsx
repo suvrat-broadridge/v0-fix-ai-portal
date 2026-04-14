@@ -152,11 +152,33 @@ export default function BCometPlatform() {
   ])
 
   // Approvals data
-  const [pendingApprovals] = useState([
-    { id: "APR-001", type: "Stage Gate", caseId: "OB-2024-001", client: "Nexus Trading Group", description: "Approve progression from Testing to Certification", requiredApprovers: ["Ops", "Technical"], currentApprovers: ["Ops"], submittedBy: "John Smith", submittedDate: "Jan 14, 2024", dueDate: "Jan 16, 2024", status: "pending" },
-    { id: "APR-002", type: "Exception", caseId: "OB-2024-002", client: "Apex Capital Partners", description: "Waiver for custom field 5001 mapping", requiredApprovers: ["Compliance", "Technical"], currentApprovers: [], submittedBy: "Sarah Johnson", submittedDate: "Jan 13, 2024", dueDate: "Jan 15, 2024", status: "overdue" },
-    { id: "APR-003", type: "Go-Live", caseId: "OB-2024-004", client: "Velocity Securities", description: "Final go-live approval for production cutover", requiredApprovers: ["Ops", "Compliance", "Technical", "Management"], currentApprovers: ["Ops", "Technical"], submittedBy: "Lisa Wang", submittedDate: "Jan 12, 2024", dueDate: "Jan 18, 2024", status: "pending" },
+  const [allApprovals] = useState([
+    // Nexus Trading Group
+    { id: "APR-001", type: "Stage Gate", caseId: "OB-2024-001", client: "Nexus Trading Group", description: "Approve progression from Testing to Certification", requiredApprovers: ["Ops", "Technical"], currentApprovers: ["Ops"], submittedBy: "John Smith", submittedDate: "Jan 14, 2024", dueDate: "Jan 16, 2024", status: "pending", notes: "All test cases passed. One minor field mapping discrepancy noted but waived per APR-004." },
+    { id: "APR-004", type: "Exception", caseId: "OB-2024-001", client: "Nexus Trading Group", description: "Waiver for optional field 58 custom usage pattern", requiredApprovers: ["Compliance", "Technical"], currentApprovers: ["Compliance", "Technical"], submittedBy: "John Smith", submittedDate: "Jan 8, 2024", dueDate: "Jan 10, 2024", status: "approved", resolvedDate: "Jan 9, 2024", resolvedBy: "David Park", notes: "Field usage confirmed as non-breaking. Client workflow depends on it. Approved with monitoring clause." },
+    { id: "APR-007", type: "Stage Gate", caseId: "OB-2024-001", client: "Nexus Trading Group", description: "Approve progression from Spec Analysis to Connectivity", requiredApprovers: ["Technical"], currentApprovers: ["Technical"], submittedBy: "John Smith", submittedDate: "Dec 28, 2023", dueDate: "Dec 30, 2023", status: "approved", resolvedDate: "Dec 29, 2023", resolvedBy: "Technical Lead", notes: "Spec comparison completed with 3 minor discrepancies. All documented and accepted." },
+    { id: "APR-010", type: "Exception", caseId: "OB-2024-001", client: "Nexus Trading Group", description: "SLA extension request for UAT phase due to holiday period", requiredApprovers: ["Management", "Ops"], currentApprovers: [], submittedBy: "John Smith", submittedDate: "Dec 20, 2023", dueDate: "Dec 22, 2023", status: "rejected", resolvedDate: "Dec 21, 2023", resolvedBy: "Karen Mitchell", notes: "Extension not approved. Client advised to use existing buffer in schedule. Alternative timeline provided." },
+    // Apex Capital Partners
+    { id: "APR-002", type: "Exception", caseId: "OB-2024-002", client: "Apex Capital Partners", description: "Waiver for custom field 5001 mapping", requiredApprovers: ["Compliance", "Technical"], currentApprovers: [], submittedBy: "Sarah Johnson", submittedDate: "Jan 13, 2024", dueDate: "Jan 15, 2024", status: "overdue", notes: "Field 5001 is proprietary and not part of standard FIX spec. Risk assessment required before approval." },
+    { id: "APR-005", type: "Stage Gate", caseId: "OB-2024-002", client: "Apex Capital Partners", description: "Approve progression from Setup to Spec Analysis", requiredApprovers: ["Ops", "Technical"], currentApprovers: ["Ops", "Technical"], submittedBy: "Sarah Johnson", submittedDate: "Jan 2, 2024", dueDate: "Jan 5, 2024", status: "approved", resolvedDate: "Jan 3, 2024", resolvedBy: "Ops Team", notes: "Environment setup confirmed. FIX engine version validated. Credentials tested." },
+    { id: "APR-008", type: "Exception", caseId: "OB-2024-002", client: "Apex Capital Partners", description: "Protocol downgrade request from FIX 4.4 to FIX 4.2 for legacy system", requiredApprovers: ["Technical", "Compliance", "Management"], currentApprovers: ["Technical"], submittedBy: "Sarah Johnson", submittedDate: "Jan 10, 2024", dueDate: "Jan 12, 2024", status: "pending", notes: "Client legacy OMS cannot support FIX 4.4 features. Requesting temporary downgrade with upgrade plan." },
+    { id: "APR-011", type: "Stage Gate", caseId: "OB-2024-002", client: "Apex Capital Partners", description: "Connectivity sign-off for primary and failover sessions", requiredApprovers: ["Technical", "Ops"], currentApprovers: ["Technical"], submittedBy: "Sarah Johnson", submittedDate: "Jan 11, 2024", dueDate: "Jan 14, 2024", status: "pending", notes: "Primary session stable. Failover testing scheduled for Jan 13." },
+    // Velocity Securities
+    { id: "APR-003", type: "Go-Live", caseId: "OB-2024-004", client: "Velocity Securities", description: "Final go-live approval for production cutover", requiredApprovers: ["Ops", "Compliance", "Technical", "Management"], currentApprovers: ["Ops", "Technical"], submittedBy: "Lisa Wang", submittedDate: "Jan 12, 2024", dueDate: "Jan 18, 2024", status: "pending", notes: "All certification tests passed. Production environment configured. Runbook reviewed and approved." },
+    { id: "APR-006", type: "Stage Gate", caseId: "OB-2024-004", client: "Velocity Securities", description: "Certification package sign-off", requiredApprovers: ["Compliance", "Technical", "Management"], currentApprovers: ["Compliance", "Technical", "Management"], submittedBy: "Lisa Wang", submittedDate: "Jan 5, 2024", dueDate: "Jan 8, 2024", status: "approved", resolvedDate: "Jan 7, 2024", resolvedBy: "QA Lead", notes: "All 48 test cases executed with 100% pass rate. Certification package complete." },
+    { id: "APR-009", type: "Exception", caseId: "OB-2024-004", client: "Velocity Securities", description: "Waiver for missing CumQty on cancel acknowledgements", requiredApprovers: ["Technical", "Compliance"], currentApprovers: ["Technical"], submittedBy: "Lisa Wang", submittedDate: "Dec 30, 2023", dueDate: "Jan 2, 2024", status: "approved", resolvedDate: "Jan 1, 2024", resolvedBy: "Compliance Team", notes: "Venue-specific behavior. Documented in onboarding notes. No functional impact confirmed." },
+    { id: "APR-012", type: "Exception", caseId: "OB-2024-004", client: "Velocity Securities", description: "Request to skip regression suite for patch release", requiredApprovers: ["Technical", "Management"], currentApprovers: [], submittedBy: "Lisa Wang", submittedDate: "Jan 14, 2024", dueDate: "Jan 15, 2024", status: "rejected", resolvedDate: "Jan 14, 2024", resolvedBy: "Head of QA", notes: "Regression suite mandatory per policy. Expedited 4-hour regression window offered as alternative." },
+    // Horizon Investments
+    { id: "APR-013", type: "Stage Gate", caseId: "OB-2024-003", client: "Horizon Investments", description: "Approve progression from Setup to Spec Analysis", requiredApprovers: ["Technical"], currentApprovers: [], submittedBy: "Mike Chen", submittedDate: "Jan 13, 2024", dueDate: "Jan 17, 2024", status: "pending", notes: "FIX 5.0 SP2 environment configured. Waiting for client spec documents." },
+    { id: "APR-014", type: "Exception", caseId: "OB-2024-003", client: "Horizon Investments", description: "Approval for use of non-standard MsgSeqNum reset on daily reconnect", requiredApprovers: ["Technical", "Ops"], currentApprovers: ["Technical", "Ops"], submittedBy: "Mike Chen", submittedDate: "Jan 9, 2024", dueDate: "Jan 11, 2024", status: "approved", resolvedDate: "Jan 10, 2024", resolvedBy: "Ops Lead", notes: "Sequence reset confirmed safe for this venue. Documented and monitoring alerts configured." },
   ])
+
+  const pendingApprovals = allApprovals.filter(a => a.status === "pending" || a.status === "overdue")
+
+  // Approvals screen state
+  const [approvalsTab, setApprovalsTab] = useState<"Pending" | "Approved" | "Rejected" | "All">("Pending")
+  const [expandedApprovalClients, setExpandedApprovalClients] = useState<Record<string, boolean>>({})
+  const [selectedApproval, setSelectedApproval] = useState<typeof allApprovals[0] | null>(null)
 
   // Evidence vault data
   const [evidenceItems] = useState([
@@ -7719,6 +7741,30 @@ const copyToClipboard = () => {
 
   // Approvals & Exceptions Screen
   if (currentScreen === "approvals") {
+    const filteredApprovals = allApprovals.filter(a => {
+      if (approvalsTab === "Pending") return a.status === "pending" || a.status === "overdue"
+      if (approvalsTab === "Approved") return a.status === "approved"
+      if (approvalsTab === "Rejected") return a.status === "rejected"
+      return true
+    })
+
+    const clientGroups = filteredApprovals.reduce((acc, item) => {
+      if (!acc[item.client]) acc[item.client] = []
+      acc[item.client].push(item)
+      return acc
+    }, {} as Record<string, typeof allApprovals>)
+
+    const pendingCount = allApprovals.filter(a => a.status === "pending" || a.status === "overdue").length
+    const approvedCount = allApprovals.filter(a => a.status === "approved").length
+    const rejectedCount = allApprovals.filter(a => a.status === "rejected").length
+
+    const typeStyle = (type: string) => ({
+      icon: type === "Stage Gate" ? Layers : type === "Exception" ? FileWarning : Rocket,
+      bg: type === "Stage Gate" ? "bg-[#2196f3]/20" : type === "Exception" ? "bg-[#ff9800]/20" : "bg-[#4caf50]/20",
+      text: type === "Stage Gate" ? "text-[#2196f3]" : type === "Exception" ? "text-[#ff9800]" : "text-[#4caf50]",
+      badge: type === "Stage Gate" ? "bg-[#2196f3]/20 text-[#2196f3]" : type === "Exception" ? "bg-[#ff9800]/20 text-[#ff9800]" : "bg-[#4caf50]/20 text-[#4caf50]",
+    })
+
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
@@ -7734,99 +7780,240 @@ const copyToClipboard = () => {
           </header>
 
           <div className="p-6">
-            {/* Tabs */}
-            <div className={`flex gap-1 p-1 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-100"} w-fit mb-6`}>
-              {["Pending", "Approved", "Rejected", "All"].map(tab => (
-                <button key={tab} className={`px-4 py-2 rounded text-sm font-medium transition-colors ${tab === "Pending" ? "bg-[#00e5ff] text-[#0a1628]" : textSecondary}`}>
-                  {tab} {tab === "Pending" && <span className="ml-1 px-1.5 py-0.5 rounded-full text-xs bg-[#f44336] text-white">{pendingApprovals.length}</span>}
-                </button>
-              ))}
+            {/* Stats + Tabs row */}
+            <div className="flex items-center justify-between mb-6">
+              <div className={`flex gap-1 p-1 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-100"}`}>
+                {(["Pending", "Approved", "Rejected", "All"] as const).map(tab => {
+                  const count = tab === "Pending" ? pendingCount : tab === "Approved" ? approvedCount : tab === "Rejected" ? rejectedCount : allApprovals.length
+                  const isActive = approvalsTab === tab
+                  return (
+                    <button
+                      key={tab}
+                      onClick={() => setApprovalsTab(tab)}
+                      className={`px-4 py-2 rounded text-sm font-medium transition-colors flex items-center gap-2 ${
+                        isActive ? "bg-[#00e5ff] text-[#0a1628]" : `${textSecondary} hover:bg-[#1e4976]/30`
+                      }`}
+                    >
+                      {tab}
+                      <span className={`px-1.5 py-0.5 rounded-full text-xs font-bold ${
+                        isActive ? "bg-[#0a1628]/20 text-[#0a1628]" :
+                        tab === "Pending" && count > 0 ? "bg-[#f44336] text-white" :
+                        tab === "Rejected" ? "bg-[#f44336]/20 text-[#f44336]" :
+                        tab === "Approved" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                        isDarkMode ? "bg-[#1e4976]/50 text-slate-300" : "bg-gray-200 text-gray-600"
+                      }`}>{count}</span>
+                    </button>
+                  )
+                })}
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => setExpandedApprovalClients(Object.fromEntries(Object.keys(clientGroups).map(c => [c, true])))}>
+                  Expand All
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setExpandedApprovalClients({})}>
+                  Collapse All
+                </Button>
+              </div>
             </div>
 
-            {/* Pending Approvals */}
-            <div className="space-y-4">
-              {pendingApprovals.map((approval) => (
-                <Card key={approval.id} className={`${bgCard} border ${borderColor} ${approval.status === "overdue" ? "border-[#f44336]/50" : ""}`}>
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-start gap-4">
-                        <div className={`p-3 rounded-lg ${
-                          approval.type === "Stage Gate" ? "bg-[#2196f3]/20" :
-                          approval.type === "Exception" ? "bg-[#ff9800]/20" :
-                          "bg-[#4caf50]/20"
-                        }`}>
-                          {approval.type === "Stage Gate" && <Layers className="h-6 w-6 text-[#2196f3]" />}
-                          {approval.type === "Exception" && <FileWarning className="h-6 w-6 text-[#ff9800]" />}
-                          {approval.type === "Go-Live" && <Rocket className="h-6 w-6 text-[#4caf50]" />}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-3 mb-1">
-                            <span className={`font-mono text-sm ${textSecondary}`}>{approval.id}</span>
-                            <span className={`px-2 py-0.5 rounded text-xs ${
-                              approval.type === "Stage Gate" ? "bg-[#2196f3]/20 text-[#2196f3]" :
-                              approval.type === "Exception" ? "bg-[#ff9800]/20 text-[#ff9800]" :
-                              "bg-[#4caf50]/20 text-[#4caf50]"
-                            }`}>
-                              {approval.type}
-                            </span>
-                            {approval.status === "overdue" && (
-                              <span className="px-2 py-0.5 rounded text-xs bg-[#f44336]/20 text-[#f44336] flex items-center gap-1">
-                                <Clock className="h-3 w-3" /> Overdue
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <Building2 className="h-4 w-4 text-[#00e5ff]" />
-                            <span className={`font-bold text-[#00e5ff]`}>{approval.client}</span>
-                            <span className={`font-mono text-xs ${textSecondary}`}>({approval.caseId})</span>
-                          </div>
-                          <h3 className={`font-bold ${textPrimary} mb-1`}>{approval.description}</h3>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className={`text-xs ${textSecondary}`}>Submitted by {approval.submittedBy}</p>
-                        <p className={`text-xs ${textSecondary}`}>{approval.submittedDate}</p>
-                      </div>
-                    </div>
+            {/* Client-grouped approvals */}
+            {Object.keys(clientGroups).length === 0 ? (
+              <div className={`text-center py-16 ${textSecondary}`}>
+                <Scale className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                <p className="text-lg font-medium">No {approvalsTab.toLowerCase()} items</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {Object.entries(clientGroups).map(([client, items]) => {
+                  const isExpanded = expandedApprovalClients[client] !== false
+                  const clientPending = items.filter(i => i.status === "pending" || i.status === "overdue").length
+                  const clientOverdue = items.filter(i => i.status === "overdue").length
+                  const caseId = items[0]?.caseId
 
-                    {/* Approval Progress */}
-                    <div className={`p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]/50" : "bg-gray-50"} mb-4`}>
-                      <p className={`text-xs font-medium ${textSecondary} mb-2`}>Required Approvals</p>
-                      <div className="flex items-center gap-3">
-                        {approval.requiredApprovers.map((approver, i) => {
-                          const isApproved = approval.currentApprovers.includes(approver)
-                          return (
-                            <div key={i} className="flex items-center gap-2">
-                              <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isApproved ? "bg-[#4caf50] text-white" : isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"}`}>
-                                {isApproved ? <CheckCircle className="h-4 w-4" /> : <Clock className="h-3 w-3" />}
-                              </div>
-                              <span className={`text-sm ${isApproved ? "text-[#4caf50]" : textSecondary}`}>{approver}</span>
-                              {i < approval.requiredApprovers.length - 1 && <ArrowRight className={`h-4 w-4 ${textSecondary}`} />}
+                  return (
+                    <Card key={client} className={`${bgCard} border ${borderColor} overflow-hidden`}>
+                      {/* Client header */}
+                      <button
+                        onClick={() => setExpandedApprovalClients(prev => ({ ...prev, [client]: !isExpanded }))}
+                        className={`w-full px-5 py-4 flex items-center justify-between hover:bg-[#1e4976]/10 transition-colors`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="p-2 rounded-lg bg-[#00e5ff]/20">
+                            <Building2 className="h-5 w-5 text-[#00e5ff]" />
+                          </div>
+                          <div className="text-left">
+                            <div className="flex items-center gap-3">
+                              <span className={`font-bold ${textPrimary}`}>{client}</span>
+                              <span className={`font-mono text-xs ${textSecondary}`}>{caseId}</span>
+                              {clientOverdue > 0 && (
+                                <span className="px-2 py-0.5 rounded-full text-xs bg-[#f44336]/20 text-[#f44336] flex items-center gap-1">
+                                  <Clock className="h-3 w-3" /> {clientOverdue} overdue
+                                </span>
+                              )}
+                              {clientPending > 0 && clientOverdue === 0 && (
+                                <span className="px-2 py-0.5 rounded-full text-xs bg-[#ff9800]/20 text-[#ff9800]">
+                                  {clientPending} pending
+                                </span>
+                              )}
                             </div>
-                          )
-                        })}
-                      </div>
-                    </div>
+                            <p className={`text-xs ${textSecondary}`}>{items.length} item{items.length !== 1 ? "s" : ""}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="flex gap-2">
+                            {Array.from(new Set(items.map(i => i.type))).map(t => {
+                              const s = typeStyle(t)
+                              return (
+                                <span key={t} className={`px-2 py-0.5 rounded text-xs ${s.badge}`}>{t}</span>
+                              )
+                            })}
+                          </div>
+                          <ChevronDown className={`h-5 w-5 ${textSecondary} transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                        </div>
+                      </button>
 
-                    {/* Actions */}
-                    <div className="flex items-center justify-between">
-                      <p className={`text-sm ${textSecondary}`}>Due: <span className={approval.status === "overdue" ? "text-[#f44336]" : textPrimary}>{approval.dueDate}</span></p>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                          <Eye className="h-4 w-4 mr-2" /> View Details
-                        </Button>
-                        <Button variant="outline" size="sm" className="text-[#f44336] border-[#f44336]/30 hover:bg-[#f44336]/10">
-                          <ThumbsDown className="h-4 w-4 mr-2" /> Reject
-                        </Button>
-                        <Button size="sm" className="bg-[#4caf50] hover:bg-[#4caf50]/80">
-                          <ThumbsUp className="h-4 w-4 mr-2" /> Approve
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
+                      {/* Items list */}
+                      {isExpanded && (
+                        <div className={`border-t ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"} divide-y ${isDarkMode ? "divide-[#1e4976]/40" : "divide-gray-100"}`}>
+                          {items.map((approval) => {
+                            const s = typeStyle(approval.type)
+                            const TypeIcon = s.icon
+                            const isSelected = selectedApproval?.id === approval.id
+                            return (
+                              <div key={approval.id}>
+                                <button
+                                  onClick={() => setSelectedApproval(isSelected ? null : approval)}
+                                  className={`w-full px-5 py-4 flex items-start gap-4 text-left transition-colors ${
+                                    isSelected
+                                      ? isDarkMode ? "bg-[#1e4976]/30" : "bg-blue-50"
+                                      : "hover:bg-[#1e4976]/10"
+                                  }`}
+                                >
+                                  <div className={`p-2 rounded-lg flex-shrink-0 ${s.bg}`}>
+                                    <TypeIcon className={`h-4 w-4 ${s.text}`} />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                      <span className={`font-mono text-xs ${textSecondary}`}>{approval.id}</span>
+                                      <span className={`px-1.5 py-0.5 rounded text-xs ${s.badge}`}>{approval.type}</span>
+                                      {approval.status === "overdue" && (
+                                        <span className="px-1.5 py-0.5 rounded text-xs bg-[#f44336]/20 text-[#f44336] flex items-center gap-1">
+                                          <Clock className="h-3 w-3" /> Overdue
+                                        </span>
+                                      )}
+                                      {approval.status === "approved" && (
+                                        <span className="px-1.5 py-0.5 rounded text-xs bg-[#4caf50]/20 text-[#4caf50] flex items-center gap-1">
+                                          <CheckCircle className="h-3 w-3" /> Approved
+                                        </span>
+                                      )}
+                                      {approval.status === "rejected" && (
+                                        <span className="px-1.5 py-0.5 rounded text-xs bg-[#f44336]/20 text-[#f44336] flex items-center gap-1">
+                                          <X className="h-3 w-3" /> Rejected
+                                        </span>
+                                      )}
+                                      <span className={`text-xs ${textSecondary}`}>{approval.submittedDate}</span>
+                                    </div>
+                                    <p className={`text-sm font-medium ${textPrimary} truncate`}>{approval.description}</p>
+                                    <p className={`text-xs ${textSecondary} mt-0.5`}>
+                                      Submitted by {approval.submittedBy}
+                                      {(approval.status === "approved" || approval.status === "rejected") && (approval as any).resolvedBy
+                                        ? ` · ${approval.status === "approved" ? "Approved" : "Rejected"} by ${(approval as any).resolvedBy} on ${(approval as any).resolvedDate}`
+                                        : ` · Due ${approval.dueDate}`}
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center gap-2 flex-shrink-0">
+                                    {/* Approver progress dots */}
+                                    <div className="flex items-center gap-1">
+                                      {approval.requiredApprovers.map((approver, i) => {
+                                        const done = approval.currentApprovers.includes(approver)
+                                        return (
+                                          <div
+                                            key={i}
+                                            title={approver}
+                                            className={`w-2 h-2 rounded-full ${done ? "bg-[#4caf50]" : isDarkMode ? "bg-[#1e4976]/80" : "bg-gray-300"}`}
+                                          />
+                                        )
+                                      })}
+                                    </div>
+                                    <span className={`text-xs ${textSecondary}`}>
+                                      {approval.currentApprovers.length}/{approval.requiredApprovers.length}
+                                    </span>
+                                    <ChevronDown className={`h-4 w-4 ${textSecondary} transition-transform ${isSelected ? "rotate-180" : ""}`} />
+                                  </div>
+                                </button>
+
+                                {/* Expanded detail panel */}
+                                {isSelected && (
+                                  <div className={`mx-5 mb-4 rounded-lg border ${borderColor} overflow-hidden`}>
+                                    {/* Approver chain */}
+                                    <div className={`px-5 py-4 ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"} border-b ${borderColor}`}>
+                                      <p className={`text-xs font-semibold ${textSecondary} mb-3 uppercase tracking-wider`}>Approval Chain</p>
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        {approval.requiredApprovers.map((approver, i) => {
+                                          const done = approval.currentApprovers.includes(approver)
+                                          return (
+                                            <div key={i} className="flex items-center gap-2">
+                                              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border ${
+                                                done
+                                                  ? "bg-[#4caf50]/15 border-[#4caf50]/40 text-[#4caf50]"
+                                                  : isDarkMode ? "bg-[#1e4976]/40 border-[#1e4976] text-slate-400" : "bg-gray-100 border-gray-300 text-gray-500"
+                                              }`}>
+                                                {done ? <CheckCircle className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
+                                                <span className="text-sm font-medium">{approver}</span>
+                                              </div>
+                                              {i < approval.requiredApprovers.length - 1 && (
+                                                <ArrowRight className={`h-4 w-4 ${textSecondary}`} />
+                                              )}
+                                            </div>
+                                          )
+                                        })}
+                                      </div>
+                                    </div>
+                                    {/* Notes */}
+                                    {(approval as any).notes && (
+                                      <div className={`px-5 py-4 ${isDarkMode ? "bg-[#0a1628]/40" : "bg-white"} border-b ${borderColor}`}>
+                                        <p className={`text-xs font-semibold ${textSecondary} mb-1.5 uppercase tracking-wider`}>Notes</p>
+                                        <p className={`text-sm ${textPrimary} leading-relaxed`}>{(approval as any).notes}</p>
+                                      </div>
+                                    )}
+                                    {/* Actions — only for pending/overdue */}
+                                    {(approval.status === "pending" || approval.status === "overdue") && (
+                                      <div className={`px-5 py-3 flex items-center justify-between ${isDarkMode ? "bg-[#1e4976]/10" : "bg-gray-50"}`}>
+                                        <p className={`text-sm ${textSecondary}`}>
+                                          Due: <span className={approval.status === "overdue" ? "text-[#f44336] font-medium" : textPrimary}>{approval.dueDate}</span>
+                                        </p>
+                                        <div className="flex gap-2">
+                                          <Button variant="outline" size="sm" className={`text-[#f44336] border-[#f44336]/30 hover:bg-[#f44336]/10`}>
+                                            <ThumbsDown className="h-4 w-4 mr-1.5" /> Reject
+                                          </Button>
+                                          <Button size="sm" className="bg-[#4caf50] hover:bg-[#4caf50]/80 text-white">
+                                            <ThumbsUp className="h-4 w-4 mr-1.5" /> Approve
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    )}
+                                    {(approval.status === "approved" || approval.status === "rejected") && (
+                                      <div className={`px-5 py-3 flex items-center justify-between ${isDarkMode ? "bg-[#1e4976]/10" : "bg-gray-50"}`}>
+                                        <p className={`text-sm ${textSecondary}`}>
+                                          Resolved: <span className={textPrimary}>{(approval as any).resolvedDate}</span> by <span className={textPrimary}>{(approval as any).resolvedBy}</span>
+                                        </p>
+                                        <Button variant="outline" size="sm">
+                                          <Eye className="h-4 w-4 mr-1.5" /> View Full Record
+                                        </Button>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </Card>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>
