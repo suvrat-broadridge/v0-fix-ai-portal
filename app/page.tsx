@@ -2,7 +2,7 @@
 
 // B- COMET Platform - FIX Protocol Testing Suite v2
 import React, { useState } from "react"
-import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, Stamp, Code, ScrollText, Navigation } from "lucide-react"
+import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, Stamp, Code, ScrollText, Navigation, Sparkles, Minus, Loader } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -381,6 +381,7 @@ export default function BCometPlatform() {
   const [atdlSelectedFixSpec, setAtdlSelectedFixSpec] = useState("equities-4.4")
   const [atdlWizardStep, setAtdlWizardStep] = useState(0)
   const [atdlWizardWorkOrder, setAtdlWizardWorkOrder] = useState<string | null>(null)
+  const [atdlWorkflowType, setAtdlWorkflowType] = useState<"conversion" | "version-upgrade" | "remediation" | "guided">("guided")
   const [atdlValidationFilter, setAtdlValidationFilter] = useState<"all" | "error" | "warning" | "pass">("all")
   const [atdlDecisions, setAtdlDecisions] = useState<Record<string, string>>({})
   const [atdlRemediationFilter, setAtdlRemediationFilter] = useState<"all" | "open" | "in-progress" | "resolved">("all")
@@ -4930,7 +4931,7 @@ const specCompareResults = [
                 </div>
               </div>
               <Button
-                onClick={() => { setAtdlWizardStep(0); setAtdlWizardWorkOrder(null); setCurrentScreen("atdl-wizard" as any); }}
+                onClick={() => setCurrentScreen("atdl-flow-select" as any)}
                 className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80"
               >
                 <Plus className="h-4 w-4 mr-2" /> New Work Order
@@ -5067,8 +5068,169 @@ const specCompareResults = [
   }
 
   // ATDL Guided Wizard
+  // ATDL Flow Selection Screen - Choose between 3 workflows
+  if (currentScreen === "atdl-flow-select") {
+    const workflows = [
+      {
+        id: "conversion",
+        title: "FIX to ATDL Conversion",
+        icon: RefreshCw,
+        color: "#00e5ff",
+        description: "Convert a FIX specification PDF to ATDL format, validate the schema structure, and preview the rendered strategy UI.",
+        steps: ["Upload FIX Spec PDF", "Convert to ATDL", "Validate Schema", "Render Preview", "Use/Export"],
+        useCase: "When you have a new FIX spec and need to create the corresponding ATDL file from scratch.",
+      },
+      {
+        id: "version-upgrade",
+        title: "Version Upgrade Comparison",
+        icon: GitCompare,
+        color: "#9c27b0",
+        description: "Compare two versions of FIX specs and their ATDLs side-by-side, identify differences, validate for standard format, and preview changes.",
+        steps: ["Upload Old & New FIX Specs", "Upload Old & New ATDLs", "Compare FIX Diffs", "Compare ATDL Diffs", "Validate & Preview"],
+        useCase: "When upgrading FIX spec versions and need to ensure ATDLs are updated correctly with all changes tracked.",
+      },
+      {
+        id: "remediation",
+        title: "ATDL Validation & Remediation",
+        icon: Wrench,
+        color: "#ff9800",
+        description: "Validate an existing ATDL file against standard schema, identify issues, auto-fix or manually remediate errors, and re-validate.",
+        steps: ["Upload Existing ATDL", "Run Validation", "Review Issues", "Apply Fixes", "Re-validate & Export"],
+        useCase: "When you have an existing ATDL with potential issues that needs to be validated and corrected.",
+      },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Layers className="h-8 w-8 text-[#00e5ff]" />
+                <div>
+                  <h1 className={`text-2xl font-bold ${textPrimary}`}>ATDL Workflow</h1>
+                  <p className={`text-sm ${textSecondary}`}>Choose a workflow to get started</p>
+                </div>
+              </div>
+              <Button variant="outline" onClick={() => setCurrentScreen("atdl-workbench" as ScreenType)}>
+                <ArrowLeft className="h-4 w-4 mr-2" /> Back to Workbench
+              </Button>
+            </div>
+          </header>
+
+          <div className="p-6">
+            <div className="max-w-5xl mx-auto">
+              <div className="text-center mb-8">
+                <h2 className={`text-xl font-semibold ${textPrimary} mb-2`}>Select Your Workflow</h2>
+                <p className={`${textSecondary}`}>Choose the workflow that best matches your objective</p>
+              </div>
+
+              <div className="grid grid-cols-3 gap-6">
+                {workflows.map((wf) => {
+                  const Icon = wf.icon
+                  return (
+                    <Card 
+                      key={wf.id}
+                      className={`${bgCard} border-2 ${borderColor} hover:border-[${wf.color}] transition-all cursor-pointer group relative overflow-hidden`}
+                      onClick={() => {
+                        setAtdlWorkflowType(wf.id as any)
+                        setAtdlWizardStep(0)
+                        setCurrentScreen("atdl-wizard" as ScreenType)
+                      }}
+                    >
+                      {/* Accent top border */}
+                      <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: wf.color }} />
+                      
+                      <div className="p-6">
+                        {/* Icon and Title */}
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="p-3 rounded-lg" style={{ backgroundColor: `${wf.color}20` }}>
+                            <Icon className="h-6 w-6" style={{ color: wf.color }} />
+                          </div>
+                          <h3 className={`text-lg font-semibold ${textPrimary} group-hover:text-[#00e5ff] transition-colors`}>{wf.title}</h3>
+                        </div>
+
+                        {/* Description */}
+                        <p className={`text-sm ${textSecondary} mb-4 min-h-[60px]`}>{wf.description}</p>
+
+                        {/* Steps */}
+                        <div className="mb-4">
+                          <p className={`text-xs font-medium ${textSecondary} uppercase tracking-wide mb-2`}>Workflow Steps</p>
+                          <div className="flex flex-wrap gap-1">
+                            {wf.steps.map((step, i) => (
+                              <span key={i} className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]/50 text-slate-300" : "bg-gray-100 text-gray-600"}`}>
+                                {i + 1}. {step}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Use Case */}
+                        <div className={`text-xs ${textSecondary} italic border-t ${borderColor} pt-3`}>
+                          {wf.useCase}
+                        </div>
+
+                        {/* Start Button */}
+                        <Button 
+                          className="w-full mt-4 group-hover:bg-[#00e5ff] group-hover:text-[#0a1628] transition-colors"
+                          variant="outline"
+                        >
+                          Start Workflow <ArrowRight className="h-4 w-4 ml-2" />
+                        </Button>
+                      </div>
+                    </Card>
+                  )
+                })}
+              </div>
+
+              {/* Quick Actions */}
+              <div className={`mt-8 p-4 rounded-lg border ${borderColor} ${bgCard}`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className={`text-sm font-medium ${textPrimary}`}>Not sure which workflow to use?</p>
+                    <p className={`text-xs ${textSecondary}`}>Our guided wizard will help you determine the best approach based on your inputs.</p>
+                  </div>
+                  <Button variant="outline" onClick={() => { setAtdlWorkflowType("guided" as any); setAtdlWizardStep(0); setCurrentScreen("atdl-wizard" as ScreenType); }}>
+                    <Sparkles className="h-4 w-4 mr-2" /> Guided Mode
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (currentScreen === "atdl-wizard") {
-    const steps = [
+    // Dynamic steps based on workflow type
+    const conversionSteps = [
+      { id: 0, label: "Upload FIX Spec", icon: Upload,       desc: "Upload your FIX specification PDF" },
+      { id: 1, label: "Convert",         icon: RefreshCw,    desc: "Convert FIX spec to ATDL format" },
+      { id: 2, label: "Validate",        icon: CheckCircle,  desc: "Validate ATDL schema structure" },
+      { id: 3, label: "Preview",         icon: Eye,          desc: "Render strategy UI preview" },
+      { id: 4, label: "Export",          icon: Download,     desc: "Export and use the ATDL" },
+    ]
+    
+    const versionUpgradeSteps = [
+      { id: 0, label: "Upload Specs",    icon: Upload,       desc: "Upload old & new FIX spec versions" },
+      { id: 1, label: "Upload ATDLs",    icon: FileText,     desc: "Upload old & new ATDL versions" },
+      { id: 2, label: "Compare FIX",     icon: GitCompare,   desc: "Compare FIX spec differences" },
+      { id: 3, label: "Compare ATDL",    icon: GitCompare,   desc: "Compare ATDL differences" },
+      { id: 4, label: "Validate",        icon: CheckCircle,  desc: "Validate ATDLs for standard format" },
+      { id: 5, label: "Preview",         icon: Eye,          desc: "Preview and export" },
+    ]
+    
+    const remediationSteps = [
+      { id: 0, label: "Upload ATDL",     icon: Upload,       desc: "Upload existing ATDL file" },
+      { id: 1, label: "Validate",        icon: CheckCircle,  desc: "Run validation checks" },
+      { id: 2, label: "Review Issues",   icon: AlertTriangle, desc: "Review identified issues" },
+      { id: 3, label: "Remediate",       icon: Wrench,       desc: "Apply fixes to issues" },
+      { id: 4, label: "Re-validate",     icon: RefreshCw,    desc: "Re-validate and export" },
+    ]
+    
+    const guidedSteps = [
       { id: 0, label: "Scope",    icon: Target,       desc: "Define objective and target strategies" },
       { id: 1, label: "Inputs",   icon: Upload,       desc: "Lock source files and versions" },
       { id: 2, label: "Validate", icon: CheckCircle,  desc: "Structural schema validation" },
@@ -5078,10 +5240,427 @@ const specCompareResults = [
       { id: 6, label: "Approve",  icon: Stamp,        desc: "Sign-off and certification pack" },
     ]
 
+    const steps = atdlWorkflowType === "conversion" ? conversionSteps :
+                  atdlWorkflowType === "version-upgrade" ? versionUpgradeSteps :
+                  atdlWorkflowType === "remediation" ? remediationSteps :
+                  guidedSteps
+
+    const workflowTitle = atdlWorkflowType === "conversion" ? "FIX to ATDL Conversion" :
+                          atdlWorkflowType === "version-upgrade" ? "Version Upgrade Comparison" :
+                          atdlWorkflowType === "remediation" ? "ATDL Validation & Remediation" :
+                          "Guided ATDL Workflow"
+
     const gateForStep = ["A","B","C","D","E","F"]
     const gateLabel = ["Inputs Locked","Structural Compliance","Mapping Integrity","Strategy Qualification","Approval Complete","Certified"]
 
-    const stepContent: Record<number, React.ReactNode> = {
+    // Workflow-specific step content
+    const conversionStepContent: Record<number, React.ReactNode> = {
+      0: (
+        <div className="space-y-5">
+          <div className="grid grid-cols-2 gap-5">
+            <div>
+              <label className={`block text-sm font-medium mb-1.5 ${textPrimary}`}>Client</label>
+              <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"}`}>
+                <option>Nexus Trading Group</option>
+                <option>Apex Capital Partners</option>
+                <option>Velocity Securities</option>
+              </select>
+            </div>
+            <div>
+              <label className={`block text-sm font-medium mb-1.5 ${textPrimary}`}>Asset Class</label>
+              <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"}`}>
+                <option>Equities</option><option>Options</option><option>Futures</option><option>FX</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Upload FIX Specification PDF</label>
+            <div className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center hover:border-[#00e5ff] transition-colors cursor-pointer`}>
+              <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+              <p className={`${textPrimary} font-medium mb-1`}>Drop FIX Spec PDF here</p>
+              <p className={`text-xs ${textSecondary}`}>or click to browse. Supports PDF format.</p>
+            </div>
+          </div>
+          <div>
+            <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Target Strategies to Extract</label>
+            <div className="flex gap-2 flex-wrap">
+              {["VWAP","TWAP","POV","IS","MOC","Iceberg","Sniper"].map(s => (
+                <label key={s} className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor} cursor-pointer hover:border-[#00e5ff] ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
+                  <input type="checkbox" defaultChecked={["VWAP","TWAP"].includes(s)} className="accent-[#00e5ff]" />
+                  <span className={`text-sm ${textPrimary}`}>{s}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+      ),
+      1: (
+        <div className="space-y-4">
+          <div className={`p-4 rounded-lg border ${borderColor} ${bgCard}`}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-[#00e5ff]/20">
+                <Zap className="h-5 w-5 text-[#00e5ff]" />
+              </div>
+              <div>
+                <p className={`font-medium ${textPrimary}`}>AI-Powered Conversion</p>
+                <p className={`text-xs ${textSecondary}`}>Extracting strategies and parameters from FIX spec...</p>
+              </div>
+            </div>
+            <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"} overflow-hidden`}>
+              <div className="h-full bg-[#00e5ff] rounded-full animate-pulse" style={{ width: "75%" }} />
+            </div>
+            <div className="mt-4 space-y-2">
+              {["Parsing PDF structure", "Extracting algo definitions", "Mapping parameters to ATDL types", "Generating ATDL XML"].map((step, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  {i < 3 ? <CheckCircle className="h-4 w-4 text-[#4caf50]" /> : <Loader className="h-4 w-4 text-[#00e5ff] animate-spin" />}
+                  <span className={`text-sm ${i < 3 ? textSecondary : textPrimary}`}>{step}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ),
+      2: (
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">5 Pass</span>
+            <span className="px-2 py-1 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">1 Warning</span>
+            <span className="px-2 py-1 rounded text-xs bg-[#f44336]/20 text-[#f44336]">0 Errors</span>
+          </div>
+          {[
+            { rule: "Schema Validation", status: "pass", msg: "Conforms to FIXatdl-1-1 schema" },
+            { rule: "Strategy Definitions", status: "pass", msg: "All 5 strategies have valid structure" },
+            { rule: "Parameter Types", status: "pass", msg: "All parameters use valid types" },
+            { rule: "UI Control Mappings", status: "warning", msg: "2 parameters could use better UI controls" },
+            { rule: "Validation Rules", status: "pass", msg: "All validation rules are well-formed" },
+            { rule: "Wire Value Mappings", status: "pass", msg: "All wire values properly defined" },
+          ].map((r, i) => (
+            <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${r.status === "warning" ? "border-[#ff9800]/30 bg-[#ff9800]/5" : `${borderColor} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}`}>
+              {r.status === "pass" && <CheckCircle className="h-4 w-4 text-[#4caf50] flex-shrink-0" />}
+              {r.status === "warning" && <AlertTriangle className="h-4 w-4 text-[#ff9800] flex-shrink-0" />}
+              <span className={`text-sm font-medium flex-1 ${textPrimary}`}>{r.rule}</span>
+              <span className={`text-xs flex-1 ${textSecondary}`}>{r.msg}</span>
+            </div>
+          ))}
+        </div>
+      ),
+      3: (
+        <div className="space-y-4">
+          <p className={`text-sm ${textSecondary} mb-4`}>Preview how the ATDL strategies will render in a trading UI:</p>
+          <div className={`border ${borderColor} rounded-lg overflow-hidden`}>
+            <div className={`px-4 py-2 border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"}`}>
+              <span className={`text-sm font-medium ${textPrimary}`}>VWAP Strategy Parameters</span>
+            </div>
+            <div className="p-4 grid grid-cols-2 gap-4">
+              {[
+                { label: "Start Time", type: "time", value: "09:30" },
+                { label: "End Time", type: "time", value: "16:00" },
+                { label: "Participation Rate", type: "slider", value: "25%" },
+                { label: "Min Fill Size", type: "number", value: "100" },
+              ].map((param, i) => (
+                <div key={i}>
+                  <label className={`block text-xs ${textSecondary} mb-1`}>{param.label}</label>
+                  {param.type === "slider" ? (
+                    <div className="flex items-center gap-2">
+                      <input type="range" className="flex-1" />
+                      <span className={`text-sm ${textPrimary}`}>{param.value}</span>
+                    </div>
+                  ) : (
+                    <Input type={param.type} defaultValue={param.value} className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ),
+      4: (
+        <div className="space-y-4">
+          <div className={`p-4 rounded-lg border border-[#4caf50]/40 bg-[#4caf50]/10`}>
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-6 w-6 text-[#4caf50]" />
+              <div>
+                <p className="text-[#4caf50] font-semibold">ATDL Ready for Use</p>
+                <p className={`text-sm ${textSecondary}`}>Your ATDL file has been generated and validated successfully.</p>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Button className="bg-[#00e5ff] text-[#0a1628]"><Download className="h-4 w-4 mr-2" /> Download ATDL</Button>
+            <Button variant="outline"><FileText className="h-4 w-4 mr-2" /> View XML</Button>
+          </div>
+        </div>
+      ),
+    }
+
+    const versionUpgradeStepContent: Record<number, React.ReactNode> = {
+      0: (
+        <div className="space-y-5">
+          <p className={`text-sm ${textSecondary} mb-4`}>Upload the old and new versions of your FIX specification PDFs:</p>
+          <div className="grid grid-cols-2 gap-6">
+            <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#2196f3] transition-colors cursor-pointer`}>
+              <FileText className={`h-8 w-8 mx-auto mb-2 text-[#2196f3]`} />
+              <p className={`${textPrimary} font-medium mb-1`}>Old FIX Spec (v2.0)</p>
+              <p className={`text-xs ${textSecondary}`}>Drop PDF or click to upload</p>
+              <span className="inline-block mt-2 px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">Uploaded</span>
+            </div>
+            <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#9c27b0] transition-colors cursor-pointer`}>
+              <FileText className={`h-8 w-8 mx-auto mb-2 text-[#9c27b0]`} />
+              <p className={`${textPrimary} font-medium mb-1`}>New FIX Spec (v2.1)</p>
+              <p className={`text-xs ${textSecondary}`}>Drop PDF or click to upload</p>
+              <span className="inline-block mt-2 px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">Uploaded</span>
+            </div>
+          </div>
+        </div>
+      ),
+      1: (
+        <div className="space-y-5">
+          <p className={`text-sm ${textSecondary} mb-4`}>Upload the corresponding ATDL files for each FIX spec version:</p>
+          <div className="grid grid-cols-2 gap-6">
+            <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#2196f3] transition-colors cursor-pointer`}>
+              <Layers className={`h-8 w-8 mx-auto mb-2 text-[#2196f3]`} />
+              <p className={`${textPrimary} font-medium mb-1`}>Old ATDL (v2.0)</p>
+              <p className={`text-xs ${textSecondary}`}>Drop ATDL or click to upload</p>
+            </div>
+            <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#9c27b0] transition-colors cursor-pointer`}>
+              <Layers className={`h-8 w-8 mx-auto mb-2 text-[#9c27b0]`} />
+              <p className={`${textPrimary} font-medium mb-1`}>New ATDL (v2.1)</p>
+              <p className={`text-xs ${textSecondary}`}>Drop ATDL or click to upload</p>
+            </div>
+          </div>
+        </div>
+      ),
+      2: (
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">12 Unchanged</span>
+            <span className="px-2 py-1 rounded text-xs bg-[#2196f3]/20 text-[#2196f3]">5 Added</span>
+            <span className="px-2 py-1 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">3 Modified</span>
+            <span className="px-2 py-1 rounded text-xs bg-[#f44336]/20 text-[#f44336]">1 Removed</span>
+          </div>
+          {[
+            { type: "added", field: "Tag 7945 (DisplayQty)", desc: "New optional parameter for iceberg orders" },
+            { type: "modified", field: "Tag 7942 (ParticipationRate)", desc: "Range changed from 0-100 to 0-50" },
+            { type: "added", field: "Strategy: Sniper", desc: "New aggressive execution strategy added" },
+            { type: "removed", field: "Tag 7948 (LegacyMode)", desc: "Deprecated parameter removed" },
+            { type: "modified", field: "Tag 7941 (EndTime)", desc: "Now required instead of optional" },
+          ].map((diff, i) => (
+            <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${
+              diff.type === "added" ? "border-[#4caf50]/30 bg-[#4caf50]/5" :
+              diff.type === "modified" ? "border-[#ff9800]/30 bg-[#ff9800]/5" :
+              "border-[#f44336]/30 bg-[#f44336]/5"
+            }`}>
+              {diff.type === "added" && <Plus className="h-4 w-4 text-[#4caf50]" />}
+              {diff.type === "modified" && <RefreshCw className="h-4 w-4 text-[#ff9800]" />}
+              {diff.type === "removed" && <Minus className="h-4 w-4 text-[#f44336]" />}
+              <span className={`text-sm font-medium ${textPrimary}`}>{diff.field}</span>
+              <span className={`text-xs ${textSecondary} flex-1`}>{diff.desc}</span>
+              <span className={`text-xs px-2 py-0.5 rounded ${
+                diff.type === "added" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                diff.type === "modified" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                "bg-[#f44336]/20 text-[#f44336]"
+              }`}>{diff.type}</span>
+            </div>
+          ))}
+        </div>
+      ),
+      3: (
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">8 Unchanged</span>
+            <span className="px-2 py-1 rounded text-xs bg-[#2196f3]/20 text-[#2196f3]">4 Added</span>
+            <span className="px-2 py-1 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">2 Modified</span>
+          </div>
+          {[
+            { type: "added", field: "Strategy: Sniper", desc: "New strategy definition with 6 parameters" },
+            { type: "modified", field: "VWAP.ParticipationRate", desc: "maxValue changed from 100 to 50" },
+            { type: "added", field: "VWAP.DisplayQty", desc: "New parameter for display quantity" },
+            { type: "modified", field: "TWAP.EndTime", desc: "use attribute changed to REQUIRED" },
+          ].map((diff, i) => (
+            <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${
+              diff.type === "added" ? "border-[#4caf50]/30 bg-[#4caf50]/5" :
+              "border-[#ff9800]/30 bg-[#ff9800]/5"
+            }`}>
+              {diff.type === "added" && <Plus className="h-4 w-4 text-[#4caf50]" />}
+              {diff.type === "modified" && <RefreshCw className="h-4 w-4 text-[#ff9800]" />}
+              <span className={`text-sm font-medium ${textPrimary}`}>{diff.field}</span>
+              <span className={`text-xs ${textSecondary} flex-1`}>{diff.desc}</span>
+            </div>
+          ))}
+        </div>
+      ),
+      4: (
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">6 Pass</span>
+            <span className="px-2 py-1 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">0 Warnings</span>
+            <span className="px-2 py-1 rounded text-xs bg-[#f44336]/20 text-[#f44336]">0 Errors</span>
+          </div>
+          {[
+            { rule: "Schema Validation", status: "pass", msg: "Both ATDLs conform to FIXatdl-1-1 schema" },
+            { rule: "Strategy Consistency", status: "pass", msg: "All strategies have matching structures" },
+            { rule: "Parameter Types", status: "pass", msg: "All parameter types are valid" },
+            { rule: "FIX Spec Alignment", status: "pass", msg: "ATDL changes match FIX spec changes" },
+            { rule: "Backward Compatibility", status: "pass", msg: "No breaking changes detected" },
+            { rule: "Wire Value Integrity", status: "pass", msg: "All wire values properly defined" },
+          ].map((r, i) => (
+            <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}>
+              <CheckCircle className="h-4 w-4 text-[#4caf50] flex-shrink-0" />
+              <span className={`text-sm font-medium flex-1 ${textPrimary}`}>{r.rule}</span>
+              <span className={`text-xs flex-1 ${textSecondary}`}>{r.msg}</span>
+            </div>
+          ))}
+        </div>
+      ),
+      5: (
+        <div className="space-y-4">
+          <div className={`p-4 rounded-lg border border-[#4caf50]/40 bg-[#4caf50]/10`}>
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-6 w-6 text-[#4caf50]" />
+              <div>
+                <p className="text-[#4caf50] font-semibold">Version Comparison Complete</p>
+                <p className={`text-sm ${textSecondary}`}>Both ATDLs validated. Ready to deploy new version.</p>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Button className="bg-[#00e5ff] text-[#0a1628]"><Download className="h-4 w-4 mr-2" /> Download Report</Button>
+            <Button variant="outline"><Rocket className="h-4 w-4 mr-2" /> Deploy New Version</Button>
+          </div>
+        </div>
+      ),
+    }
+
+    const remediationStepContent: Record<number, React.ReactNode> = {
+      0: (
+        <div className="space-y-5">
+          <div>
+            <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Upload Existing ATDL File</label>
+            <div className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center hover:border-[#00e5ff] transition-colors cursor-pointer`}>
+              <Layers className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+              <p className={`${textPrimary} font-medium mb-1`}>Drop ATDL file here</p>
+              <p className={`text-xs ${textSecondary}`}>Supports .atdl and .xml formats</p>
+            </div>
+          </div>
+        </div>
+      ),
+      1: (
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">4 Pass</span>
+            <span className="px-2 py-1 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">2 Warnings</span>
+            <span className="px-2 py-1 rounded text-xs bg-[#f44336]/20 text-[#f44336]">3 Errors</span>
+          </div>
+          {[
+            { rule: "Schema Validation", status: "error", msg: "Missing required 'wireValue' on 3 parameters" },
+            { rule: "Strategy Definitions", status: "pass", msg: "All strategies have valid structure" },
+            { rule: "Parameter Types", status: "warning", msg: "2 deprecated type declarations" },
+            { rule: "UI Control Mappings", status: "error", msg: "Invalid control type 'CustomSlider'" },
+            { rule: "Validation Rules", status: "pass", msg: "All validation rules well-formed" },
+            { rule: "Edit Rules", status: "warning", msg: "Circular reference in edit rule" },
+            { rule: "Wire Value Format", status: "error", msg: "Wire values contain invalid characters" },
+          ].map((r, i) => (
+            <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${
+              r.status === "error" ? "border-[#f44336]/40 bg-[#f44336]/5" :
+              r.status === "warning" ? "border-[#ff9800]/30 bg-[#ff9800]/5" :
+              `${borderColor} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`
+            }`}>
+              {r.status === "pass" && <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
+              {r.status === "warning" && <AlertTriangle className="h-4 w-4 text-[#ff9800]" />}
+              {r.status === "error" && <AlertCircle className="h-4 w-4 text-[#f44336]" />}
+              <span className={`text-sm font-medium flex-1 ${textPrimary}`}>{r.rule}</span>
+              <span className={`text-xs ${textSecondary}`}>{r.msg}</span>
+            </div>
+          ))}
+        </div>
+      ),
+      2: (
+        <div className="space-y-3">
+          <p className={`text-sm ${textSecondary} mb-4`}>Review each issue and decide how to handle it:</p>
+          {[
+            { issue: "Missing wireValue on ParticipationRate", severity: "Error", suggestion: "Add wireValue='7942'", autoFix: true },
+            { issue: "Missing wireValue on StartTime", severity: "Error", suggestion: "Add wireValue='7940'", autoFix: true },
+            { issue: "Invalid control type 'CustomSlider'", severity: "Error", suggestion: "Replace with 'SingleSpinner'", autoFix: true },
+            { issue: "Deprecated Qty_t type", severity: "Warning", suggestion: "Update to Int_t", autoFix: true },
+            { issue: "Circular edit rule reference", severity: "Warning", suggestion: "Manual review required", autoFix: false },
+          ].map((issue, i) => (
+            <div key={i} className={`border ${borderColor} rounded-lg overflow-hidden`}>
+              <div className={`flex items-center gap-3 px-4 py-2 ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"}`}>
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
+                  issue.severity === "Error" ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ff9800]/20 text-[#ff9800]"
+                }`}>{issue.severity}</span>
+                <span className={`text-sm font-medium ${textPrimary}`}>{issue.issue}</span>
+              </div>
+              <div className={`px-4 py-3 flex items-center justify-between ${isDarkMode ? "bg-[#0a1628]/40" : "bg-white"}`}>
+                <div>
+                  <p className={`text-xs ${textSecondary}`}>Suggested fix:</p>
+                  <p className={`text-sm ${textPrimary}`}>{issue.suggestion}</p>
+                </div>
+                {issue.autoFix ? (
+                  <Button size="sm" className="bg-[#4caf50] text-white hover:bg-[#4caf50]/80">
+                    <Wrench className="h-3 w-3 mr-1" /> Auto-Fix
+                  </Button>
+                ) : (
+                  <Button size="sm" variant="outline">Manual Review</Button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      ),
+      3: (
+        <div className="space-y-4">
+          <div className={`p-4 rounded-lg border border-[#2196f3]/40 bg-[#2196f3]/10`}>
+            <div className="flex items-center gap-3">
+              <Wrench className="h-6 w-6 text-[#2196f3]" />
+              <div>
+                <p className="text-[#2196f3] font-semibold">Applying Fixes...</p>
+                <p className={`text-sm ${textSecondary}`}>4 of 5 issues have been automatically fixed.</p>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-2">
+            {[
+              { issue: "Missing wireValue on ParticipationRate", status: "fixed" },
+              { issue: "Missing wireValue on StartTime", status: "fixed" },
+              { issue: "Invalid control type 'CustomSlider'", status: "fixed" },
+              { issue: "Deprecated Qty_t type", status: "fixed" },
+              { issue: "Circular edit rule reference", status: "pending" },
+            ].map((item, i) => (
+              <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${borderColor}`}>
+                {item.status === "fixed" ? <CheckCircle className="h-4 w-4 text-[#4caf50]" /> : <Clock className="h-4 w-4 text-[#ff9800]" />}
+                <span className={`text-sm ${textPrimary}`}>{item.issue}</span>
+                <span className={`ml-auto text-xs px-2 py-0.5 rounded ${
+                  item.status === "fixed" ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#ff9800]/20 text-[#ff9800]"
+                }`}>{item.status === "fixed" ? "Fixed" : "Needs Review"}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ),
+      4: (
+        <div className="space-y-4">
+          <div className={`p-4 rounded-lg border border-[#4caf50]/40 bg-[#4caf50]/10`}>
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-6 w-6 text-[#4caf50]" />
+              <div>
+                <p className="text-[#4caf50] font-semibold">ATDL Remediated Successfully</p>
+                <p className={`text-sm ${textSecondary}`}>All critical issues fixed. 1 warning requires manual review.</p>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Button className="bg-[#00e5ff] text-[#0a1628]"><Download className="h-4 w-4 mr-2" /> Download Fixed ATDL</Button>
+            <Button variant="outline"><Eye className="h-4 w-4 mr-2" /> Preview Changes</Button>
+          </div>
+        </div>
+      ),
+    }
+
+    const stepContent: Record<number, React.ReactNode> = atdlWorkflowType === "conversion" ? conversionStepContent :
+                                                          atdlWorkflowType === "version-upgrade" ? versionUpgradeStepContent :
+                                                          atdlWorkflowType === "remediation" ? remediationStepContent :
+    {
       0: (
         <div className="space-y-5">
           <div className="grid grid-cols-2 gap-5">
