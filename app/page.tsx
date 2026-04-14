@@ -4007,7 +4007,7 @@ const specCompareResults = [
                       <option value="log2">{selectedClient?.name || "Client"}_session_20260409.log</option>
                       <option value="log3">{selectedClient?.name || "Client"}_session_20260404.log</option>
                     </select>
-                      {selectedRole === "client" ? (
+                    {selectedRole === "client" ? (
                       <div className="mt-3 pt-3 border-t border-dashed border-[#1e4976]/50">
                         <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => setCurrentScreen("client-log-files")}>
                           <Upload className="h-3 w-3 mr-2" /> Go to My Log Files to Upload
