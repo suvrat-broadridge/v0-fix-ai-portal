@@ -1512,6 +1512,7 @@ export default function BCometPlatform() {
 
               {/* Cards View - Original Dashboard Content */}
               {dashboardView === "cards" && (
+              <>
               <div className="grid grid-cols-2 gap-6">
                 {/* Pending Tasks */}
                 <Card className={`${bgCard} border ${borderColor}`}>
@@ -1606,6 +1607,7 @@ export default function BCometPlatform() {
                   </table>
                 </div>
               </Card>
+              </>
               )}
             </div>
           </div>
