@@ -3316,19 +3316,199 @@ const specCompareResults = [
       },
     ]
 
+    // Ad-hoc mode: Show step-by-step workflow
+    if (isAdHocMode) {
+      return (
+        <div className={`min-h-screen ${bgPrimary} flex`}>
+          <Sidebar />
+          <div className="flex-1 overflow-auto">
+            <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+              <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+                <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+              </button>
+              <div className="flex items-center gap-3">
+                <VerifixLogo size={32} />
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>Testing (Ad-hoc)</h1>
+              </div>
+              <p className={`text-sm ${textSecondary} mt-1`}>Generate regression test cases from specs, logs, or scenarios</p>
+            </header>
+
+            <div className="p-6">
+              {/* Step 1: Select Source */}
+              <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
+                <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Step 1: Select Test Case Source</h3>
+                <p className={`mb-4 ${textSecondary}`}>Choose a source to generate test cases from - a standardized spec, log file, or existing scenarios.</p>
+                
+                <div className="grid grid-cols-3 gap-4 mb-6">
+                  <button 
+                    onClick={() => setRegTestSource("spec")}
+                    className={`p-4 rounded-lg border-2 transition-all ${regTestSource === "spec" ? "border-[#00e5ff] bg-[#00e5ff]/10" : `border-[#1e4976]/50 hover:border-[#00e5ff]/50`}`}
+                  >
+                    <FileText className={`h-8 w-8 mx-auto mb-2 ${regTestSource === "spec" ? "text-[#00e5ff]" : textSecondary}`} />
+                    <p className={`font-medium ${textPrimary}`}>Standardized Spec</p>
+                    <p className={`text-xs ${textSecondary}`}>Generate from FIX spec</p>
+                  </button>
+                  <button 
+                    onClick={() => setRegTestSource("log")}
+                    className={`p-4 rounded-lg border-2 transition-all ${regTestSource === "log" ? "border-[#00e5ff] bg-[#00e5ff]/10" : `border-[#1e4976]/50 hover:border-[#00e5ff]/50`}`}
+                  >
+                    <FileSearch className={`h-8 w-8 mx-auto mb-2 ${regTestSource === "log" ? "text-[#00e5ff]" : textSecondary}`} />
+                    <p className={`font-medium ${textPrimary}`}>Log File</p>
+                    <p className={`text-xs ${textSecondary}`}>Extract from FIX logs</p>
+                  </button>
+                  <button 
+                    onClick={() => setRegTestSource("scenario")}
+                    className={`p-4 rounded-lg border-2 transition-all ${regTestSource === "scenario" ? "border-[#00e5ff] bg-[#00e5ff]/10" : `border-[#1e4976]/50 hover:border-[#00e5ff]/50`}`}
+                  >
+                    <Activity className={`h-8 w-8 mx-auto mb-2 ${regTestSource === "scenario" ? "text-[#00e5ff]" : textSecondary}`} />
+                    <p className={`font-medium ${textPrimary}`}>Scenarios</p>
+                    <p className={`text-xs ${textSecondary}`}>Use created scenarios</p>
+                  </button>
+                </div>
+
+                {/* Spec Upload/Selection */}
+                {regTestSource === "spec" && (
+                  <div className={`p-4 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"}`}>
+                    <h4 className={`font-medium mb-3 ${textPrimary}`}>Upload or Select Spec</h4>
+                    <label className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center hover:border-[#00e5ff] cursor-pointer block transition-colors`}>
+                      <input type="file" className="hidden" accept=".xlsx,.xls,.csv" />
+                      <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                      <p className={textPrimary}>Drop FIX spec file here or click to browse</p>
+                      <p className={`text-xs ${textSecondary} mt-1`}>Supports .xlsx, .xls, .csv formats</p>
+                    </label>
+                  </div>
+                )}
+
+                {/* Log File Upload/Selection */}
+                {regTestSource === "log" && (
+                  <div className={`p-4 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"}`}>
+                    <h4 className={`font-medium mb-3 ${textPrimary}`}>Upload or Select Log File</h4>
+                    <label className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center hover:border-[#00e5ff] cursor-pointer block transition-colors`}>
+                      <input type="file" className="hidden" accept=".log,.txt,.fix" />
+                      <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                      <p className={textPrimary}>Drop FIX log file here or click to browse</p>
+                      <p className={`text-xs ${textSecondary} mt-1`}>Supports .log, .txt, .fix formats</p>
+                    </label>
+                  </div>
+                )}
+
+                {/* Scenario Selection */}
+                {regTestSource === "scenario" && (
+                  <div className={`p-4 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"}`}>
+                    <h4 className={`font-medium mb-3 ${textPrimary}`}>Load Scenarios</h4>
+                    <div className="flex gap-4">
+                      <Button variant="outline" onClick={() => setCurrentScreen("scenario-creation")}>
+                        <Activity className="h-4 w-4 mr-2" /> Go to Scenario Creation
+                      </Button>
+                      <label className={`border-2 border-dashed ${borderColor} rounded-lg px-6 py-3 hover:border-[#00e5ff] cursor-pointer flex items-center gap-2 transition-colors`}>
+                        <input type="file" className="hidden" accept=".json,.xml" />
+                        <Upload className={`h-5 w-5 ${textSecondary}`} />
+                        <span className={textSecondary}>Upload Scenario File</span>
+                      </label>
+                    </div>
+                  </div>
+                )}
+              </Card>
+
+              {/* Step 2: Generate Test Cases */}
+              {regTestSource && (
+                <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
+                  <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Step 2: Generate Regression Test Suite</h3>
+                  <p className={`mb-4 ${textSecondary}`}>Analyze the selected source and generate test cases.</p>
+                  <Button 
+                    onClick={async () => {
+                      setGeneratingRegTest("adhoc");
+                      await new Promise(resolve => setTimeout(resolve, 2000));
+                      setShowTestCaseResults(true);
+                      setGeneratingRegTest(null);
+                    }} 
+                    disabled={generatingRegTest !== null}
+                  >
+                    {generatingRegTest === "adhoc" ? (
+                      <><div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div> Generating...</>
+                    ) : (
+                      <><Play className="h-4 w-4 mr-2" /> Generate Test Cases</>
+                    )}
+                  </Button>
+                </Card>
+              )}
+
+              {/* Step 3: Review & Export Test Cases */}
+              {showTestCaseResults && (
+                <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
+                  <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Step 3: Review Test Cases</h3>
+                  <p className={`mb-4 ${textSecondary}`}>Review generated test cases grouped by category. Select which to include in VeriFIX export.</p>
+                  
+                  <div className="space-y-4">
+                    {testCaseGroups.map((group, gi) => (
+                      <div key={gi} className={`border ${borderColor} rounded-lg overflow-hidden`}>
+                        <div className={`px-4 py-3 ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"} flex items-center justify-between`}>
+                          <div className="flex items-center gap-3">
+                            <input type="checkbox" defaultChecked className="h-4 w-4" />
+                            <span className={`font-medium ${textPrimary}`}>{group.group}</span>
+                            <span className={`text-xs ${textSecondary}`}>({group.cases.length} tests)</span>
+                          </div>
+                          <ChevronDown className={`h-4 w-4 ${textSecondary}`} />
+                        </div>
+                        <div className="divide-y divide-[#1e4976]/30">
+                          {group.cases.map((tc, ti) => (
+                            <div key={ti} className={`flex items-center justify-between px-4 py-2 ${isDarkMode ? "bg-[#0a1628]/50" : "bg-white"}`}>
+                              <div className="flex items-center gap-3 pl-6">
+                                <input type="checkbox" defaultChecked className="h-4 w-4" />
+                                <span className={`text-sm font-mono ${textSecondary}`}>{tc.id}</span>
+                                <span className={`text-sm ${textPrimary}`}>{tc.name}</span>
+                              </div>
+                              <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">Ready</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-4 mt-6">
+                    <Button>
+                      <VerifixLogo size={16} /> Export to VeriFIX
+                    </Button>
+                    <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download Suite</Button>
+                  </div>
+                </Card>
+              )}
+
+              {/* Launch VeriFIX */}
+              {showTestCaseResults && (
+                <Card className={`${bgCard} p-6 border ${borderColor}`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className={`text-lg font-bold ${textPrimary}`}>Launch VeriFIX</h3>
+                      <p className={`${textSecondary}`}>Open VeriFIX to run your regression test cases</p>
+                    </div>
+                    <Button>
+                      <VerifixLogo size={20} /> Launch VeriFIX
+                    </Button>
+                  </div>
+                </Card>
+              )}
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    // Client mode: Show asset class-based view with pre-generated suites
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-            <button onClick={() => isAdHocMode ? setCurrentScreen("dashboard") : setCurrentScreen("asset-tools")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+            <button onClick={() => setCurrentScreen("asset-tools")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> Back
             </button>
             <div className="flex items-center gap-3">
               <VerifixLogo size={32} />
-              <h1 className={`text-2xl font-bold ${textPrimary}`}>Reg Test Case Generation {isAdHocMode && "(Ad-hoc)"}</h1>
+              <h1 className={`text-2xl font-bold ${textPrimary}`}>Testing</h1>
             </div>
-            <p className={`text-sm ${textSecondary} mt-1`}>Manage regression test suites by asset class</p>
+            <p className={`text-sm ${textSecondary} mt-1`}>Manage regression test suites for {selectedClient?.name || "client"} by asset class</p>
           </header>
 
           <div className="p-6">
@@ -3621,19 +3801,199 @@ const specCompareResults = [
       },
     ]
 
+    // Ad-hoc mode: Show step-by-step workflow
+    if (isAdHocMode) {
+      return (
+        <div className={`min-h-screen ${bgPrimary} flex`}>
+          <Sidebar />
+          <div className="flex-1 overflow-auto">
+            <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+              <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+                <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+              </button>
+              <div className="flex items-center gap-3">
+                <ConductorLogo size={32} />
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>Certification (Ad-hoc)</h1>
+              </div>
+              <p className={`text-sm ${textSecondary} mt-1`}>Generate certification test cases from specs, logs, or scenarios</p>
+            </header>
+
+            <div className="p-6">
+              {/* Step 1: Select Source */}
+              <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
+                <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Step 1: Select Certification Source</h3>
+                <p className={`mb-4 ${textSecondary}`}>Choose a source to generate certification test cases from.</p>
+                
+                <div className="grid grid-cols-3 gap-4 mb-6">
+                  <button 
+                    onClick={() => setCertTestSource("spec")}
+                    className={`p-4 rounded-lg border-2 transition-all ${certTestSource === "spec" ? "border-[#00e5ff] bg-[#00e5ff]/10" : `border-[#1e4976]/50 hover:border-[#00e5ff]/50`}`}
+                  >
+                    <FileText className={`h-8 w-8 mx-auto mb-2 ${certTestSource === "spec" ? "text-[#00e5ff]" : textSecondary}`} />
+                    <p className={`font-medium ${textPrimary}`}>Standardized Spec</p>
+                    <p className={`text-xs ${textSecondary}`}>Generate from FIX spec</p>
+                  </button>
+                  <button 
+                    onClick={() => setCertTestSource("log")}
+                    className={`p-4 rounded-lg border-2 transition-all ${certTestSource === "log" ? "border-[#00e5ff] bg-[#00e5ff]/10" : `border-[#1e4976]/50 hover:border-[#00e5ff]/50`}`}
+                  >
+                    <FileSearch className={`h-8 w-8 mx-auto mb-2 ${certTestSource === "log" ? "text-[#00e5ff]" : textSecondary}`} />
+                    <p className={`font-medium ${textPrimary}`}>Log File</p>
+                    <p className={`text-xs ${textSecondary}`}>Extract from FIX logs</p>
+                  </button>
+                  <button 
+                    onClick={() => setCertTestSource("scenario")}
+                    className={`p-4 rounded-lg border-2 transition-all ${certTestSource === "scenario" ? "border-[#00e5ff] bg-[#00e5ff]/10" : `border-[#1e4976]/50 hover:border-[#00e5ff]/50`}`}
+                  >
+                    <Activity className={`h-8 w-8 mx-auto mb-2 ${certTestSource === "scenario" ? "text-[#00e5ff]" : textSecondary}`} />
+                    <p className={`font-medium ${textPrimary}`}>Scenarios</p>
+                    <p className={`text-xs ${textSecondary}`}>Use created scenarios</p>
+                  </button>
+                </div>
+
+                {/* Spec Upload/Selection */}
+                {certTestSource === "spec" && (
+                  <div className={`p-4 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"}`}>
+                    <h4 className={`font-medium mb-3 ${textPrimary}`}>Upload or Select Spec</h4>
+                    <label className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center hover:border-[#00e5ff] cursor-pointer block transition-colors`}>
+                      <input type="file" className="hidden" accept=".xlsx,.xls,.csv" />
+                      <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                      <p className={textPrimary}>Drop FIX spec file here or click to browse</p>
+                      <p className={`text-xs ${textSecondary} mt-1`}>Supports .xlsx, .xls, .csv formats</p>
+                    </label>
+                  </div>
+                )}
+
+                {/* Log File Upload/Selection */}
+                {certTestSource === "log" && (
+                  <div className={`p-4 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"}`}>
+                    <h4 className={`font-medium mb-3 ${textPrimary}`}>Upload or Select Log File</h4>
+                    <label className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center hover:border-[#00e5ff] cursor-pointer block transition-colors`}>
+                      <input type="file" className="hidden" accept=".log,.txt,.fix" />
+                      <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                      <p className={textPrimary}>Drop FIX log file here or click to browse</p>
+                      <p className={`text-xs ${textSecondary} mt-1`}>Supports .log, .txt, .fix formats</p>
+                    </label>
+                  </div>
+                )}
+
+                {/* Scenario Selection */}
+                {certTestSource === "scenario" && (
+                  <div className={`p-4 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/50" : "bg-[#f8fafc]"}`}>
+                    <h4 className={`font-medium mb-3 ${textPrimary}`}>Load Scenarios</h4>
+                    <div className="flex gap-4">
+                      <Button variant="outline" onClick={() => setCurrentScreen("scenario-creation")}>
+                        <Activity className="h-4 w-4 mr-2" /> Go to Scenario Creation
+                      </Button>
+                      <label className={`border-2 border-dashed ${borderColor} rounded-lg px-6 py-3 hover:border-[#00e5ff] cursor-pointer flex items-center gap-2 transition-colors`}>
+                        <input type="file" className="hidden" accept=".json,.xml" />
+                        <Upload className={`h-5 w-5 ${textSecondary}`} />
+                        <span className={textSecondary}>Upload Scenario File</span>
+                      </label>
+                    </div>
+                  </div>
+                )}
+              </Card>
+
+              {/* Step 2: Generate Certification Test Cases */}
+              {certTestSource && (
+                <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
+                  <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Step 2: Generate Certification Test Suite</h3>
+                  <p className={`mb-4 ${textSecondary}`}>Analyze the selected source and generate certification test cases.</p>
+                  <Button 
+                    onClick={async () => {
+                      setGeneratingCertTest("adhoc");
+                      await new Promise(resolve => setTimeout(resolve, 2000));
+                      setShowCertResults(true);
+                      setGeneratingCertTest(null);
+                    }} 
+                    disabled={generatingCertTest !== null}
+                  >
+                    {generatingCertTest === "adhoc" ? (
+                      <><div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div> Generating...</>
+                    ) : (
+                      <><Play className="h-4 w-4 mr-2" /> Generate Certification Tests</>
+                    )}
+                  </Button>
+                </Card>
+              )}
+
+              {/* Step 3: Review & Export Test Cases */}
+              {showCertResults && (
+                <Card className={`${bgCard} p-6 border ${borderColor} mb-6`}>
+                  <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Step 3: Review Certification Test Cases</h3>
+                  <p className={`mb-4 ${textSecondary}`}>Review generated certification test cases grouped by category. Select which to include in Conductor export.</p>
+                  
+                  <div className="space-y-4">
+                    {certTestGroups.map((group, gi) => (
+                      <div key={gi} className={`border ${borderColor} rounded-lg overflow-hidden`}>
+                        <div className={`px-4 py-3 ${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"} flex items-center justify-between`}>
+                          <div className="flex items-center gap-3">
+                            <input type="checkbox" defaultChecked className="h-4 w-4" />
+                            <span className={`font-medium ${textPrimary}`}>{group.group}</span>
+                            <span className={`text-xs ${textSecondary}`}>({group.cases.length} tests)</span>
+                          </div>
+                          <ChevronDown className={`h-4 w-4 ${textSecondary}`} />
+                        </div>
+                        <div className="divide-y divide-[#1e4976]/30">
+                          {group.cases.map((tc, ti) => (
+                            <div key={ti} className={`flex items-center justify-between px-4 py-2 ${isDarkMode ? "bg-[#0a1628]/50" : "bg-white"}`}>
+                              <div className="flex items-center gap-3 pl-6">
+                                <input type="checkbox" defaultChecked className="h-4 w-4" />
+                                <span className={`text-sm font-mono ${textSecondary}`}>{tc.id}</span>
+                                <span className={`text-sm ${textPrimary}`}>{tc.name}</span>
+                              </div>
+                              <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">Ready</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-4 mt-6">
+                    <Button>
+                      <ConductorLogo size={16} /> Export to Conductor
+                    </Button>
+                    <Button variant="outline"><Download className="h-4 w-4 mr-2" /> Download Suite</Button>
+                  </div>
+                </Card>
+              )}
+
+              {/* Launch Conductor */}
+              {showCertResults && (
+                <Card className={`${bgCard} p-6 border ${borderColor}`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className={`text-lg font-bold ${textPrimary}`}>Launch Conductor</h3>
+                      <p className={`${textSecondary}`}>Open Conductor to run your certification test cases</p>
+                    </div>
+                    <Button>
+                      <ConductorLogo size={20} /> Launch Conductor
+                    </Button>
+                  </div>
+                </Card>
+              )}
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    // Client mode: Show asset class-based view with pre-generated suites
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-            <button onClick={() => isAdHocMode ? setCurrentScreen("dashboard") : setCurrentScreen("asset-tools")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+            <button onClick={() => setCurrentScreen("asset-tools")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> Back
             </button>
             <div className="flex items-center gap-3">
               <ConductorLogo size={32} />
-              <h1 className={`text-2xl font-bold ${textPrimary}`}>Certification Case Generation {isAdHocMode && "(Ad-hoc)"}</h1>
+              <h1 className={`text-2xl font-bold ${textPrimary}`}>Certification</h1>
             </div>
-            <p className={`text-sm ${textSecondary} mt-1`}>Manage certification test suites by asset class</p>
+            <p className={`text-sm ${textSecondary} mt-1`}>Manage certification test suites for {selectedClient?.name || "client"} by asset class</p>
           </header>
 
           <div className="p-6">
