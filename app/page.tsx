@@ -2,14 +2,14 @@
 
 // B- COMET Platform - FIX Protocol Testing Suite v2
 import { useState } from "react"
-import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw } from "lucide-react"
+import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports">("home")
   const [settingsTab, setSettingsTab] = useState<"look-feel" | "general" | "security" | "mail" | "questionnaires" | "license">("general")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -109,6 +109,38 @@ export default function BCometPlatform() {
   const [showContactPanel, setShowContactPanel] = useState(false)
   const [showDemoForm, setShowDemoForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  // Session configuration state
+  const [sessionConfigs, setSessionConfigs] = useState<Record<string, {host: string, port: string, senderCompId: string, targetCompId: string, protocol: string, ssl: boolean, heartbeat: number, connected: boolean, lastTested: string | null}>>({
+    "Equities-FIX 4.2": { host: "fix.nexustrading.com", port: "9876", senderCompId: "NEXUS_EQ", targetCompId: "BROADRIDGE", protocol: "FIX 4.2", ssl: true, heartbeat: 30, connected: true, lastTested: "Jan 15, 2024 10:30 AM" },
+  })
+  // Test execution results state
+  const [testRunHistory, setTestRunHistory] = useState<Array<{id: string, suite: string, asset: string, protocol: string, runDate: string, status: "passed" | "failed" | "running", passed: number, failed: number, total: number}>>([
+    { id: "TR001", suite: "EQ_FIX42_RegTests_v1.2", asset: "Equities", protocol: "FIX 4.2", runDate: "Jan 15, 2024 10:45 AM", status: "passed", passed: 24, failed: 0, total: 24 },
+    { id: "TR002", suite: "OPT_FIX44_RegTests_v2.0", asset: "Options", protocol: "FIX 4.4", runDate: "Jan 14, 2024 3:20 PM", status: "failed", passed: 15, failed: 3, total: 18 },
+    { id: "TR003", suite: "EQ_FIX42_CertTests_v1.2", asset: "Equities", protocol: "FIX 4.2", runDate: "Jan 13, 2024 9:00 AM", status: "passed", passed: 32, failed: 0, total: 32 },
+  ])
+  // Client workflow stage tracking
+  const [clientStages, setClientStages] = useState<Record<string, {stage: number, stageStatus: Record<number, "completed" | "in-progress" | "blocked" | "pending">}>>({
+    "Nexus Trading Group": { stage: 5, stageStatus: { 1: "completed", 2: "completed", 3: "completed", 4: "completed", 5: "in-progress", 6: "pending", 7: "pending" } },
+    "Apex Capital Partners": { stage: 3, stageStatus: { 1: "completed", 2: "completed", 3: "in-progress", 4: "pending", 5: "pending", 6: "pending", 7: "pending" } },
+    "Horizon Investments": { stage: 2, stageStatus: { 1: "completed", 2: "in-progress", 3: "pending", 4: "pending", 5: "pending", 6: "pending", 7: "pending" } },
+    "Velocity Securities": { stage: 6, stageStatus: { 1: "completed", 2: "completed", 3: "completed", 4: "completed", 5: "completed", 6: "in-progress", 7: "pending" } },
+    "Summit Financial": { stage: 1, stageStatus: { 1: "in-progress", 2: "pending", 3: "pending", 4: "pending", 5: "pending", 6: "pending", 7: "pending" } },
+  })
+  // Field mapping rules state
+  const [fieldMappings, setFieldMappings] = useState<Record<string, Array<{clientTag: string, clientName: string, broaderTag: string, broaderName: string, transform: string | null, status: "mapped" | "custom" | "unmapped"}>>>({})
+  // Dashboard view mode
+  const [dashboardView, setDashboardView] = useState<"cards" | "kanban">("cards")
+  // Go-live checklist
+  const [goLiveChecklist, setGoLiveChecklist] = useState<Record<string, boolean>>({
+    "spec-approved": true,
+    "connectivity-verified": true,
+    "regression-passed": true,
+    "certification-passed": false,
+    "client-signoff": false,
+    "broadridge-signoff": false,
+    "production-config": false,
+  })
   // FIX MSG Creator state
   const [fixMsgSelectedSpec, setFixMsgSelectedSpec] = useState("")
   const [fixMsgSelectedType, setFixMsgSelectedType] = useState("")
@@ -1339,14 +1371,31 @@ export default function BCometPlatform() {
                 <h1 className={`text-xl font-bold ${textPrimary}`}>Dashboard</h1>
                 <p className={textSecondary}>Overview of client onboarding status</p>
               </div>
-              <button className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 relative`}>
-                <Bell className="h-5 w-5" />
-                {totalAlerts > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#f44336] rounded-full text-[10px] text-white flex items-center justify-center">{totalAlerts}</span>}
-              </button>
+              <div className="flex items-center gap-4">
+                {/* View Toggle */}
+                <div className={`flex gap-1 p-1 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-100"}`}>
+                  <button 
+                    onClick={() => setDashboardView("cards")}
+                    className={`px-3 py-1.5 rounded text-xs font-medium transition-colors flex items-center gap-1 ${dashboardView === "cards" ? "bg-[#00e5ff] text-[#0a1628]" : textSecondary}`}
+                  >
+                    <LayoutDashboard className="h-3 w-3" /> Cards
+                  </button>
+                  <button 
+                    onClick={() => setDashboardView("kanban")}
+                    className={`px-3 py-1.5 rounded text-xs font-medium transition-colors flex items-center gap-1 ${dashboardView === "kanban" ? "bg-[#00e5ff] text-[#0a1628]" : textSecondary}`}
+                  >
+                    <TrendingUp className="h-3 w-3" /> Kanban
+                  </button>
+                </div>
+                <button className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 relative`}>
+                  <Bell className="h-5 w-5" />
+                  {totalAlerts > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#f44336] rounded-full text-[10px] text-white flex items-center justify-center">{totalAlerts}</span>}
+                </button>
+              </div>
             </header>
 
             <div className="p-6 space-y-6">
-              {/* Metrics Cards */}
+              {/* Metrics Cards - Always visible */}
               <div className="grid grid-cols-4 gap-4">
                 <Card className={`${bgCard} border ${borderColor} p-4`}>
                   <div className="flex items-center justify-between">
@@ -1394,6 +1443,75 @@ export default function BCometPlatform() {
                 </Card>
               </div>
 
+              {/* Kanban View */}
+              {dashboardView === "kanban" && (
+                <div className="overflow-x-auto pb-4">
+                  <div className="flex gap-4 min-w-max">
+                    {[
+                      { stage: 1, name: "Setup", color: "#2196f3", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 1) },
+                      { stage: 2, name: "Spec Analysis", color: "#9c27b0", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 2) },
+                      { stage: 3, name: "Connectivity", color: "#00bcd4", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 3) },
+                      { stage: 4, name: "Log Analysis", color: "#ff9800", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 4) },
+                      { stage: 5, name: "Testing", color: "#e91e63", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 5) },
+                      { stage: 6, name: "Certification", color: "#4caf50", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 6) },
+                      { stage: 7, name: "Live", color: "#00e5ff", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 7) },
+                    ].map((column) => (
+                      <div key={column.stage} className="w-72 flex-shrink-0">
+                        <div className={`rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-100"} p-3`}>
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: column.color }} />
+                              <span className={`font-medium ${textPrimary}`}>{column.name}</span>
+                            </div>
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"} ${textSecondary}`}>
+                              {column.clients.length}
+                            </span>
+                          </div>
+                          <div className="space-y-2 min-h-[200px]">
+                            {column.clients.map((client) => (
+                              <Card 
+                                key={client.id} 
+                                className={`${bgCard} border ${borderColor} p-3 cursor-pointer hover:border-[#00e5ff]/50 transition-colors`}
+                                onClick={() => { setSelectedClient(client); setCurrentScreen("client-detail"); }}
+                              >
+                                <div className="flex items-start justify-between mb-2">
+                                  <p className={`font-medium text-sm ${textPrimary}`}>{client.name}</p>
+                                  {getTotalAlerts(client) > 0 && (
+                                    <span className="w-5 h-5 rounded-full bg-[#f44336]/20 text-[#f44336] text-xs flex items-center justify-center">
+                                      {getTotalAlerts(client)}
+                                    </span>
+                                  )}
+                                </div>
+                                <p className={`text-xs ${textSecondary} mb-2`}>{client.accountManager}</p>
+                                <div className="flex flex-wrap gap-1">
+                                  {client.assetClasses.slice(0, 3).map((ac, i) => (
+                                    <span key={i} className={`text-[10px] px-1.5 py-0.5 rounded ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"} ${textSecondary}`}>
+                                      {ac.name}
+                                    </span>
+                                  ))}
+                                  {client.assetClasses.length > 3 && (
+                                    <span className={`text-[10px] px-1.5 py-0.5 rounded ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"} ${textSecondary}`}>
+                                      +{client.assetClasses.length - 3}
+                                    </span>
+                                  )}
+                                </div>
+                              </Card>
+                            ))}
+                            {column.clients.length === 0 && (
+                              <div className={`text-center py-8 ${textSecondary} text-sm`}>
+                                No clients
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Cards View - Original Dashboard Content */}
+              {dashboardView === "cards" && (
               <div className="grid grid-cols-2 gap-6">
                 {/* Pending Tasks */}
                 <Card className={`${bgCard} border ${borderColor}`}>
@@ -1488,6 +1606,7 @@ export default function BCometPlatform() {
                   </table>
                 </div>
               </Card>
+              )}
             </div>
           </div>
         </div>
@@ -1615,6 +1734,104 @@ const clientProgressData = [
           </header>
 
           <div className="p-6">
+            {/* Progress Stepper */}
+            {(() => {
+              const stages = [
+                { num: 1, name: "Setup", icon: FileText, description: "Client onboarding & spec upload" },
+                { num: 2, name: "Spec Analysis", icon: GitCompare, description: "Comparison & field mapping" },
+                { num: 3, name: "Connectivity", icon: Server, description: "Session configuration & testing" },
+                { num: 4, name: "Log Analysis", icon: FileSearch, description: "Message pattern extraction" },
+                { num: 5, name: "Testing", icon: TestTube, description: "Regression test execution" },
+                { num: 6, name: "Certification", icon: Award, description: "Certification & sign-off" },
+                { num: 7, name: "Go-Live", icon: Rocket, description: "Production cutover" },
+              ]
+              const clientStage = clientStages[selectedClient.name] || { stage: 1, stageStatus: { 1: "in-progress", 2: "pending", 3: "pending", 4: "pending", 5: "pending", 6: "pending", 7: "pending" } }
+              
+              return (
+                <Card className={`${bgCard} border ${borderColor} mb-6 p-6`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className={`text-lg font-bold ${textPrimary}`}>Onboarding Progress</h2>
+                    <span className={`text-sm ${textSecondary}`}>Stage {clientStage.stage} of 7</span>
+                  </div>
+                  <div className="flex items-center justify-between relative">
+                    {/* Progress line */}
+                    <div className={`absolute top-6 left-0 right-0 h-1 ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"}`}>
+                      <div 
+                        className="h-full bg-gradient-to-r from-[#00e5ff] to-[#4caf50] transition-all duration-500"
+                        style={{ width: `${((clientStage.stage - 1) / 6) * 100}%` }}
+                      />
+                    </div>
+                    
+                    {stages.map((stage) => {
+                      const status = clientStage.stageStatus[stage.num] || "pending"
+                      const isActive = stage.num === clientStage.stage
+                      const StageIcon = stage.icon
+                      
+                      return (
+                        <div key={stage.num} className="flex flex-col items-center relative z-10" style={{ width: "14%" }}>
+                          <div 
+                            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
+                              status === "completed" ? "bg-[#4caf50] text-white" :
+                              status === "in-progress" ? "bg-[#00e5ff] text-[#0a1628] ring-4 ring-[#00e5ff]/30" :
+                              status === "blocked" ? "bg-[#f44336] text-white" :
+                              isDarkMode ? "bg-[#1e4976]/50 text-[#8b9dc3]" : "bg-gray-200 text-gray-500"
+                            }`}
+                          >
+                            {status === "completed" ? <CheckCircle className="h-5 w-5" /> : 
+                             status === "blocked" ? <Lock className="h-5 w-5" /> :
+                             <StageIcon className="h-5 w-5" />}
+                          </div>
+                          <span className={`text-xs font-medium mt-2 text-center ${isActive ? "text-[#00e5ff]" : status === "completed" ? "text-[#4caf50]" : textSecondary}`}>
+                            {stage.name}
+                          </span>
+                          <span className={`text-[10px] ${textSecondary} text-center mt-0.5 hidden lg:block`}>{stage.description}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  
+                  {/* Stage action buttons */}
+                  <div className="flex gap-3 mt-6 pt-4 border-t border-[#1e4976]/30">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => setCurrentScreen("session-config")}
+                    >
+                      <Server className="h-4 w-4 mr-2" /> Configure Sessions
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => setCurrentScreen("field-mapping")}
+                    >
+                      <Link2 className="h-4 w-4 mr-2" /> Field Mappings
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => setCurrentScreen("test-results")}
+                    >
+                      <BarChart3 className="h-4 w-4 mr-2" /> Test Results
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => setCurrentScreen("go-live")}
+                    >
+                      <Rocket className="h-4 w-4 mr-2" /> Go-Live Checklist
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => setCurrentScreen("reports")}
+                    >
+                      <FileCheck className="h-4 w-4 mr-2" /> Reports
+                    </Button>
+                  </div>
+                </Card>
+              )
+            })()}
+
             {/* Client Specs Section */}
             <Card className={`${bgCard} border ${borderColor} mb-6`}>
               <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
@@ -6356,6 +6573,716 @@ const copyToClipboard = () => {
     )
   }
   
+  // Session Configuration Screen
+  if (currentScreen === "session-config") {
+    const assetVersions = [
+      { asset: "Equities", protocol: "FIX 4.2" },
+      { asset: "Equities", protocol: "FIX 4.4" },
+      { asset: "Options", protocol: "FIX 4.4" },
+      { asset: "Futures", protocol: "FIX 4.2" },
+      { asset: "Futures", protocol: "FIX 5.0 SP2" },
+    ]
+    
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => selectedClient ? setCurrentScreen("client-detail") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <div className="flex items-center gap-3">
+              <Server className="h-8 w-8 text-[#00e5ff]" />
+              <div>
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>FIX Session Configuration</h1>
+                <p className={`text-sm ${textSecondary}`}>{selectedClient ? `Configure connectivity for ${selectedClient.name}` : "Configure FIX session parameters"}</p>
+              </div>
+            </div>
+          </header>
+
+          <div className="p-6">
+            {/* Environment Selector */}
+            <Card className={`${bgCard} border ${borderColor} mb-6 p-4`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <span className={`font-medium ${textPrimary}`}>Environment:</span>
+                  <div className={`flex gap-1 p-1 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-100"}`}>
+                    {["UAT", "Staging", "Production"].map(env => (
+                      <button 
+                        key={env}
+                        className={`px-4 py-1.5 rounded text-sm font-medium transition-colors ${env === "UAT" ? "bg-[#00e5ff] text-[#0a1628]" : textSecondary}`}
+                      >
+                        {env}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <Button size="sm" className="bg-[#4caf50] hover:bg-[#4caf50]/80">
+                  <Plus className="h-4 w-4 mr-2" /> Add Session
+                </Button>
+              </div>
+            </Card>
+
+            {/* Session Configurations */}
+            <div className="space-y-4">
+              {assetVersions.map((av, i) => {
+                const key = `${av.asset}-${av.protocol}`
+                const config = sessionConfigs[key]
+                const isConfigured = !!config
+                
+                return (
+                  <Card key={i} className={`${bgCard} border ${borderColor}`}>
+                    <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
+                      <div className="flex items-center gap-4">
+                        <span className={`font-bold ${textPrimary}`}>{av.asset} - {av.protocol}</span>
+                        {isConfigured ? (
+                          <span className="flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-[#4caf50]/20 text-[#4caf50]">
+                            <Wifi className="h-3 w-3" /> Connected
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-[#ff9800]/20 text-[#ff9800]">
+                            <WifiOff className="h-3 w-3" /> Not Configured
+                          </span>
+                        )}
+                      </div>
+                      {isConfigured && config.lastTested && (
+                        <span className={`text-xs ${textSecondary}`}>Last tested: {config.lastTested}</span>
+                      )}
+                    </div>
+                    
+                    <div className="p-6">
+                      <div className="grid grid-cols-4 gap-4 mb-4">
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${textSecondary}`}>Host</label>
+                          <Input 
+                            placeholder="fix.exchange.com"
+                            defaultValue={config?.host || ""}
+                            className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                          />
+                        </div>
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${textSecondary}`}>Port</label>
+                          <Input 
+                            placeholder="9876"
+                            defaultValue={config?.port || ""}
+                            className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                          />
+                        </div>
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${textSecondary}`}>SenderCompID</label>
+                          <Input 
+                            placeholder="CLIENT_ID"
+                            defaultValue={config?.senderCompId || ""}
+                            className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                          />
+                        </div>
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${textSecondary}`}>TargetCompID</label>
+                          <Input 
+                            placeholder="BROADRIDGE"
+                            defaultValue={config?.targetCompId || ""}
+                            className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-4 gap-4 mb-4">
+                        <div>
+                          <label className={`block text-xs font-medium mb-1 ${textSecondary}`}>Heartbeat Interval (sec)</label>
+                          <Input 
+                            type="number"
+                            placeholder="30"
+                            defaultValue={config?.heartbeat || 30}
+                            className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                          />
+                        </div>
+                        <div className="flex items-end gap-4">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" defaultChecked={config?.ssl || false} className="h-4 w-4" />
+                            <span className={`text-sm ${textPrimary}`}>SSL/TLS Enabled</span>
+                          </label>
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-3">
+                        <Button 
+                          size="sm"
+                          onClick={() => {
+                            setSessionConfigs(prev => ({
+                              ...prev,
+                              [key]: {
+                                host: "fix.client.com",
+                                port: "9876",
+                                senderCompId: "CLIENT",
+                                targetCompId: "BROADRIDGE",
+                                protocol: av.protocol,
+                                ssl: true,
+                                heartbeat: 30,
+                                connected: false,
+                                lastTested: null
+                              }
+                            }))
+                          }}
+                        >
+                          <Database className="h-4 w-4 mr-2" /> Save Configuration
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={async () => {
+                            // Simulate connection test
+                            await new Promise(r => setTimeout(r, 1500))
+                            const now = new Date().toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true })
+                            setSessionConfigs(prev => ({
+                              ...prev,
+                              [key]: {
+                                ...prev[key],
+                                connected: true,
+                                lastTested: now
+                              }
+                            }))
+                          }}
+                        >
+                          <Wifi className="h-4 w-4 mr-2" /> Test Connection
+                        </Button>
+                        <Button size="sm" variant="outline">
+                          <Play className="h-4 w-4 mr-2" /> Send Test Logon
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Field Mapping Rules Screen
+  if (currentScreen === "field-mapping") {
+    const sampleMappings = [
+      { clientTag: "1", clientName: "Account", broaderTag: "1", broaderName: "Account", transform: null, status: "mapped" as const },
+      { clientTag: "11", clientName: "ClOrdID", broaderTag: "11", broaderName: "ClOrdID", transform: null, status: "mapped" as const },
+      { clientTag: "55", clientName: "Symbol", broaderTag: "55", broaderName: "Symbol", transform: null, status: "mapped" as const },
+      { clientTag: "5001", clientName: "ClientRef", broaderTag: "20001", broaderName: "BroaderClientRef", transform: "PREFIX:BR_", status: "custom" as const },
+      { clientTag: "5002", clientName: "DeskID", broaderTag: null, broaderName: null, transform: null, status: "unmapped" as const },
+      { clientTag: "54", clientName: "Side", broaderTag: "54", broaderName: "Side", transform: "MAP:B->1,S->2", status: "custom" as const },
+      { clientTag: "38", clientName: "OrderQty", broaderTag: "38", broaderName: "OrderQty", transform: null, status: "mapped" as const },
+      { clientTag: "44", clientName: "Price", broaderTag: "44", broaderName: "Price", transform: "SCALE:100", status: "custom" as const },
+    ]
+    
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => selectedClient ? setCurrentScreen("client-detail") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <div className="flex items-center gap-3">
+              <Link2 className="h-8 w-8 text-[#00e5ff]" />
+              <div>
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>Field Mapping Rules</h1>
+                <p className={`text-sm ${textSecondary}`}>{selectedClient ? `Define field mappings for ${selectedClient.name}` : "Configure field transformation rules"}</p>
+              </div>
+            </div>
+          </header>
+
+          <div className="p-6">
+            {/* Asset/Version Selector */}
+            <Card className={`${bgCard} border ${borderColor} mb-6 p-4`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <span className={`font-medium ${textPrimary}`}>Asset Class:</span>
+                  <select className={`px-3 py-1.5 rounded border ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}>
+                    <option>Equities - FIX 4.2</option>
+                    <option>Equities - FIX 4.4</option>
+                    <option>Options - FIX 4.4</option>
+                  </select>
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline">
+                    <Upload className="h-4 w-4 mr-2" /> Import Mappings
+                  </Button>
+                  <Button size="sm" variant="outline">
+                    <Download className="h-4 w-4 mr-2" /> Export Mappings
+                  </Button>
+                  <Button size="sm" className="bg-[#4caf50] hover:bg-[#4caf50]/80">
+                    <Plus className="h-4 w-4 mr-2" /> Add Rule
+                  </Button>
+                </div>
+              </div>
+            </Card>
+
+            {/* Mapping Stats */}
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#4caf50]/20">
+                    <CheckCircle className="h-5 w-5 text-[#4caf50]" />
+                  </div>
+                  <div>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>5</p>
+                    <p className={`text-xs ${textSecondary}`}>Mapped Fields</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#00e5ff]/20">
+                    <Wrench className="h-5 w-5 text-[#00e5ff]" />
+                  </div>
+                  <div>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>3</p>
+                    <p className={`text-xs ${textSecondary}`}>Custom Transforms</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#ff9800]/20">
+                    <AlertTriangle className="h-5 w-5 text-[#ff9800]" />
+                  </div>
+                  <div>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>1</p>
+                    <p className={`text-xs ${textSecondary}`}>Unmapped Fields</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#2196f3]/20">
+                    <FileText className="h-5 w-5 text-[#2196f3]" />
+                  </div>
+                  <div>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>8</p>
+                    <p className={`text-xs ${textSecondary}`}>Total Rules</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Mapping Table */}
+            <Card className={`${bgCard} border ${borderColor}`}>
+              <div className={`px-6 py-4 border-b ${borderColor}`}>
+                <h3 className={`font-bold ${textPrimary}`}>Field Mapping Rules</h3>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Client Tag</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Client Name</th>
+                      <th className={`px-4 py-3 text-center font-semibold ${textPrimary}`}></th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Broadridge Tag</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Broadridge Name</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Transform</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Status</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sampleMappings.map((m, i) => (
+                      <tr key={i} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
+                        <td className={`px-4 py-3 font-mono ${textPrimary}`}>{m.clientTag}</td>
+                        <td className={`px-4 py-3 ${textPrimary}`}>{m.clientName}</td>
+                        <td className="px-4 py-3 text-center">
+                          {m.status === "mapped" || m.status === "custom" ? (
+                            <ArrowRight className="h-4 w-4 text-[#4caf50] mx-auto" />
+                          ) : (
+                            <Unlink className="h-4 w-4 text-[#ff9800] mx-auto" />
+                          )}
+                        </td>
+                        <td className={`px-4 py-3 font-mono ${m.broaderTag ? textPrimary : textSecondary}`}>{m.broaderTag || "-"}</td>
+                        <td className={`px-4 py-3 ${m.broaderName ? textPrimary : textSecondary}`}>{m.broaderName || "-"}</td>
+                        <td className={`px-4 py-3`}>
+                          {m.transform ? (
+                            <code className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]/50 text-[#00e5ff]" : "bg-blue-100 text-blue-700"}`}>{m.transform}</code>
+                          ) : (
+                            <span className={textSecondary}>-</span>
+                          )}
+                        </td>
+                        <td className={`px-4 py-3`}>
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            m.status === "mapped" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                            m.status === "custom" ? "bg-[#00e5ff]/20 text-[#00e5ff]" :
+                            "bg-[#ff9800]/20 text-[#ff9800]"
+                          }`}>
+                            {m.status === "mapped" ? "Mapped" : m.status === "custom" ? "Custom" : "Unmapped"}
+                          </span>
+                        </td>
+                        <td className={`px-4 py-3`}>
+                          <div className="flex gap-1">
+                            <Button size="sm" variant="outline" className="h-7 w-7 p-0">
+                              <Eye className="h-3 w-3" />
+                            </Button>
+                            <Button size="sm" variant="outline" className="h-7 w-7 p-0">
+                              <Wrench className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Test Execution Results Dashboard
+  if (currentScreen === "test-results") {
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => selectedClient ? setCurrentScreen("client-detail") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <div className="flex items-center gap-3">
+              <BarChart3 className="h-8 w-8 text-[#00e5ff]" />
+              <div>
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>Test Execution Results</h1>
+                <p className={`text-sm ${textSecondary}`}>{selectedClient ? `Test history for ${selectedClient.name}` : "View all test execution results"}</p>
+              </div>
+            </div>
+          </header>
+
+          <div className="p-6">
+            {/* Summary Stats */}
+            <div className="grid grid-cols-5 gap-4 mb-6">
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <p className={`text-3xl font-bold text-[#00e5ff]`}>12</p>
+                <p className={`text-xs ${textSecondary}`}>Total Runs</p>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <p className={`text-3xl font-bold text-[#4caf50]`}>9</p>
+                <p className={`text-xs ${textSecondary}`}>Passed</p>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <p className={`text-3xl font-bold text-[#f44336]`}>2</p>
+                <p className={`text-xs ${textSecondary}`}>Failed</p>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <p className={`text-3xl font-bold text-[#ff9800]`}>1</p>
+                <p className={`text-xs ${textSecondary}`}>Running</p>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <p className={`text-3xl font-bold ${textPrimary}`}>91%</p>
+                <p className={`text-xs ${textSecondary}`}>Pass Rate</p>
+              </Card>
+            </div>
+
+            {/* Test Run History */}
+            <Card className={`${bgCard} border ${borderColor}`}>
+              <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
+                <h3 className={`font-bold ${textPrimary}`}>Test Run History</h3>
+                <div className="flex gap-2">
+                  <select className={`px-3 py-1.5 rounded border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}>
+                    <option>All Suites</option>
+                    <option>Regression Tests</option>
+                    <option>Certification Tests</option>
+                  </select>
+                  <select className={`px-3 py-1.5 rounded border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}>
+                    <option>All Status</option>
+                    <option>Passed</option>
+                    <option>Failed</option>
+                    <option>Running</option>
+                  </select>
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Run ID</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Suite</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Asset / Protocol</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Run Date</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Status</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Results</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {testRunHistory.map((run) => (
+                      <tr key={run.id} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
+                        <td className={`px-4 py-3 font-mono ${textPrimary}`}>{run.id}</td>
+                        <td className={`px-4 py-3 ${textPrimary}`}>{run.suite}</td>
+                        <td className={`px-4 py-3 ${textSecondary}`}>{run.asset} / {run.protocol}</td>
+                        <td className={`px-4 py-3 ${textSecondary}`}>{run.runDate}</td>
+                        <td className={`px-4 py-3`}>
+                          <span className={`px-2 py-1 rounded text-xs flex items-center gap-1 w-fit ${
+                            run.status === "passed" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                            run.status === "failed" ? "bg-[#f44336]/20 text-[#f44336]" :
+                            "bg-[#ff9800]/20 text-[#ff9800]"
+                          }`}>
+                            {run.status === "running" && <div className="animate-spin h-3 w-3 border border-current border-t-transparent rounded-full" />}
+                            {run.status.charAt(0).toUpperCase() + run.status.slice(1)}
+                          </span>
+                        </td>
+                        <td className={`px-4 py-3`}>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[#4caf50]">{run.passed}</span>
+                            <span className={textSecondary}>/</span>
+                            <span className="text-[#f44336]">{run.failed}</span>
+                            <span className={textSecondary}>/</span>
+                            <span className={textSecondary}>{run.total}</span>
+                            {/* Progress bar */}
+                            <div className={`w-16 h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"} overflow-hidden`}>
+                              <div 
+                                className="h-full bg-[#4caf50]" 
+                                style={{ width: `${(run.passed / run.total) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                        </td>
+                        <td className={`px-4 py-3`}>
+                          <div className="flex gap-1">
+                            <Button size="sm" variant="outline" className="h-7">
+                              <Eye className="h-3 w-3 mr-1" /> Details
+                            </Button>
+                            {run.status === "failed" && (
+                              <Button size="sm" variant="outline" className="h-7 text-[#ff9800] border-[#ff9800]/30">
+                                <RefreshCw className="h-3 w-3 mr-1" /> Re-run
+                              </Button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Go-Live Checklist Screen
+  if (currentScreen === "go-live") {
+    const checklistItems = [
+      { key: "spec-approved", label: "Spec Comparison Approved", description: "All spec discrepancies resolved or approved", stage: 2, icon: GitCompare },
+      { key: "connectivity-verified", label: "Connectivity Verified", description: "FIX sessions established and tested in all environments", stage: 3, icon: Server },
+      { key: "regression-passed", label: "Regression Tests Passed", description: "100% pass rate on all regression test suites", stage: 5, icon: TestTube },
+      { key: "certification-passed", label: "Certification Completed", description: "All certification test cases passed", stage: 6, icon: Award },
+      { key: "client-signoff", label: "Client Sign-off", description: "Client has reviewed and approved all test results", stage: 6, icon: CheckSquare },
+      { key: "broadridge-signoff", label: "Broadridge Sign-off", description: "Internal review and approval completed", stage: 6, icon: Shield },
+      { key: "production-config", label: "Production Configuration", description: "Production FIX sessions configured and verified", stage: 7, icon: Rocket },
+    ]
+    
+    const completedCount = Object.values(goLiveChecklist).filter(Boolean).length
+    const totalCount = checklistItems.length
+    const readyForGoLive = completedCount === totalCount
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => selectedClient ? setCurrentScreen("client-detail") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <div className="flex items-center gap-3">
+              <Rocket className="h-8 w-8 text-[#00e5ff]" />
+              <div>
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>Go-Live Checklist</h1>
+                <p className={`text-sm ${textSecondary}`}>{selectedClient ? `Production readiness for ${selectedClient.name}` : "Review go-live requirements"}</p>
+              </div>
+            </div>
+          </header>
+
+          <div className="p-6">
+            {/* Progress Summary */}
+            <Card className={`${bgCard} border ${borderColor} mb-6 p-6`}>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className={`text-lg font-bold ${textPrimary}`}>Go-Live Readiness</h2>
+                  <p className={textSecondary}>{completedCount} of {totalCount} requirements completed</p>
+                </div>
+                <div className="text-right">
+                  <p className={`text-3xl font-bold ${readyForGoLive ? "text-[#4caf50]" : "text-[#ff9800]"}`}>
+                    {Math.round((completedCount / totalCount) * 100)}%
+                  </p>
+                  <p className={`text-sm ${readyForGoLive ? "text-[#4caf50]" : textSecondary}`}>
+                    {readyForGoLive ? "Ready for Go-Live" : "In Progress"}
+                  </p>
+                </div>
+              </div>
+              <div className={`w-full h-3 rounded-full ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"} overflow-hidden`}>
+                <div 
+                  className={`h-full transition-all duration-500 ${readyForGoLive ? "bg-[#4caf50]" : "bg-[#00e5ff]"}`}
+                  style={{ width: `${(completedCount / totalCount) * 100}%` }}
+                />
+              </div>
+            </Card>
+
+            {/* Checklist Items */}
+            <Card className={`${bgCard} border ${borderColor}`}>
+              <div className={`px-6 py-4 border-b ${borderColor}`}>
+                <h3 className={`font-bold ${textPrimary}`}>Requirements Checklist</h3>
+              </div>
+              <div className="divide-y divide-[#1e4976]/30">
+                {checklistItems.map((item) => {
+                  const isCompleted = goLiveChecklist[item.key]
+                  const ItemIcon = item.icon
+                  
+                  return (
+                    <div key={item.key} className="px-6 py-4 flex items-center gap-4">
+                      <button 
+                        onClick={() => setGoLiveChecklist(prev => ({ ...prev, [item.key]: !prev[item.key] }))}
+                        className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
+                          isCompleted 
+                            ? "bg-[#4caf50] border-[#4caf50] text-white" 
+                            : `${isDarkMode ? "border-[#1e4976]" : "border-gray-300"}`
+                        }`}
+                      >
+                        {isCompleted && <CheckCircle className="h-4 w-4" />}
+                      </button>
+                      <div className={`p-2 rounded-lg ${isCompleted ? "bg-[#4caf50]/20" : isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"}`}>
+                        <ItemIcon className={`h-5 w-5 ${isCompleted ? "text-[#4caf50]" : textSecondary}`} />
+                      </div>
+                      <div className="flex-1">
+                        <p className={`font-medium ${isCompleted ? "text-[#4caf50]" : textPrimary}`}>{item.label}</p>
+                        <p className={`text-sm ${textSecondary}`}>{item.description}</p>
+                      </div>
+                      <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"} ${textSecondary}`}>
+                        Stage {item.stage}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            </Card>
+
+            {/* Go-Live Actions */}
+            <Card className={`${bgCard} border ${borderColor} mt-6 p-6`}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className={`text-lg font-bold ${textPrimary}`}>Production Cutover</h3>
+                  <p className={textSecondary}>
+                    {readyForGoLive 
+                      ? "All requirements met. Ready to schedule production cutover."
+                      : `Complete ${totalCount - completedCount} remaining item(s) before scheduling cutover.`
+                    }
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <Button variant="outline">
+                    <FileCheck className="h-4 w-4 mr-2" /> Generate Certificate
+                  </Button>
+                  <Button disabled={!readyForGoLive} className={readyForGoLive ? "bg-[#4caf50] hover:bg-[#4caf50]/80" : ""}>
+                    <Rocket className="h-4 w-4 mr-2" /> Schedule Go-Live
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Reports Screen
+  if (currentScreen === "reports") {
+    const reportTypes = [
+      { id: "onboarding-summary", name: "Onboarding Summary Report", description: "Overall status, timeline, and key findings", icon: FileText, format: "PDF" },
+      { id: "spec-comparison", name: "Spec Comparison Report", description: "Detailed comparison of client vs Broadridge specs", icon: GitCompare, format: "PDF/Excel" },
+      { id: "test-execution", name: "Test Execution Report", description: "Complete test results with pass/fail details", icon: TestTube, format: "PDF" },
+      { id: "certification", name: "Certification Report", description: "Official certification documentation for audit", icon: Award, format: "PDF" },
+      { id: "field-mapping", name: "Field Mapping Report", description: "All field mappings and transformation rules", icon: Link2, format: "Excel" },
+      { id: "audit-trail", name: "Audit Trail Report", description: "Complete history of all actions and changes", icon: Clock, format: "PDF/Excel" },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => selectedClient ? setCurrentScreen("client-detail") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <div className="flex items-center gap-3">
+              <FileCheck className="h-8 w-8 text-[#00e5ff]" />
+              <div>
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>Reports & Documentation</h1>
+                <p className={`text-sm ${textSecondary}`}>{selectedClient ? `Generate reports for ${selectedClient.name}` : "Generate and download reports"}</p>
+              </div>
+            </div>
+          </header>
+
+          <div className="p-6">
+            {/* Report Cards */}
+            <div className="grid grid-cols-2 gap-6">
+              {reportTypes.map((report) => {
+                const ReportIcon = report.icon
+                return (
+                  <Card key={report.id} className={`${bgCard} border ${borderColor} p-6`}>
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 rounded-lg bg-[#00e5ff]/20">
+                        <ReportIcon className="h-6 w-6 text-[#00e5ff]" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className={`font-bold ${textPrimary} mb-1`}>{report.name}</h3>
+                        <p className={`text-sm ${textSecondary} mb-3`}>{report.description}</p>
+                        <div className="flex items-center justify-between">
+                          <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"} ${textSecondary}`}>
+                            Format: {report.format}
+                          </span>
+                          <Button size="sm">
+                            <Download className="h-4 w-4 mr-2" /> Generate
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                )
+              })}
+            </div>
+
+            {/* Recent Reports */}
+            <Card className={`${bgCard} border ${borderColor} mt-6`}>
+              <div className={`px-6 py-4 border-b ${borderColor}`}>
+                <h3 className={`font-bold ${textPrimary}`}>Recently Generated Reports</h3>
+              </div>
+              <div className="divide-y divide-[#1e4976]/30">
+                {[
+                  { name: "Nexus_Onboarding_Summary_2024-01-15.pdf", type: "Onboarding Summary", date: "Jan 15, 2024", size: "245 KB" },
+                  { name: "Nexus_EQ_FIX42_TestResults_2024-01-15.pdf", type: "Test Execution Report", date: "Jan 15, 2024", size: "1.2 MB" },
+                  { name: "Nexus_SpecComparison_2024-01-10.xlsx", type: "Spec Comparison Report", date: "Jan 10, 2024", size: "890 KB" },
+                ].map((report, i) => (
+                  <div key={i} className="px-6 py-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <FileText className={`h-5 w-5 ${textSecondary}`} />
+                      <div>
+                        <p className={`font-medium ${textPrimary}`}>{report.name}</p>
+                        <p className={`text-xs ${textSecondary}`}>{report.type} - {report.date}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className={`text-xs ${textSecondary}`}>{report.size}</span>
+                      <Button size="sm" variant="outline">
+                        <Download className="h-3 w-3 mr-1" /> Download
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // Fallback - no matching screen found
   return (
     <div className="min-h-screen bg-[#0a1628] flex items-center justify-center">
