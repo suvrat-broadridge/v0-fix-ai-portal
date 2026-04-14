@@ -3371,17 +3371,7 @@ const specCompareResults = [
   </div>
   </div>
   )}
-
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // Scenario Creation Screen
-  if (currentScreen === "scenario-creation") {
-    const sampleScenarios = [
+}
       { id: 1, name: "New Order Single - Buy", type: "order", source: "log", status: "valid", msgType: "D" },
       { id: 2, name: "Order Cancel Request", type: "cancel", source: "spec", status: "valid", msgType: "F" },
       { id: 3, name: "Execution Report - Fill", type: "execution", source: "both", status: "warning", msgType: "8" },
