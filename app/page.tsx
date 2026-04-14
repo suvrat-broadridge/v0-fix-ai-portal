@@ -23,6 +23,7 @@ type ScreenType =
   | "testing" | "certification" 
   | "approvals" | "evidence-vault" | "rule-library" | "sla-analytics"
   | "atdl-fix-compare" | "atdl-atdl-compare" | "atdl-convert" | "atdl-validate" | "atdl-preview"
+  | "admin-specs"
 
 export default function Page() {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>("welcome")
@@ -108,7 +109,7 @@ export default function Page() {
         id: "admin",
         label: "Admin",
         items: [
-          { label: "Admin Specs", icon: Settings, screen: "dashboard" as ScreenType },
+          { label: "Admin Specs", icon: Database, screen: "admin-specs" as ScreenType },
         ]
       }
     ]
@@ -1415,6 +1416,165 @@ export default function Page() {
   }
   if (currentScreen === "atdl-preview") {
     return <ATDLToolScreen title="Usage Preview" description="Preview ATDL usage and parameter rendering" />
+  }
+
+  // ========== ADMIN SPECS SCREEN ==========
+  if (currentScreen === "admin-specs") {
+    const specs = [
+      { id: 1, name: "FIX 4.2 Equities", assetClass: "Equities", version: "4.2", status: "Active", lastUpdated: "2024-01-15", format: "JSON" },
+      { id: 2, name: "FIX 4.4 Fixed Income", assetClass: "Fixed Income", version: "4.4", status: "Active", lastUpdated: "2024-01-10", format: "JSON" },
+      { id: 3, name: "FIX 5.0 Futures", assetClass: "Futures", version: "5.0", status: "Draft", lastUpdated: "2024-01-08", format: "PDF" },
+      { id: 4, name: "FIX 4.4 Options", assetClass: "Options", version: "4.4", status: "Active", lastUpdated: "2023-12-20", format: "JSON" },
+      { id: 5, name: "FIX 4.2 Commodities", assetClass: "Commodities", version: "4.2", status: "Pending", lastUpdated: "2024-01-12", format: "PDF" },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <div className="p-8 space-y-6">
+            {/* Header */}
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className={`text-3xl font-bold ${textPrimary}`}>Admin Specs</h2>
+                <p className={`${textSecondary} text-sm mt-1`}>Manage FIX protocol specifications by asset class and version</p>
+              </div>
+              <Button style={{ backgroundColor: accentCyan, color: "#0a1628" }}>
+                <Upload className="h-4 w-4 mr-2" /> Upload New Spec
+              </Button>
+            </div>
+
+            {/* KPI Strip */}
+            <div className="grid grid-cols-4 gap-4">
+              {[
+                { label: "Total Specs", value: "12", color: "#2196f3" },
+                { label: "Active", value: "8", color: "#4caf50" },
+                { label: "Pending Conversion", value: "3", color: "#ff9800" },
+                { label: "Asset Classes", value: "5", color: "#9c27b0" },
+              ].map((kpi) => (
+                <Card key={kpi.label} className={`${bgCard} border ${borderColor} p-4`}>
+                  <p className={`text-xs ${textSecondary} mb-1`}>{kpi.label}</p>
+                  <p className="text-2xl font-bold" style={{ color: kpi.color }}>{kpi.value}</p>
+                </Card>
+              ))}
+            </div>
+
+            {/* Upload Section */}
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`text-lg font-semibold ${textPrimary} mb-4`}>Upload FIX Specification</h3>
+              <div className="grid grid-cols-3 gap-4 mb-4">
+                <div>
+                  <label className={`block text-sm font-medium ${textPrimary} mb-2`}>Asset Class</label>
+                  <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0d2137] text-white" : ""}`}>
+                    <option>Select Asset Class</option>
+                    <option>Equities</option>
+                    <option>Fixed Income</option>
+                    <option>Futures</option>
+                    <option>Options</option>
+                    <option>Commodities</option>
+                    <option>FX</option>
+                  </select>
+                </div>
+                <div>
+                  <label className={`block text-sm font-medium ${textPrimary} mb-2`}>FIX Version</label>
+                  <select className={`w-full p-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0d2137] text-white" : ""}`}>
+                    <option>Select Version</option>
+                    <option>FIX 4.0</option>
+                    <option>FIX 4.2</option>
+                    <option>FIX 4.4</option>
+                    <option>FIX 5.0</option>
+                    <option>FIX 5.0 SP2</option>
+                    <option>Custom</option>
+                  </select>
+                </div>
+                <div>
+                  <label className={`block text-sm font-medium ${textPrimary} mb-2`}>Spec Name</label>
+                  <Input placeholder="e.g., FIX 4.4 Equities Standard" className={`${isDarkMode ? "bg-[#0d2137] border-[#1e4976] text-white" : ""}`} />
+                </div>
+              </div>
+              
+              <div className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center mb-4`}>
+                <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                <p className={`${textPrimary} font-medium mb-1`}>Drop FIX specification PDF here</p>
+                <p className={`text-xs ${textSecondary}`}>Supports PDF format. Max file size 25MB.</p>
+                <Button variant="outline" className="mt-4">Browse Files</Button>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <Button style={{ backgroundColor: accentCyan, color: "#0a1628" }}>
+                  <Upload className="h-4 w-4 mr-2" /> Upload & Parse
+                </Button>
+                <Button variant="outline">
+                  <RefreshCw className="h-4 w-4 mr-2" /> Convert to JSON
+                </Button>
+              </div>
+            </Card>
+
+            {/* Specs Table */}
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className={`text-lg font-semibold ${textPrimary}`}>Uploaded Specifications</h3>
+                <div className="flex gap-2">
+                  <Input placeholder="Search specs..." className={`w-64 ${isDarkMode ? "bg-[#0d2137] border-[#1e4976] text-white" : ""}`} />
+                  <Button variant="outline"><Filter className="h-4 w-4" /></Button>
+                </div>
+              </div>
+              
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className={`border-b ${borderColor}`}>
+                      <th className={`text-left py-3 px-2 ${textSecondary} font-semibold`}>Spec Name</th>
+                      <th className={`text-left py-3 px-2 ${textSecondary} font-semibold`}>Asset Class</th>
+                      <th className={`text-left py-3 px-2 ${textSecondary} font-semibold`}>FIX Version</th>
+                      <th className={`text-left py-3 px-2 ${textSecondary} font-semibold`}>Format</th>
+                      <th className={`text-left py-3 px-2 ${textSecondary} font-semibold`}>Status</th>
+                      <th className={`text-left py-3 px-2 ${textSecondary} font-semibold`}>Last Updated</th>
+                      <th className={`text-left py-3 px-2 ${textSecondary} font-semibold`}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {specs.map((spec) => (
+                      <tr key={spec.id} className={`border-b ${borderColor} hover:bg-[#1e4976]/30`}>
+                        <td className={`py-3 px-2 font-medium ${textPrimary}`}>{spec.name}</td>
+                        <td className={`py-3 px-2 ${textSecondary}`}>{spec.assetClass}</td>
+                        <td className={`py-3 px-2`}>
+                          <span className="px-2 py-1 rounded text-xs bg-[#2196f3]/20 text-[#2196f3]">{spec.version}</span>
+                        </td>
+                        <td className={`py-3 px-2`}>
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            spec.format === "JSON" ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#ff9800]/20 text-[#ff9800]"
+                          }`}>{spec.format}</span>
+                        </td>
+                        <td className={`py-3 px-2`}>
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            spec.status === "Active" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                            spec.status === "Draft" ? "bg-[#9c27b0]/20 text-[#9c27b0]" :
+                            "bg-[#ff9800]/20 text-[#ff9800]"
+                          }`}>{spec.status}</span>
+                        </td>
+                        <td className={`py-3 px-2 ${textSecondary}`}>{spec.lastUpdated}</td>
+                        <td className="py-3 px-2">
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm"><Eye className="h-3 w-3" /></Button>
+                            {spec.format === "PDF" && (
+                              <Button variant="outline" size="sm" title="Convert to JSON">
+                                <RefreshCw className="h-3 w-3" />
+                              </Button>
+                            )}
+                            <Button variant="outline" size="sm"><Download className="h-3 w-3" /></Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return null
