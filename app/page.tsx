@@ -276,6 +276,10 @@ export default function BCometPlatform() {
     certReadinessScore: 78,
   })
 
+  // Rule Library filter state
+  const [ruleFilter, setRuleFilter] = useState("All")
+  const [ruleSearch, setRuleSearch] = useState("")
+
   // FIX MSG Creator state
   const [fixMsgSelectedSpec, setFixMsgSelectedSpec] = useState("")
   const [fixMsgSelectedType, setFixMsgSelectedType] = useState("")
@@ -7933,9 +7937,6 @@ const copyToClipboard = () => {
       "Venue": "#ff9800",
       "Custom": "#795548"
     }
-    
-    const [ruleFilter, setRuleFilter] = React.useState("All")
-    const [ruleSearch, setRuleSearch] = React.useState("")
     
     const filteredRules = ruleLibrary.filter(r => {
       const matchesCategory = ruleFilter === "All" || r.category === ruleFilter
