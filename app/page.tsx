@@ -3992,29 +3992,21 @@ const specCompareResults = [
                           </optgroup>
                         </>
                       ) : (
-                        {selectedClientProtocols.map((protocol) => (
-              <option key={protocol.protocol} value={protocol.protocol}>{protocol.protocol}</option>
-            ))}
-                      </select>
+                        <select className={`w-full p-2 border ${borderColor} rounded ${isDarkMode ? "bg-[#0d2137]" : "bg-white"} ${textPrimary} text-sm`}>
+                          {selectedClientProtocols.map((protocol) => (
+                            <option key={protocol.protocol} value={protocol.protocol}>{protocol.protocol}</option>
+                          ))}
+                        </select>
+                      )}
                     </div>
                     <div>
                       <label className={`text-sm font-medium ${textPrimary} mb-1 block`}>Select Log File</label>
                       <select className={`w-full p-2 border ${borderColor} rounded ${isDarkMode ? "bg-[#0d2137]" : "bg-white"} ${textPrimary} text-sm`}>
-              <option value="log1">{selectedClient?.name || "Client"}_session_20260413.log</option>
-              <option value="log2">{selectedClient?.name || "Client"}_session_20260409.log</option>
-              <option value="log3">{selectedClient?.name || "Client"}_session_20260404.log</option>
-            </select>
-          </div>
-          {/* right column content */}
-          <div className="space-y-4">
-            <div>
-              <label className={`text-sm font-medium ${textPrimary} mb-1 block`}>Log Files</label>
-              <select className={`w-full p-2 border ${borderColor} rounded ${isDarkMode ? "bg-[#0d2137]" : "bg-white"} ${textPrimary} text-sm`}>
-                <option value="log1">{selectedClient?.name || "Client"}_session_20260413.log</option>
-                <option value="log2">{selectedClient?.name || "Client"}_session_20260409.log</option>
-                <option value="log3">{selectedClient?.name || "Client"}_session_20260404.log</option>
-                    </select>
-                    {selectedRole === "client" ? (
+                        <option value="log1">{selectedClient?.name || "Client"}_session_20260413.log</option>
+                        <option value="log2">{selectedClient?.name || "Client"}_session_20260409.log</option>
+                        <option value="log3">{selectedClient?.name || "Client"}_session_20260404.log</option>
+                      </select>
+                      {selectedRole === "client" ? (
                       <div className="mt-3 pt-3 border-t border-dashed border-[#1e4976]/50">
                         <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => setCurrentScreen("client-log-files")}>
                           <Upload className="h-3 w-3 mr-2" /> Go to My Log Files to Upload
