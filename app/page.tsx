@@ -5067,6 +5067,160 @@ const specCompareResults = [
     )
   }
 
+  // ATDL Guided Mode - Choice Selection
+  if (currentScreen === "atdl-guided-choices") {
+    const guidedOptions = [
+      {
+        id: "fix-to-atdl",
+        title: "I have a FIX Specification",
+        subtitle: "Convert & Create ATDL",
+        icon: FileText,
+        color: "#00e5ff",
+        description: "I have a FIX specification document that I need to convert into an ATDL file",
+        workflow: "conversion",
+        question: "Which asset class is this FIX spec for?",
+        examples: ["Equities", "Options", "Futures", "FX"]
+      },
+      {
+        id: "version-upgrade",
+        title: "I'm Upgrading FIX Versions",
+        subtitle: "Compare & Validate Changes",
+        icon: GitCompare,
+        color: "#9c27b0",
+        description: "I have two versions of FIX specs and their corresponding ATDLs to compare",
+        workflow: "version-upgrade",
+        question: "Are you moving to a newer FIX version?",
+        examples: ["FIX 4.4 → FIX 5.0", "FIX 5.0 → FIX 5.0 SP2"]
+      },
+      {
+        id: "atdl-issue",
+        title: "I have an Existing ATDL",
+        subtitle: "Validate & Remediate",
+        icon: AlertTriangle,
+        color: "#ff9800",
+        description: "I have an ATDL file that needs validation or has issues to fix",
+        workflow: "remediation",
+        question: "Is the ATDL having validation errors?",
+        examples: ["Schema validation errors", "Missing parameters", "Type mismatches"]
+      }
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Sparkles className="h-8 w-8 text-[#ff9800]" />
+                <div>
+                  <h1 className={`text-2xl font-bold ${textPrimary}`}>ATDL Guided Workflow</h1>
+                  <p className={`text-sm ${textSecondary}`}>Let us help you choose the right workflow</p>
+                </div>
+              </div>
+              <Button variant="outline" onClick={() => setCurrentScreen("atdl-flow-select" as any)}>
+                <ArrowLeft className="h-4 w-4 mr-2" /> Back
+              </Button>
+            </div>
+          </header>
+
+          <div className="p-6">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-8">
+                <h2 className={`text-xl font-semibold ${textPrimary} mb-2`}>What are you trying to do?</h2>
+                <p className={`${textSecondary}`}>Answer a few quick questions and we'll guide you through the perfect workflow</p>
+              </div>
+
+              <div className="grid grid-cols-3 gap-6 mb-8">
+                {guidedOptions.map((option) => {
+                  const Icon = option.icon
+                  return (
+                    <Card 
+                      key={option.id}
+                      className={`${bgCard} border-2 ${borderColor} hover:border-[${option.color}] transition-all cursor-pointer group overflow-hidden`}
+                      onClick={() => {
+                        setAtdlWorkflowType(option.workflow as any)
+                        setAtdlWizardStep(0)
+                        setCurrentScreen("atdl-wizard" as any)
+                      }}
+                    >
+                      <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: option.color }} />
+                      
+                      <div className="p-6">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="p-3 rounded-lg" style={{ backgroundColor: `${option.color}20` }}>
+                            <Icon className="h-6 w-6" style={{ color: option.color }} />
+                          </div>
+                        </div>
+
+                        <h3 className={`text-lg font-semibold ${textPrimary} group-hover:text-[${option.color}] transition-colors mb-1`}>
+                          {option.title}
+                        </h3>
+                        <p className={`text-xs font-medium mb-3 ${textSecondary}`} style={{ color: option.color }}>
+                          {option.subtitle}
+                        </p>
+
+                        <p className={`text-sm ${textSecondary} min-h-[60px] mb-4`}>
+                          {option.description}
+                        </p>
+
+                        <div className="space-y-2 mb-4">
+                          {option.examples.map((ex, i) => (
+                            <div key={i} className={`text-xs ${textSecondary} flex items-center gap-2`}>
+                              <span className="w-1 h-1 rounded-full" style={{ backgroundColor: option.color }} />
+                              {ex}
+                            </div>
+                          ))}
+                        </div>
+
+                        <Button 
+                          className="w-full transition-all group-hover:opacity-100"
+                          style={{ 
+                            backgroundColor: option.color,
+                            color: "#0a1628"
+                          }}
+                        >
+                          Choose This <ArrowRight className="h-4 w-4 ml-2" />
+                        </Button>
+                      </div>
+                    </Card>
+                  )
+                })}
+              </div>
+
+              {/* Help Section */}
+              <div className={`border ${borderColor} rounded-lg p-6 ${bgCard}`}>
+                <div className="grid grid-cols-3 gap-6">
+                  <div>
+                    <div className="h-8 w-8 rounded-full flex items-center justify-center mb-3" style={{ backgroundColor: "#00e5ff20", color: "#00e5ff" }}>
+                      <FileText className="h-4 w-4" />
+                    </div>
+                    <p className={`text-sm font-semibold ${textPrimary} mb-2`}>Option 1: FIX to ATDL</p>
+                    <p className={`text-xs ${textSecondary}`}>Best for creating new ATDL files from FIX specifications</p>
+                  </div>
+                  <div>
+                    <div className="h-8 w-8 rounded-full flex items-center justify-center mb-3" style={{ backgroundColor: "#9c27b020", color: "#9c27b0" }}>
+                      <GitCompare className="h-4 w-4" />
+                    </div>
+                    <p className={`text-sm font-semibold ${textPrimary} mb-2`}>Option 2: Version Upgrade</p>
+                    <p className={`text-xs ${textSecondary}`}>Best for tracking and validating version changes</p>
+                  </div>
+                  <div>
+                    <div className="h-8 w-8 rounded-full flex items-center justify-center mb-3" style={{ backgroundColor: "#ff980020", color: "#ff9800" }}>
+                      <AlertTriangle className="h-4 w-4" />
+                    </div>
+                    <p className={`text-sm font-semibold ${textPrimary} mb-2`}>Option 3: ATDL Issues</p>
+                    <p className={`text-xs ${textSecondary}`}>Best for fixing and validating existing ATDLs</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // ATDL Guided Wizard
   // ATDL Flow Selection Screen - Choose between 3 workflows
   if (currentScreen === "atdl-flow-select") {
@@ -5191,7 +5345,7 @@ const specCompareResults = [
                     <p className={`text-sm font-medium ${textPrimary}`}>Not sure which workflow to use?</p>
                     <p className={`text-xs ${textSecondary}`}>Our guided wizard will help you determine the best approach based on your inputs.</p>
                   </div>
-                  <Button variant="outline" onClick={() => { setAtdlWorkflowType("guided" as any); setAtdlWizardStep(0); setCurrentScreen("atdl-wizard" as ScreenType); }}>
+                  <Button variant="outline" onClick={() => setCurrentScreen("atdl-guided-choices" as any)}>
                     <Sparkles className="h-4 w-4 mr-2" /> Guided Mode
                   </Button>
                 </div>
