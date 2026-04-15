@@ -2470,7 +2470,7 @@ export default function BCometPlatform() {
             {selectedRole === "admin" && (
               <button
                 type="button"
-                onClick={() => setIsManager(prev => !prev)}
+                onClick={() => setIsManager(!isManager)}
                 className={`w-full flex items-center justify-between px-4 py-3 rounded-lg border-2 transition-all ${
                   isManager
                     ? "border-[#9c27b0] bg-[#9c27b0]/10"
