@@ -2373,10 +2373,11 @@ export default function BCometPlatform() {
   // Login Screen
   if (currentScreen === "login") {
     const handleLogin = () => {
-      // Admin always logs in as Manager
       if (selectedRole === "admin") {
-        setIsManager(true)
-        setCurrentUser({ name: "Sarah Johnson", email: "sarah.johnson@broadridge.com" })
+        // Use the name from email or a default based on isManager
+        const userName = loginEmail ? loginEmail.split("@")[0].split(".").map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" ") : (isManager ? "Sarah Johnson" : "John Smith")
+        const userEmail = loginEmail || (isManager ? "sarah.johnson@broadridge.com" : "john.smith@broadridge.com")
+        setCurrentUser({ name: userName, email: userEmail })
       } else {
         // Client login
         setIsManager(false)
@@ -2409,17 +2410,41 @@ export default function BCometPlatform() {
               <Input type="password" placeholder="Enter your password" className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`} />
             </div>
             
-            {/* Admin Role Indicator */}
+            {/* Admin Role Toggle - Manager vs IC */}
             {selectedRole === "admin" && (
-              <div className={`p-4 rounded-lg border border-[#9c27b0] ${isDarkMode ? "bg-[#9c27b0]/10" : "bg-purple-50"}`}>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#9c27b0]/20 flex items-center justify-center">
-                    <Shield className="h-5 w-5 text-[#9c27b0]" />
-                  </div>
-                  <div>
-                    <p className={`text-sm font-medium ${textPrimary}`}>Manager Access</p>
-                    <p className={`text-xs ${textSecondary}`}>Full access to all clients, cases, approvals & team management</p>
-                  </div>
+              <div className={`p-4 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                <p className={`text-sm font-medium mb-3 ${textPrimary}`}>Login as:</p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsManager(true)}
+                    className={`flex-1 p-3 rounded-lg border-2 transition-all ${
+                      isManager 
+                        ? "border-[#9c27b0] bg-[#9c27b0]/10" 
+                        : `border-transparent ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"} hover:border-[#9c27b0]/30`
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 justify-center">
+                      <Shield className={`h-5 w-5 ${isManager ? "text-[#9c27b0]" : textSecondary}`} />
+                      <span className={`font-medium ${isManager ? "text-[#9c27b0]" : textSecondary}`}>Manager</span>
+                    </div>
+                    <p className={`text-xs mt-1 ${textSecondary}`}>All clients & approvals</p>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsManager(false)}
+                    className={`flex-1 p-3 rounded-lg border-2 transition-all ${
+                      !isManager 
+                        ? "border-[#00e5ff] bg-[#00e5ff]/10" 
+                        : `border-transparent ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"} hover:border-[#00e5ff]/30`
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 justify-center">
+                      <Users className={`h-5 w-5 ${!isManager ? "text-[#00e5ff]" : textSecondary}`} />
+                      <span className={`font-medium ${!isManager ? "text-[#00e5ff]" : textSecondary}`}>IC</span>
+                    </div>
+                    <p className={`text-xs mt-1 ${textSecondary}`}>My assigned clients</p>
+                  </button>
                 </div>
               </div>
             )}
@@ -2465,10 +2490,22 @@ export default function BCometPlatform() {
                 <h1 className={`text-xl font-bold ${textPrimary}`}>My Progress</h1>
                 <p className={textSecondary}>Track your certification progress across asset classes</p>
               </div>
-              <button className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 relative`}>
-                <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#f44336] rounded-full text-[10px] text-white flex items-center justify-center">3</span>
-              </button>
+              <div className="flex items-center gap-4">
+                <button className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 relative`}>
+                  <Bell className="h-5 w-5" />
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#f44336] rounded-full text-[10px] text-white flex items-center justify-center">3</span>
+                </button>
+                {/* User Profile */}
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <p className={`text-sm font-medium ${textPrimary}`}>{currentUser?.name || "Client"}</p>
+                    <p className={`text-xs ${textSecondary}`}>Client Portal</p>
+                  </div>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-[#00e5ff]/20 text-[#00e5ff]`}>
+                    {currentUser?.name?.split(" ").map(n => n[0]).join("") || "C"}
+                  </div>
+                </div>
+              </div>
             </header>
 
             <div className="p-6">
@@ -2637,11 +2674,21 @@ export default function BCometPlatform() {
                 <h1 className={`text-xl font-bold ${textPrimary}`}>Dashboard</h1>
                 <p className={textSecondary}>Operational control tower for urgency, risk, and next actions</p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <button className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 relative`}>
                   <Bell className="h-5 w-5" />
                   {totalAlerts > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#f44336] rounded-full text-[10px] text-white flex items-center justify-center">{totalAlerts}</span>}
                 </button>
+                {/* User Profile */}
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <p className={`text-sm font-medium ${textPrimary}`}>{currentUser?.name || "User"}</p>
+                    <p className={`text-xs ${textSecondary}`}>{isManager ? "Manager" : "Individual Contributor"}</p>
+                  </div>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${isManager ? "bg-[#9c27b0]/20 text-[#9c27b0]" : "bg-[#00e5ff]/20 text-[#00e5ff]"}`}>
+                    {currentUser?.name?.split(" ").map(n => n[0]).join("") || "U"}
+                  </div>
+                </div>
               </div>
             </header>
 
