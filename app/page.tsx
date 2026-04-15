@@ -2508,7 +2508,12 @@ export default function BCometPlatform() {
 
       // Dashboard metrics calculations
       const casesAtRisk = clients.filter(c => getTotalAlerts(c) > 0).length
-      const approvalsPending = 7 // Mock data - would come from approvals system
+      // Calculate approvals pending for the current manager (Management role)
+      const myPendingApprovals = pendingApprovals.filter(a => 
+        a.requiredApprovers.includes("Management") && !a.currentApprovers.includes("Management")
+      )
+      const approvalsPendingForMe = myPendingApprovals.length
+      const totalApprovalsPending = pendingApprovals.length
       const evidenceCompleteness = 68 // Mock percentage
       const readyForGoLive = clients.filter(c => c.assetClasses.every(a => a.certification === "completed")).length
 
@@ -2600,8 +2605,8 @@ export default function BCometPlatform() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className={`text-xs ${textSecondary} uppercase tracking-wide`}>Approvals Pending</p>
-                      <p className={`text-2xl font-bold text-[#ff9800] mt-1`}>{approvalsPending}</p>
-                      <p className={`text-xs text-[#ff9800] mt-1`}>3 due today</p>
+                      <p className={`text-2xl font-bold text-[#ff9800] mt-1`}>{totalApprovalsPending}</p>
+                      <p className={`text-xs text-[#ff9800] mt-1 font-medium`}>{approvalsPendingForMe} awaiting your approval</p>
                     </div>
                     <div className={`p-3 rounded-lg bg-[#ff9800]/20`}>
                       <ClipboardCheck className="h-6 w-6 text-[#ff9800]" />
@@ -11454,6 +11459,14 @@ const copyToClipboard = () => {
                                           <X className="h-3 w-3" /> Rejected
                                         </span>
                                       )}
+                                      {/* Show "Needs Your Approval" for manager if their approval is pending */}
+                                      {(approval.status === "pending" || approval.status === "overdue") && 
+                                        approval.requiredApprovers.includes("Management") && 
+                                        !approval.currentApprovers.includes("Management") && (
+                                        <span className="px-1.5 py-0.5 rounded text-xs bg-[#9c27b0]/20 text-[#9c27b0] flex items-center gap-1 font-medium">
+                                          <UserCheck className="h-3 w-3" /> Needs Your Approval
+                                        </span>
+                                      )}
                                       <span className={`text-xs ${textSecondary}`}>{approval.submittedDate}</span>
                                     </div>
                                     <p className={`text-sm font-medium ${textPrimary} truncate`}>{approval.description}</p>
@@ -11463,6 +11476,15 @@ const copyToClipboard = () => {
                                         ? ` · ${approval.status === "approved" ? "Approved" : "Rejected"} by ${(approval as any).resolvedBy} on ${(approval as any).resolvedDate}`
                                         : ` · Due ${approval.dueDate}`}
                                     </p>
+                                    {/* Waiting for indicator - show who needs to approve */}
+                                    {(approval.status === "pending" || approval.status === "overdue") && approval.requiredApprovers.filter(a => !approval.currentApprovers.includes(a)).length > 0 && (
+                                      <div className="flex items-center gap-1.5 mt-1.5">
+                                        <Clock className="h-3 w-3 text-[#ff9800]" />
+                                        <span className="text-xs text-[#ff9800]">
+                                          Waiting for: {approval.requiredApprovers.filter(a => !approval.currentApprovers.includes(a)).join(", ")}
+                                        </span>
+                                      </div>
+                                    )}
                                   </div>
                                   <div className="flex items-center gap-2 flex-shrink-0">
                                     {/* Approver progress dots */}
