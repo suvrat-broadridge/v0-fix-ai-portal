@@ -10,7 +10,26 @@ import { Input } from "@/components/ui/input"
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "approvals" | "evidence-vault" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case">("home")
-  const [settingsTab, setSettingsTab] = useState<"look-feel" | "general" | "security" | "mail" | "questionnaires" | "license">("general")
+  const [settingsTab, setSettingsTab] = useState<"profile" | "notifications" | "security" | "integrations" | "appearance" | "api-keys">("profile")
+  const [userProfile, setUserProfile] = useState({
+    firstName: currentUser?.name.split(" ")[0] || "",
+    lastName: currentUser?.name.split(" ")[1] || "",
+    email: currentUser?.email || "",
+    role: isManager ? "Manager" : "Individual Contributor",
+  })
+  const [notificationPrefs, setNotificationPrefs] = useState({
+    caseUpdates: true,
+    approvalRequests: true,
+    slaWarnings: true,
+    dailyDigest: true,
+  })
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false)
+  const [integrations, setIntegrations] = useState([
+    { name: "JIRA", description: "Issue tracking integration", status: "configured" as "configured" | "not-connected" },
+    { name: "ServiceNow", description: "ITSM integration", status: "configured" as "configured" | "not-connected" },
+    { name: "Slack", description: "Team notifications", status: "not-connected" as "configured" | "not-connected" },
+    { name: "Microsoft Teams", description: "Team collaboration", status: "not-connected" as "configured" | "not-connected" },
+  ])
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [isManager, setIsManager] = useState(false)
   const [currentUser, setCurrentUser] = useState<{ name: string; email: string } | null>(null)
@@ -8181,12 +8200,12 @@ const specCompareResults = [
   // Settings Screen
   if (currentScreen === "settings") {
     const settingsTabs = [
-      { key: "look-feel", label: "Look and Feel", icon: Sun },
-      { key: "general", label: "General", icon: Settings },
+      { key: "profile", label: "Profile", icon: Users },
+      { key: "notifications", label: "Notifications", icon: Bell },
       { key: "security", label: "Security", icon: Shield },
-      { key: "mail", label: "Mail", icon: Bell },
-      { key: "questionnaires", label: "Questionnaires", icon: HelpCircle },
-      { key: "license", label: "License", icon: Award },
+      { key: "integrations", label: "Integrations", icon: Link2 },
+      { key: "appearance", label: "Appearance", icon: Sun },
+      { key: "api-keys", label: "API Keys", icon: Code },
     ]
 
     return (
@@ -8196,225 +8215,260 @@ const specCompareResults = [
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <h1 className={`text-2xl font-bold ${textPrimary}`}>Settings</h1>
-            <p className={textSecondary}>Configure your B- COMET preferences</p>
+            <p className={textSecondary}>Manage your account and application preferences</p>
           </header>
 
           <div className="p-6">
-            {/* Tabs */}
-            <div className={`flex gap-1 border-b ${borderColor} mb-6`}>
-              {settingsTabs.map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => setSettingsTab(tab.key as any)}
-                  className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors ${
-                    settingsTab === tab.key
-                      ? "border-[#00e5ff] text-[#00e5ff]"
-                      : `border-transparent ${textSecondary} hover:text-[#00e5ff]`
-                  }`}
-                >
-                  <tab.icon className="h-4 w-4" />
-                  <span className="text-sm font-medium">{tab.label}</span>
-                </button>
-              ))}
-            </div>
+            <div className="grid grid-cols-[200px_1fr] gap-6">
+              {/* Left Sidebar */}
+              <div className={`rounded-lg border ${borderColor} p-4 h-fit`}>
+                {settingsTabs.map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setSettingsTab(tab.key as any)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 transition-all ${
+                      settingsTab === tab.key
+                        ? "bg-[#00e5ff]/20 text-[#00e5ff] border border-[#00e5ff]/50"
+                        : `${textSecondary} hover:bg-[#1e4976]/30`
+                    }`}
+                  >
+                    <tab.icon className="h-4 w-4" />
+                    <span className="text-sm font-medium">{tab.label}</span>
+                  </button>
+                ))}
+              </div>
 
-            {/* Tab Content */}
-            <Card className={`${bgCard} p-6 border ${borderColor}`}>
-              {settingsTab === "look-feel" && (
-                <div className="space-y-6">
-                  <h3 className={`text-lg font-bold ${textPrimary}`}>Look and Feel Settings</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
+              {/* Right Content */}
+              <div className={`rounded-lg border ${borderColor} p-6`}>
+                {/* Profile Tab */}
+                {settingsTab === "profile" && (
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className={`text-lg font-bold ${textPrimary} mb-1`}>Profile Settings</h3>
+                      <p className={`text-sm ${textSecondary}`}>Update your personal information and preferences</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className={`font-medium ${textPrimary}`}>Theme</p>
-                        <p className={`text-sm ${textSecondary}`}>Choose between dark and light mode</p>
+                        <label className={`block text-sm font-medium ${textPrimary} mb-1`}>First Name</label>
+                        <Input 
+                          value={userProfile.firstName}
+                          onChange={(e) => setUserProfile({...userProfile, firstName: e.target.value})}
+                          className={isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}
+                        />
                       </div>
-                      <Button variant="outline" onClick={() => setIsDarkMode(!isDarkMode)}>
-                        {isDarkMode ? <><Sun className="h-4 w-4 mr-2" /> Light Mode</> : <><Moon className="h-4 w-4 mr-2" /> Dark Mode</>}
+                      <div>
+                        <label className={`block text-sm font-medium ${textPrimary} mb-1`}>Last Name</label>
+                        <Input 
+                          value={userProfile.lastName}
+                          onChange={(e) => setUserProfile({...userProfile, lastName: e.target.value})}
+                          className={isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}
+                        />
+                      </div>
+                      <div>
+                        <label className={`block text-sm font-medium ${textPrimary} mb-1`}>Email</label>
+                        <Input 
+                          value={userProfile.email}
+                          onChange={(e) => setUserProfile({...userProfile, email: e.target.value})}
+                          className={isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}
+                        />
+                      </div>
+                      <div>
+                        <label className={`block text-sm font-medium ${textPrimary} mb-1`}>Role</label>
+                        <Input 
+                          value={userProfile.role}
+                          disabled
+                          className={isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex justify-end gap-3 pt-4">
+                      <Button variant="outline">Cancel</Button>
+                      <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">Save Changes</Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Notifications Tab */}
+                {settingsTab === "notifications" && (
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className={`text-lg font-bold ${textPrimary} mb-1`}>Notification Preferences</h3>
+                      <p className={`text-sm ${textSecondary}`}>Choose how you want to be notified about updates</p>
+                    </div>
+                    <div className="space-y-3">
+                      {[
+                        { key: "caseUpdates", title: "Case Updates", desc: "Receive email notifications for case status changes" },
+                        { key: "approvalRequests", title: "Approval Requests", desc: "Get notified when you have pending approvals" },
+                        { key: "slaWarnings", title: "SLA Warnings", desc: "Receive alerts when cases approach SLA deadlines" },
+                        { key: "dailyDigest", title: "Daily Digest", desc: "Receive a daily summary of all activities" },
+                      ].map(({ key, title, desc }) => (
+                        <label key={key} className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
+                          notificationPrefs[key as keyof typeof notificationPrefs] 
+                            ? "border-[#00e5ff] bg-[#00e5ff]/10" 
+                            : `${borderColor} hover:border-[#00e5ff]/50`
+                        }`}>
+                          <input 
+                            type="checkbox"
+                            checked={notificationPrefs[key as keyof typeof notificationPrefs]}
+                            onChange={() => setNotificationPrefs({...notificationPrefs, [key]: !notificationPrefs[key as keyof typeof notificationPrefs]})}
+                            className="accent-[#00e5ff] mt-1"
+                          />
+                          <div>
+                            <p className={`font-medium ${textPrimary}`}>{title}</p>
+                            <p className={`text-sm ${textSecondary}`}>{desc}</p>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                    <div className="flex justify-end gap-3 pt-4 border-t">
+                      <Button className="bg-[#4caf50] hover:bg-[#4caf50]/80">Save Preferences</Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Security Tab */}
+                {settingsTab === "security" && (
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className={`text-lg font-bold ${textPrimary} mb-1`}>Security Settings</h3>
+                      <p className={`text-sm ${textSecondary}`}>Manage your account security and authentication</p>
+                    </div>
+                    
+                    <div className={`p-4 rounded-lg border ${borderColor} flex items-center justify-between`}>
+                      <div>
+                        <p className={`font-medium ${textPrimary}`}>Two-Factor Authentication</p>
+                        <p className={`text-sm ${textSecondary}`}>Add an extra layer of security to your account</p>
+                      </div>
+                      <Button variant={twoFactorEnabled ? "outline" : "default"} onClick={() => setTwoFactorEnabled(!twoFactorEnabled)}>
+                        {twoFactorEnabled ? "Disable" : "Enable"}
                       </Button>
                     </div>
-                    <div className={`border-t ${borderColor} pt-4`}>
-                      <p className={`font-medium ${textPrimary} mb-2`}>Accent Color</p>
-                      <div className="flex gap-2">
-                        {["#00e5ff", "#4caf50", "#ff9800", "#9c27b0", "#f44336"].map((color) => (
-                          <button
-                            key={color}
-                            className="w-8 h-8 rounded-full border-2 border-white/20"
-                            style={{ backgroundColor: color }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
 
-              {settingsTab === "general" && (
-                <div className="space-y-6">
-                  <h3 className={`text-lg font-bold ${textPrimary}`}>General Settings</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
-                      <span className={textSecondary}>Refresh Script Enabled:</span>
-                      <input type="checkbox" className="h-5 w-5 rounded" />
-                    </div>
-                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
-                      <span className={textSecondary}>Path to Script/Executable:</span>
-                      <Input className={`w-96 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} placeholder="/path/to/script" />
-                    </div>
-                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
-                      <span className={textSecondary}>Send Conductor Logs to Support Team:</span>
-                      <div className="flex gap-2">
-                        <Button size="sm">Send Conductor Logs</Button>
-                        <Button size="sm" variant="outline">Download Conductor Logs</Button>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+                    <div className={`p-4 rounded-lg border ${borderColor} flex items-center justify-between`}>
                       <div>
-                        <span className={textSecondary}>Test Runner Inactivity Timeout (in minutes):</span>
-                        <p className={`text-xs ${textSecondary}`}>(Leave blank for no timeout)</p>
+                        <p className={`font-medium ${textPrimary}`}>Change Password</p>
+                        <p className={`text-sm ${textSecondary}`}>Update your password regularly for better security</p>
                       </div>
-                      <Input className={`w-48 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} placeholder="" />
+                      <Button variant="outline">Change</Button>
                     </div>
-                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
+
+                    <div className={`p-4 rounded-lg border ${borderColor} flex items-center justify-between`}>
                       <div>
-                        <span className={textSecondary}>Autonomous Test Timeout (in minutes):</span>
-                        <p className={`text-xs ${textSecondary}`}>(Must be greater than 0)</p>
+                        <p className={`font-medium ${textPrimary}`}>Active Sessions</p>
+                        <p className={`text-sm ${textSecondary}`}>View and manage your active login sessions</p>
                       </div>
-                      <Input className={`w-48 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} defaultValue="5" />
+                      <Button variant="outline">View</Button>
                     </div>
-                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
-                      <div>
-                        <span className={textSecondary}>Admin Dashboard Certification Filter (in days):</span>
-                        <p className={`text-xs ${textSecondary}`}>(Leave blank for no filter)</p>
+                  </div>
+                )}
+
+                {/* Integrations Tab */}
+                {settingsTab === "integrations" && (
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className={`text-lg font-bold ${textPrimary} mb-1`}>Integrations</h3>
+                      <p className={`text-sm ${textSecondary}`}>Connect external services and data sources</p>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      {integrations.map((integration) => (
+                        <div key={integration.name} className={`p-4 rounded-lg border ${borderColor} flex items-center justify-between`}>
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-lg ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} flex items-center justify-center`}>
+                              <Link2 className="h-5 w-5 text-[#00e5ff]" />
+                            </div>
+                            <div>
+                              <p className={`font-medium ${textPrimary}`}>{integration.name}</p>
+                              <p className={`text-sm ${textSecondary}`}>{integration.description}</p>
+                            </div>
+                          </div>
+                          <Button 
+                            variant={integration.status === "configured" ? "outline" : "default"}
+                            className={integration.status === "configured" ? "" : "bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80"}
+                          >
+                            {integration.status === "configured" ? "Configure" : "Connect"}
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Appearance Tab */}
+                {settingsTab === "appearance" && (
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className={`text-lg font-bold ${textPrimary} mb-1`}>Appearance Settings</h3>
+                      <p className={`text-sm ${textSecondary}`}>Customize how B- COMET looks to you</p>
+                    </div>
+                    
+                    <div className={`p-4 rounded-lg border ${borderColor}`}>
+                      <p className={`font-medium ${textPrimary} mb-3`}>Theme</p>
+                      <div className="flex gap-3">
+                        <button onClick={() => setIsDarkMode(true)} className={`flex-1 px-4 py-2 rounded-lg border transition-all ${isDarkMode ? "border-[#00e5ff] bg-[#00e5ff]/20 text-[#00e5ff]" : `${borderColor} ${textSecondary}`}`}>
+                          <Moon className="h-4 w-4 inline mr-2" /> Dark Mode
+                        </button>
+                        <button onClick={() => setIsDarkMode(false)} className={`flex-1 px-4 py-2 rounded-lg border transition-all ${!isDarkMode ? "border-[#00e5ff] bg-[#00e5ff]/20 text-[#00e5ff]" : `${borderColor} ${textSecondary}`}`}>
+                          <Sun className="h-4 w-4 inline mr-2" /> Light Mode
+                        </button>
                       </div>
-                      <Input className={`w-48 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} placeholder="" />
                     </div>
-                    <div className="flex items-center justify-between py-3">
-                      <span className={textSecondary}>Automated Test Case Limit:</span>
-                      <Input className={`w-48 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} defaultValue="10" />
-                    </div>
-                  </div>
-                  <div className="flex justify-center pt-4">
-                    <Button><CheckCircle className="h-4 w-4 mr-2" /> Save</Button>
-                  </div>
-                </div>
-              )}
 
-              {settingsTab === "security" && (
-                <div className="space-y-6">
-                  <h3 className={`text-lg font-bold ${textPrimary}`}>Security Settings</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
-                      <span className={textSecondary}>Password Expiry (days):</span>
-                      <Input className={`w-48 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} defaultValue="90" />
-                    </div>
-                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
-                      <span className={textSecondary}>Session Timeout (minutes):</span>
-                      <Input className={`w-48 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} defaultValue="30" />
-                    </div>
-                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
-                      <span className={textSecondary}>Two-Factor Authentication:</span>
-                      <input type="checkbox" className="h-5 w-5 rounded" />
-                    </div>
-                    <div className="flex items-center justify-between py-3">
-                      <span className={textSecondary}>IP Whitelist Enabled:</span>
-                      <input type="checkbox" className="h-5 w-5 rounded" />
+                    <div className={`p-4 rounded-lg border ${borderColor}`}>
+                      <p className={`font-medium ${textPrimary} mb-3`}>Sidebar</p>
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input 
+                          type="checkbox"
+                          checked={sidebarCollapsed}
+                          onChange={() => setSidebarCollapsed(!sidebarCollapsed)}
+                          className="accent-[#00e5ff]"
+                        />
+                        <span className={`text-sm ${textPrimary}`}>Collapse sidebar by default</span>
+                      </label>
                     </div>
                   </div>
-                  <div className="flex justify-center pt-4">
-                    <Button><CheckCircle className="h-4 w-4 mr-2" /> Save</Button>
-                  </div>
-                </div>
-              )}
+                )}
 
-              {settingsTab === "mail" && (
-                <div className="space-y-6">
-                  <h3 className={`text-lg font-bold ${textPrimary}`}>Mail Settings</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
-                      <span className={textSecondary}>SMTP Server:</span>
-                      <Input className={`w-64 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} placeholder="smtp.example.com" />
+                {/* API Keys Tab */}
+                {settingsTab === "api-keys" && (
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className={`text-lg font-bold ${textPrimary} mb-1`}>API Keys</h3>
+                      <p className={`text-sm ${textSecondary}`}>Manage API keys for external integrations</p>
                     </div>
-                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
-                      <span className={textSecondary}>SMTP Port:</span>
-                      <Input className={`w-48 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} defaultValue="587" />
+                    
+                    <div className="space-y-3">
+                      {[
+                        { name: "Production API Key", value: "brx_prod_***************************sf2a" },
+                        { name: "Development API Key", value: "brx_dev_***************************3b1c" },
+                      ].map((key) => (
+                        <div key={key.name} className={`p-4 rounded-lg border ${borderColor}`}>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className={`text-sm font-medium ${textPrimary}`}>{key.name}</p>
+                              <p className={`text-xs font-mono ${textSecondary} mt-1`}>{key.value}</p>
+                            </div>
+                            <Button variant="outline" size="sm">Regenerate</Button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
-                      <span className={textSecondary}>From Email:</span>
-                      <Input className={`w-64 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} placeholder="noreply@bcomet.com" />
-                    </div>
-                    <div className="flex items-center justify-between py-3">
-                      <span className={textSecondary}>Email Notifications Enabled:</span>
-                      <input type="checkbox" defaultChecked className="h-5 w-5 rounded" />
-                    </div>
-                  </div>
-                  <div className="flex justify-center pt-4">
-                    <Button><CheckCircle className="h-4 w-4 mr-2" /> Save</Button>
-                  </div>
-                </div>
-              )}
 
-              {settingsTab === "questionnaires" && (
-                <div className="space-y-6">
-                  <h3 className={`text-lg font-bold ${textPrimary}`}>Questionnaires Settings</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
-                      <span className={textSecondary}>Enable Client Questionnaires:</span>
-                      <input type="checkbox" defaultChecked className="h-5 w-5 rounded" />
-                    </div>
-                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
-                      <span className={textSecondary}>Questionnaire Reminder Interval (days):</span>
-                      <Input className={`w-48 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} defaultValue="7" />
-                    </div>
-                    <div className="flex items-center justify-between py-3">
-                      <span className={textSecondary}>Auto-Archive Completed (days):</span>
-                      <Input className={`w-48 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`} defaultValue="30" />
+                    <div className="pt-4">
+                      <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
+                        <Plus className="h-4 w-4 mr-2" /> Create New API Key
+                      </Button>
                     </div>
                   </div>
-                  <div className="flex justify-center pt-4">
-                    <Button><CheckCircle className="h-4 w-4 mr-2" /> Save</Button>
-                  </div>
-                </div>
-              )}
-
-              {settingsTab === "license" && (
-                <div className="space-y-6">
-                  <h3 className={`text-lg font-bold ${textPrimary}`}>License Information</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
-                      <span className={textSecondary}>License Type:</span>
-                      <span className={`font-medium ${textPrimary}`}>Enterprise</span>
-                    </div>
-                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
-                      <span className={textSecondary}>License Key:</span>
-                      <span className={`font-mono text-sm ${textPrimary}`}>BCOMET-ENT-2024-XXXX-XXXX</span>
-                    </div>
-                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
-                      <span className={textSecondary}>Expiry Date:</span>
-                      <span className={`font-medium ${textPrimary}`}>December 31, 2026</span>
-                    </div>
-                    <div className="flex items-center justify-between py-3 border-b border-dashed border-[#1e4976]/30">
-                      <span className={textSecondary}>Max Users:</span>
-                      <span className={`font-medium ${textPrimary}`}>Unlimited</span>
-                    </div>
-                    <div className="flex items-center justify-between py-3">
-                      <span className={textSecondary}>Max Clients:</span>
-                      <span className={`font-medium ${textPrimary}`}>Unlimited</span>
-                    </div>
-                  </div>
-                  <div className="flex justify-center gap-3 pt-4">
-                    <Button variant="outline">Update License</Button>
-                    <Button>Contact Support</Button>
-                  </div>
-                </div>
-              )}
-            </Card>
+                )}
+              </div>
+            </div>
           </div>
-  </div>
-  </div>
-  )
+        </div>
+      </div>
+    )
   }
-  
+
   // FIX MSG Creator Screen
   if (currentScreen === "fix-msg-creator") {
     const messageTypes = [
@@ -10815,6 +10869,139 @@ const copyToClipboard = () => {
               </div>
             )}
           </div>
+
+          {/* Decision Workbench - Right Panel */}
+          {selectedApproval && (
+            <div className={`w-96 border-l ${borderColor} overflow-auto`}>
+              <div className={`${bgSecondary} border-b ${borderColor} px-5 py-4 flex items-center justify-between`}>
+                <h3 className={`font-semibold ${textPrimary}`}>Decision Workbench</h3>
+                <button onClick={() => setSelectedApproval(null)} className={`${textSecondary} hover:${textPrimary}`}>
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="p-5 space-y-4">
+                {/* Case Summary */}
+                <div>
+                  <p className={`text-xs font-semibold ${textSecondary} mb-2 uppercase tracking-wider`}>Case Details</p>
+                  <div className={`rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} p-3 space-y-2 text-sm`}>
+                    <div className="flex justify-between">
+                      <span className={textSecondary}>Request ID:</span>
+                      <span className={`font-mono ${textPrimary}`}>{selectedApproval.id}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={textSecondary}>Client:</span>
+                      <span className={textPrimary}>{selectedApproval.client}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={textSecondary}>Type:</span>
+                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                        selectedApproval.type === "Stage Gate" ? "bg-[#2196f3]/20 text-[#2196f3]" :
+                        selectedApproval.type === "Exception" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                        "bg-[#4caf50]/20 text-[#4caf50]"
+                      }`}>{selectedApproval.type}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={textSecondary}>Due:</span>
+                      <span className={selectedApproval.status === "overdue" ? "text-[#f44336]" : textPrimary}>{selectedApproval.dueDate}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Risk Assessment */}
+                <div>
+                  <p className={`text-xs font-semibold ${textSecondary} mb-2 uppercase tracking-wider`}>Risk Assessment</p>
+                  <div className={`rounded-lg border ${borderColor} p-3 space-y-3`}>
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <span className={`text-xs ${textSecondary}`}>Business Impact</span>
+                        <span className="text-xs font-semibold text-[#ff9800]">High</span>
+                      </div>
+                      <div className="h-2 rounded-full overflow-hidden bg-[#1e4976]/30">
+                        <div className="h-full w-3/4 bg-[#ff9800]" />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <span className={`text-xs ${textSecondary}`}>Technical Risk</span>
+                        <span className="text-xs font-semibold text-[#2196f3]">Medium</span>
+                      </div>
+                      <div className="h-2 rounded-full overflow-hidden bg-[#1e4976]/30">
+                        <div className="h-full w-1/2 bg-[#2196f3]" />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <span className={`text-xs ${textSecondary}`}>Compliance Risk</span>
+                        <span className="text-xs font-semibold text-[#4caf50]">Low</span>
+                      </div>
+                      <div className="h-2 rounded-full overflow-hidden bg-[#1e4976]/30">
+                        <div className="h-full w-1/4 bg-[#4caf50]" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Decision Support */}
+                <div>
+                  <p className={`text-xs font-semibold ${textSecondary} mb-2 uppercase tracking-wider`}>Decision Support</p>
+                  <div className={`rounded-lg border ${borderColor} p-3 space-y-2 text-sm`}>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-[#4caf50] flex-shrink-0 mt-0.5" />
+                      <span className={textSecondary}><span className="font-medium">Align with SLA:</span> Within deadline</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-[#4caf50] flex-shrink-0 mt-0.5" />
+                      <span className={textSecondary}><span className="font-medium">Precedent:</span> Similar case approved Q4 2023</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <AlertTriangle className="h-4 w-4 text-[#ff9800] flex-shrink-0 mt-0.5" />
+                      <span className={textSecondary}><span className="font-medium">Policy Check:</span> Requires exception form</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Approval Chain Status */}
+                <div>
+                  <p className={`text-xs font-semibold ${textSecondary} mb-2 uppercase tracking-wider`}>Approvers Status</p>
+                  <div className="space-y-2">
+                    {selectedApproval.requiredApprovers.map((approver, i) => {
+                      const done = selectedApproval.currentApprovers.includes(approver)
+                      return (
+                        <div key={i} className={`flex items-center gap-2 p-2 rounded-lg ${done ? isDarkMode ? "bg-[#4caf50]/10" : "bg-green-50" : isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
+                          {done ? (
+                            <CheckCircle className="h-4 w-4 text-[#4caf50] flex-shrink-0" />
+                          ) : (
+                            <Clock className="h-4 w-4 text-[#ff9800] flex-shrink-0" />
+                          )}
+                          <span className={`text-sm ${done ? "text-[#4caf50] font-medium" : textPrimary}`}>{approver}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                {(selectedApproval.status === "pending" || selectedApproval.status === "overdue") && (
+                  <div className="flex gap-2 pt-4 border-t">
+                    <Button 
+                      variant="outline" 
+                      className="flex-1 text-[#f44336] border-[#f44336]/30 hover:bg-[#f44336]/10"
+                      onClick={() => console.log("[v0] Rejection workflow started")}
+                    >
+                      <ThumbsDown className="h-4 w-4 mr-1.5" /> Reject
+                    </Button>
+                    <Button 
+                      className="flex-1 bg-[#4caf50] hover:bg-[#4caf50]/80 text-white"
+                      onClick={() => console.log("[v0] Approval workflow started")}
+                    >
+                      <ThumbsUp className="h-4 w-4 mr-1.5" /> Approve
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     )
