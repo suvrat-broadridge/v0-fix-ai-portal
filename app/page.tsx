@@ -1,7 +1,7 @@
 "use client"
 
 // B- COMET Platform - FIX Protocol Testing Suite v2
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, Stamp, Code, ScrollText, Navigation, Sparkles, Minus, Loader } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -11,11 +11,14 @@ export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "approvals" | "evidence-vault" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case">("home")
   const [settingsTab, setSettingsTab] = useState<"profile" | "notifications" | "security" | "integrations" | "appearance" | "api-keys">("profile")
+  const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
+  const [isManager, setIsManager] = useState(false)
+  const [currentUser, setCurrentUser] = useState<{ name: string; email: string } | null>(null)
   const [userProfile, setUserProfile] = useState({
-    firstName: currentUser?.name.split(" ")[0] || "",
-    lastName: currentUser?.name.split(" ")[1] || "",
-    email: currentUser?.email || "",
-    role: isManager ? "Manager" : "Individual Contributor",
+    firstName: "",
+    lastName: "",
+    email: "",
+    role: "Individual Contributor",
   })
   const [notificationPrefs, setNotificationPrefs] = useState({
     caseUpdates: true,
@@ -30,9 +33,19 @@ export default function BCometPlatform() {
     { name: "Slack", description: "Team notifications", status: "not-connected" as "configured" | "not-connected" },
     { name: "Microsoft Teams", description: "Team collaboration", status: "not-connected" as "configured" | "not-connected" },
   ])
-  const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
-  const [isManager, setIsManager] = useState(false)
-  const [currentUser, setCurrentUser] = useState<{ name: string; email: string } | null>(null)
+  
+  // Update userProfile when currentUser changes
+  useEffect(() => {
+    if (currentUser) {
+      const nameParts = currentUser.name.split(" ")
+      setUserProfile({
+        firstName: nameParts[0] || "",
+        lastName: nameParts[1] || "",
+        email: currentUser.email || "",
+        role: isManager ? "Manager" : "Individual Contributor",
+      })
+    }
+  }, [currentUser, isManager])
   
   // User roster for assignment
   const userRoster = [
@@ -140,6 +153,8 @@ export default function BCometPlatform() {
   })
   const [showContactPanel, setShowContactPanel] = useState(false)
   const [showDemoForm, setShowDemoForm] = useState(false)
+  const [showWalkthrough, setShowWalkthrough] = useState(false)
+  const [walkthroughStep, setWalkthroughStep] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   // Session configuration state
   const [sessionConfigs, setSessionConfigs] = useState<Record<string, {host: string, port: string, senderCompId: string, targetCompId: string, protocol: string, ssl: boolean, heartbeat: number, connected: boolean, lastTested: string | null}>>({
@@ -1291,6 +1306,387 @@ export default function BCometPlatform() {
               ))}
             </div>
           </div>
+  </section>
+
+  {/* Interactive Demo Walkthrough Section */}
+  <section className="py-20">
+    <div className="max-w-7xl mx-auto px-6">
+      <div className="text-center mb-12">
+        <h2 className={`text-3xl font-bold mb-4 ${textPrimary}`}>See B-COMET in Action</h2>
+        <p className={`text-lg ${textSecondary} max-w-2xl mx-auto`}>
+          Walk through the complete client onboarding and certification process
+        </p>
+      </div>
+      
+      {!showWalkthrough ? (
+        <div className="flex justify-center">
+          <Button 
+            size="lg" 
+            onClick={() => { setShowWalkthrough(true); setWalkthroughStep(0); }}
+            className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-semibold gap-2"
+          >
+            <Play className="h-5 w-5" /> Start Interactive Demo
+          </Button>
+        </div>
+      ) : (
+        <div className={`${bgCard} rounded-xl border ${borderColor} overflow-hidden`}>
+          {/* Progress Bar */}
+          <div className={`${bgSecondary} px-6 py-4 border-b ${borderColor}`}>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className={`font-semibold ${textPrimary}`}>Demo Walkthrough</h3>
+              <button onClick={() => setShowWalkthrough(false)} className={`${textSecondary} hover:${textPrimary}`}>
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              {["Add Client", "Create Case", "Upload Specs", "Run Tests", "Review & Approve", "Certify"].map((step, i) => (
+                <div key={step} className="flex-1">
+                  <div className={`h-2 rounded-full ${i <= walkthroughStep ? "bg-[#00e5ff]" : isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"} transition-all`} />
+                  <p className={`text-[10px] mt-1 text-center ${i === walkthroughStep ? "text-[#00e5ff] font-medium" : textSecondary}`}>{step}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Step Content */}
+          <div className="p-6">
+            {walkthroughStep === 0 && (
+              <div className="grid grid-cols-2 gap-8 items-center">
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-[#00e5ff]/20 flex items-center justify-center">
+                      <Building2 className="h-5 w-5 text-[#00e5ff]" />
+                    </div>
+                    <div>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>Step 1: Add a New Client</h4>
+                      <p className={`text-sm ${textSecondary}`}>Register client details and trading requirements</p>
+                    </div>
+                  </div>
+                  <div className={`space-y-3 mb-6 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                    <p className={`text-sm ${textPrimary}`}>In this step, you would:</p>
+                    <ul className={`text-sm ${textSecondary} space-y-2 list-disc ml-4`}>
+                      <li>Enter client name and contact information</li>
+                      <li>Select client type (Buy Side, Sell Side, Exchange)</li>
+                      <li>Choose asset classes they will trade</li>
+                      <li>Configure FIX protocol versions needed</li>
+                    </ul>
+                  </div>
+                </div>
+                <div className={`rounded-lg border ${borderColor} p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
+                  <div className="space-y-3">
+                    <div>
+                      <label className={`text-xs font-medium ${textSecondary} mb-1 block`}>Client Name</label>
+                      <div className={`px-3 py-2 rounded border ${borderColor} ${textPrimary} text-sm`}>Acme Capital Partners</div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className={`text-xs font-medium ${textSecondary} mb-1 block`}>Client Type</label>
+                        <div className="px-3 py-2 rounded border border-[#00e5ff] bg-[#00e5ff]/10 text-[#00e5ff] text-sm">Buy Side</div>
+                      </div>
+                      <div>
+                        <label className={`text-xs font-medium ${textSecondary} mb-1 block`}>Region</label>
+                        <div className={`px-3 py-2 rounded border ${borderColor} ${textPrimary} text-sm`}>North America</div>
+                      </div>
+                    </div>
+                    <div>
+                      <label className={`text-xs font-medium ${textSecondary} mb-1 block`}>Asset Classes</label>
+                      <div className="flex gap-2">
+                        <span className="px-2 py-1 rounded bg-[#4caf50]/20 text-[#4caf50] text-xs">Equities</span>
+                        <span className="px-2 py-1 rounded bg-[#2196f3]/20 text-[#2196f3] text-xs">Options</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {walkthroughStep === 1 && (
+              <div className="grid grid-cols-2 gap-8 items-center">
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-[#ff9800]/20 flex items-center justify-center">
+                      <FileText className="h-5 w-5 text-[#ff9800]" />
+                    </div>
+                    <div>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>Step 2: Create Onboarding Case</h4>
+                      <p className={`text-sm ${textSecondary}`}>Initiate the certification workflow</p>
+                    </div>
+                  </div>
+                  <div className={`space-y-3 mb-6 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                    <p className={`text-sm ${textPrimary}`}>The case tracks the entire process:</p>
+                    <ul className={`text-sm ${textSecondary} space-y-2 list-disc ml-4`}>
+                      <li>Assign team members and approvers</li>
+                      <li>Set target completion date and SLA</li>
+                      <li>Define required stages and milestones</li>
+                      <li>Configure notification preferences</li>
+                    </ul>
+                  </div>
+                </div>
+                <div className={`rounded-lg border ${borderColor} p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className={`text-xs font-mono ${textSecondary}`}>CASE-2024-0042</span>
+                    <span className="px-2 py-0.5 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">In Progress</span>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <Building2 className="h-4 w-4 text-[#00e5ff]" />
+                      <span className={`text-sm ${textPrimary}`}>Acme Capital Partners</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Users className="h-4 w-4 text-[#4caf50]" />
+                      <span className={`text-sm ${textPrimary}`}>John Smith, Jane Doe</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Calendar className="h-4 w-4 text-[#ff9800]" />
+                      <span className={`text-sm ${textPrimary}`}>Target: Feb 15, 2024</span>
+                    </div>
+                    <div className="pt-3 border-t border-dashed">
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className={textSecondary}>Progress</span>
+                        <span className="text-[#00e5ff]">2 of 7 stages</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-[#1e4976]/30 overflow-hidden">
+                        <div className="h-full w-[28%] bg-[#00e5ff]" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {walkthroughStep === 2 && (
+              <div className="grid grid-cols-2 gap-8 items-center">
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-[#2196f3]/20 flex items-center justify-center">
+                      <Upload className="h-5 w-5 text-[#2196f3]" />
+                    </div>
+                    <div>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>Step 3: Upload & Standardize Specs</h4>
+                      <p className={`text-sm ${textSecondary}`}>AI converts client specs to standard format</p>
+                    </div>
+                  </div>
+                  <div className={`space-y-3 mb-6 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                    <p className={`text-sm ${textPrimary}`}>Specification processing:</p>
+                    <ul className={`text-sm ${textSecondary} space-y-2 list-disc ml-4`}>
+                      <li>Upload client FIX specification documents</li>
+                      <li>AI extracts fields, messages, and rules</li>
+                      <li>Compare against Broadridge standard specs</li>
+                      <li>Generate gap analysis and mapping report</li>
+                    </ul>
+                  </div>
+                </div>
+                <div className={`rounded-lg border ${borderColor} p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <FileText className="h-4 w-4 text-[#00e5ff]" />
+                    <span className={`text-sm font-medium ${textPrimary}`}>Acme_FIX44_Equities_Spec.pdf</span>
+                    <CheckCircle className="h-4 w-4 text-[#4caf50] ml-auto" />
+                  </div>
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-between text-xs">
+                      <span className={textSecondary}>Standardization</span>
+                      <span className="text-[#4caf50]">Complete</span>
+                    </div>
+                    <div className="h-2 rounded-full bg-[#4caf50]" />
+                  </div>
+                  <div className={`text-xs ${textSecondary} space-y-1`}>
+                    <div className="flex justify-between"><span>Messages Extracted:</span><span className={textPrimary}>12</span></div>
+                    <div className="flex justify-between"><span>Fields Mapped:</span><span className={textPrimary}>156</span></div>
+                    <div className="flex justify-between"><span>Custom Fields:</span><span className="text-[#ff9800]">8</span></div>
+                    <div className="flex justify-between"><span>Gaps Identified:</span><span className="text-[#f44336]">3</span></div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {walkthroughStep === 3 && (
+              <div className="grid grid-cols-2 gap-8 items-center">
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-[#4caf50]/20 flex items-center justify-center">
+                      <TestTube className="h-5 w-5 text-[#4caf50]" />
+                    </div>
+                    <div>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>Step 4: Run Test Cases</h4>
+                      <p className={`text-sm ${textSecondary}`}>Execute AI-generated regression tests</p>
+                    </div>
+                  </div>
+                  <div className={`space-y-3 mb-6 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                    <p className={`text-sm ${textPrimary}`}>Automated testing process:</p>
+                    <ul className={`text-sm ${textSecondary} space-y-2 list-disc ml-4`}>
+                      <li>AI generates test scenarios from specs</li>
+                      <li>Execute tests against client FIX gateway</li>
+                      <li>Validate message flows and responses</li>
+                      <li>Generate detailed test reports</li>
+                    </ul>
+                  </div>
+                </div>
+                <div className={`rounded-lg border ${borderColor} p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className={`text-sm font-medium ${textPrimary}`}>Test Suite: EQ_FIX44_v1.0</span>
+                    <span className="px-2 py-0.5 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">Passed</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className={`p-2 rounded text-center ${isDarkMode ? "bg-[#4caf50]/10" : "bg-green-50"}`}>
+                      <div className="text-xl font-bold text-[#4caf50]">24</div>
+                      <div className="text-[10px] text-[#4caf50]">Passed</div>
+                    </div>
+                    <div className={`p-2 rounded text-center ${isDarkMode ? "bg-[#f44336]/10" : "bg-red-50"}`}>
+                      <div className="text-xl font-bold text-[#f44336]">0</div>
+                      <div className="text-[10px] text-[#f44336]">Failed</div>
+                    </div>
+                    <div className={`p-2 rounded text-center ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"}`}>
+                      <div className={`text-xl font-bold ${textPrimary}`}>24</div>
+                      <div className={`text-[10px] ${textSecondary}`}>Total</div>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    {["New Order Single", "Order Cancel", "Execution Report"].map((test, i) => (
+                      <div key={test} className="flex items-center gap-2">
+                        <CheckCircle className="h-3 w-3 text-[#4caf50]" />
+                        <span className={`text-xs ${textPrimary}`}>{test}</span>
+                        <span className={`text-[10px] ${textSecondary} ml-auto`}>{(i + 1) * 8} tests</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {walkthroughStep === 4 && (
+              <div className="grid grid-cols-2 gap-8 items-center">
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-[#9c27b0]/20 flex items-center justify-center">
+                      <ClipboardCheck className="h-5 w-5 text-[#9c27b0]" />
+                    </div>
+                    <div>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>Step 5: Review & Approve</h4>
+                      <p className={`text-sm ${textSecondary}`}>Multi-level approval workflow</p>
+                    </div>
+                  </div>
+                  <div className={`space-y-3 mb-6 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                    <p className={`text-sm ${textPrimary}`}>Approval process:</p>
+                    <ul className={`text-sm ${textSecondary} space-y-2 list-disc ml-4`}>
+                      <li>IC reviews test results and artifacts</li>
+                      <li>Manager approves stage completion</li>
+                      <li>Decision workbench shows risk assessment</li>
+                      <li>All evidence captured in Evidence Vault</li>
+                    </ul>
+                  </div>
+                </div>
+                <div className={`rounded-lg border ${borderColor} p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className={`text-sm font-medium ${textPrimary}`}>Approval Request</span>
+                    <span className="px-2 py-0.5 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">Pending</span>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                      <span className={`text-sm ${textPrimary}`}>John Smith (IC)</span>
+                      <span className={`text-xs ${textSecondary} ml-auto`}>Approved</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-[#ff9800]" />
+                      <span className={`text-sm ${textPrimary}`}>Sarah Johnson (Manager)</span>
+                      <span className={`text-xs ${textSecondary} ml-auto`}>Awaiting</span>
+                    </div>
+                    <div className={`mt-3 pt-3 border-t border-dashed ${borderColor}`}>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" className="flex-1 text-[#f44336] border-[#f44336]/30">
+                          <ThumbsDown className="h-3 w-3 mr-1" /> Reject
+                        </Button>
+                        <Button size="sm" className="flex-1 bg-[#4caf50] hover:bg-[#4caf50]/80">
+                          <ThumbsUp className="h-3 w-3 mr-1" /> Approve
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {walkthroughStep === 5 && (
+              <div className="grid grid-cols-2 gap-8 items-center">
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-[#00e5ff]/20 flex items-center justify-center">
+                      <Award className="h-5 w-5 text-[#00e5ff]" />
+                    </div>
+                    <div>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>Step 6: Certify & Go Live</h4>
+                      <p className={`text-sm ${textSecondary}`}>Issue certification and deploy to production</p>
+                    </div>
+                  </div>
+                  <div className={`space-y-3 mb-6 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                    <p className={`text-sm ${textPrimary}`}>Final certification:</p>
+                    <ul className={`text-sm ${textSecondary} space-y-2 list-disc ml-4`}>
+                      <li>Generate certification documents</li>
+                      <li>Export production configuration</li>
+                      <li>Client receives certification package</li>
+                      <li>Monitor post-go-live performance</li>
+                    </ul>
+                  </div>
+                </div>
+                <div className={`rounded-lg border-2 border-[#00e5ff] p-6 ${isDarkMode ? "bg-[#00e5ff]/5" : "bg-[#00e5ff]/10"} text-center`}>
+                  <Award className="h-16 w-16 text-[#00e5ff] mx-auto mb-4" />
+                  <h4 className={`text-xl font-bold ${textPrimary} mb-2`}>Certification Complete</h4>
+                  <p className={`text-sm ${textSecondary} mb-4`}>Acme Capital Partners - Equities FIX 4.4</p>
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <CheckCircle className="h-5 w-5 text-[#4caf50]" />
+                    <span className="text-[#4caf50] font-medium">Ready for Production</span>
+                  </div>
+                  <div className="flex gap-2 justify-center">
+                    <Button size="sm" variant="outline">
+                      <Download className="h-4 w-4 mr-1" /> Download Certificate
+                    </Button>
+                    <Button size="sm" className="bg-[#4caf50] hover:bg-[#4caf50]/80">
+                      <Rocket className="h-4 w-4 mr-1" /> Go Live
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Navigation */}
+            <div className="flex justify-between mt-8 pt-6 border-t border-dashed">
+              <Button 
+                variant="outline" 
+                onClick={() => setWalkthroughStep(Math.max(0, walkthroughStep - 1))}
+                disabled={walkthroughStep === 0}
+                className={walkthroughStep === 0 ? "opacity-50" : ""}
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" /> Previous
+              </Button>
+              <div className="flex gap-1">
+                {[0,1,2,3,4,5].map(i => (
+                  <button 
+                    key={i}
+                    onClick={() => setWalkthroughStep(i)}
+                    className={`w-2 h-2 rounded-full ${i === walkthroughStep ? "bg-[#00e5ff]" : isDarkMode ? "bg-[#1e4976]" : "bg-gray-300"}`}
+                  />
+                ))}
+              </div>
+              {walkthroughStep < 5 ? (
+                <Button 
+                  onClick={() => setWalkthroughStep(walkthroughStep + 1)}
+                  className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80"
+                >
+                  Next <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              ) : (
+                <Button 
+                  onClick={() => setCurrentScreen("role-select")}
+                  className="bg-[#4caf50] hover:bg-[#4caf50]/80"
+                >
+                  Try It Now <ArrowRight className="h-4 w-4 ml-1" />
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   </section>
 
   {/* Contact Panel Modal */}
