@@ -9,9 +9,22 @@ import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "approvals" | "evidence-vault" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "approvals" | "evidence-vault" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case">("home")
   const [settingsTab, setSettingsTab] = useState<"look-feel" | "general" | "security" | "mail" | "questionnaires" | "license">("general")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
+  const [isManager, setIsManager] = useState(false)
+  const [currentUser, setCurrentUser] = useState<{ name: string; email: string } | null>(null)
+  
+  // User roster for assignment
+  const userRoster = [
+    { id: "U001", name: "John Smith", email: "john.smith@broadridge.com", role: "ic" },
+    { id: "U002", name: "Jane Doe", email: "jane.doe@broadridge.com", role: "ic" },
+    { id: "U003", name: "Bob Wilson", email: "bob.wilson@broadridge.com", role: "ic" },
+    { id: "U004", name: "Alice Brown", email: "alice.brown@broadridge.com", role: "ic" },
+    { id: "U005", name: "Charlie Davis", email: "charlie.davis@broadridge.com", role: "ic" },
+    { id: "U006", name: "Sarah Johnson", email: "sarah.johnson@broadridge.com", role: "manager" },
+    { id: "U007", name: "David Park", email: "david.park@broadridge.com", role: "manager" },
+  ]
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [selectedClient, setSelectedClient] = useState<any>(null)
   const [selectedAssetClass, setSelectedAssetClass] = useState<string | null>(null)
@@ -142,13 +155,14 @@ export default function BCometPlatform() {
     "production-config": false,
   })
   
-  // Onboarding Cases data
+  // Onboarding Cases data with assigned users
   const [onboardingCases] = useState([
-    { id: "OB-2024-001", client: "Nexus Trading Group", legalEntity: "Nexus Trading LLC", region: "AMER", assetClass: "Equities", protocol: "FIX 4.2", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Medium", owner: "John Smith", slaDate: "Feb 15, 2024", blockers: 0, status: "on-track", createdDate: "Jan 2, 2024" },
-    { id: "OB-2024-002", client: "Apex Capital Partners", legalEntity: "Apex Capital Inc", region: "EMEA", assetClass: "Options", protocol: "FIX 4.4", environment: "Cert", stage: 3, stageLabel: "Connectivity", priority: "Critical", riskRating: "High", owner: "Sarah Johnson", slaDate: "Jan 30, 2024", blockers: 2, status: "at-risk", createdDate: "Dec 15, 2023" },
-    { id: "OB-2024-003", client: "Horizon Investments", legalEntity: "Horizon Fund Management", region: "APAC", assetClass: "Futures", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "Medium", riskRating: "Low", owner: "Mike Chen", slaDate: "Mar 1, 2024", blockers: 0, status: "on-track", createdDate: "Jan 8, 2024" },
-    { id: "OB-2024-004", client: "Velocity Securities", legalEntity: "Velocity Trading Ltd", region: "AMER", assetClass: "Equities", protocol: "FIX 4.4", environment: "Prod", stage: 6, stageLabel: "Certification", priority: "High", riskRating: "Low", owner: "Lisa Wang", slaDate: "Jan 20, 2024", blockers: 0, status: "on-track", createdDate: "Nov 20, 2023" },
-    { id: "OB-2024-005", client: "Summit Financial", legalEntity: "Summit Advisory Group", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.2", environment: "UAT", stage: 1, stageLabel: "Setup", priority: "Low", riskRating: "Medium", owner: "Tom Brown", slaDate: "Apr 1, 2024", blockers: 1, status: "blocked", createdDate: "Jan 10, 2024" },
+    { id: "OB-2024-001", client: "Nexus Trading Group", legalEntity: "Nexus Trading LLC", region: "AMER", assetClass: "Equities", protocol: "FIX 4.2", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Medium", owner: "John Smith", assignedUser: "John Smith", slaDate: "Feb 15, 2024", blockers: 0, status: "on-track", createdDate: "Jan 2, 2024", readinessScore: 85 },
+    { id: "OB-2024-002", client: "Apex Capital Partners", legalEntity: "Apex Capital Inc", region: "EMEA", assetClass: "Options", protocol: "FIX 4.4", environment: "Cert", stage: 3, stageLabel: "Connectivity", priority: "Critical", riskRating: "High", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Jan 30, 2024", blockers: 2, status: "at-risk", createdDate: "Dec 15, 2023", readinessScore: 62 },
+    { id: "OB-2024-003", client: "Horizon Investments", legalEntity: "Horizon Fund Management", region: "APAC", assetClass: "Futures", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "Medium", riskRating: "Low", owner: "Mike Chen", assignedUser: "Bob Wilson", slaDate: "Mar 1, 2024", blockers: 0, status: "on-track", createdDate: "Jan 8, 2024", readinessScore: 78 },
+    { id: "OB-2024-004", client: "Velocity Securities", legalEntity: "Velocity Trading Ltd", region: "AMER", assetClass: "Equities", protocol: "FIX 4.4", environment: "Prod", stage: 6, stageLabel: "Certification", priority: "High", riskRating: "Low", owner: "Lisa Wang", assignedUser: "Alice Brown", slaDate: "Jan 20, 2024", blockers: 0, status: "on-track", createdDate: "Nov 20, 2023", readinessScore: 95 },
+    { id: "OB-2024-005", client: "Summit Financial", legalEntity: "Summit Advisory Group", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.2", environment: "UAT", stage: 1, stageLabel: "Setup", priority: "Low", riskRating: "Medium", owner: "Tom Brown", assignedUser: "Charlie Davis", slaDate: "Apr 1, 2024", blockers: 1, status: "blocked", createdDate: "Jan 10, 2024", readinessScore: 45 },
+    { id: "OB-2024-006", client: "Quantum Asset Management", legalEntity: "Quantum Holdings LLC", region: "AMER", assetClass: "Commodities", protocol: "FIX 4.4", environment: "UAT", stage: 4, stageLabel: "Log Analysis", priority: "Medium", riskRating: "Medium", owner: "John Smith", assignedUser: "John Smith", slaDate: "Feb 28, 2024", blockers: 1, status: "at-risk", createdDate: "Jan 5, 2024", readinessScore: 72 },
   ])
 
   // Approvals data
@@ -177,6 +191,34 @@ export default function BCometPlatform() {
 
   // Approvals screen state
   const [approvalsTab, setApprovalsTab] = useState<"Pending" | "Due Soon" | "Overdue" | "Approved" | "Rejected" | "Waivers" | "All">("Pending")
+  
+  // Create Case Wizard State
+  const [createCaseStep, setCreateCaseStep] = useState(1)
+  const [createCaseData, setCreateCaseData] = useState({
+    // Step 1: Basic Info
+    caseName: "",
+    clientId: "",
+    legalEntity: "",
+    primaryContact: "",
+    // Step 2: Scope
+    assetClasses: [] as string[],
+    fixVersions: {} as Record<string, string>,
+    venueProfiles: [] as string[],
+    onboardingTracks: [] as string[],
+    // Step 3: Dependencies
+    clientSpecStatus: "pending" as "received" | "needs-clarification" | "pending",
+    connectivityEnvironment: "uat" as "uat" | "staging" | "prod",
+    certificationWindow: "",
+    thirdPartyDeps: "",
+    blockers: [] as { description: string; isCriticalPath: boolean }[],
+    // Step 4: Ownership
+    onboardingManager: "",
+    technicalLead: "",
+    qaCertLead: "",
+    businessApprover: "",
+    // Step 5: Risk Assessment - auto-calculated
+    // Step 6: Confirm
+  })
   const [expandedApprovalClients, setExpandedApprovalClients] = useState<Record<string, boolean>>({})
   const [selectedApproval, setSelectedApproval] = useState<typeof allApprovals[0] | null>(null)
 
@@ -502,39 +544,45 @@ export default function BCometPlatform() {
 
   const assetClassesList = ["Equities", "Fixed Income", "Options", "Futures", "FX", "Commodities"]
 
-  // Sample clients data with asset class progress
+  // Sample clients data with asset class progress and assigned users
   const [clients, setClients] = useState([
     { 
-      id: 1, name: "Nexus Trading Group", jira: "NTG-001", accountManager: "John Smith", 
+      id: 1, name: "Nexus Trading Group", jira: "NTG-001", accountManager: "John Smith", assignedUser: "John Smith",
       assetClasses: [
         { name: "Equities", specCompare: "completed", logAnalysis: "error", scenario: "in-progress", testCase: "completed", certification: "not-started", config: "completed", alerts: 2 },
         { name: "Options", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "in-progress", certification: "not-started", config: "completed", alerts: 1 },
       ]
     },
     { 
-      id: 2, name: "Apex Capital Partners", jira: "ACP-002", accountManager: "Jane Doe", 
+      id: 2, name: "Apex Capital Partners", jira: "ACP-002", accountManager: "Sarah Johnson", assignedUser: "Jane Doe",
       assetClasses: [
         { name: "Fixed Income", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "in-progress", certification: "not-started", config: "completed", alerts: 0 },
       ]
     },
     { 
-      id: 3, name: "Horizon Investments", jira: "HI-003", accountManager: "Bob Wilson", 
+      id: 3, name: "Horizon Investments", jira: "HI-003", accountManager: "Mike Chen", assignedUser: "Bob Wilson",
       assetClasses: [
         { name: "Futures", specCompare: "in-progress", logAnalysis: "not-started", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "in-progress", alerts: 3 },
         { name: "FX", specCompare: "completed", logAnalysis: "in-progress", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "completed", alerts: 2 },
       ]
     },
     { 
-      id: 4, name: "Velocity Securities", jira: "VS-004", accountManager: "Alice Brown", 
+      id: 4, name: "Velocity Securities", jira: "VS-004", accountManager: "Lisa Wang", assignedUser: "Alice Brown",
       assetClasses: [
         { name: "Equities", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "completed", certification: "in-progress", config: "completed", alerts: 1 },
       ]
     },
     { 
-      id: 5, name: "Quantum Asset Management", jira: "QAM-005", accountManager: "Charlie Davis", 
+      id: 5, name: "Quantum Asset Management", jira: "QAM-005", accountManager: "John Smith", assignedUser: "Charlie Davis",
       assetClasses: [
         { name: "Commodities", specCompare: "error", logAnalysis: "in-progress", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "error", alerts: 5 },
         { name: "Equities", specCompare: "completed", logAnalysis: "completed", scenario: "in-progress", testCase: "not-started", certification: "not-started", config: "completed", alerts: 3 },
+      ]
+    },
+    { 
+      id: 6, name: "Summit Financial", jira: "SF-006", accountManager: "Tom Brown", assignedUser: "John Smith",
+      assetClasses: [
+        { name: "Fixed Income", specCompare: "not-started", logAnalysis: "not-started", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "not-started", alerts: 0 },
       ]
     },
   ])
@@ -1489,6 +1537,16 @@ export default function BCometPlatform() {
 
   // Login Screen
   if (currentScreen === "login") {
+    const [loginEmail, setLoginEmail] = useState("")
+    
+    const handleLogin = () => {
+      // Simulate login - set current user based on manager checkbox
+      const userName = isManager ? "Sarah Johnson" : "John Smith"
+      const userEmail = isManager ? "sarah.johnson@broadridge.com" : "john.smith@broadridge.com"
+      setCurrentUser({ name: userName, email: userEmail })
+      setCurrentScreen("dashboard")
+    }
+    
     return (
       <div className={`min-h-screen ${bgPrimary} flex items-center justify-center`}>
         <Card className={`${bgCard} p-8 w-full max-w-md border ${borderColor}`}>
@@ -1500,16 +1558,58 @@ export default function BCometPlatform() {
           <div className="space-y-4">
             <div>
               <label className={`text-sm font-medium ${textPrimary}`}>Email</label>
-              <Input type="email" placeholder="Enter your email" className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`} />
+              <Input 
+                type="email" 
+                placeholder="Enter your email" 
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
+                className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`} 
+              />
             </div>
             <div>
               <label className={`text-sm font-medium ${textPrimary}`}>Password</label>
               <Input type="password" placeholder="Enter your password" className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`} />
             </div>
-            <Button className="w-full" onClick={() => setCurrentScreen("dashboard")}>Sign In</Button>
+            
+            {/* Role Type Selection - IC vs Manager */}
+            {selectedRole === "admin" && (
+              <div className={`p-4 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/50" : "bg-gray-50"}`}>
+                <p className={`text-sm font-medium mb-3 ${textPrimary}`}>Login as:</p>
+                <div className="flex gap-4">
+                  <label className={`flex items-center gap-2 cursor-pointer px-4 py-2.5 rounded-lg border-2 transition-all ${!isManager ? "border-[#00e5ff] bg-[#00e5ff]/10" : `${borderColor} hover:border-[#00e5ff]/50`}`}>
+                    <input 
+                      type="radio" 
+                      name="userType" 
+                      checked={!isManager} 
+                      onChange={() => setIsManager(false)}
+                      className="accent-[#00e5ff]" 
+                    />
+                    <div>
+                      <span className={`text-sm font-medium ${textPrimary}`}>Individual Contributor</span>
+                      <p className={`text-xs ${textSecondary}`}>View assigned clients only</p>
+                    </div>
+                  </label>
+                  <label className={`flex items-center gap-2 cursor-pointer px-4 py-2.5 rounded-lg border-2 transition-all ${isManager ? "border-[#9c27b0] bg-[#9c27b0]/10" : `${borderColor} hover:border-[#9c27b0]/50`}`}>
+                    <input 
+                      type="radio" 
+                      name="userType" 
+                      checked={isManager} 
+                      onChange={() => setIsManager(true)}
+                      className="accent-[#9c27b0]" 
+                    />
+                    <div>
+                      <span className={`text-sm font-medium ${textPrimary}`}>Manager</span>
+                      <p className={`text-xs ${textSecondary}`}>View all clients + assignments</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            )}
+            
+            <Button className="w-full bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80" onClick={handleLogin}>Sign In</Button>
           </div>
           <div className="mt-6 text-center">
-            <button onClick={() => setCurrentScreen("home")} className={`text-sm ${textSecondary} hover:text-[#00e5ff]`}>Back to Home</button>
+            <button onClick={() => { setCurrentScreen("home"); setIsManager(false); }} className={`text-sm ${textSecondary} hover:text-[#00e5ff]`}>Back to Home</button>
           </div>
         </Card>
       </div>
@@ -2186,6 +2286,11 @@ export default function BCometPlatform() {
       )
     }
 
+    // Filter clients based on role - IC sees only assigned clients, Manager sees all
+    const filteredClients = isManager 
+      ? clients 
+      : clients.filter(c => c.assignedUser === currentUser?.name)
+    
     // Admin Clients page - full client list
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
@@ -2195,10 +2300,20 @@ export default function BCometPlatform() {
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
             <div>
-              <h1 className={`text-xl font-bold ${textPrimary}`}>Clients</h1>
-              <p className={textSecondary}>Manage and track all client onboarding</p>
+              <h1 className={`text-xl font-bold ${textPrimary}`}>
+                {isManager ? "All Clients" : "My Clients"}
+              </h1>
+              <p className={textSecondary}>
+                {isManager 
+                  ? `Viewing all ${clients.length} clients with team assignments` 
+                  : `Viewing ${filteredClients.length} clients assigned to you`}
+              </p>
             </div>
             <div className="flex items-center gap-4">
+              {/* User Role Badge */}
+              <span className={`px-3 py-1.5 rounded-full text-xs font-medium ${isManager ? "bg-[#9c27b0]/20 text-[#9c27b0]" : "bg-[#00e5ff]/20 text-[#00e5ff]"}`}>
+                {isManager ? "Manager View" : "IC View"}
+              </span>
               <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
                 <Search className={`h-4 w-4 ${textSecondary}`} />
                 <input type="text" placeholder="Search clients..." className={`bg-transparent border-0 outline-none text-sm ${textPrimary} placeholder:${textSecondary}`} />
@@ -2214,6 +2329,7 @@ export default function BCometPlatform() {
                   <thead className={`${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"}`}>
                     <tr>
                       <th className={`px-4 py-3 text-left text-sm font-medium ${textPrimary}`}>Client</th>
+                      {isManager && <th className={`px-4 py-3 text-left text-sm font-medium ${textPrimary}`}>Assigned To</th>}
                       <th className={`px-4 py-3 text-center text-sm font-medium ${textPrimary}`}>Spec Compare</th>
                       <th className={`px-4 py-3 text-center text-sm font-medium ${textPrimary}`}>Log Analysis</th>
                       <th className={`px-4 py-3 text-center text-sm font-medium ${textPrimary}`}>Scenarios</th>
@@ -2224,7 +2340,7 @@ export default function BCometPlatform() {
                     </tr>
                   </thead>
                   <tbody>
-                    {clients.map((client) => (
+                    {filteredClients.map((client) => (
                       <tr 
                         key={client.id} 
                         className={`border-t ${borderColor} cursor-pointer hover:${isDarkMode ? "bg-[#1e4976]/20" : "bg-[#f1f5f9]"}`}
@@ -2234,6 +2350,16 @@ export default function BCometPlatform() {
                           <div className="font-medium">{client.name}</div>
                           <div className={`text-xs ${textSecondary}`}>{client.assetClasses.length} asset classes</div>
                         </td>
+                        {isManager && (
+                          <td className={`px-4 py-3 ${textPrimary}`}>
+                            <div className="flex items-center gap-2">
+                              <div className={`w-7 h-7 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"} flex items-center justify-center text-xs font-medium`}>
+                                {client.assignedUser?.split(" ").map((n: string) => n[0]).join("")}
+                              </div>
+                              <span className="text-sm">{client.assignedUser}</span>
+                            </div>
+                          </td>
+                        )}
                         <td className="px-4 py-3 text-center">{getStatusBadge(getAggregateStatus(client, "specCompare"))}</td>
                         <td className="px-4 py-3 text-center">{getStatusBadge(getAggregateStatus(client, "logAnalysis"))}</td>
                         <td className="px-4 py-3 text-center">{getStatusBadge(getAggregateStatus(client, "scenario"))}</td>
@@ -9492,6 +9618,11 @@ const copyToClipboard = () => {
   if (currentScreen === "onboarding-cases") {
     const stageColors: Record<number, string> = { 1: "#2196f3", 2: "#9c27b0", 3: "#00bcd4", 4: "#ff9800", 5: "#e91e63", 6: "#4caf50", 7: "#00e5ff" }
     
+    // Filter cases based on role - IC sees only their assigned cases, Manager sees all
+    const filteredOnboardingCases = isManager 
+      ? onboardingCases 
+      : onboardingCases.filter(c => c.assignedUser === currentUser?.name)
+    
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
@@ -9501,13 +9632,25 @@ const copyToClipboard = () => {
               <div className="flex items-center gap-3">
                 <Briefcase className="h-8 w-8 text-[#00e5ff]" />
                 <div>
-                  <h1 className={`text-2xl font-bold ${textPrimary}`}>Onboarding Cases</h1>
-                  <p className={`text-sm ${textSecondary}`}>Manage client onboarding lifecycle from setup to go-live</p>
+                  <h1 className={`text-2xl font-bold ${textPrimary}`}>
+                    {isManager ? "All Onboarding Cases" : "My Onboarding Cases"}
+                  </h1>
+                  <p className={`text-sm ${textSecondary}`}>
+                    {isManager 
+                      ? "Manage all client onboarding lifecycle from setup to go-live" 
+                      : `Viewing ${filteredOnboardingCases.length} cases assigned to you`}
+                  </p>
                 </div>
               </div>
-              <Button className="bg-[#4caf50] hover:bg-[#4caf50]/80">
-                <Plus className="h-4 w-4 mr-2" /> New Case
-              </Button>
+              <div className="flex items-center gap-3">
+                {/* User Role Badge */}
+                <span className={`px-3 py-1.5 rounded-full text-xs font-medium ${isManager ? "bg-[#9c27b0]/20 text-[#9c27b0]" : "bg-[#00e5ff]/20 text-[#00e5ff]"}`}>
+                  {isManager ? "Manager View" : "IC View"}
+                </span>
+                <Button className="bg-[#4caf50] hover:bg-[#4caf50]/80" onClick={() => setCurrentScreen("create-case")}>
+                  <Plus className="h-4 w-4 mr-2" /> New Case
+                </Button>
+              </div>
             </div>
           </header>
 
@@ -9561,12 +9704,12 @@ const copyToClipboard = () => {
             </Card>
 
             {/* Summary Stats */}
-            <div className="grid grid-cols-5 gap-4 mb-6">
+            <div className="grid grid-cols-6 gap-4 mb-6">
               <Card className={`${bgCard} border ${borderColor} p-4`}>
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-[#2196f3]/20"><Briefcase className="h-5 w-5 text-[#2196f3]" /></div>
                   <div>
-                    <p className={`text-2xl font-bold ${textPrimary}`}>{onboardingCases.length}</p>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{filteredOnboardingCases.length}</p>
                     <p className={`text-xs ${textSecondary}`}>Active Cases</p>
                   </div>
                 </div>
@@ -9575,7 +9718,7 @@ const copyToClipboard = () => {
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-[#4caf50]/20"><CheckCircle className="h-5 w-5 text-[#4caf50]" /></div>
                   <div>
-                    <p className={`text-2xl font-bold ${textPrimary}`}>{onboardingCases.filter(c => c.status === "on-track").length}</p>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{filteredOnboardingCases.filter(c => c.status === "on-track").length}</p>
                     <p className={`text-xs ${textSecondary}`}>On Track</p>
                   </div>
                 </div>
@@ -9584,7 +9727,7 @@ const copyToClipboard = () => {
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-[#ff9800]/20"><AlertTriangle className="h-5 w-5 text-[#ff9800]" /></div>
                   <div>
-                    <p className={`text-2xl font-bold ${textPrimary}`}>{onboardingCases.filter(c => c.status === "at-risk").length}</p>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{filteredOnboardingCases.filter(c => c.status === "at-risk").length}</p>
                     <p className={`text-xs ${textSecondary}`}>At Risk</p>
                   </div>
                 </div>
@@ -9593,7 +9736,7 @@ const copyToClipboard = () => {
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-[#f44336]/20"><Lock className="h-5 w-5 text-[#f44336]" /></div>
                   <div>
-                    <p className={`text-2xl font-bold ${textPrimary}`}>{onboardingCases.filter(c => c.status === "blocked").length}</p>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{filteredOnboardingCases.filter(c => c.status === "blocked").length}</p>
                     <p className={`text-xs ${textSecondary}`}>Blocked</p>
                   </div>
                 </div>
@@ -9602,8 +9745,17 @@ const copyToClipboard = () => {
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-[#e91e63]/20"><AlertOctagon className="h-5 w-5 text-[#e91e63]" /></div>
                   <div>
-                    <p className={`text-2xl font-bold ${textPrimary}`}>{onboardingCases.reduce((acc, c) => acc + c.blockers, 0)}</p>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{filteredOnboardingCases.reduce((acc, c) => acc + c.blockers, 0)}</p>
                     <p className={`text-xs ${textSecondary}`}>Total Blockers</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#00e5ff]/20"><TrendingUp className="h-5 w-5 text-[#00e5ff]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>{Math.round(filteredOnboardingCases.reduce((acc, c) => acc + (c.readinessScore || 0), 0) / filteredOnboardingCases.length)}%</p>
+                    <p className={`text-xs ${textSecondary}`}>Avg Readiness</p>
                   </div>
                 </div>
               </Card>
@@ -9617,19 +9769,18 @@ const copyToClipboard = () => {
                     <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Case ID</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Client</th>
-                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Region</th>
+                      {isManager && <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Assigned To</th>}
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Asset / Protocol</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Stage</th>
+                      <th className={`px-4 py-3 text-center font-semibold ${textPrimary}`}>Readiness</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Priority</th>
-                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Risk</th>
-                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Owner</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>SLA Date</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Status</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {onboardingCases.map((caseItem) => (
+                    {filteredOnboardingCases.map((caseItem) => (
                       <tr key={caseItem.id} className={`border-b ${borderColor} hover:bg-[#1e4976]/10 cursor-pointer`}>
                         <td className={`px-4 py-3 font-mono font-medium text-[#00e5ff]`}>{caseItem.id}</td>
                         <td className={`px-4 py-3`}>
@@ -9638,16 +9789,38 @@ const copyToClipboard = () => {
                             <p className={`text-xs ${textSecondary}`}>{caseItem.legalEntity}</p>
                           </div>
                         </td>
-                        <td className={`px-4 py-3`}>
-                          <span className={`px-2 py-1 rounded text-xs ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-100"} ${textSecondary}`}>
-                            {caseItem.region}
-                          </span>
-                        </td>
+                        {isManager && (
+                          <td className={`px-4 py-3`}>
+                            <div className="flex items-center gap-2">
+                              <div className={`w-7 h-7 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"} flex items-center justify-center text-xs font-medium ${textPrimary}`}>
+                                {caseItem.assignedUser?.split(" ").map((n: string) => n[0]).join("")}
+                              </div>
+                              <span className={`text-sm ${textPrimary}`}>{caseItem.assignedUser}</span>
+                            </div>
+                          </td>
+                        )}
                         <td className={`px-4 py-3 ${textSecondary}`}>{caseItem.assetClass} / {caseItem.protocol}</td>
                         <td className={`px-4 py-3`}>
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: stageColors[caseItem.stage] }} />
                             <span className={textPrimary}>{caseItem.stageLabel}</span>
+                          </div>
+                        </td>
+                        <td className={`px-4 py-3`}>
+                          <div className="flex items-center justify-center gap-2">
+                            <div className={`w-12 h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`}>
+                              <div 
+                                className={`h-full rounded-full ${
+                                  (caseItem.readinessScore || 0) >= 70 ? "bg-[#4caf50]" :
+                                  (caseItem.readinessScore || 0) >= 50 ? "bg-[#ff9800]" : "bg-[#f44336]"
+                                }`} 
+                                style={{ width: `${caseItem.readinessScore || 0}%` }} 
+                              />
+                            </div>
+                            <span className={`text-xs font-medium ${
+                              (caseItem.readinessScore || 0) >= 70 ? "text-[#4caf50]" :
+                              (caseItem.readinessScore || 0) >= 50 ? "text-[#ff9800]" : "text-[#f44336]"
+                            }`}>{caseItem.readinessScore || 0}%</span>
                           </div>
                         </td>
                         <td className={`px-4 py-3`}>
@@ -9660,16 +9833,6 @@ const copyToClipboard = () => {
                             {caseItem.priority}
                           </span>
                         </td>
-                        <td className={`px-4 py-3`}>
-                          <span className={`px-2 py-1 rounded text-xs ${
-                            caseItem.riskRating === "High" ? "bg-[#f44336]/20 text-[#f44336]" :
-                            caseItem.riskRating === "Medium" ? "bg-[#ff9800]/20 text-[#ff9800]" :
-                            "bg-[#4caf50]/20 text-[#4caf50]"
-                          }`}>
-                            {caseItem.riskRating}
-                          </span>
-                        </td>
-                        <td className={`px-4 py-3 ${textSecondary}`}>{caseItem.owner}</td>
                         <td className={`px-4 py-3 ${textSecondary}`}>{caseItem.slaDate}</td>
                         <td className={`px-4 py-3`}>
                           <div className="flex items-center gap-2">
@@ -9704,6 +9867,613 @@ const copyToClipboard = () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Create Case Wizard (6-Step)
+  if (currentScreen === "create-case") {
+    const wizardSteps = [
+      { num: 1, title: "Basic Information", desc: "Client and case details" },
+      { num: 2, title: "Onboarding Scope", desc: "Asset classes and protocols" },
+      { num: 3, title: "Dependencies", desc: "Blockers and external deps" },
+      { num: 4, title: "Ownership & SLA", desc: "Assign team and timelines" },
+      { num: 5, title: "Risk Assessment", desc: "Auto-calculated risk score" },
+      { num: 6, title: "Confirm & Launch", desc: "Review and submit" },
+    ]
+    
+    const clientOptions = clients.map(c => ({ id: c.id, name: c.name }))
+    const assetClassOptions = ["Equities", "Fixed Income", "Options", "Futures", "FX", "Commodities"]
+    const fixVersionOptions = ["FIX 4.2", "FIX 4.4", "FIX 5.0", "FIX 5.0 SP2", "Custom"]
+    const venueOptions = ["NYSE", "NASDAQ", "CME", "OTC", "Custom"]
+    const trackOptions = ["FIX Specification Baseline", "ATDL Strategy Definition", "Integration & Connectivity", "Testing & Certification", "Go-Live & Hypercare"]
+    
+    // Calculate risk score
+    const customTagCount = 15 // Mock
+    const multiAssetComplexity = createCaseData.assetClasses.length
+    const timelinePressure = 20 // Mock days
+    const regulatoryReqs = "standard"
+    
+    const riskFactors = {
+      customTags: customTagCount > 50 ? "High" : customTagCount > 10 ? "Medium" : "Low",
+      multiAsset: multiAssetComplexity >= 4 ? "High" : multiAssetComplexity >= 2 ? "Medium" : "Low",
+      timeline: timelinePressure < 15 ? "High" : timelinePressure < 30 ? "Medium" : "Low",
+      regulatory: regulatoryReqs === "strict" ? "High" : regulatoryReqs === "standard" ? "Medium" : "Low",
+    }
+    
+    // Readiness score calculation
+    const inputScore = createCaseData.clientId ? 25 : 0
+    const scopeScore = createCaseData.assetClasses.length > 0 && createCaseData.onboardingTracks.length > 0 ? 25 : createCaseData.assetClasses.length > 0 ? 12 : 0
+    const ownerScore = createCaseData.onboardingManager && createCaseData.technicalLead ? 25 : createCaseData.onboardingManager ? 12 : 0
+    const blockerScore = createCaseData.blockers.filter(b => b.isCriticalPath).length === 0 ? 25 : 0
+    const readinessScore = inputScore + scopeScore + ownerScore + blockerScore
+    
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <button onClick={() => { setCurrentScreen("onboarding-cases"); setCreateCaseStep(1); }} className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}>
+                  <ArrowLeft className="h-5 w-5" />
+                </button>
+                <div>
+                  <h1 className={`text-2xl font-bold ${textPrimary}`}>Create Onboarding Case</h1>
+                  <p className={`text-sm ${textSecondary}`}>Step {createCaseStep} of 6: {wizardSteps[createCaseStep - 1].title}</p>
+                </div>
+              </div>
+              <Button variant="outline" onClick={() => { setCurrentScreen("onboarding-cases"); setCreateCaseStep(1); }}>
+                Save Draft
+              </Button>
+            </div>
+          </header>
+          
+          {/* Step Progress */}
+          <div className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <div className="flex items-center justify-between">
+              {wizardSteps.map((step, idx) => (
+                <div key={step.num} className="flex items-center">
+                  <div 
+                    className={`flex items-center gap-2 cursor-pointer ${createCaseStep >= step.num ? "opacity-100" : "opacity-50"}`}
+                    onClick={() => createCaseStep > step.num && setCreateCaseStep(step.num)}
+                  >
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                      createCaseStep > step.num ? "bg-[#4caf50] text-white" :
+                      createCaseStep === step.num ? "bg-[#00e5ff] text-[#0a1628]" :
+                      isDarkMode ? "bg-[#1e4976] text-white" : "bg-gray-200 text-gray-600"
+                    }`}>
+                      {createCaseStep > step.num ? <Check className="h-4 w-4" /> : step.num}
+                    </div>
+                    <div className="hidden md:block">
+                      <p className={`text-sm font-medium ${createCaseStep === step.num ? "text-[#00e5ff]" : textPrimary}`}>{step.title}</p>
+                      <p className={`text-xs ${textSecondary}`}>{step.desc}</p>
+                    </div>
+                  </div>
+                  {idx < 5 && <div className={`w-12 h-0.5 mx-2 ${createCaseStep > step.num ? "bg-[#4caf50]" : isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`} />}
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="p-6">
+            <Card className={`${bgCard} border ${borderColor} p-6 max-w-4xl mx-auto`}>
+              {/* Step 1: Basic Information */}
+              {createCaseStep === 1 && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className={`text-lg font-bold ${textPrimary} mb-1`}>Basic Case Information</h3>
+                    <p className={`text-sm ${textSecondary}`}>Create unique, identifiable case and establish client governance scope</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className={`block text-sm font-medium ${textPrimary} mb-1`}>Case Name <span className="text-[#f44336]">*</span></label>
+                      <Input 
+                        placeholder="Auto-formatted: ClientName-AssetClass-Date"
+                        value={createCaseData.caseName}
+                        onChange={(e) => setCreateCaseData({...createCaseData, caseName: e.target.value})}
+                        className={isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}
+                      />
+                    </div>
+                    <div>
+                      <label className={`block text-sm font-medium ${textPrimary} mb-1`}>Client <span className="text-[#f44336]">*</span></label>
+                      <select 
+                        value={createCaseData.clientId}
+                        onChange={(e) => setCreateCaseData({...createCaseData, clientId: e.target.value})}
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}
+                      >
+                        <option value="">Select client...</option>
+                        {clientOptions.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className={`block text-sm font-medium ${textPrimary} mb-1`}>Legal Entity</label>
+                      <Input 
+                        placeholder="Legal entity name"
+                        value={createCaseData.legalEntity}
+                        onChange={(e) => setCreateCaseData({...createCaseData, legalEntity: e.target.value})}
+                        className={isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}
+                      />
+                    </div>
+                    <div>
+                      <label className={`block text-sm font-medium ${textPrimary} mb-1`}>Primary Contact</label>
+                      <Input 
+                        placeholder="Client account manager"
+                        value={createCaseData.primaryContact}
+                        onChange={(e) => setCreateCaseData({...createCaseData, primaryContact: e.target.value})}
+                        className={isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Step 2: Onboarding Scope */}
+              {createCaseStep === 2 && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className={`text-lg font-bold ${textPrimary} mb-1`}>Onboarding Scope Selection</h3>
+                    <p className={`text-sm ${textSecondary}`}>Define which work streams apply and size the engagement</p>
+                  </div>
+                  
+                  <div>
+                    <label className={`block text-sm font-medium ${textPrimary} mb-2`}>Asset Classes <span className="text-[#f44336]">*</span></label>
+                    <div className="flex flex-wrap gap-2">
+                      {assetClassOptions.map(ac => (
+                        <button
+                          key={ac}
+                          onClick={() => {
+                            const newAc = createCaseData.assetClasses.includes(ac) 
+                              ? createCaseData.assetClasses.filter(a => a !== ac)
+                              : [...createCaseData.assetClasses, ac]
+                            setCreateCaseData({...createCaseData, assetClasses: newAc})
+                          }}
+                          className={`px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
+                            createCaseData.assetClasses.includes(ac) 
+                              ? "bg-[#00e5ff]/20 border-[#00e5ff] text-[#00e5ff]" 
+                              : `${isDarkMode ? "border-[#1e4976]" : "border-gray-300"} ${textSecondary} hover:border-[#00e5ff]/50`
+                          }`}
+                        >
+                          {ac}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {createCaseData.assetClasses.length > 0 && (
+                    <div>
+                      <label className={`block text-sm font-medium ${textPrimary} mb-2`}>FIX Version per Asset Class</label>
+                      <div className="grid grid-cols-3 gap-3">
+                        {createCaseData.assetClasses.map(ac => (
+                          <div key={ac} className={`p-3 rounded-lg border ${borderColor}`}>
+                            <p className={`text-xs font-medium ${textPrimary} mb-1`}>{ac}</p>
+                            <select 
+                              value={createCaseData.fixVersions[ac] || ""}
+                              onChange={(e) => setCreateCaseData({...createCaseData, fixVersions: {...createCaseData.fixVersions, [ac]: e.target.value}})}
+                              className={`w-full px-2 py-1.5 rounded border text-xs ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}
+                            >
+                              <option value="">Select version...</option>
+                              {fixVersionOptions.map(v => <option key={v} value={v}>{v}</option>)}
+                            </select>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div>
+                    <label className={`block text-sm font-medium ${textPrimary} mb-2`}>Venue Profiles</label>
+                    <div className="flex flex-wrap gap-2">
+                      {venueOptions.map(v => (
+                        <button
+                          key={v}
+                          onClick={() => {
+                            const newV = createCaseData.venueProfiles.includes(v) 
+                              ? createCaseData.venueProfiles.filter(x => x !== v)
+                              : [...createCaseData.venueProfiles, v]
+                            setCreateCaseData({...createCaseData, venueProfiles: newV})
+                          }}
+                          className={`px-3 py-1.5 rounded border text-sm ${
+                            createCaseData.venueProfiles.includes(v) 
+                              ? "bg-[#9c27b0]/20 border-[#9c27b0] text-[#9c27b0]" 
+                              : `${isDarkMode ? "border-[#1e4976]" : "border-gray-300"} ${textSecondary}`
+                          }`}
+                        >
+                          {v}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className={`block text-sm font-medium ${textPrimary} mb-2`}>Onboarding Tracks <span className="text-[#f44336]">*</span></label>
+                    <div className="space-y-2">
+                      {trackOptions.map(t => (
+                        <label key={t} className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                          createCaseData.onboardingTracks.includes(t) 
+                            ? "border-[#00e5ff] bg-[#00e5ff]/10" 
+                            : `${borderColor} hover:border-[#00e5ff]/50`
+                        }`}>
+                          <input 
+                            type="checkbox"
+                            checked={createCaseData.onboardingTracks.includes(t)}
+                            onChange={() => {
+                              const newT = createCaseData.onboardingTracks.includes(t)
+                                ? createCaseData.onboardingTracks.filter(x => x !== t)
+                                : [...createCaseData.onboardingTracks, t]
+                              setCreateCaseData({...createCaseData, onboardingTracks: newT})
+                            }}
+                            className="accent-[#00e5ff]"
+                          />
+                          <span className={`text-sm ${textPrimary}`}>{t}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Step 3: Dependencies */}
+              {createCaseStep === 3 && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className={`text-lg font-bold ${textPrimary} mb-1`}>Dependencies and External Blockers</h3>
+                    <p className={`text-sm ${textSecondary}`}>Identify and surface blockers early to prevent false starts</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className={`block text-sm font-medium ${textPrimary} mb-1`}>Client FIX Spec Status</label>
+                      <select 
+                        value={createCaseData.clientSpecStatus}
+                        onChange={(e) => setCreateCaseData({...createCaseData, clientSpecStatus: e.target.value as any})}
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}
+                      >
+                        <option value="received">Received</option>
+                        <option value="needs-clarification">Needs Clarification</option>
+                        <option value="pending">Pending</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className={`block text-sm font-medium ${textPrimary} mb-1`}>Connectivity Environment</label>
+                      <select 
+                        value={createCaseData.connectivityEnvironment}
+                        onChange={(e) => setCreateCaseData({...createCaseData, connectivityEnvironment: e.target.value as any})}
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}
+                      >
+                        <option value="uat">UAT Ready</option>
+                        <option value="staging">Staging</option>
+                        <option value="prod">Production</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className={`block text-sm font-medium ${textPrimary} mb-1`}>Certification Window</label>
+                      <Input 
+                        type="date"
+                        value={createCaseData.certificationWindow}
+                        onChange={(e) => setCreateCaseData({...createCaseData, certificationWindow: e.target.value})}
+                        className={isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}
+                      />
+                    </div>
+                    <div>
+                      <label className={`block text-sm font-medium ${textPrimary} mb-1`}>Third-Party Dependencies</label>
+                      <Input 
+                        placeholder="Client IT, venue approvals, etc."
+                        value={createCaseData.thirdPartyDeps}
+                        onChange={(e) => setCreateCaseData({...createCaseData, thirdPartyDeps: e.target.value})}
+                        className={isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className={`block text-sm font-medium ${textPrimary} mb-2`}>Known Blockers</label>
+                    <div className="space-y-2">
+                      {createCaseData.blockers.map((b, idx) => (
+                        <div key={idx} className={`flex items-center gap-3 p-3 rounded-lg border ${borderColor}`}>
+                          <input 
+                            type="text"
+                            value={b.description}
+                            onChange={(e) => {
+                              const newBlockers = [...createCaseData.blockers]
+                              newBlockers[idx].description = e.target.value
+                              setCreateCaseData({...createCaseData, blockers: newBlockers})
+                            }}
+                            placeholder="Blocker description..."
+                            className={`flex-1 px-2 py-1 rounded border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}
+                          />
+                          <label className="flex items-center gap-2">
+                            <input 
+                              type="checkbox"
+                              checked={b.isCriticalPath}
+                              onChange={(e) => {
+                                const newBlockers = [...createCaseData.blockers]
+                                newBlockers[idx].isCriticalPath = e.target.checked
+                                setCreateCaseData({...createCaseData, blockers: newBlockers})
+                              }}
+                              className="accent-[#f44336]"
+                            />
+                            <span className="text-xs text-[#f44336]">Critical Path</span>
+                          </label>
+                          <button onClick={() => setCreateCaseData({...createCaseData, blockers: createCaseData.blockers.filter((_, i) => i !== idx)})} className="text-[#f44336]">
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                      <Button variant="outline" size="sm" onClick={() => setCreateCaseData({...createCaseData, blockers: [...createCaseData.blockers, { description: "", isCriticalPath: false }]})}>
+                        <Plus className="h-4 w-4 mr-1" /> Add Blocker
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Step 4: Ownership & SLA */}
+              {createCaseStep === 4 && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className={`text-lg font-bold ${textPrimary} mb-1`}>Ownership and SLA Assignment</h3>
+                    <p className={`text-sm ${textSecondary}`}>Make accountability explicit and set realistic delivery expectations</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className={`block text-sm font-medium ${textPrimary} mb-1`}>Onboarding Manager <span className="text-[#f44336]">*</span></label>
+                      <select 
+                        value={createCaseData.onboardingManager}
+                        onChange={(e) => setCreateCaseData({...createCaseData, onboardingManager: e.target.value})}
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}
+                      >
+                        <option value="">Select manager...</option>
+                        {userRoster.map(u => <option key={u.id} value={u.name}>{u.name}</option>)}
+                      </select>
+                      <p className={`text-xs ${textSecondary} mt-1`}>Owns overall case health, SLA tracking</p>
+                    </div>
+                    <div>
+                      <label className={`block text-sm font-medium ${textPrimary} mb-1`}>Technical Lead <span className="text-[#f44336]">*</span></label>
+                      <select 
+                        value={createCaseData.technicalLead}
+                        onChange={(e) => setCreateCaseData({...createCaseData, technicalLead: e.target.value})}
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}
+                      >
+                        <option value="">Select lead...</option>
+                        {userRoster.map(u => <option key={u.id} value={u.name}>{u.name}</option>)}
+                      </select>
+                      <p className={`text-xs ${textSecondary} mt-1`}>Owns spec, rules, testing decisions</p>
+                    </div>
+                    <div>
+                      <label className={`block text-sm font-medium ${textPrimary} mb-1`}>QA/Cert Lead</label>
+                      <select 
+                        value={createCaseData.qaCertLead}
+                        onChange={(e) => setCreateCaseData({...createCaseData, qaCertLead: e.target.value})}
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}
+                      >
+                        <option value="">Select lead...</option>
+                        {userRoster.map(u => <option key={u.id} value={u.name}>{u.name}</option>)}
+                      </select>
+                      <p className={`text-xs ${textSecondary} mt-1`}>Owns test strategy and certification readiness</p>
+                    </div>
+                    <div>
+                      <label className={`block text-sm font-medium ${textPrimary} mb-1`}>Business Approver</label>
+                      <select 
+                        value={createCaseData.businessApprover}
+                        onChange={(e) => setCreateCaseData({...createCaseData, businessApprover: e.target.value})}
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}
+                      >
+                        <option value="">Select approver...</option>
+                        {userRoster.filter(u => u.role === "manager").map(u => <option key={u.id} value={u.name}>{u.name}</option>)}
+                      </select>
+                      <p className={`text-xs ${textSecondary} mt-1`}>Owns business sign-off and go-live decision</p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className={`text-sm font-semibold ${textPrimary} mb-3`}>SLA Targets (per stage)</h4>
+                    <div className={`grid grid-cols-5 gap-2 p-4 rounded-lg border ${borderColor}`}>
+                      <div className="text-center">
+                        <p className={`text-xs ${textSecondary}`}>Spec Analysis</p>
+                        <p className={`text-lg font-bold text-[#2196f3]`}>5-7d</p>
+                      </div>
+                      <div className="text-center">
+                        <p className={`text-xs ${textSecondary}`}>ATDL</p>
+                        <p className={`text-lg font-bold text-[#9c27b0]`}>3-5d</p>
+                      </div>
+                      <div className="text-center">
+                        <p className={`text-xs ${textSecondary}`}>Testing</p>
+                        <p className={`text-lg font-bold text-[#ff9800]`}>7-10d</p>
+                      </div>
+                      <div className="text-center">
+                        <p className={`text-xs ${textSecondary}`}>Certification</p>
+                        <p className={`text-lg font-bold text-[#e91e63]`}>3-5d</p>
+                      </div>
+                      <div className="text-center">
+                        <p className={`text-xs ${textSecondary}`}>Total</p>
+                        <p className={`text-lg font-bold text-[#4caf50]`}>20-30d</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Step 5: Risk Assessment */}
+              {createCaseStep === 5 && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className={`text-lg font-bold ${textPrimary} mb-1`}>Risk Assessment and Readiness Scoring</h3>
+                    <p className={`text-sm ${textSecondary}`}>Auto-calculated risk factors based on your inputs</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <h4 className={`text-sm font-semibold ${textPrimary} mb-3`}>Risk Factors</h4>
+                      <div className="space-y-3">
+                        <div className={`flex items-center justify-between p-3 rounded-lg border ${borderColor}`}>
+                          <span className={`text-sm ${textPrimary}`}>Custom FIX Tags</span>
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            riskFactors.customTags === "High" ? "bg-[#f44336]/20 text-[#f44336]" :
+                            riskFactors.customTags === "Medium" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                            "bg-[#4caf50]/20 text-[#4caf50]"
+                          }`}>{riskFactors.customTags}</span>
+                        </div>
+                        <div className={`flex items-center justify-between p-3 rounded-lg border ${borderColor}`}>
+                          <span className={`text-sm ${textPrimary}`}>Multi-Asset Complexity</span>
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            riskFactors.multiAsset === "High" ? "bg-[#f44336]/20 text-[#f44336]" :
+                            riskFactors.multiAsset === "Medium" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                            "bg-[#4caf50]/20 text-[#4caf50]"
+                          }`}>{riskFactors.multiAsset} ({createCaseData.assetClasses.length} assets)</span>
+                        </div>
+                        <div className={`flex items-center justify-between p-3 rounded-lg border ${borderColor}`}>
+                          <span className={`text-sm ${textPrimary}`}>Timeline Pressure</span>
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            riskFactors.timeline === "High" ? "bg-[#f44336]/20 text-[#f44336]" :
+                            riskFactors.timeline === "Medium" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                            "bg-[#4caf50]/20 text-[#4caf50]"
+                          }`}>{riskFactors.timeline}</span>
+                        </div>
+                        <div className={`flex items-center justify-between p-3 rounded-lg border ${borderColor}`}>
+                          <span className={`text-sm ${textPrimary}`}>Regulatory Requirements</span>
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            riskFactors.regulatory === "High" ? "bg-[#f44336]/20 text-[#f44336]" :
+                            riskFactors.regulatory === "Medium" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                            "bg-[#4caf50]/20 text-[#4caf50]"
+                          }`}>{riskFactors.regulatory}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className={`text-sm font-semibold ${textPrimary} mb-3`}>Readiness Score</h4>
+                      <div className={`p-6 rounded-lg border ${borderColor} text-center`}>
+                        <div className={`inline-flex items-center justify-center w-24 h-24 rounded-full border-4 ${
+                          readinessScore >= 70 ? "border-[#4caf50]" :
+                          readinessScore >= 50 ? "border-[#ff9800]" : "border-[#f44336]"
+                        }`}>
+                          <span className={`text-3xl font-bold ${
+                            readinessScore >= 70 ? "text-[#4caf50]" :
+                            readinessScore >= 50 ? "text-[#ff9800]" : "text-[#f44336]"
+                          }`}>{readinessScore}</span>
+                        </div>
+                        <p className={`mt-3 text-sm ${textSecondary}`}>
+                          {readinessScore >= 70 ? "Ready to launch" : readinessScore >= 50 ? "Needs attention" : "Not ready"}
+                        </p>
+                      </div>
+                      
+                      <div className="mt-4 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-4 h-4 rounded ${inputScore === 25 ? "bg-[#4caf50]" : "bg-[#f44336]"}`} />
+                          <span className={`text-xs ${textSecondary}`}>Input completeness ({inputScore}/25)</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className={`w-4 h-4 rounded ${scopeScore === 25 ? "bg-[#4caf50]" : scopeScore > 0 ? "bg-[#ff9800]" : "bg-[#f44336]"}`} />
+                          <span className={`text-xs ${textSecondary}`}>Scope clarity ({scopeScore}/25)</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className={`w-4 h-4 rounded ${ownerScore === 25 ? "bg-[#4caf50]" : ownerScore > 0 ? "bg-[#ff9800]" : "bg-[#f44336]"}`} />
+                          <span className={`text-xs ${textSecondary}`}>Ownership defined ({ownerScore}/25)</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className={`w-4 h-4 rounded ${blockerScore === 25 ? "bg-[#4caf50]" : "bg-[#f44336]"}`} />
+                          <span className={`text-xs ${textSecondary}`}>No critical blockers ({blockerScore}/25)</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Step 6: Confirm */}
+              {createCaseStep === 6 && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className={`text-lg font-bold ${textPrimary} mb-1`}>Confirm and Launch</h3>
+                    <p className={`text-sm ${textSecondary}`}>Review all selections before creating the case</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className={`p-4 rounded-lg border ${borderColor}`}>
+                      <h4 className={`text-sm font-semibold ${textPrimary} mb-3`}>Basic Info</h4>
+                      <div className="space-y-2 text-sm">
+                        <p><span className={textSecondary}>Case:</span> <span className={textPrimary}>{createCaseData.caseName || "Auto-generated"}</span></p>
+                        <p><span className={textSecondary}>Client:</span> <span className={textPrimary}>{clients.find(c => c.id.toString() === createCaseData.clientId)?.name || "-"}</span></p>
+                        <p><span className={textSecondary}>Legal Entity:</span> <span className={textPrimary}>{createCaseData.legalEntity || "-"}</span></p>
+                      </div>
+                    </div>
+                    
+                    <div className={`p-4 rounded-lg border ${borderColor}`}>
+                      <h4 className={`text-sm font-semibold ${textPrimary} mb-3`}>Scope</h4>
+                      <div className="space-y-2 text-sm">
+                        <p><span className={textSecondary}>Assets:</span> <span className={textPrimary}>{createCaseData.assetClasses.join(", ") || "-"}</span></p>
+                        <p><span className={textSecondary}>Venues:</span> <span className={textPrimary}>{createCaseData.venueProfiles.join(", ") || "-"}</span></p>
+                        <p><span className={textSecondary}>Tracks:</span> <span className={textPrimary}>{createCaseData.onboardingTracks.length} selected</span></p>
+                      </div>
+                    </div>
+                    
+                    <div className={`p-4 rounded-lg border ${borderColor}`}>
+                      <h4 className={`text-sm font-semibold ${textPrimary} mb-3`}>Ownership</h4>
+                      <div className="space-y-2 text-sm">
+                        <p><span className={textSecondary}>Manager:</span> <span className={textPrimary}>{createCaseData.onboardingManager || "-"}</span></p>
+                        <p><span className={textSecondary}>Tech Lead:</span> <span className={textPrimary}>{createCaseData.technicalLead || "-"}</span></p>
+                        <p><span className={textSecondary}>QA Lead:</span> <span className={textPrimary}>{createCaseData.qaCertLead || "-"}</span></p>
+                      </div>
+                    </div>
+                    
+                    <div className={`p-4 rounded-lg border ${borderColor}`}>
+                      <h4 className={`text-sm font-semibold ${textPrimary} mb-3`}>Readiness</h4>
+                      <div className="flex items-center gap-4">
+                        <div className={`text-3xl font-bold ${
+                          readinessScore >= 70 ? "text-[#4caf50]" :
+                          readinessScore >= 50 ? "text-[#ff9800]" : "text-[#f44336]"
+                        }`}>{readinessScore}/100</div>
+                        <div>
+                          <p className={`text-sm ${textPrimary}`}>{readinessScore >= 70 ? "Ready to Launch" : readinessScore >= 50 ? "Review Recommended" : "Not Ready"}</p>
+                          <p className={`text-xs ${textSecondary}`}>{createCaseData.blockers.filter(b => b.isCriticalPath).length} critical blockers</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {readinessScore < 70 && (
+                    <div className={`p-4 rounded-lg bg-[#ff9800]/10 border border-[#ff9800]/30`}>
+                      <div className="flex items-start gap-3">
+                        <AlertTriangle className="h-5 w-5 text-[#ff9800] mt-0.5" />
+                        <div>
+                          <p className="text-sm font-medium text-[#ff9800]">Readiness score below 70</p>
+                          <p className={`text-xs ${textSecondary} mt-1`}>You can still create this case, but some fields are incomplete. The case will start in Draft status.</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {/* Navigation */}
+              <div className={`flex items-center justify-between mt-8 pt-6 border-t ${borderColor}`}>
+                <Button 
+                  variant="outline" 
+                  onClick={() => createCaseStep > 1 && setCreateCaseStep(createCaseStep - 1)}
+                  disabled={createCaseStep === 1}
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" /> Back
+                </Button>
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={() => { setCurrentScreen("onboarding-cases"); setCreateCaseStep(1); }}>
+                    Cancel
+                  </Button>
+                  {createCaseStep < 6 ? (
+                    <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80" onClick={() => setCreateCaseStep(createCaseStep + 1)}>
+                      Next <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  ) : (
+                    <Button className="bg-[#4caf50] hover:bg-[#4caf50]/80" onClick={() => { setCurrentScreen("onboarding-cases"); setCreateCaseStep(1); }}>
+                      <Rocket className="h-4 w-4 mr-2" /> Launch Case
+                    </Button>
+                  )}
+                </div>
               </div>
             </Card>
           </div>
