@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "approvals" | "evidence-vault" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "case-workflow" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "approvals" | "evidence-vault" | "prod-config" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case">("home")
   const [settingsTab, setSettingsTab] = useState<"profile" | "notifications" | "security" | "integrations" | "appearance" | "api-keys">("profile")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [isManager, setIsManager] = useState(false)
@@ -60,6 +60,7 @@ export default function BCometPlatform() {
   ]
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [selectedClient, setSelectedClient] = useState<any>(null)
+  const [selectedCase, setSelectedCase] = useState<any>(null)
   const [selectedAssetClass, setSelectedAssetClass] = useState<string | null>(null)
   const [selectedFixVersion, setSelectedFixVersion] = useState<string | null>(null)
   const [showSpecResults, setShowSpecResults] = useState(false)
@@ -589,12 +590,19 @@ export default function BCometPlatform() {
       assetClasses: [
         { name: "Equities", specCompare: "completed", logAnalysis: "error", scenario: "in-progress", testCase: "completed", certification: "not-started", config: "completed", alerts: 2 },
         { name: "Options", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "in-progress", certification: "not-started", config: "completed", alerts: 1 },
+      ],
+      onboardingCases: [
+        { id: "CASE-NTG-EQ-001", name: "Equities FIX 4.4", assetClass: "Equities", status: "in-progress", currentStage: 4, totalStages: 9, dueDate: "2024-02-15", assignee: "John Smith", progress: 44 },
+        { id: "CASE-NTG-OPT-001", name: "Options FIX 4.4", assetClass: "Options", status: "in-progress", currentStage: 5, totalStages: 9, dueDate: "2024-02-20", assignee: "John Smith", progress: 56 },
       ]
     },
     { 
       id: 2, name: "Apex Capital Partners", jira: "ACP-002", accountManager: "Sarah Johnson", assignedUser: "Jane Doe",
       assetClasses: [
         { name: "Fixed Income", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "in-progress", certification: "not-started", config: "completed", alerts: 0 },
+      ],
+      onboardingCases: [
+        { id: "CASE-ACP-FI-001", name: "Fixed Income FIX 4.2", assetClass: "Fixed Income", status: "in-progress", currentStage: 6, totalStages: 9, dueDate: "2024-02-10", assignee: "Jane Doe", progress: 67 },
       ]
     },
     { 
@@ -602,12 +610,19 @@ export default function BCometPlatform() {
       assetClasses: [
         { name: "Futures", specCompare: "in-progress", logAnalysis: "not-started", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "in-progress", alerts: 3 },
         { name: "FX", specCompare: "completed", logAnalysis: "in-progress", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "completed", alerts: 2 },
+      ],
+      onboardingCases: [
+        { id: "CASE-HI-FUT-001", name: "Futures FIX 5.0", assetClass: "Futures", status: "in-progress", currentStage: 2, totalStages: 9, dueDate: "2024-03-01", assignee: "Bob Wilson", progress: 22 },
+        { id: "CASE-HI-FX-001", name: "FX FIX 4.4", assetClass: "FX", status: "in-progress", currentStage: 3, totalStages: 9, dueDate: "2024-02-28", assignee: "Bob Wilson", progress: 33 },
       ]
     },
     { 
       id: 4, name: "Velocity Securities", jira: "VS-004", accountManager: "Lisa Wang", assignedUser: "Alice Brown",
       assetClasses: [
         { name: "Equities", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "completed", certification: "in-progress", config: "completed", alerts: 1 },
+      ],
+      onboardingCases: [
+        { id: "CASE-VS-EQ-001", name: "Equities FIX 4.4", assetClass: "Equities", status: "in-progress", currentStage: 8, totalStages: 9, dueDate: "2024-02-05", assignee: "Alice Brown", progress: 89 },
       ]
     },
     { 
@@ -615,12 +630,20 @@ export default function BCometPlatform() {
       assetClasses: [
         { name: "Commodities", specCompare: "error", logAnalysis: "in-progress", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "error", alerts: 5 },
         { name: "Equities", specCompare: "completed", logAnalysis: "completed", scenario: "in-progress", testCase: "not-started", certification: "not-started", config: "completed", alerts: 3 },
+      ],
+      onboardingCases: [
+        { id: "CASE-QAM-COM-001", name: "Commodities FIX 4.4", assetClass: "Commodities", status: "blocked", currentStage: 2, totalStages: 9, dueDate: "2024-02-25", assignee: "Charlie Davis", progress: 22 },
+        { id: "CASE-QAM-EQ-001", name: "Equities FIX 4.4", assetClass: "Equities", status: "in-progress", currentStage: 4, totalStages: 9, dueDate: "2024-03-05", assignee: "Charlie Davis", progress: 44 },
+        { id: "CASE-QAM-ALGO-001", name: "ATDL/Algo Trading", assetClass: "Algo", status: "not-started", currentStage: 1, totalStages: 9, dueDate: "2024-03-15", assignee: "Charlie Davis", progress: 0 },
       ]
     },
     { 
       id: 6, name: "Summit Financial", jira: "SF-006", accountManager: "Tom Brown", assignedUser: "John Smith",
       assetClasses: [
         { name: "Fixed Income", specCompare: "not-started", logAnalysis: "not-started", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "not-started", alerts: 0 },
+      ],
+      onboardingCases: [
+        { id: "CASE-SF-FI-001", name: "Fixed Income FIX 4.2", assetClass: "Fixed Income", status: "not-started", currentStage: 1, totalStages: 9, dueDate: "2024-03-20", assignee: "John Smith", progress: 0 },
       ]
     },
   ])
@@ -641,12 +664,15 @@ export default function BCometPlatform() {
 
   // Features for landing page
   const features = [
-    { icon: GitCompare, title: "Spec Comparison", desc: "Compare client FIX specs against standard specifications" },
-    { icon: FileSearch, title: "Log Analysis", desc: "Analyze FIX logs to identify protocol violations" },
-    { icon: Activity, title: "Scenario Creation", desc: "Create and manage test scenarios for validation" },
-    { icon: Zap, title: "Test Case Generation", desc: "Convert scenarios to VeriFIX regression test cases" },
-    { icon: Award, title: "Certification Test Cases", desc: "Generate certification test cases for Conductor" },
-    { icon: Cog, title: "Configuration", desc: "Configure FIX settings and parameters" },
+    { icon: Building2, title: "Case-Based Onboarding", desc: "Track multiple onboarding cases per client - Equities, Options, ATDL/Algo - each with full workflow visibility" },
+    { icon: GitCompare, title: "AI Spec Compare", desc: "Upload client FIX specs and let AI extract, compare, and identify gaps against Broadridge standards" },
+    { icon: FileSearch, title: "FIX Log Analysis", desc: "Parse production logs with AI to detect patterns, errors, and auto-generate test scenarios" },
+    { icon: Sliders, title: "ATDL Viewer", desc: "Configure and validate algorithmic trading parameters - VWAP, TWAP, POV strategies" },
+    { icon: TestTube, title: "AI Test Generation", desc: "Generate regression and certification test suites from specs, logs, or custom scenarios" },
+    { icon: Sparkles, title: "Scenario Generator", desc: "AI creates edge cases, failure conditions, and complex trading scenarios for comprehensive testing" },
+    { icon: FolderArchive, title: "Evidence Vault", desc: "Immutable audit trail with digital signatures - all artifacts stored for compliance review" },
+    { icon: ClipboardCheck, title: "Approval Workflows", desc: "Multi-level approval process with clear visibility on who needs to approve what" },
+    { icon: Settings, title: "Prod Config Export", desc: "Generate production-ready configuration packages for deployment to live environments" },
   ]
 
   const getStatusBadge = (status: string) => {
@@ -926,6 +952,7 @@ export default function BCometPlatform() {
   { icon: Briefcase, label: "Onboarding Cases", screen: "onboarding-cases", roles: ["admin"] },
   { icon: Scale, label: "Approvals", screen: "approvals", roles: ["admin"], badge: 3 },
   { icon: Archive, label: "Evidence Vault", screen: "evidence-vault", roles: ["admin"] },
+  { icon: Server, label: "Prod Config", screen: "prod-config", roles: ["admin"] },
   { icon: BookOpen, label: "Rule Library", screen: "rule-library", roles: ["admin"] },
   { icon: Brain, label: "AI Review Queue", screen: "ai-review-queue", roles: ["admin"], badge: 2 },
   { icon: Gauge, label: "SLA Analytics", screen: "sla-analytics", roles: ["admin"] },
@@ -1297,23 +1324,8 @@ export default function BCometPlatform() {
 
         </section>
 
-        <section className={`${bgSecondary}/80 py-20`}>
-          <div className="max-w-7xl mx-auto px-6">
-            <h2 className={`text-3xl font-bold text-center mb-12 ${textPrimary}`}>Platform Capabilities</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {features.map((feature, i) => (
-                <Card key={i} className={`${bgCard} p-6 border ${borderColor} hover:border-[#00e5ff]/50`}>
-                  <feature.icon className="h-10 w-10 mb-4 text-[#00e5ff]" />
-                  <h3 className={`text-lg font-bold mb-2 ${textPrimary}`}>{feature.title}</h3>
-                  <p className={`text-sm ${textSecondary}`}>{feature.desc}</p>
-                </Card>
-              ))}
-            </div>
-          </div>
-  </section>
-
-  {/* Interactive Demo Walkthrough Section */}
-  <section className="py-20">
+  {/* Interactive Demo Walkthrough Section - ABOVE Platform Capabilities */}
+  <section className={`${bgSecondary}/80 py-20`}>
     <div className="max-w-7xl mx-auto px-6">
       <div className="text-center mb-12">
         <h2 className={`text-3xl font-bold mb-4 ${textPrimary}`}>See B-COMET in Action</h2>
@@ -1335,7 +1347,7 @@ export default function BCometPlatform() {
       ) : (
         <div className={`${bgCard} rounded-xl border ${borderColor} overflow-hidden`}>
           {/* Progress Bar */}
-          <div className={`${bgSecondary} px-6 py-4 border-b ${borderColor}`}>
+          <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-white"} px-6 py-4 border-b ${borderColor}`}>
             <div className="flex items-center justify-between mb-3">
               <h3 className={`font-semibold ${textPrimary}`}>Onboarding Workflow Demo</h3>
               <button onClick={() => setShowWalkthrough(false)} className={`${textSecondary} hover:${textPrimary}`}>
@@ -1343,7 +1355,7 @@ export default function BCometPlatform() {
               </button>
             </div>
             <div className="flex items-center gap-1">
-              {["Client Setup", "Spec Compare", "Log Analysis", "ATDL Config", "Test Suite", "Scenario Gen", "Evidence", "Certification"].map((step, i) => (
+              {["Client Setup", "Spec Compare", "Log Analysis", "ATDL Config", "Test Suite", "Scenario Gen", "Evidence", "Prod Config", "Certification"].map((step, i) => (
                 <button 
                   key={step} 
                   onClick={() => setWalkthroughStep(i)}
@@ -1904,8 +1916,87 @@ export default function BCometPlatform() {
               </div>
             )}
 
-            {/* Step 7: Certification */}
+            {/* Step 7: Prod Config */}
             {walkthroughStep === 7 && (
+              <div className="grid grid-cols-2 gap-8">
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#4caf50]/20 to-[#4caf50]/5 flex items-center justify-center border border-[#4caf50]/30">
+                      <Server className="h-6 w-6 text-[#4caf50]" />
+                    </div>
+                    <div>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>8. Production Config Export</h4>
+                      <p className={`text-sm ${textSecondary}`}>Generate deployment-ready configuration</p>
+                    </div>
+                  </div>
+                  <div className={`space-y-3 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                    <p className={`text-sm ${textPrimary} font-medium`}>Config Export Includes:</p>
+                    <ul className={`text-sm ${textSecondary} space-y-2`}>
+                      <li className="flex items-start gap-2">
+                        <Database className="h-4 w-4 text-[#4caf50] flex-shrink-0 mt-0.5" />
+                        <span>FIX session parameters (SenderCompID, TargetCompID)</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Database className="h-4 w-4 text-[#4caf50] flex-shrink-0 mt-0.5" />
+                        <span>Message routing and transformation rules</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Database className="h-4 w-4 text-[#4caf50] flex-shrink-0 mt-0.5" />
+                        <span>Custom field mappings and validations</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Database className="h-4 w-4 text-[#4caf50] flex-shrink-0 mt-0.5" />
+                        <span>Connection settings and failover config</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                  <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} px-4 py-2 border-b ${borderColor} flex items-center justify-between`}>
+                    <div className="flex items-center gap-2">
+                      <Server className="h-4 w-4 text-[#4caf50]" />
+                      <span className={`text-sm font-medium ${textPrimary}`}>Production Config Package</span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">Ready</span>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    <div className={`p-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-white"}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-xs font-medium ${textPrimary}`}>Session Config</span>
+                        <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                      </div>
+                      <div className={`font-mono text-[10px] ${textSecondary} space-y-0.5`}>
+                        <div>SenderCompID: APEX_PROD</div>
+                        <div>TargetCompID: BRDG_GW01</div>
+                        <div>HeartBtInt: 30</div>
+                      </div>
+                    </div>
+                    <div className={`p-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-white"}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-xs font-medium ${textPrimary}`}>Network Settings</span>
+                        <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                      </div>
+                      <div className={`font-mono text-[10px] ${textSecondary} space-y-0.5`}>
+                        <div>Primary: fix-gw01.brdg.com:9876</div>
+                        <div>Failover: fix-gw02.brdg.com:9876</div>
+                        <div>SSL: TLS 1.3 Required</div>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" className="flex-1 text-xs">
+                        <Eye className="h-3 w-3 mr-1" /> Preview
+                      </Button>
+                      <Button size="sm" className="flex-1 text-xs bg-[#4caf50] hover:bg-[#4caf50]/80">
+                        <Download className="h-3 w-3 mr-1" /> Export Config
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 8: Certification */}
+            {walkthroughStep === 8 && (
               <div className="grid grid-cols-2 gap-8">
                 <div>
                   <div className="flex items-center gap-3 mb-4">
@@ -1913,7 +2004,7 @@ export default function BCometPlatform() {
                       <Award className="h-6 w-6 text-[#00e5ff]" />
                     </div>
                     <div>
-                      <h4 className={`font-bold text-xl ${textPrimary}`}>8. Certification & Go-Live</h4>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>9. Certification & Go-Live</h4>
                       <p className={`text-sm ${textSecondary}`}>Final approval and production deployment</p>
                     </div>
                   </div>
@@ -1972,7 +2063,7 @@ export default function BCometPlatform() {
                 <ChevronLeft className="h-4 w-4 mr-1" /> Previous
               </Button>
               <div className="flex gap-1">
-                {[0,1,2,3,4,5,6,7].map(i => (
+                {[0,1,2,3,4,5,6,7,8].map(i => (
                   <button 
                     key={i}
                     onClick={() => setWalkthroughStep(i)}
@@ -1980,7 +2071,7 @@ export default function BCometPlatform() {
                   />
                 ))}
               </div>
-              {walkthroughStep < 7 ? (
+              {walkthroughStep < 8 ? (
                 <Button 
                   onClick={() => setWalkthroughStep(walkthroughStep + 1)}
                   className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80"
@@ -1999,6 +2090,22 @@ export default function BCometPlatform() {
           </div>
         </div>
       )}
+    </div>
+  </section>
+
+  {/* Platform Capabilities Section */}
+  <section className="py-20">
+    <div className="max-w-7xl mx-auto px-6">
+      <h2 className={`text-3xl font-bold text-center mb-12 ${textPrimary}`}>Platform Capabilities</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {features.map((feature, i) => (
+          <Card key={i} className={`${bgCard} p-6 border ${borderColor} hover:border-[#00e5ff]/50 transition-colors`}>
+            <feature.icon className="h-10 w-10 mb-4 text-[#00e5ff]" />
+            <h3 className={`text-lg font-bold mb-2 ${textPrimary}`}>{feature.title}</h3>
+            <p className={`text-sm ${textSecondary}`}>{feature.desc}</p>
+          </Card>
+        ))}
+      </div>
     </div>
   </section>
 
@@ -3101,6 +3208,244 @@ export default function BCometPlatform() {
     )
   }
 
+  // Case Workflow - Work through onboarding case stages
+  if (currentScreen === "case-workflow" && selectedCase && selectedClient) {
+    const caseStages = [
+      { num: 1, name: "Client Setup", icon: Building2, description: "Client registration & spec upload" },
+      { num: 2, name: "Spec Compare", icon: GitCompare, description: "AI spec analysis & gap identification" },
+      { num: 3, name: "Log Analysis", icon: FileSearch, description: "Parse FIX logs & detect patterns" },
+      { num: 4, name: "ATDL Config", icon: Sliders, description: "Algo trading parameters" },
+      { num: 5, name: "Test Suite", icon: TestTube, description: "Generate regression tests" },
+      { num: 6, name: "Scenario Gen", icon: Sparkles, description: "AI scenario generation" },
+      { num: 7, name: "Evidence", icon: FolderArchive, description: "Collect audit artifacts" },
+      { num: 8, name: "Prod Config", icon: Server, description: "Production config export" },
+      { num: 9, name: "Certification", icon: Award, description: "Final approval & go-live" },
+    ]
+    
+    const currentStageData = caseStages[selectedCase.currentStage - 1]
+    
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button 
+              onClick={() => setCurrentScreen("client-detail")} 
+              className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}
+            >
+              <ArrowLeft className="h-4 w-4" /> Back to {selectedClient.name}
+            </button>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-3">
+                  <h1 className={`text-2xl font-bold ${textPrimary}`}>{selectedCase.name}</h1>
+                  <span className={`px-2.5 py-1 rounded text-sm ${
+                    selectedCase.status === "completed" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                    selectedCase.status === "blocked" ? "bg-[#f44336]/20 text-[#f44336]" :
+                    selectedCase.status === "in-progress" ? "bg-[#2196f3]/20 text-[#2196f3]" :
+                    isDarkMode ? "bg-[#1e4976] text-[#8b9dc3]" : "bg-gray-100 text-gray-500"
+                  }`}>
+                    {selectedCase.status === "in-progress" ? "In Progress" : selectedCase.status === "not-started" ? "Not Started" : selectedCase.status.charAt(0).toUpperCase() + selectedCase.status.slice(1)}
+                  </span>
+                </div>
+                <p className={`${textSecondary} text-sm mt-1`}>
+                  <span className="font-mono">{selectedCase.id}</span> | {selectedClient.name} | Assignee: {selectedCase.assignee} | Due: {selectedCase.dueDate}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button size="sm" variant="outline">
+                  <History className="h-4 w-4 mr-1" /> History
+                </Button>
+                <Button size="sm" className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
+                  <Play className="h-4 w-4 mr-1" /> Continue Work
+                </Button>
+              </div>
+            </div>
+          </header>
+          
+          <div className="p-6">
+            {/* Stage Progress */}
+            <Card className={`${bgCard} border ${borderColor} mb-6 p-6`}>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className={`text-lg font-bold ${textPrimary}`}>Workflow Progress</h2>
+                <div className={`text-sm ${textSecondary}`}>
+                  Stage {selectedCase.currentStage} of {selectedCase.totalStages} - <span className="text-[#00e5ff] font-medium">{currentStageData?.name}</span>
+                </div>
+              </div>
+              
+              {/* Progress Steps */}
+              <div className="relative">
+                {/* Progress line */}
+                <div className={`absolute top-6 left-0 right-0 h-1 ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"}`}>
+                  <div 
+                    className="h-full bg-gradient-to-r from-[#00e5ff] to-[#4caf50] transition-all duration-500"
+                    style={{ width: `${((selectedCase.currentStage - 1) / (caseStages.length - 1)) * 100}%` }}
+                  />
+                </div>
+                
+                <div className="flex justify-between relative z-10">
+                  {caseStages.map((stage) => {
+                    const isCompleted = stage.num < selectedCase.currentStage
+                    const isCurrent = stage.num === selectedCase.currentStage
+                    const StageIcon = stage.icon
+                    
+                    return (
+                      <button 
+                        key={stage.num}
+                        onClick={() => {
+                          if (isCompleted || isCurrent) {
+                            // Navigate to the appropriate tool/screen for this stage
+                            if (stage.num === 2) setCurrentScreen("spec-compare")
+                            else if (stage.num === 3) setCurrentScreen("log-analysis")
+                            else if (stage.num === 4) setCurrentScreen("atdl-viewer")
+                            else if (stage.num === 5) setCurrentScreen("test-generation")
+                            else if (stage.num === 6) setCurrentScreen("scenario-generator")
+                            else if (stage.num === 7) setCurrentScreen("evidence-vault")
+                            else if (stage.num === 8) setCurrentScreen("prod-config")
+                            else if (stage.num === 9) setCurrentScreen("certification")
+                          }
+                        }}
+                        className="flex flex-col items-center group"
+                        disabled={!isCompleted && !isCurrent}
+                      >
+                        <div 
+                          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
+                            isCompleted ? "bg-[#4caf50] text-white cursor-pointer hover:ring-2 hover:ring-[#4caf50]/50" :
+                            isCurrent ? "bg-[#00e5ff] text-[#0a1628] ring-4 ring-[#00e5ff]/30 cursor-pointer" :
+                            isDarkMode ? "bg-[#1e4976]/50 text-[#8b9dc3]" : "bg-gray-200 text-gray-500"
+                          }`}
+                        >
+                          {isCompleted ? <CheckCircle className="h-5 w-5" /> : <StageIcon className="h-5 w-5" />}
+                        </div>
+                        <span className={`text-[10px] font-medium mt-2 text-center max-w-[60px] ${
+                          isCurrent ? "text-[#00e5ff]" : isCompleted ? "text-[#4caf50]" : textSecondary
+                        }`}>
+                          {stage.name}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            </Card>
+            
+            {/* Current Stage Actions */}
+            <div className="grid grid-cols-3 gap-6">
+              <div className="col-span-2">
+                <Card className={`${bgCard} border ${borderColor} p-6`}>
+                  <div className="flex items-center gap-3 mb-4">
+                    {currentStageData && <currentStageData.icon className="h-6 w-6 text-[#00e5ff]" />}
+                    <div>
+                      <h3 className={`font-bold ${textPrimary}`}>Current Stage: {currentStageData?.name}</h3>
+                      <p className={`text-sm ${textSecondary}`}>{currentStageData?.description}</p>
+                    </div>
+                  </div>
+                  
+                  <div className={`p-4 rounded-lg mb-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                    <h4 className={`text-sm font-medium ${textPrimary} mb-3`}>Actions Required:</h4>
+                    <div className="space-y-2">
+                      {selectedCase.currentStage === 1 && (
+                        <>
+                          <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#4caf50]" /><span className={`text-sm ${textSecondary}`}>Client registered</span></div>
+                          <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#4caf50]" /><span className={`text-sm ${textSecondary}`}>JIRA ticket linked</span></div>
+                          <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-[#ff9800]" /><span className={`text-sm ${textSecondary}`}>Upload client FIX specification</span></div>
+                        </>
+                      )}
+                      {selectedCase.currentStage === 2 && (
+                        <>
+                          <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#4caf50]" /><span className={`text-sm ${textSecondary}`}>Client spec uploaded</span></div>
+                          <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-[#ff9800]" /><span className={`text-sm ${textSecondary}`}>Run AI spec comparison</span></div>
+                          <div className="flex items-center gap-2"><AlertCircle className="h-4 w-4 text-[#8b9dc3]" /><span className={`text-sm ${textSecondary}`}>Review gaps and customizations</span></div>
+                        </>
+                      )}
+                      {selectedCase.currentStage >= 3 && (
+                        <>
+                          <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-[#4caf50]" /><span className={`text-sm ${textSecondary}`}>Previous stages completed</span></div>
+                          <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-[#ff9800]" /><span className={`text-sm ${textSecondary}`}>Complete current stage tasks</span></div>
+                          <div className="flex items-center gap-2"><AlertCircle className="h-4 w-4 text-[#8b9dc3]" /><span className={`text-sm ${textSecondary}`}>Collect evidence for audit trail</span></div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-3">
+                    <Button 
+                      className="flex-1 bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80"
+                      onClick={() => {
+                        // Navigate to appropriate tool
+                        if (selectedCase.currentStage === 2) setCurrentScreen("spec-compare")
+                        else if (selectedCase.currentStage === 3) setCurrentScreen("log-analysis")
+                        else if (selectedCase.currentStage === 4) setCurrentScreen("atdl-viewer")
+                        else if (selectedCase.currentStage === 5) setCurrentScreen("test-generation")
+                        else if (selectedCase.currentStage === 6) setCurrentScreen("scenario-generator")
+                        else if (selectedCase.currentStage === 7) setCurrentScreen("evidence-vault")
+                        else if (selectedCase.currentStage === 8) setCurrentScreen("prod-config")
+                        else if (selectedCase.currentStage === 9) setCurrentScreen("certification")
+                      }}
+                    >
+                      <Play className="h-4 w-4 mr-2" /> Start {currentStageData?.name}
+                    </Button>
+                    <Button variant="outline" className="flex-1">
+                      <Eye className="h-4 w-4 mr-2" /> View Details
+                    </Button>
+                  </div>
+                </Card>
+              </div>
+              
+              <div>
+                <Card className={`${bgCard} border ${borderColor} p-4 mb-4`}>
+                  <h4 className={`text-sm font-bold ${textPrimary} mb-3`}>Case Summary</h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className={`text-xs ${textSecondary}`}>Progress</span>
+                      <span className={`text-xs font-medium ${textPrimary}`}>{selectedCase.progress}%</span>
+                    </div>
+                    <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"} overflow-hidden`}>
+                      <div 
+                        className="h-full rounded-full bg-gradient-to-r from-[#00e5ff] to-[#4caf50]"
+                        style={{ width: `${selectedCase.progress}%` }}
+                      />
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={`text-xs ${textSecondary}`}>Asset Class</span>
+                      <span className={`text-xs font-medium ${textPrimary}`}>{selectedCase.assetClass}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={`text-xs ${textSecondary}`}>Due Date</span>
+                      <span className={`text-xs font-medium ${textPrimary}`}>{selectedCase.dueDate}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className={`text-xs ${textSecondary}`}>Assignee</span>
+                      <span className={`text-xs font-medium ${textPrimary}`}>{selectedCase.assignee}</span>
+                    </div>
+                  </div>
+                </Card>
+                
+                <Card className={`${bgCard} border ${borderColor} p-4`}>
+                  <h4 className={`text-sm font-bold ${textPrimary} mb-3`}>Quick Actions</h4>
+                  <div className="space-y-2">
+                    <Button variant="outline" size="sm" className="w-full justify-start">
+                      <Upload className="h-4 w-4 mr-2" /> Upload Document
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start">
+                      <MessageSquare className="h-4 w-4 mr-2" /> Add Note
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start">
+                      <Users className="h-4 w-4 mr-2" /> Reassign
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start text-[#f44336] hover:bg-[#f44336]/10">
+                      <AlertOctagon className="h-4 w-4 mr-2" /> Flag Issue
+                    </Button>
+                  </div>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // Client Detail - Show Asset Classes
   if (currentScreen === "client-detail" && selectedClient) {
     // Client progress data with multiple FIX versions per asset class
@@ -3149,6 +3494,111 @@ const clientProgressData = [
           </header>
 
           <div className="p-6">
+            {/* Onboarding Cases Section */}
+            <Card className={`${bgCard} border ${borderColor} mb-6`}>
+              <div className={`${bgSecondary} px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                <div className="flex items-center gap-2">
+                  <Briefcase className="h-5 w-5 text-[#00e5ff]" />
+                  <h2 className={`text-lg font-bold ${textPrimary}`}>Onboarding Cases</h2>
+                  <span className={`px-2 py-0.5 rounded-full text-xs ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>
+                    {selectedClient.onboardingCases?.length || 0} active
+                  </span>
+                </div>
+                <Button size="sm" className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
+                  <Plus className="h-4 w-4 mr-1" /> New Case
+                </Button>
+              </div>
+              <div className="p-4">
+                {selectedClient.onboardingCases && selectedClient.onboardingCases.length > 0 ? (
+                  <div className="space-y-3">
+                    {selectedClient.onboardingCases.map((caseItem: any) => {
+                      const stageNames = ["Setup", "Spec Compare", "Log Analysis", "ATDL", "Testing", "Scenarios", "Evidence", "Prod Config", "Certification"]
+                      const currentStageName = stageNames[caseItem.currentStage - 1] || "Setup"
+                      return (
+                        <div 
+                          key={caseItem.id}
+                          onClick={() => {
+                            setSelectedCase(caseItem)
+                            setCurrentScreen("case-workflow")
+                          }}
+                          className={`p-4 rounded-lg border ${borderColor} cursor-pointer transition-all hover:border-[#00e5ff]/50 hover:shadow-md ${isDarkMode ? "hover:bg-[#1e4976]/20" : "hover:bg-gray-50"}`}
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                                caseItem.status === "completed" ? "bg-[#4caf50]/20" :
+                                caseItem.status === "blocked" ? "bg-[#f44336]/20" :
+                                caseItem.status === "in-progress" ? "bg-[#00e5ff]/20" :
+                                isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"
+                              }`}>
+                                {caseItem.assetClass === "Equities" && <TrendingUp className={`h-5 w-5 ${caseItem.status === "completed" ? "text-[#4caf50]" : caseItem.status === "blocked" ? "text-[#f44336]" : "text-[#00e5ff]"}`} />}
+                                {caseItem.assetClass === "Options" && <Activity className={`h-5 w-5 ${caseItem.status === "completed" ? "text-[#4caf50]" : caseItem.status === "blocked" ? "text-[#f44336]" : "text-[#ff9800]"}`} />}
+                                {caseItem.assetClass === "Fixed Income" && <Scale className={`h-5 w-5 ${caseItem.status === "completed" ? "text-[#4caf50]" : caseItem.status === "blocked" ? "text-[#f44336]" : "text-[#2196f3]"}`} />}
+                                {caseItem.assetClass === "Futures" && <BarChart3 className={`h-5 w-5 ${caseItem.status === "completed" ? "text-[#4caf50]" : caseItem.status === "blocked" ? "text-[#f44336]" : "text-[#9c27b0]"}`} />}
+                                {caseItem.assetClass === "FX" && <Globe className={`h-5 w-5 ${caseItem.status === "completed" ? "text-[#4caf50]" : caseItem.status === "blocked" ? "text-[#f44336]" : "text-[#4caf50]"}`} />}
+                                {caseItem.assetClass === "Commodities" && <Database className={`h-5 w-5 ${caseItem.status === "completed" ? "text-[#4caf50]" : caseItem.status === "blocked" ? "text-[#f44336]" : "text-[#ff9800]"}`} />}
+                                {caseItem.assetClass === "Algo" && <Sliders className={`h-5 w-5 ${caseItem.status === "completed" ? "text-[#4caf50]" : caseItem.status === "blocked" ? "text-[#f44336]" : "text-[#00e5ff]"}`} />}
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className={`font-medium ${textPrimary}`}>{caseItem.name}</span>
+                                  <span className={`px-2 py-0.5 rounded text-xs ${
+                                    caseItem.status === "completed" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                                    caseItem.status === "blocked" ? "bg-[#f44336]/20 text-[#f44336]" :
+                                    caseItem.status === "in-progress" ? "bg-[#2196f3]/20 text-[#2196f3]" :
+                                    isDarkMode ? "bg-[#1e4976] text-[#8b9dc3]" : "bg-gray-100 text-gray-500"
+                                  }`}>
+                                    {caseItem.status === "in-progress" ? "In Progress" : caseItem.status === "not-started" ? "Not Started" : caseItem.status.charAt(0).toUpperCase() + caseItem.status.slice(1)}
+                                  </span>
+                                </div>
+                                <div className={`text-xs ${textSecondary} flex items-center gap-3 mt-1`}>
+                                  <span className="font-mono">{caseItem.id}</span>
+                                  <span>|</span>
+                                  <span>Assignee: {caseItem.assignee}</span>
+                                  <span>|</span>
+                                  <span>Due: {caseItem.dueDate}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <ChevronRight className={`h-5 w-5 ${textSecondary}`} />
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className={`text-xs ${textSecondary}`}>Stage {caseItem.currentStage} of {caseItem.totalStages}: {currentStageName}</span>
+                                <span className={`text-xs font-medium ${caseItem.progress >= 80 ? "text-[#4caf50]" : caseItem.progress >= 50 ? "text-[#ff9800]" : "text-[#00e5ff]"}`}>
+                                  {caseItem.progress}%
+                                </span>
+                              </div>
+                              <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"} overflow-hidden`}>
+                                <div 
+                                  className={`h-full rounded-full transition-all ${
+                                    caseItem.status === "blocked" ? "bg-[#f44336]" :
+                                    caseItem.progress >= 80 ? "bg-[#4caf50]" : 
+                                    caseItem.progress >= 50 ? "bg-[#ff9800]" : 
+                                    "bg-[#00e5ff]"
+                                  }`}
+                                  style={{ width: `${caseItem.progress}%` }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <div className={`text-center py-8 ${textSecondary}`}>
+                    <Briefcase className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>No onboarding cases yet</p>
+                    <Button size="sm" className="mt-3 bg-[#00e5ff] text-[#0a1628]">
+                      <Plus className="h-4 w-4 mr-1" /> Create First Case
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </Card>
+
             {/* Progress Stepper */}
             {(() => {
               const stages = [
@@ -11965,6 +12415,162 @@ const copyToClipboard = () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Production Config Export Screen
+  if (currentScreen === "prod-config") {
+    const configSections = [
+      { id: "session", name: "FIX Session", icon: Wifi, status: "ready", items: 12 },
+      { id: "routing", name: "Message Routing", icon: Navigation, status: "ready", items: 8 },
+      { id: "fields", name: "Field Mappings", icon: Layers, status: "review", items: 45 },
+      { id: "validation", name: "Validation Rules", icon: ShieldCheck, status: "ready", items: 23 },
+      { id: "network", name: "Network Config", icon: Server, status: "ready", items: 6 },
+    ]
+    
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button 
+              onClick={() => selectedCase ? setCurrentScreen("case-workflow") : setCurrentScreen("dashboard")} 
+              className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}
+            >
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>Production Config Export</h1>
+                <p className={textSecondary}>Generate deployment-ready configuration packages</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm">
+                  <Eye className="h-4 w-4 mr-1" /> Preview All
+                </Button>
+                <Button size="sm" className="bg-[#4caf50] hover:bg-[#4caf50]/80">
+                  <Download className="h-4 w-4 mr-1" /> Export Package
+                </Button>
+              </div>
+            </div>
+          </header>
+          
+          <div className="p-6">
+            {/* Client Context */}
+            {selectedClient && (
+              <Card className={`${bgCard} border ${borderColor} mb-6 p-4`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"}`}>
+                      <Building2 className="h-6 w-6 text-[#00e5ff]" />
+                    </div>
+                    <div>
+                      <h3 className={`font-bold ${textPrimary}`}>{selectedClient.name}</h3>
+                      <p className={`text-sm ${textSecondary}`}>
+                        {selectedCase ? `${selectedCase.name} - ${selectedCase.assetClass}` : "All Asset Classes"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-center">
+                      <div className={`text-2xl font-bold ${textPrimary}`}>94</div>
+                      <div className={`text-xs ${textSecondary}`}>Config Items</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-[#4caf50]">Ready</div>
+                      <div className={`text-xs ${textSecondary}`}>Export Status</div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            )}
+            
+            {/* Config Sections Grid */}
+            <div className="grid grid-cols-2 gap-6 mb-6">
+              {configSections.map((section) => (
+                <Card key={section.id} className={`${bgCard} border ${borderColor} p-4`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"}`}>
+                        <section.icon className="h-5 w-5 text-[#00e5ff]" />
+                      </div>
+                      <div>
+                        <h3 className={`font-medium ${textPrimary}`}>{section.name}</h3>
+                        <p className={`text-xs ${textSecondary}`}>{section.items} parameters</p>
+                      </div>
+                    </div>
+                    <span className={`px-2 py-1 rounded text-xs ${
+                      section.status === "ready" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                      section.status === "review" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                      "bg-[#f44336]/20 text-[#f44336]"
+                    }`}>
+                      {section.status === "ready" ? "Ready" : section.status === "review" ? "Needs Review" : "Issues"}
+                    </span>
+                  </div>
+                  <Button variant="outline" size="sm" className="w-full">
+                    <Eye className="h-4 w-4 mr-1" /> View Config
+                  </Button>
+                </Card>
+              ))}
+            </div>
+            
+            {/* Session Config Preview */}
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className={`font-bold ${textPrimary}`}>FIX Session Configuration Preview</h3>
+                <Button variant="outline" size="sm">
+                  <Copy className="h-4 w-4 mr-1" /> Copy
+                </Button>
+              </div>
+              <div className={`font-mono text-sm p-4 rounded-lg overflow-auto ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-900"}`}>
+                <pre className="text-green-400">
+{`# FIX Session Configuration
+# Generated: ${new Date().toISOString().split('T')[0]}
+# Client: ${selectedClient?.name || "Apex Trading LLC"}
+
+[SESSION]
+BeginString=FIX.4.4
+SenderCompID=${selectedClient?.name?.replace(/\s+/g, '_').toUpperCase() || "APEX"}_PROD
+TargetCompID=BRDG_GW01
+HeartBtInt=30
+ReconnectInterval=5
+FileStorePath=./store
+FileLogPath=./logs
+
+[SSL]
+SSLEnable=Y
+SSLProtocols=TLSv1.3
+SSLValidateCert=Y
+SSLCertFile=/certs/client.pem
+SSLKeyFile=/certs/client.key
+
+[NETWORK]
+SocketConnectHost=fix-gw01.broadridge.com
+SocketConnectPort=9876
+SocketConnectHostBackup=fix-gw02.broadridge.com
+SocketConnectPortBackup=9876
+
+[VALIDATION]
+ValidateUserDefinedFields=Y
+ValidateFieldsOutOfOrder=N
+ValidateFieldsHaveValues=Y`}
+                </pre>
+              </div>
+              <div className="flex justify-end gap-2 mt-4">
+                <Button variant="outline">
+                  <FileText className="h-4 w-4 mr-1" /> Export INI
+                </Button>
+                <Button variant="outline">
+                  <Code className="h-4 w-4 mr-1" /> Export XML
+                </Button>
+                <Button className="bg-[#4caf50] hover:bg-[#4caf50]/80">
+                  <Download className="h-4 w-4 mr-1" /> Download All
+                </Button>
               </div>
             </Card>
           </div>
