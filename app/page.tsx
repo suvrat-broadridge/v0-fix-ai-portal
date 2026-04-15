@@ -5957,6 +5957,50 @@ const specCompareResults = [
     {
       0: (
         <div className="space-y-5">
+          {/* Workflow selection - 3 clickable tabs */}
+          <div>
+            <label className={`block text-sm font-medium mb-3 ${textPrimary}`}>Select Workflow</label>
+            <div className="grid grid-cols-3 gap-3">
+              {([
+                { id: "conversion",       icon: RefreshCw,      label: "FIX to ATDL",           sub: "Convert & Create",          color: "#00e5ff" },
+                { id: "version-upgrade",  icon: GitCompare,     label: "Version Upgrade",         sub: "Compare & Validate",        color: "#9c27b0" },
+                { id: "remediation",      icon: Wrench,         label: "Validate & Remediate",    sub: "Fix Existing ATDL",         color: "#ff9800" },
+              ] as const).map((opt) => {
+                const Icon = opt.icon
+                const isSelected = atdlWorkflowType === opt.id
+                return (
+                  <button
+                    key={opt.id}
+                    onClick={() => setAtdlWorkflowType(opt.id as any)}
+                    className={`relative flex flex-col items-start gap-2 p-4 rounded-lg border-2 text-left transition-all ${
+                      isSelected
+                        ? "border-current"
+                        : `${borderColor} hover:border-current/50 ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`
+                    }`}
+                    style={{
+                      borderColor: isSelected ? opt.color : undefined,
+                      backgroundColor: isSelected ? `${opt.color}10` : undefined,
+                    }}
+                  >
+                    {/* Selected indicator */}
+                    {isSelected && (
+                      <span className="absolute top-3 right-3 flex h-5 w-5 items-center justify-center rounded-full" style={{ backgroundColor: opt.color }}>
+                        <CheckCircle className="h-3 w-3 text-[#0a1628]" />
+                      </span>
+                    )}
+                    <div className="p-2 rounded-md" style={{ backgroundColor: `${opt.color}20` }}>
+                      <Icon className="h-4 w-4" style={{ color: opt.color }} />
+                    </div>
+                    <div>
+                      <p className={`text-sm font-semibold ${textPrimary}`}>{opt.label}</p>
+                      <p className="text-xs" style={{ color: opt.color }}>{opt.sub}</p>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-5">
             <div>
               <label className={`block text-sm font-medium mb-1.5 ${textPrimary}`}>Client</label>
@@ -5977,15 +6021,6 @@ const specCompareResults = [
               <label className={`block text-sm font-medium mb-1.5 ${textPrimary}`}>FIX Version</label>
               <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"}`}>
                 <option>FIX 4.2</option><option>FIX 4.4</option><option>FIX 5.0</option><option>FIX 5.0 SP2</option>
-              </select>
-            </div>
-            <div>
-              <label className={`block text-sm font-medium mb-1.5 ${textPrimary}`}>Objective</label>
-              <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"}`}>
-                <option>Validate Existing ATDL</option>
-                <option>Compare FIX to ATDL</option>
-                <option>Convert FIX to ATDL</option>
-                <option>Full Certification</option>
               </select>
             </div>
           </div>
