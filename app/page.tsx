@@ -4931,7 +4931,7 @@ const specCompareResults = [
                 </div>
               </div>
               <Button
-                onClick={() => setCurrentScreen("atdl-flow-select" as any)}
+                onClick={() => setCurrentScreen("atdl-guided-choices" as any)}
                 className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80"
               >
                 <Plus className="h-4 w-4 mr-2" /> New Work Order
@@ -5112,14 +5112,14 @@ const specCompareResults = [
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Sparkles className="h-8 w-8 text-[#ff9800]" />
+                <Layers className="h-8 w-8 text-[#00e5ff]" />
                 <div>
-                  <h1 className={`text-2xl font-bold ${textPrimary}`}>ATDL Guided Workflow</h1>
-                  <p className={`text-sm ${textSecondary}`}>Let us help you choose the right workflow</p>
+                  <h1 className={`text-2xl font-bold ${textPrimary}`}>ATDL Workflow</h1>
+                  <p className={`text-sm ${textSecondary}`}>Select your workflow to get started</p>
                 </div>
               </div>
-              <Button variant="outline" onClick={() => setCurrentScreen("atdl-flow-select" as any)}>
-                <ArrowLeft className="h-4 w-4 mr-2" /> Back
+              <Button variant="outline" onClick={() => setCurrentScreen("atdl-workbench" as any)}>
+                <ArrowLeft className="h-4 w-4 mr-2" /> Back to Workbench
               </Button>
             </div>
           </header>
