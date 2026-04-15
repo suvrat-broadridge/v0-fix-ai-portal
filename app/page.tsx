@@ -2,7 +2,7 @@
 
 // B- COMET Platform - FIX Protocol Testing Suite v2
 import React, { useState, useEffect } from "react"
-import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, ChevronUp, ChevronsUpDown, FileText, Activity, Zap, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, Stamp, Code, ScrollText, Navigation, Sparkles, Minus, Loader, FolderArchive, Sliders, Bot } from "lucide-react"
+import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, ChevronUp, ChevronsUpDown, FileText, Activity, Zap, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, Stamp, Code, ScrollText, Navigation, Sparkles, Minus, Loader, FolderArchive, Sliders, Bot, ExternalLink, GitMerge } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -2466,44 +2466,31 @@ export default function BCometPlatform() {
               />
             </div>
             
-            {/* Admin Role Toggle - Manager vs IC */}
+            {/* Admin Manager Toggle */}
             {selectedRole === "admin" && (
-              <div className={`p-4 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
-                <p className={`text-sm font-medium mb-3 ${textPrimary}`}>Login as:</p>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsManager(true)}
-                    className={`flex-1 p-3 rounded-lg border-2 transition-all ${
-                      isManager 
-                        ? "border-[#9c27b0] bg-[#9c27b0]/10" 
-                        : `border-transparent ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"} hover:border-[#9c27b0]/30`
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 justify-center">
-                      <Shield className={`h-5 w-5 ${isManager ? "text-[#9c27b0]" : textSecondary}`} />
-                      <span className={`font-medium ${isManager ? "text-[#9c27b0]" : textSecondary}`}>Manager</span>
-                    </div>
-                    <p className={`text-xs mt-1 ${textSecondary}`}>All clients & approvals</p>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsManager(false)}
-                    className={`flex-1 p-3 rounded-lg border-2 transition-all ${
-                      !isManager 
-                        ? "border-[#00e5ff] bg-[#00e5ff]/10" 
-                        : `border-transparent ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"} hover:border-[#00e5ff]/30`
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 justify-center">
-                      <Users className={`h-5 w-5 ${!isManager ? "text-[#00e5ff]" : textSecondary}`} />
-                      <span className={`font-medium ${!isManager ? "text-[#00e5ff]" : textSecondary}`}>IC</span>
-                    </div>
-                    <p className={`text-xs mt-1 ${textSecondary}`}>My assigned clients</p>
-                  </button>
+              <button
+                type="button"
+                onClick={() => setIsManager(prev => !prev)}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg border-2 transition-all ${
+                  isManager
+                    ? "border-[#9c27b0] bg-[#9c27b0]/10"
+                    : `${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} hover:border-[#9c27b0]/40`
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${isManager ? "bg-[#9c27b0]/20" : isDarkMode ? "bg-[#1e4976]/40" : "bg-gray-200"}`}>
+                    <Shield className={`h-5 w-5 ${isManager ? "text-[#9c27b0]" : textSecondary}`} />
+                  </div>
+                  <div className="text-left">
+                    <p className={`text-sm font-medium ${isManager ? "text-[#9c27b0]" : textPrimary}`}>Login as Manager</p>
+                    <p className={`text-xs ${textSecondary}`}>Access approvals, all clients & team view</p>
+                  </div>
                 </div>
-
-              </div>
+                {/* Toggle pill */}
+                <div className={`w-11 h-6 rounded-full transition-colors flex items-center px-0.5 ${isManager ? "bg-[#9c27b0]" : isDarkMode ? "bg-[#1e4976]" : "bg-gray-300"}`}>
+                  <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${isManager ? "translate-x-5" : "translate-x-0"}`} />
+                </div>
+              </button>
             )}
             
             <Button className="w-full bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80" onClick={handleLogin}>Sign In</Button>
@@ -3153,11 +3140,20 @@ export default function BCometPlatform() {
                         const riskScore = getTotalAlerts(client) > 2 ? "High" : getTotalAlerts(client) > 0 ? "Medium" : "Low"
                         const slaStatus = idx === 0 ? "At Risk" : idx === 2 ? "Breached" : "On Track"
                         const nextActions = ["Review spec differences", "Complete log analysis", "Run test suite", "Sign certification pack", "Schedule go-live"]
+                        const caseId = `OB-2024-00${client.id}`
                         return (
-                          <tr key={client.id} className={`border-t ${borderColor} cursor-pointer hover:bg-[#1e4976]/10 group`} onClick={() => { setSelectedClient(client); setCurrentScreen("client-detail"); }}>
-                            <td className={`px-4 py-3 ${textPrimary}`}>
-                              <div className="font-medium group-hover:text-[#00e5ff]">{client.name}</div>
-                              <div className={`text-xs ${textSecondary}`}>CASE-{1000 + client.id}</div>
+                          <tr key={client.id} className={`border-t ${borderColor} hover:bg-[#1e4976]/10 group`}>
+                            <td className="px-4 py-3">
+                              <button
+                                className="text-left group/case"
+                                onClick={() => { setSelectedClient(client); setCurrentScreen("client-detail"); }}
+                              >
+                                <div className={`font-mono text-sm font-semibold text-[#00e5ff] group-hover/case:underline flex items-center gap-1`}>
+                                  {caseId}
+                                  <ExternalLink className="h-3 w-3 opacity-0 group-hover/case:opacity-100 transition-opacity" />
+                                </div>
+                                <div className={`text-sm ${textPrimary} mt-0.5`}>{client.name}</div>
+                              </button>
                             </td>
                             <td className={`px-4 py-3 ${textSecondary}`}>
                               <div className="flex flex-wrap gap-1">
@@ -3205,6 +3201,54 @@ export default function BCometPlatform() {
                   </table>
                 </div>
               </Card>
+              {/* Manager-only: Approvals Waiting Panel */}
+              {isManager && (
+                <Card className={`${bgCard} border-2 border-[#ff9800]/30`}>
+                  <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                    <div className="flex items-center gap-2">
+                      <Scale className="h-4 w-4 text-[#ff9800]" />
+                      <h2 className={`font-semibold ${textPrimary}`}>Approvals Waiting on You</h2>
+                      <span className="px-2 py-0.5 rounded-full bg-[#ff9800]/20 text-[#ff9800] text-xs font-bold">{myPendingApprovals.length}</span>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => setCurrentScreen("approvals")}>View All Approvals</Button>
+                  </div>
+                  <div className="divide-y divide-[#1e4976]/30">
+                    {myPendingApprovals.length === 0 ? (
+                      <div className={`px-4 py-6 text-center ${textSecondary} text-sm`}>No approvals pending — you are all caught up.</div>
+                    ) : (
+                      myPendingApprovals.slice(0, 4).map((appr) => (
+                        <div
+                          key={appr.id}
+                          className="px-4 py-3 flex items-center justify-between hover:bg-[#1e4976]/10 cursor-pointer group"
+                          onClick={() => setCurrentScreen("approvals")}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${appr.status === "overdue" ? "bg-[#f44336]/20" : "bg-[#ff9800]/20"}`}>
+                              {appr.type === "Go-Live" ? <Rocket className={`h-4 w-4 ${appr.status === "overdue" ? "text-[#f44336]" : "text-[#ff9800]"}`} /> :
+                               appr.type === "Stage Gate" ? <GitMerge className={`h-4 w-4 ${appr.status === "overdue" ? "text-[#f44336]" : "text-[#ff9800]"}`} /> :
+                               <AlertCircle className={`h-4 w-4 ${appr.status === "overdue" ? "text-[#f44336]" : "text-[#ff9800]"}`} />}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className={`font-mono text-xs font-semibold text-[#00e5ff]`}>{appr.caseId}</span>
+                                <span className={`text-xs px-1.5 py-0.5 rounded ${appr.type === "Go-Live" ? "bg-[#4caf50]/20 text-[#4caf50]" : appr.type === "Stage Gate" ? "bg-[#2196f3]/20 text-[#2196f3]" : "bg-[#9c27b0]/20 text-[#9c27b0]"}`}>{appr.type}</span>
+                                {appr.status === "overdue" && <span className="text-xs px-1.5 py-0.5 rounded bg-[#f44336]/20 text-[#f44336]">Overdue</span>}
+                              </div>
+                              <p className={`text-sm ${textPrimary} mt-0.5`}>{appr.description}</p>
+                              <p className={`text-xs ${textSecondary}`}>{appr.client} · Due {appr.dueDate}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <button className="px-3 py-1.5 rounded-lg bg-[#4caf50]/20 text-[#4caf50] text-xs font-medium hover:bg-[#4caf50]/30 transition-colors">Approve</button>
+                            <button className="px-3 py-1.5 rounded-lg bg-[#f44336]/20 text-[#f44336] text-xs font-medium hover:bg-[#f44336]/30 transition-colors">Reject</button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </Card>
+              )}
+
               </>
               )}
             </div>
