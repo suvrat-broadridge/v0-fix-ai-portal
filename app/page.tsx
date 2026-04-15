@@ -2417,7 +2417,7 @@ export default function BCometPlatform() {
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() => setIsManager(true)}
+                    onClick={() => { console.log("[v0] Setting isManager to true"); setIsManager(true); }}
                     className={`flex-1 p-3 rounded-lg border-2 transition-all ${
                       isManager 
                         ? "border-[#9c27b0] bg-[#9c27b0]/10" 
@@ -2432,7 +2432,7 @@ export default function BCometPlatform() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setIsManager(false)}
+                    onClick={() => { console.log("[v0] Setting isManager to false"); setIsManager(false); }}
                     className={`flex-1 p-3 rounded-lg border-2 transition-all ${
                       !isManager 
                         ? "border-[#00e5ff] bg-[#00e5ff]/10" 
@@ -2446,6 +2446,7 @@ export default function BCometPlatform() {
                     <p className={`text-xs mt-1 ${textSecondary}`}>My assigned clients</p>
                   </button>
                 </div>
+                <p className={`text-xs mt-2 ${textSecondary}`}>Current selection: <span className="font-bold text-[#00e5ff]">{isManager ? "Manager" : "IC"}</span></p>
               </div>
             )}
             
