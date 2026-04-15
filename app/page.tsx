@@ -5556,8 +5556,44 @@ const specCompareResults = [
             </div>
           </div>
           <div>
-            <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Upload FIX Specification PDF</label>
-            <FileUploadZone fileKey="conversion-fix-spec" label="Drop FIX Specification PDF here" acceptTypes=".pdf" icon={FileText} />
+            <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Select Algo Spec</label>
+            <div className={`rounded-lg border ${borderColor} overflow-hidden`}>
+              {[
+                { asset: "Equities", protocol: "FIX 4.2", name: "EQ_FIX42_v1.2.xml" },
+                { asset: "Equities", protocol: "FIX 4.4", name: "EQ_FIX44_v2.1.xml" },
+                { asset: "Options",  protocol: "FIX 4.4", name: "OPT_FIX44_v2.0.xml" },
+                { asset: "Futures",  protocol: "FIX 4.4", name: "FUT_FIX44_v1.1.xml" },
+                { asset: "Futures",  protocol: "FIX 5.0 SP2", name: "FUT_FIX50SP2_v2.0.xml" },
+                { asset: "Fixed Income", protocol: "FIX 4.4", name: "FI_FIX44_v1.2.xml" },
+                { asset: "FX",       protocol: "FIX 5.0 SP2", name: "FX_FIX50SP2_v1.1.xml" },
+              ].map((spec, i) => {
+                const key = `${spec.asset}-${spec.protocol}`
+                const isSelected = (uploadedFiles["conversion-fix-spec"] as any)?.key === key
+                return (
+                  <button
+                    key={i}
+                    onClick={() => setUploadedFiles(prev => ({ ...prev, "conversion-fix-spec": { name: spec.name, size: 0, type: ".xml", status: "complete", key } as any }))}
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors border-b last:border-b-0 ${borderColor} ${
+                      isSelected
+                        ? isDarkMode ? "bg-[#00e5ff]/10 border-l-2 border-l-[#00e5ff]" : "bg-[#00e5ff]/5 border-l-2 border-l-[#00e5ff]"
+                        : isDarkMode ? "hover:bg-[#1e4976]/30" : "hover:bg-gray-50"
+                    }`}
+                  >
+                    <FileText className={`h-4 w-4 flex-shrink-0 ${isSelected ? "text-[#00e5ff]" : textSecondary}`} />
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-medium truncate ${textPrimary}`}>{spec.name}</p>
+                      <p className={`text-xs ${textSecondary}`}>{spec.asset} · {spec.protocol}</p>
+                    </div>
+                    {isSelected && <CheckCircle className="h-4 w-4 text-[#00e5ff] flex-shrink-0" />}
+                  </button>
+                )
+              })}
+            </div>
+            {(uploadedFiles["conversion-fix-spec"] as any)?.status === "complete" && (
+              <p className="text-xs text-[#4caf50] mt-1.5 flex items-center gap-1">
+                <CheckCircle className="h-3 w-3" /> Selected: {uploadedFiles["conversion-fix-spec"].name}
+              </p>
+            )}
           </div>
           <div>
             <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Target Strategies to Extract</label>
@@ -5742,32 +5778,98 @@ const specCompareResults = [
         <div className="space-y-5">
           {workflowTabSelector}
           <div className={`border-t ${borderColor}`} />
-          <p className={`text-sm ${textSecondary}`}>Upload the old and new versions of your FIX specification PDFs:</p>
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <p className={`text-xs font-medium ${textSecondary} mb-2 uppercase tracking-wider`}>Old Version</p>
-              <FileUploadZone fileKey="upgrade-old-fix" label="Old FIX Spec (v2.0)" acceptTypes=".pdf" icon={FileText} />
-            </div>
-            <div>
-              <p className={`text-xs font-medium ${textSecondary} mb-2 uppercase tracking-wider`}>New Version</p>
-              <FileUploadZone fileKey="upgrade-new-fix" label="New FIX Spec (v2.1)" acceptTypes=".pdf" icon={FileText} />
-            </div>
-          </div>
+          <p className={`text-sm ${textSecondary}`}>Select the old and new algo spec versions to compare:</p>
+          {(() => {
+            const specOptions = [
+              { asset: "Equities", protocol: "FIX 4.2", name: "EQ_FIX42_v1.2.xml" },
+              { asset: "Equities", protocol: "FIX 4.4", name: "EQ_FIX44_v2.1.xml" },
+              { asset: "Options",  protocol: "FIX 4.4", name: "OPT_FIX44_v2.0.xml" },
+              { asset: "Futures",  protocol: "FIX 4.4", name: "FUT_FIX44_v1.1.xml" },
+              { asset: "Futures",  protocol: "FIX 5.0 SP2", name: "FUT_FIX50SP2_v2.0.xml" },
+              { asset: "Fixed Income", protocol: "FIX 4.4", name: "FI_FIX44_v1.2.xml" },
+              { asset: "FX",       protocol: "FIX 5.0 SP2", name: "FX_FIX50SP2_v1.1.xml" },
+            ]
+            return (
+              <div className="grid grid-cols-2 gap-6">
+                {(["upgrade-old-fix", "upgrade-new-fix"] as const).map((fileKey, col) => (
+                  <div key={fileKey}>
+                    <p className={`text-xs font-medium ${textSecondary} mb-2 uppercase tracking-wider`}>{col === 0 ? "Old Version" : "New Version"}</p>
+                    <div className={`rounded-lg border ${borderColor} overflow-hidden`}>
+                      {specOptions.map((spec, i) => {
+                        const key = `${spec.asset}-${spec.protocol}`
+                        const isSelected = (uploadedFiles[fileKey] as any)?.key === key
+                        return (
+                          <button key={i} onClick={() => setUploadedFiles(prev => ({ ...prev, [fileKey]: { name: spec.name, size: 0, type: ".xml", status: "complete", key } as any }))}
+                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors border-b last:border-b-0 ${borderColor} ${isSelected ? isDarkMode ? "bg-[#00e5ff]/10 border-l-2 border-l-[#00e5ff]" : "bg-[#00e5ff]/5 border-l-2 border-l-[#00e5ff]" : isDarkMode ? "hover:bg-[#1e4976]/30" : "hover:bg-gray-50"}`}
+                          >
+                            <FileText className={`h-3.5 w-3.5 flex-shrink-0 ${isSelected ? "text-[#00e5ff]" : textSecondary}`} />
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-xs font-medium truncate ${textPrimary}`}>{spec.name}</p>
+                              <p className={`text-xs ${textSecondary}`}>{spec.asset} · {spec.protocol}</p>
+                            </div>
+                            {isSelected && <CheckCircle className="h-3.5 w-3.5 text-[#00e5ff] flex-shrink-0" />}
+                          </button>
+                        )
+                      })}
+                    </div>
+                    {(uploadedFiles[fileKey] as any)?.status === "complete" && (
+                      <p className="text-xs text-[#4caf50] mt-1.5 flex items-center gap-1">
+                        <CheckCircle className="h-3 w-3" /> {uploadedFiles[fileKey].name}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )
+          })()}
         </div>
       ),
       1: (
         <div className="space-y-5">
-          <p className={`text-sm ${textSecondary}`}>Upload the corresponding ATDL files for each FIX spec version:</p>
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <p className={`text-xs font-medium ${textSecondary} mb-2 uppercase tracking-wider`}>Old Version</p>
-              <FileUploadZone fileKey="upgrade-old-atdl" label="Old ATDL (v2.0)" acceptTypes=".atdl,.xml" icon={Layers} />
-            </div>
-            <div>
-              <p className={`text-xs font-medium ${textSecondary} mb-2 uppercase tracking-wider`}>New Version</p>
-              <FileUploadZone fileKey="upgrade-new-atdl" label="New ATDL (v2.1)" acceptTypes=".atdl,.xml" icon={Layers} />
-            </div>
-          </div>
+          <p className={`text-sm ${textSecondary}`}>Select the corresponding ATDL files for each version:</p>
+          {(() => {
+            const atdlOptions = [
+              { asset: "Equities",      protocol: "FIX 4.2",     name: "EQ_FIX42_AlgoSuite.atdl" },
+              { asset: "Equities",      protocol: "FIX 4.4",     name: "EQ_FIX44_AlgoSuite.atdl" },
+              { asset: "Options",       protocol: "FIX 4.4",     name: "OPT_FIX44_AlgoSuite.atdl" },
+              { asset: "Futures",       protocol: "FIX 4.4",     name: "FUT_FIX44_AlgoSuite.atdl" },
+              { asset: "Futures",       protocol: "FIX 5.0 SP2", name: "FUT_FIX50SP2_AlgoSuite.atdl" },
+              { asset: "Fixed Income",  protocol: "FIX 4.4",     name: "FI_FIX44_AlgoSuite.atdl" },
+              { asset: "FX",            protocol: "FIX 5.0 SP2", name: "FX_FIX50SP2_AlgoSuite.atdl" },
+            ]
+            return (
+              <div className="grid grid-cols-2 gap-6">
+                {(["upgrade-old-atdl", "upgrade-new-atdl"] as const).map((fileKey, col) => (
+                  <div key={fileKey}>
+                    <p className={`text-xs font-medium ${textSecondary} mb-2 uppercase tracking-wider`}>{col === 0 ? "Old Version" : "New Version"}</p>
+                    <div className={`rounded-lg border ${borderColor} overflow-hidden`}>
+                      {atdlOptions.map((atdl, i) => {
+                        const key = `${atdl.asset}-${atdl.protocol}`
+                        const isSelected = (uploadedFiles[fileKey] as any)?.key === key
+                        return (
+                          <button key={i} onClick={() => setUploadedFiles(prev => ({ ...prev, [fileKey]: { name: atdl.name, size: 0, type: ".atdl", status: "complete", key } as any }))}
+                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors border-b last:border-b-0 ${borderColor} ${isSelected ? isDarkMode ? "bg-[#9c27b0]/10 border-l-2 border-l-[#9c27b0]" : "bg-[#9c27b0]/5 border-l-2 border-l-[#9c27b0]" : isDarkMode ? "hover:bg-[#1e4976]/30" : "hover:bg-gray-50"}`}
+                          >
+                            <Layers className={`h-3.5 w-3.5 flex-shrink-0 ${isSelected ? "text-[#9c27b0]" : textSecondary}`} />
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-xs font-medium truncate ${textPrimary}`}>{atdl.name}</p>
+                              <p className={`text-xs ${textSecondary}`}>{atdl.asset} · {atdl.protocol}</p>
+                            </div>
+                            {isSelected && <CheckCircle className="h-3.5 w-3.5 text-[#9c27b0] flex-shrink-0" />}
+                          </button>
+                        )
+                      })}
+                    </div>
+                    {(uploadedFiles[fileKey] as any)?.status === "complete" && (
+                      <p className="text-xs text-[#4caf50] mt-1.5 flex items-center gap-1">
+                        <CheckCircle className="h-3 w-3" /> {uploadedFiles[fileKey].name}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )
+          })()}
         </div>
       ),
       2: (
@@ -5919,8 +6021,43 @@ const specCompareResults = [
           {workflowTabSelector}
           <div className={`border-t ${borderColor}`} />
           <div>
-            <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Upload Existing ATDL File</label>
-            <FileUploadZone fileKey="remediation-atdl" label="Drop ATDL file here" acceptTypes=".atdl,.xml" icon={Layers} />
+            <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Select ATDL File to Validate</label>
+            <div className={`rounded-lg border ${borderColor} overflow-hidden`}>
+              {[
+                { asset: "Equities",     protocol: "FIX 4.2",     name: "EQ_FIX42_AlgoSuite.atdl" },
+                { asset: "Equities",     protocol: "FIX 4.4",     name: "EQ_FIX44_AlgoSuite.atdl" },
+                { asset: "Options",      protocol: "FIX 4.4",     name: "OPT_FIX44_AlgoSuite.atdl" },
+                { asset: "Futures",      protocol: "FIX 4.4",     name: "FUT_FIX44_AlgoSuite.atdl" },
+                { asset: "Futures",      protocol: "FIX 5.0 SP2", name: "FUT_FIX50SP2_AlgoSuite.atdl" },
+                { asset: "Fixed Income", protocol: "FIX 4.4",     name: "FI_FIX44_AlgoSuite.atdl" },
+                { asset: "FX",           protocol: "FIX 5.0 SP2", name: "FX_FIX50SP2_AlgoSuite.atdl" },
+              ].map((atdl, i) => {
+                const key = `${atdl.asset}-${atdl.protocol}`
+                const isSelected = (uploadedFiles["remediation-atdl"] as any)?.key === key
+                return (
+                  <button key={i}
+                    onClick={() => setUploadedFiles(prev => ({ ...prev, "remediation-atdl": { name: atdl.name, size: 0, type: ".atdl", status: "complete", key } as any }))}
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors border-b last:border-b-0 ${borderColor} ${
+                      isSelected
+                        ? isDarkMode ? "bg-[#ff9800]/10 border-l-2 border-l-[#ff9800]" : "bg-[#ff9800]/5 border-l-2 border-l-[#ff9800]"
+                        : isDarkMode ? "hover:bg-[#1e4976]/30" : "hover:bg-gray-50"
+                    }`}
+                  >
+                    <Layers className={`h-4 w-4 flex-shrink-0 ${isSelected ? "text-[#ff9800]" : textSecondary}`} />
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-medium truncate ${textPrimary}`}>{atdl.name}</p>
+                      <p className={`text-xs ${textSecondary}`}>{atdl.asset} · {atdl.protocol}</p>
+                    </div>
+                    {isSelected && <CheckCircle className="h-4 w-4 text-[#ff9800] flex-shrink-0" />}
+                  </button>
+                )
+              })}
+            </div>
+            {(uploadedFiles["remediation-atdl"] as any)?.status === "complete" && (
+              <p className="text-xs text-[#4caf50] mt-1.5 flex items-center gap-1">
+                <CheckCircle className="h-3 w-3" /> Selected: {uploadedFiles["remediation-atdl"].name}
+              </p>
+            )}
           </div>
         </div>
       ),
@@ -7444,38 +7581,38 @@ const specCompareResults = [
       { 
         asset: "Equities", 
         versions: [
-          { protocol: "FIX 4.2", adminSpec: { name: "EQ_FIX42_v1.2.xml", uploaded: true }, standardizedSpec: { name: "EQ_FIX42_v1.2_Standardized.xlsx", available: true }, clientSpec: { name: "client_eq_42.xml", uploaded: true } },
-          { protocol: "FIX 4.4", adminSpec: { name: "EQ_FIX44_v2.1.xml", uploaded: true }, standardizedSpec: { name: "EQ_FIX44_v2.1_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false } },
-          { protocol: "FIX 5.0", adminSpec: { name: "EQ_FIX50_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: "client_eq_50.xml", uploaded: true } },
+          { protocol: "FIX 4.2", adminSpec: { name: "EQ_FIX42_v1.2.xml", uploaded: true }, standardizedSpec: { name: "EQ_FIX42_v1.2_Standardized.xlsx", available: true }, clientSpec: { name: "client_eq_42.xml", uploaded: true }, atdlFile: { name: "EQ_FIX42_AlgoSuite.atdl", uploaded: true } },
+          { protocol: "FIX 4.4", adminSpec: { name: "EQ_FIX44_v2.1.xml", uploaded: true }, standardizedSpec: { name: "EQ_FIX44_v2.1_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: "EQ_FIX44_AlgoSuite.atdl", uploaded: true } },
+          { protocol: "FIX 5.0", adminSpec: { name: "EQ_FIX50_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: "client_eq_50.xml", uploaded: true }, atdlFile: { name: null, uploaded: false } },
         ]
       },
       { 
         asset: "Options", 
         versions: [
-          { protocol: "FIX 4.2", adminSpec: { name: "OPT_FIX42_v1.1.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false } },
-          { protocol: "FIX 4.4", adminSpec: { name: "OPT_FIX44_v2.0.xml", uploaded: true }, standardizedSpec: { name: "OPT_FIX44_v2.0_Standardized.xlsx", available: true }, clientSpec: { name: "client_opt_44.xml", uploaded: true } },
+          { protocol: "FIX 4.2", adminSpec: { name: "OPT_FIX42_v1.1.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: null, uploaded: false } },
+          { protocol: "FIX 4.4", adminSpec: { name: "OPT_FIX44_v2.0.xml", uploaded: true }, standardizedSpec: { name: "OPT_FIX44_v2.0_Standardized.xlsx", available: true }, clientSpec: { name: "client_opt_44.xml", uploaded: true }, atdlFile: { name: "OPT_FIX44_AlgoSuite.atdl", uploaded: true } },
         ]
       },
       { 
         asset: "Futures", 
         versions: [
-          { protocol: "FIX 4.2", adminSpec: { name: "FUT_FIX42_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false } },
-          { protocol: "FIX 4.4", adminSpec: { name: "FUT_FIX44_v1.1.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false } },
-          { protocol: "FIX 5.0 SP2", adminSpec: { name: "FUT_FIX50SP2_v2.0.xml", uploaded: true }, standardizedSpec: { name: "FUT_FIX50SP2_v2.0_Standardized.xlsx", available: true }, clientSpec: { name: "client_fut_50sp2.xml", uploaded: true } },
+          { protocol: "FIX 4.2", adminSpec: { name: "FUT_FIX42_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: null, uploaded: false } },
+          { protocol: "FIX 4.4", adminSpec: { name: "FUT_FIX44_v1.1.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: "FUT_FIX44_AlgoSuite.atdl", uploaded: true } },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "FUT_FIX50SP2_v2.0.xml", uploaded: true }, standardizedSpec: { name: "FUT_FIX50SP2_v2.0_Standardized.xlsx", available: true }, clientSpec: { name: "client_fut_50sp2.xml", uploaded: true }, atdlFile: { name: "FUT_FIX50SP2_AlgoSuite.atdl", uploaded: true } },
         ]
       },
       { 
         asset: "Fixed Income", 
         versions: [
-          { protocol: "FIX 4.4", adminSpec: { name: "FI_FIX44_v1.2.xml", uploaded: true }, standardizedSpec: { name: "FI_FIX44_v1.2_Standardized.xlsx", available: true }, clientSpec: { name: "client_fi_44.xml", uploaded: true } },
-          { protocol: "FIX 5.0", adminSpec: { name: "FI_FIX50_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 4.4", adminSpec: { name: "FI_FIX44_v1.2.xml", uploaded: true }, standardizedSpec: { name: "FI_FIX44_v1.2_Standardized.xlsx", available: true }, clientSpec: { name: "client_fi_44.xml", uploaded: true }, atdlFile: { name: "FI_FIX44_AlgoSuite.atdl", uploaded: true } },
+          { protocol: "FIX 5.0", adminSpec: { name: "FI_FIX50_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: null, uploaded: false } },
         ]
       },
       { 
         asset: "FX", 
         versions: [
-          { protocol: "FIX 4.4", adminSpec: { name: "FX_FIX44_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false } },
-          { protocol: "FIX 5.0 SP2", adminSpec: { name: "FX_FIX50SP2_v1.1.xml", uploaded: true }, standardizedSpec: { name: "FX_FIX50SP2_v1.1_Standardized.xlsx", available: true }, clientSpec: { name: "client_fx_50sp2.xml", uploaded: true } },
+          { protocol: "FIX 4.4", adminSpec: { name: "FX_FIX44_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: null, uploaded: false } },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "FX_FIX50SP2_v1.1.xml", uploaded: true }, standardizedSpec: { name: "FX_FIX50SP2_v1.1_Standardized.xlsx", available: true }, clientSpec: { name: "client_fx_50sp2.xml", uploaded: true }, atdlFile: { name: "FX_FIX50SP2_AlgoSuite.atdl", uploaded: true } },
         ]
       },
     ]
@@ -7497,11 +7634,14 @@ const specCompareResults = [
                     <h2 className={`text-lg font-bold ${textPrimary}`}>{assetClass.asset}</h2>
                   </div>
                   
-                  {/* Table Header - 3 columns for admin, 4 for client */}
-                  <div className={`grid ${selectedRole === "admin" ? "grid-cols-3" : "grid-cols-4"} gap-4 px-6 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} border-b ${borderColor}`}>
+                  {/* Table Header - 4 columns for admin, 5 for client */}
+                  <div className={`grid ${selectedRole === "admin" ? "grid-cols-4" : "grid-cols-5"} gap-4 px-6 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} border-b ${borderColor}`}>
                     <div className={`font-semibold text-sm ${textPrimary}`}>Protocol</div>
                     <div className={`font-semibold text-sm ${textPrimary}`}>Admin Spec (Original)</div>
                     <div className={`font-semibold text-sm ${textPrimary}`}>Admin Spec (Standardized)</div>
+                    <div className={`font-semibold text-sm ${textPrimary} flex items-center gap-1.5`}>
+                      <Layers className="h-3.5 w-3.5 text-[#9c27b0]" /> ATDL File
+                    </div>
                     {selectedRole === "client" && (
                       <div className={`font-semibold text-sm ${textPrimary}`}>My Specs</div>
                     )}
@@ -7512,7 +7652,7 @@ const specCompareResults = [
                     {assetClass.versions.map((version: any) => (
                       <div 
                         key={`${assetClass.asset}-${version.protocol}`}
-                        className={`grid ${selectedRole === "admin" ? "grid-cols-3" : "grid-cols-4"} gap-4 px-6 py-4 hover:bg-[#1e4976]/10 transition-colors items-center`}
+                        className={`grid ${selectedRole === "admin" ? "grid-cols-4" : "grid-cols-5"} gap-4 px-6 py-4 hover:bg-[#1e4976]/10 transition-colors items-center`}
                       >
                         {/* Protocol Column */}
                         <div className={`font-medium ${textPrimary}`}>
@@ -7565,6 +7705,36 @@ const specCompareResults = [
   )}
   </div>
   
+{/* ATDL File Column */}
+  <div className="flex items-center gap-2">
+    {version.atdlFile?.uploaded ? (
+      <>
+        <div className={`flex items-center gap-2 px-3 py-1.5 rounded border border-[#9c27b0]/40 ${isDarkMode ? "bg-[#9c27b0]/10" : "bg-[#9c27b0]/5"}`}>
+          <Layers className="h-4 w-4 text-[#9c27b0]" />
+          <span className={`text-sm ${textPrimary}`}>{version.atdlFile.name}</span>
+        </div>
+        <button className={`p-1.5 rounded hover:bg-[#9c27b0]/20 ${textSecondary} hover:text-[#9c27b0] transition-colors`} title="View ATDL">
+          <Eye className="h-4 w-4" />
+        </button>
+        <button className={`p-1.5 rounded hover:bg-[#9c27b0]/20 ${textSecondary} hover:text-[#9c27b0] transition-colors`} title="Download ATDL">
+          <Download className="h-4 w-4" />
+        </button>
+        {selectedRole === "admin" && (
+          <label className={`cursor-pointer p-1.5 rounded hover:bg-[#1e4976]/30 ${textSecondary} hover:text-[#9c27b0] transition-colors`} title="Replace ATDL">
+            <input type="file" className="hidden" accept=".atdl,.xml" onChange={(e) => handleFileUpload(`atdl-${assetClass.asset}-${version.protocol}`, e.target.files)} />
+            <Upload className="h-4 w-4" />
+          </label>
+        )}
+      </>
+    ) : (
+      <label className={`cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded border-2 border-dashed border-[#9c27b0]/30 hover:border-[#9c27b0] hover:bg-[#9c27b0]/5 transition-colors`}>
+        <input type="file" className="hidden" accept=".atdl,.xml" onChange={(e) => handleFileUpload(`atdl-${assetClass.asset}-${version.protocol}`, e.target.files)} />
+        <Upload className={`h-4 w-4 text-[#9c27b0]/60`} />
+        <span className={`text-sm text-[#9c27b0]/60`}>Upload ATDL</span>
+      </label>
+    )}
+  </div>
+
 {/* My Specs Column - Only for client role */}
                         {selectedRole === "client" && (
                           <div className="flex items-center gap-2">
