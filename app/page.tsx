@@ -7634,135 +7634,99 @@ const specCompareResults = [
                     <h2 className={`text-lg font-bold ${textPrimary}`}>{assetClass.asset}</h2>
                   </div>
                   
-                  {/* Table Header - 4 columns for admin, 5 for client */}
-                  <div className={`grid ${selectedRole === "admin" ? "grid-cols-4" : "grid-cols-5"} gap-4 px-6 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} border-b ${borderColor}`}>
+                  {/* Table Header */}
+                  <div className={`grid ${selectedRole === "admin" ? "grid-cols-[180px_1fr_1fr]" : "grid-cols-[180px_1fr_1fr_1fr]"} gap-4 px-6 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} border-b ${borderColor}`}>
                     <div className={`font-semibold text-sm ${textPrimary}`}>Protocol</div>
-                    <div className={`font-semibold text-sm ${textPrimary}`}>Admin Spec (Original)</div>
-                    <div className={`font-semibold text-sm ${textPrimary}`}>Admin Spec (Standardized)</div>
-                    <div className={`font-semibold text-sm ${textPrimary} flex items-center gap-1.5`}>
-                      <Layers className="h-3.5 w-3.5 text-[#9c27b0]" /> ATDL File
-                    </div>
+                    <div className={`font-semibold text-sm ${textPrimary}`}>Algo Spec (Original)</div>
+                    <div className={`font-semibold text-sm ${textPrimary}`}>Algo Spec (Standardized)</div>
                     {selectedRole === "client" && (
                       <div className={`font-semibold text-sm ${textPrimary}`}>My Specs</div>
                     )}
                   </div>
-                  
-                  {/* Table Rows */}
+
+                  {/* Table Rows — each version may render 2 sub-rows if ATDL exists */}
                   <div className="divide-y divide-[#1e4976]/30">
-                    {assetClass.versions.map((version: any) => (
-                      <div 
-                        key={`${assetClass.asset}-${version.protocol}`}
-                        className={`grid ${selectedRole === "admin" ? "grid-cols-4" : "grid-cols-5"} gap-4 px-6 py-4 hover:bg-[#1e4976]/10 transition-colors items-center`}
-                      >
-                        {/* Protocol Column */}
-                        <div className={`font-medium ${textPrimary}`}>
-                          {version.protocol}
+                    {assetClass.versions.map((version: any) => {
+                      const hasAtdl = !!version.atdlFile?.name
+
+                      // Reusable file pill + actions
+                      const FilePill = ({ name, color, icon: Icon }: { name: string; color: string; icon: React.ElementType }) => (
+                        <div className="flex items-center gap-1.5">
+                          <div className={`flex items-center gap-2 px-2.5 py-1.5 rounded border max-w-[220px]`}
+                            style={{ borderColor: `${color}40`, backgroundColor: `${color}10` }}>
+                            <Icon className="h-3.5 w-3.5 flex-shrink-0" style={{ color }} />
+                            <span className={`text-sm truncate ${textPrimary}`}>{name}</span>
+                          </div>
+                          <button className={`p-1.5 rounded ${textSecondary} hover:text-[#00e5ff] hover:bg-[#00e5ff]/10 transition-colors`} title="View"><Eye className="h-3.5 w-3.5" /></button>
+                          <button className={`p-1.5 rounded ${textSecondary} hover:text-[#00e5ff] hover:bg-[#00e5ff]/10 transition-colors`} title="Download"><Download className="h-3.5 w-3.5" /></button>
+                          {selectedRole === "admin" && (
+                            <label className={`cursor-pointer p-1.5 rounded ${textSecondary} hover:text-[#00e5ff] hover:bg-[#00e5ff]/10 transition-colors`} title="Replace">
+                              <input type="file" className="hidden" />
+                              <Upload className="h-3.5 w-3.5" />
+                            </label>
+                          )}
                         </div>
-                        
-{/* Admin Spec (Original) Column */}
-  <div className="flex items-center gap-2">
-  <div className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor}`}>
-  <FileText className={`h-4 w-4 ${textSecondary}`} />
-  <span className={`text-sm ${textPrimary}`}>{version.adminSpec.name}</span>
-  </div>
-  <button
-  className={`p-1.5 rounded hover:bg-[#00e5ff]/20 ${textSecondary} hover:text-[#00e5ff] transition-colors`}
-  title="View spec"
-  >
-  <Eye className="h-4 w-4" />
-  </button>
-  <button
-  className={`p-1.5 rounded hover:bg-[#00e5ff]/20 ${textSecondary} hover:text-[#00e5ff] transition-colors`}
-  title="Download spec"
-  >
-  <Download className="h-4 w-4" />
-  </button>
-  {selectedRole === "admin" && (
-  <label className={`cursor-pointer p-1.5 rounded hover:bg-[#1e4976]/30 ${textSecondary} hover:text-[#00e5ff] transition-colors`} title="Replace">
-  <input type="file" className="hidden" accept=".xml,.txt,.csv" />
-<Upload className="h-4 w-4" />
-  </label>
-  )}
-  </div>
+                      )
 
-{/* Admin Spec (Standardized) Column */}
-  <div className="flex items-center gap-2">
-  {version.standardizedSpec?.available ? (
-  <>
-  <div className={`flex items-center gap-2 px-3 py-1.5 rounded ${isDarkMode ? "bg-[#4caf50]/20" : "bg-[#4caf50]/10"} border border-[#4caf50]/30`}>
-  <CheckCircle className="h-4 w-4 text-[#4caf50]" />
-  <span className={`text-sm ${textPrimary}`}>{version.standardizedSpec.name}</span>
-  </div>
-  <button className={`p-1.5 rounded hover:bg-[#00e5ff]/20 ${textSecondary} hover:text-[#00e5ff] transition-colors`} title="View standardized">
-  <Eye className="h-4 w-4" />
-  </button>
-  <button className={`p-1.5 rounded hover:bg-[#00e5ff]/20 ${textSecondary} hover:text-[#00e5ff] transition-colors`} title="Download standardized">
-  <Download className="h-4 w-4" />
-  </button>
-  </>
-  ) : (
-  <span className={`text-sm ${textSecondary} italic`}>Not yet standardized</span>
-  )}
-  </div>
-  
-{/* ATDL File Column */}
-  <div className="flex items-center gap-2">
-    {version.atdlFile?.uploaded ? (
-      <>
-        <div className={`flex items-center gap-2 px-3 py-1.5 rounded border border-[#9c27b0]/40 ${isDarkMode ? "bg-[#9c27b0]/10" : "bg-[#9c27b0]/5"}`}>
-          <Layers className="h-4 w-4 text-[#9c27b0]" />
-          <span className={`text-sm ${textPrimary}`}>{version.atdlFile.name}</span>
-        </div>
-        <button className={`p-1.5 rounded hover:bg-[#9c27b0]/20 ${textSecondary} hover:text-[#9c27b0] transition-colors`} title="View ATDL">
-          <Eye className="h-4 w-4" />
-        </button>
-        <button className={`p-1.5 rounded hover:bg-[#9c27b0]/20 ${textSecondary} hover:text-[#9c27b0] transition-colors`} title="Download ATDL">
-          <Download className="h-4 w-4" />
-        </button>
-        {selectedRole === "admin" && (
-          <label className={`cursor-pointer p-1.5 rounded hover:bg-[#1e4976]/30 ${textSecondary} hover:text-[#9c27b0] transition-colors`} title="Replace ATDL">
-            <input type="file" className="hidden" accept=".atdl,.xml" onChange={(e) => handleFileUpload(`atdl-${assetClass.asset}-${version.protocol}`, e.target.files)} />
-            <Upload className="h-4 w-4" />
-          </label>
-        )}
-      </>
-    ) : (
-      <label className={`cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded border-2 border-dashed border-[#9c27b0]/30 hover:border-[#9c27b0] hover:bg-[#9c27b0]/5 transition-colors`}>
-        <input type="file" className="hidden" accept=".atdl,.xml" onChange={(e) => handleFileUpload(`atdl-${assetClass.asset}-${version.protocol}`, e.target.files)} />
-        <Upload className={`h-4 w-4 text-[#9c27b0]/60`} />
-        <span className={`text-sm text-[#9c27b0]/60`}>Upload ATDL</span>
-      </label>
-    )}
-  </div>
+                      const UploadPrompt = ({ accept, color, label }: { accept: string; color: string; label: string }) => (
+                        <label className={`cursor-pointer inline-flex items-center gap-2 px-3 py-1.5 rounded border-2 border-dashed hover:bg-[${color}]/5 transition-colors`}
+                          style={{ borderColor: `${color}40` }}>
+                          <input type="file" className="hidden" accept={accept} />
+                          <Upload className="h-3.5 w-3.5" style={{ color: `${color}99` }} />
+                          <span className="text-sm" style={{ color: `${color}99` }}>{label}</span>
+                        </label>
+                      )
 
-{/* My Specs Column - Only for client role */}
-                        {selectedRole === "client" && (
-                          <div className="flex items-center gap-2">
-                            {version.clientSpec.uploaded ? (
-                              <>
-                                <div className={`flex items-center gap-2 px-3 py-1.5 rounded ${isDarkMode ? "bg-[#4caf50]/20" : "bg-[#4caf50]/10"} border border-[#4caf50]/30`}>
-                                  <CheckCircle className="h-4 w-4 text-[#4caf50]" />
-                                  <span className={`text-sm ${textPrimary}`}>{version.clientSpec.name}</span>
-                                </div>
-                                <button className={`p-1.5 rounded hover:bg-[#1e4976]/30 ${textSecondary}`} title="Download">
-                                  <Download className="h-4 w-4" />
-                                </button>
-                                <label className={`cursor-pointer p-1.5 rounded hover:bg-[#1e4976]/30 ${textSecondary}`} title="Replace">
-                                  <input type="file" className="hidden" accept=".xml,.txt,.csv" />
-                                  <Upload className="h-4 w-4" />
-                                </label>
-                              </>
-                            ) : (
-                              <label className={`cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded border-2 border-dashed ${borderColor} hover:border-[#00e5ff] hover:bg-[#00e5ff]/5 transition-colors`}>
-                                <input type="file" className="hidden" accept=".xml,.txt,.csv" />
-                                <Upload className={`h-4 w-4 ${textSecondary}`} />
-                                <span className={`text-sm ${textSecondary}`}>Upload spec</span>
-                              </label>
+                      return (
+                        <div key={`${assetClass.asset}-${version.protocol}`} className={`hover:bg-[#1e4976]/10 transition-colors`}>
+
+                          {/* Row 1 — FIX Spec */}
+                          <div className={`grid ${selectedRole === "admin" ? "grid-cols-[180px_1fr_1fr]" : "grid-cols-[180px_1fr_1fr_1fr]"} gap-4 px-6 py-3 items-center`}>
+                            {/* Protocol — spans both sub-rows via rowspan simulation: only shown on row 1 */}
+                            <div className="flex flex-col gap-0.5">
+                              <span className={`font-semibold ${textPrimary}`}>{version.protocol}</span>
+                              {hasAtdl && <span className={`text-xs px-1.5 py-0.5 rounded w-fit`} style={{ backgroundColor: "#00e5ff15", color: "#00e5ff" }}>FIX Spec</span>}
+                            </div>
+                            {/* Original spec */}
+                            <FilePill name={version.adminSpec.name} color="#00e5ff" icon={FileText} />
+                            {/* Standardized spec */}
+                            <div>
+                              {version.standardizedSpec?.available
+                                ? <FilePill name={version.standardizedSpec.name} color="#4caf50" icon={CheckCircle} />
+                                : <span className={`text-sm ${textSecondary} italic`}>Not standardized</span>
+                              }
+                            </div>
+                            {/* My Specs */}
+                            {selectedRole === "client" && (
+                              <div>
+                                {version.clientSpec?.uploaded
+                                  ? <FilePill name={version.clientSpec.name} color="#4caf50" icon={CheckCircle} />
+                                  : <UploadPrompt accept=".xml,.txt,.csv" color="#00e5ff" label="Upload spec" />
+                                }
+                              </div>
                             )}
                           </div>
-                        )}
-                      </div>
-                    ))}
+
+                          {/* Row 2 — ATDL (only if present) */}
+                          {hasAtdl && (
+                            <div className={`grid ${selectedRole === "admin" ? "grid-cols-[180px_1fr_1fr]" : "grid-cols-[180px_1fr_1fr_1fr]"} gap-4 px-6 py-3 items-center border-t border-dashed ${isDarkMode ? "border-[#9c27b0]/20" : "border-[#9c27b0]/15"} ${isDarkMode ? "bg-[#9c27b0]/5" : "bg-[#9c27b0]/3"}`}>
+                              <div>
+                                <span className={`text-xs px-1.5 py-0.5 rounded`} style={{ backgroundColor: "#9c27b015", color: "#9c27b0" }}>ATDL</span>
+                              </div>
+                              {/* ATDL file */}
+                              {version.atdlFile.uploaded
+                                ? <FilePill name={version.atdlFile.name} color="#9c27b0" icon={Layers} />
+                                : <UploadPrompt accept=".atdl,.xml" color="#9c27b0" label="Upload ATDL" />
+                              }
+                              {/* Placeholder for standardized / my specs columns to keep grid aligned */}
+                              <div />
+                              {selectedRole === "client" && <div />}
+                            </div>
+                          )}
+
+                        </div>
+                      )
+                    })}
                   </div>
                   
                   {/* Add new protocol - Admin only */}
