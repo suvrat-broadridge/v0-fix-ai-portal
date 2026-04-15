@@ -34,6 +34,7 @@ export default function BCometPlatform() {
     { name: "Microsoft Teams", description: "Team collaboration", status: "not-connected" as "configured" | "not-connected" },
   ])
   const [loginEmail, setLoginEmail] = useState("")
+  const [loginPassword, setLoginPassword] = useState("")
   
   // Update userProfile when currentUser changes
   useEffect(() => {
@@ -2451,18 +2452,33 @@ export default function BCometPlatform() {
 
   // Login Screen
   if (currentScreen === "login") {
+    // Demo credentials config
+    const demoCredentials = selectedRole === "admin"
+      ? [
+          { label: "Manager", email: "sarah.johnson@broadridge.com", password: "Demo@1234", name: "Sarah Johnson", manager: true },
+          { label: "IC", email: "john.smith@broadridge.com", password: "Demo@1234", name: "John Smith", manager: false },
+        ]
+      : [
+          { label: "Client", email: "trader@apexcapital.com", password: "Demo@1234", name: "Apex Capital Trader", manager: false },
+        ]
+
     const handleLogin = () => {
       if (selectedRole === "admin") {
-        // Use the name from email or a default based on isManager
         const userName = loginEmail ? loginEmail.split("@")[0].split(".").map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" ") : (isManager ? "Sarah Johnson" : "John Smith")
         const userEmail = loginEmail || (isManager ? "sarah.johnson@broadridge.com" : "john.smith@broadridge.com")
         setCurrentUser({ name: userName, email: userEmail })
       } else {
-        // Client login
         setIsManager(false)
-        setCurrentUser({ name: "Client User", email: "client@acmecapital.com" })
+        const userName = loginEmail ? loginEmail.split("@")[0].split(".").map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" ") : "Apex Capital Trader"
+        setCurrentUser({ name: userName, email: loginEmail || "trader@apexcapital.com" })
       }
       setCurrentScreen("dashboard")
+    }
+
+    const fillCredentials = (cred: typeof demoCredentials[0]) => {
+      setLoginEmail(cred.email)
+      setLoginPassword(cred.password)
+      setIsManager(cred.manager)
     }
     
     return (
@@ -2473,6 +2489,29 @@ export default function BCometPlatform() {
             <span className={`text-xl font-bold ${textPrimary}`}>B- COMET</span>
           </div>
           <h2 className={`text-2xl font-bold text-center mb-6 ${textPrimary}`}>{selectedRole === "admin" ? "Admin Login" : "Client Login"}</h2>
+
+          {/* Demo Credentials Hint */}
+          <div className={`mb-4 p-3 rounded-lg border border-dashed ${isDarkMode ? "border-[#1e4976] bg-[#00e5ff]/5" : "border-blue-200 bg-blue-50"}`}>
+            <p className={`text-xs font-semibold uppercase tracking-wider mb-2 ${isDarkMode ? "text-[#00e5ff]" : "text-blue-600"}`}>Demo Credentials</p>
+            <div className="space-y-1.5">
+              {demoCredentials.map((cred) => (
+                <button
+                  key={cred.email}
+                  type="button"
+                  onClick={() => fillCredentials(cred)}
+                  className={`w-full text-left px-3 py-2 rounded-md transition-all flex items-center justify-between group ${isDarkMode ? "hover:bg-[#1e4976]/50 bg-[#0a1628]" : "hover:bg-blue-100 bg-white"} border ${borderColor}`}
+                >
+                  <div>
+                    <span className={`text-xs font-medium ${textPrimary}`}>{cred.label}: </span>
+                    <span className={`text-xs font-mono ${textSecondary}`}>{cred.email}</span>
+                    <span className={`text-xs ${textSecondary} ml-2`}>/ {cred.password}</span>
+                  </div>
+                  <span className={`text-[10px] ${isDarkMode ? "text-[#00e5ff]" : "text-blue-500"} opacity-0 group-hover:opacity-100 transition-opacity`}>Click to fill</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="space-y-4">
             <div>
               <label className={`text-sm font-medium ${textPrimary}`}>Email</label>
@@ -2486,7 +2525,13 @@ export default function BCometPlatform() {
             </div>
             <div>
               <label className={`text-sm font-medium ${textPrimary}`}>Password</label>
-              <Input type="password" placeholder="Enter your password" className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`} />
+              <Input
+                type="password"
+                placeholder="Enter your password"
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-[#64748b]" : "bg-white border-[#e2e8f0] text-[#0a1628]"}`}
+              />
             </div>
             
             {/* Admin Role Toggle - Manager vs IC */}
