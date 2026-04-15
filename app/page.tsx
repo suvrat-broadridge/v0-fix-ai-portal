@@ -381,7 +381,7 @@ export default function BCometPlatform() {
   const [atdlSelectedFixSpec, setAtdlSelectedFixSpec] = useState("equities-4.4")
   const [atdlWizardStep, setAtdlWizardStep] = useState(0)
   const [atdlWizardWorkOrder, setAtdlWizardWorkOrder] = useState<string | null>(null)
-  const [atdlWorkflowType, setAtdlWorkflowType] = useState<"conversion" | "version-upgrade" | "remediation" | "guided">("guided")
+  const [atdlWorkflowType, setAtdlWorkflowType] = useState<"conversion" | "version-upgrade" | "remediation">("conversion")
   const [atdlValidationFilter, setAtdlValidationFilter] = useState<"all" | "error" | "warning" | "pass">("all")
   const [atdlDecisions, setAtdlDecisions] = useState<Record<string, string>>({})
   const [atdlRemediationFilter, setAtdlRemediationFilter] = useState<"all" | "open" | "in-progress" | "resolved">("all")
@@ -5384,33 +5384,64 @@ const specCompareResults = [
       { id: 4, label: "Re-validate",     icon: RefreshCw,    desc: "Re-validate and export" },
     ]
     
-    const guidedSteps = [
-      { id: 0, label: "Scope",    icon: Target,       desc: "Define objective and target strategies" },
-      { id: 1, label: "Inputs",   icon: Upload,       desc: "Lock source files and versions" },
-      { id: 2, label: "Validate", icon: CheckCircle,  desc: "Structural schema validation" },
-      { id: 3, label: "Compare",  icon: GitCompare,   desc: "FIX ↔ ATDL semantic comparison" },
-      { id: 4, label: "Simulate", icon: Zap,          desc: "Strategy UI render and FIX generation" },
-      { id: 5, label: "Review",   icon: ClipboardCheck, desc: "Remediation and finding triage" },
-      { id: 6, label: "Approve",  icon: Stamp,        desc: "Sign-off and certification pack" },
-    ]
-
     const steps = atdlWorkflowType === "conversion" ? conversionSteps :
                   atdlWorkflowType === "version-upgrade" ? versionUpgradeSteps :
-                  atdlWorkflowType === "remediation" ? remediationSteps :
-                  guidedSteps
+                  remediationSteps
 
     const workflowTitle = atdlWorkflowType === "conversion" ? "FIX to ATDL Conversion" :
                           atdlWorkflowType === "version-upgrade" ? "Version Upgrade Comparison" :
-                          atdlWorkflowType === "remediation" ? "ATDL Validation & Remediation" :
-                          "Guided ATDL Workflow"
+                          "ATDL Validation & Remediation"
 
     const gateForStep = ["A","B","C","D","E","F"]
     const gateLabel = ["Inputs Locked","Structural Compliance","Mapping Integrity","Strategy Qualification","Approval Complete","Certified"]
+
+    // Shared workflow selector shown at step 0 of every flow
+    const workflowTabSelector = (
+      <div>
+        <label className={`block text-sm font-medium mb-3 ${textPrimary}`}>Workflow</label>
+        <div className="grid grid-cols-3 gap-3">
+          {([
+            { id: "conversion",      icon: RefreshCw,  label: "FIX to ATDL",        sub: "Convert & Create",   color: "#00e5ff" },
+            { id: "version-upgrade", icon: GitCompare, label: "Version Upgrade",      sub: "Compare & Validate", color: "#9c27b0" },
+            { id: "remediation",     icon: Wrench,     label: "Validate & Remediate", sub: "Fix Existing ATDL",  color: "#ff9800" },
+          ] as const).map((opt) => {
+            const Icon = opt.icon
+            const isSelected = atdlWorkflowType === opt.id
+            return (
+              <button
+                key={opt.id}
+                onClick={() => { setAtdlWorkflowType(opt.id); setAtdlWizardStep(0) }}
+                className={`relative flex flex-col items-start gap-2 p-4 rounded-lg border-2 text-left transition-all`}
+                style={{
+                  borderColor: isSelected ? opt.color : isDarkMode ? "#1e4976" : "#e2e8f0",
+                  backgroundColor: isSelected ? `${opt.color}12` : isDarkMode ? "rgba(10,22,40,0.4)" : "#f8fafc",
+                }}
+              >
+                {isSelected && (
+                  <span className="absolute top-2.5 right-2.5 flex h-5 w-5 items-center justify-center rounded-full" style={{ backgroundColor: opt.color }}>
+                    <CheckCircle className="h-3 w-3 text-[#0a1628]" />
+                  </span>
+                )}
+                <div className="p-2 rounded-md" style={{ backgroundColor: `${opt.color}20` }}>
+                  <Icon className="h-4 w-4" style={{ color: opt.color }} />
+                </div>
+                <div>
+                  <p className={`text-sm font-semibold ${textPrimary}`}>{opt.label}</p>
+                  <p className="text-xs" style={{ color: opt.color }}>{opt.sub}</p>
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    )
 
     // Workflow-specific step content
     const conversionStepContent: Record<number, React.ReactNode> = {
       0: (
         <div className="space-y-5">
+          {workflowTabSelector}
+          <div className={`border-t ${borderColor}`} />
           <div className="grid grid-cols-2 gap-5">
             <div>
               <label className={`block text-sm font-medium mb-1.5 ${textPrimary}`}>Client</label>
@@ -5616,7 +5647,9 @@ const specCompareResults = [
     const versionUpgradeStepContent: Record<number, React.ReactNode> = {
       0: (
         <div className="space-y-5">
-          <p className={`text-sm ${textSecondary} mb-4`}>Upload the old and new versions of your FIX specification PDFs:</p>
+          {workflowTabSelector}
+          <div className={`border-t ${borderColor}`} />
+          <p className={`text-sm ${textSecondary}`}>Upload the old and new versions of your FIX specification PDFs:</p>
           <div className="grid grid-cols-2 gap-6">
             <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#2196f3] transition-colors cursor-pointer`}>
               <FileText className={`h-8 w-8 mx-auto mb-2 text-[#2196f3]`} />
@@ -5796,6 +5829,8 @@ const specCompareResults = [
     const remediationStepContent: Record<number, React.ReactNode> = {
       0: (
         <div className="space-y-5">
+          {workflowTabSelector}
+          <div className={`border-t ${borderColor}`} />
           <div>
             <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Upload Existing ATDL File</label>
             <div className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center hover:border-[#00e5ff] transition-colors cursor-pointer`}>
@@ -5953,259 +5988,7 @@ const specCompareResults = [
 
     const stepContent: Record<number, React.ReactNode> = atdlWorkflowType === "conversion" ? conversionStepContent :
                                                           atdlWorkflowType === "version-upgrade" ? versionUpgradeStepContent :
-                                                          atdlWorkflowType === "remediation" ? remediationStepContent :
-    {
-      0: (
-        <div className="space-y-5">
-          {/* Workflow selection - 3 clickable tabs */}
-          <div>
-            <label className={`block text-sm font-medium mb-3 ${textPrimary}`}>Select Workflow</label>
-            <div className="grid grid-cols-3 gap-3">
-              {([
-                { id: "conversion",       icon: RefreshCw,      label: "FIX to ATDL",           sub: "Convert & Create",          color: "#00e5ff" },
-                { id: "version-upgrade",  icon: GitCompare,     label: "Version Upgrade",         sub: "Compare & Validate",        color: "#9c27b0" },
-                { id: "remediation",      icon: Wrench,         label: "Validate & Remediate",    sub: "Fix Existing ATDL",         color: "#ff9800" },
-              ] as const).map((opt) => {
-                const Icon = opt.icon
-                const isSelected = atdlWorkflowType === opt.id
-                return (
-                  <button
-                    key={opt.id}
-                    onClick={() => setAtdlWorkflowType(opt.id as any)}
-                    className={`relative flex flex-col items-start gap-2 p-4 rounded-lg border-2 text-left transition-all ${
-                      isSelected
-                        ? "border-current"
-                        : `${borderColor} hover:border-current/50 ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`
-                    }`}
-                    style={{
-                      borderColor: isSelected ? opt.color : undefined,
-                      backgroundColor: isSelected ? `${opt.color}10` : undefined,
-                    }}
-                  >
-                    {/* Selected indicator */}
-                    {isSelected && (
-                      <span className="absolute top-3 right-3 flex h-5 w-5 items-center justify-center rounded-full" style={{ backgroundColor: opt.color }}>
-                        <CheckCircle className="h-3 w-3 text-[#0a1628]" />
-                      </span>
-                    )}
-                    <div className="p-2 rounded-md" style={{ backgroundColor: `${opt.color}20` }}>
-                      <Icon className="h-4 w-4" style={{ color: opt.color }} />
-                    </div>
-                    <div>
-                      <p className={`text-sm font-semibold ${textPrimary}`}>{opt.label}</p>
-                      <p className="text-xs" style={{ color: opt.color }}>{opt.sub}</p>
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-5">
-            <div>
-              <label className={`block text-sm font-medium mb-1.5 ${textPrimary}`}>Client</label>
-              <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"}`}>
-                <option>Nexus Trading Group</option>
-                <option>Apex Capital Partners</option>
-                <option>Velocity Securities</option>
-                <option>Horizon Investments</option>
-              </select>
-            </div>
-            <div>
-              <label className={`block text-sm font-medium mb-1.5 ${textPrimary}`}>Asset Class</label>
-              <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"}`}>
-                <option>Equities</option><option>Options</option><option>Futures</option><option>FX</option>
-              </select>
-            </div>
-            <div>
-              <label className={`block text-sm font-medium mb-1.5 ${textPrimary}`}>FIX Version</label>
-              <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"}`}>
-                <option>FIX 4.2</option><option>FIX 4.4</option><option>FIX 5.0</option><option>FIX 5.0 SP2</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Target Strategies</label>
-            <div className="flex gap-2 flex-wrap">
-              {["VWAP","TWAP","POV","IS","MOC"].map(s => (
-                <label key={s} className={`flex items-center gap-2 px-3 py-1.5 rounded border ${borderColor} cursor-pointer hover:border-[#00e5ff] ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
-                  <input type="checkbox" defaultChecked={["VWAP","TWAP"].includes(s)} className="accent-[#00e5ff]" />
-                  <span className={`text-sm ${textPrimary}`}>{s}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        </div>
-      ),
-      1: (
-        <div className="space-y-4">
-          {[
-            { label: "Client ATDL File", tag: "ATDL", options: ["AlgoSuite_Client_v2.1.atdl","VWAP_Strategies_v1.0.atdl"] },
-            { label: "Sell-Side ATDL File", tag: "ATDL", options: ["AlgoSuite_Complete_v1.5.atdl","VWAP_Strategies_v2.0.atdl"] },
-            { label: "FIX Algo Spec Section", tag: "FIX", options: ["Equities FIX 4.4 v2.1","Equities FIX 4.4 v2.0"] },
-          ].map(src => (
-            <div key={src.label} className={`flex items-center gap-4 p-4 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/10" : "bg-gray-50"}`}>
-              <div className="p-2 rounded bg-[#00e5ff]/10 flex-shrink-0">
-                <FileText className="h-5 w-5 text-[#00e5ff]" />
-              </div>
-              <div className="flex-1">
-                <p className={`text-sm font-medium ${textPrimary}`}>{src.label}</p>
-                <select className={`mt-1 w-full p-1.5 rounded border ${borderColor} text-sm ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"}`}>
-                  {src.options.map(o => <option key={o}>{o}</option>)}
-                </select>
-              </div>
-              <span className={`text-xs px-2 py-0.5 rounded border ${borderColor} ${textSecondary}`}>{src.tag}</span>
-            </div>
-          ))}
-          <div className={`flex items-center gap-3 p-3 rounded-lg border border-[#4caf50]/40 bg-[#4caf50]/10`}>
-            <Lock className="h-4 w-4 text-[#4caf50]" />
-            <p className="text-sm text-[#4caf50] font-medium">Lock inputs to make this run reproducible</p>
-            <input type="checkbox" className="ml-auto accent-[#4caf50]" />
-          </div>
-        </div>
-      ),
-      2: (
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">4 Pass</span>
-            <span className="px-2 py-1 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">1 Warning</span>
-            <span className="px-2 py-1 rounded text-xs bg-[#f44336]/20 text-[#f44336]">1 Error · 1 Blocker</span>
-          </div>
-          {[
-            { rule: "Schema Validation", status: "pass", msg: "Conforms to FIXatdl-1-1 schema", owner: null },
-            { rule: "Strategy Definitions", status: "pass", msg: "All 5 strategies have valid structure", owner: null },
-            { rule: "Parameter Types", status: "warning", msg: "2 parameters use deprecated types", owner: "J. Smith" },
-            { rule: "UI Control Mappings", status: "pass", msg: "All parameters mapped to valid controls", owner: null },
-            { rule: "Validation Rules", status: "pass", msg: "All validation rules are well-formed", owner: null },
-            { rule: "Wire Value Mappings", status: "error", msg: "Strategy 'POV' missing wireValue attribute", owner: "J. Smith", blocker: true },
-          ].map((r, i) => (
-            <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${r.status === "error" ? "border-[#f44336]/40 bg-[#f44336]/5" : r.status === "warning" ? "border-[#ff9800]/30 bg-[#ff9800]/5" : `${borderColor} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}`}>
-              {r.status === "pass" && <CheckCircle className="h-4 w-4 text-[#4caf50] flex-shrink-0" />}
-              {r.status === "warning" && <AlertTriangle className="h-4 w-4 text-[#ff9800] flex-shrink-0" />}
-              {r.status === "error" && <AlertCircle className="h-4 w-4 text-[#f44336] flex-shrink-0" />}
-              <span className={`text-sm font-medium flex-1 ${textPrimary}`}>{r.rule}</span>
-              <span className={`text-xs flex-1 ${textSecondary}`}>{r.msg}</span>
-              {r.blocker && <span className="text-xs px-1.5 py-0.5 rounded bg-[#f44336]/20 text-[#f44336]">Blocker</span>}
-              {r.owner && <span className={`text-xs ${textSecondary}`}>{r.owner}</span>}
-            </div>
-          ))}
-        </div>
-      ),
-      3: (
-        <div className="space-y-3">
-          {[
-            { title: "Missing Strategies",   severity: "High",   left: "VWAP, TWAP, POV, IS, MOC",           right: "VWAP, TWAP (POV, IS, MOC missing)", decision: null },
-            { title: "Parameter Type Drift", severity: "High",   left: "Tag 7942: Percentage (0-100)",        right: "ParticipationRate: Decimal (0-1)",  decision: null },
-            { title: "Missing Parameters",   severity: "Medium", left: "Tag 7941 (EndTime) required",        right: "EndTime not defined",              decision: null },
-            { title: "Enum Differences",     severity: "Low",    left: "Urgency: Low, Medium, High, Critical", right: "Urgency: 1, 2, 3",               decision: "accept" },
-          ].map((row, i) => {
-            const dec = atdlDecisions[`${i}`] || row.decision
-            return (
-              <div key={i} className={`border ${borderColor} rounded-lg overflow-hidden`}>
-                <div className={`flex items-center gap-3 px-4 py-2 ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"}`}>
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded ${row.severity === "High" ? "bg-[#f44336]/20 text-[#f44336]" : row.severity === "Medium" ? "bg-[#ff9800]/20 text-[#ff9800]" : "bg-[#2196f3]/20 text-[#2196f3]"}`}>{row.severity}</span>
-                  <span className={`text-sm font-semibold ${textPrimary}`}>{row.title}</span>
-                  {dec && <span className={`ml-auto text-xs px-2 py-0.5 rounded ${dec === "accept" ? "bg-[#4caf50]/20 text-[#4caf50]" : dec === "override" ? "bg-[#9c27b0]/20 text-[#9c27b0]" : dec === "defer" ? "bg-[#ff9800]/20 text-[#ff9800]" : "bg-[#f44336]/20 text-[#f44336]"}`}>{dec.charAt(0).toUpperCase() + dec.slice(1)}</span>}
-                </div>
-                <div className="grid grid-cols-11 gap-0">
-                  <div className={`col-span-5 p-3 text-xs ${textSecondary} ${isDarkMode ? "bg-[#0a1628]/60" : "bg-white"}`}>{row.left}</div>
-                  <div className={`col-span-1 flex items-center justify-center ${isDarkMode ? "bg-[#0a1628]/60" : "bg-white"} ${textSecondary}`}>
-                    <ArrowRight className="h-3 w-3" />
-                  </div>
-                  <div className={`col-span-5 p-3 text-xs ${textSecondary} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}>{row.right}</div>
-                </div>
-                {!dec && (
-                  <div className={`flex gap-1 px-3 py-2 border-t ${borderColor} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}>
-                    {["accept","override","defer","reject"].map(d => (
-                      <button key={d} onClick={() => setAtdlDecisions(prev => ({ ...prev, [`${i}`]: d }))}
-                        className={`px-2.5 py-1 rounded text-xs border transition-colors ${isDarkMode ? "border-[#1e4976] text-slate-400 hover:border-[#00e5ff] hover:text-[#00e5ff]" : "border-gray-300 text-gray-500 hover:border-blue-400 hover:text-blue-500"}`}>
-                        {d.charAt(0).toUpperCase() + d.slice(1)}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
-      ),
-      4: (
-        <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-3">
-            {["VWAP","TWAP","POV"].map((s, i) => (
-              <div key={s} className={`p-4 rounded-lg border ${i === 2 ? "border-[#f44336]/40 bg-[#f44336]/5" : "border-[#4caf50]/40 bg-[#4caf50]/5"}`}>
-                <div className="flex items-center justify-between mb-3">
-                  <span className={`font-semibold ${textPrimary}`}>{s}</span>
-                  {i === 2 ? <AlertCircle className="h-4 w-4 text-[#f44336]" /> : <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
-                </div>
-                <div className="space-y-1.5 text-xs">
-                  {["UI Render","FIX Generation","Mapping","Boundary Tests"].map((check, j) => (
-                    <div key={check} className="flex items-center gap-2">
-                      {(i === 2 && j === 2) ? <AlertCircle className="h-3 w-3 text-[#f44336]" /> : <CheckCircle className="h-3 w-3 text-[#4caf50]" />}
-                      <span className={textSecondary}>{check}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className={`p-4 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/60" : "bg-gray-50"}`}>
-            <p className={`text-xs font-semibold ${textSecondary} mb-2 uppercase tracking-wider`}>Sample Generated FIX Message</p>
-            <p className="font-mono text-xs text-[#00e5ff]">847=VWAP|7940=09:30:00|7941=16:00:00|7942=15|7943=100|7944=500|</p>
-          </div>
-        </div>
-      ),
-      5: (
-        <div className="space-y-3">
-          <p className={`text-sm ${textSecondary} mb-3`}>2 open findings require remediation before approval.</p>
-          {[
-            { id: "R-001", severity: "High",   finding: "wireValue missing on POV strategy",          owner: "J. Smith",  status: "in-progress" },
-            { id: "R-002", severity: "High",   finding: "ParticipationRate type mismatch (Pct vs Dec)", owner: "Unassigned", status: "open" },
-            { id: "R-003", severity: "Medium", finding: "EndTime parameter missing from ATDL",         owner: "M. Chen",   status: "resolved" },
-          ].map(r => (
-            <div key={r.id} className={`flex items-center gap-3 p-3 rounded-lg border ${r.status === "resolved" ? "border-[#4caf50]/30 opacity-60" : r.status === "in-progress" ? "border-[#2196f3]/30" : `border-[#f44336]/30`} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}>
-              <span className={`text-xs font-mono ${textSecondary} w-14`}>{r.id}</span>
-              <span className={`text-xs px-1.5 py-0.5 rounded ${r.severity === "High" ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>{r.severity}</span>
-              <span className={`text-sm flex-1 ${textPrimary}`}>{r.finding}</span>
-              <span className={`text-xs ${textSecondary}`}>{r.owner}</span>
-              <span className={`text-xs px-1.5 py-0.5 rounded ${r.status === "resolved" ? "bg-[#4caf50]/20 text-[#4caf50]" : r.status === "in-progress" ? "bg-[#2196f3]/20 text-[#2196f3]" : "bg-[#f44336]/20 text-[#f44336]"}`}>{r.status}</span>
-            </div>
-          ))}
-        </div>
-      ),
-      6: (
-        <div className="space-y-4">
-          <div className={`p-4 rounded-lg border border-[#4caf50]/40 bg-[#4caf50]/5 flex items-start gap-3`}>
-            <CheckCircle className="h-5 w-5 text-[#4caf50] flex-shrink-0 mt-0.5" />
-            <div>
-              <p className={`font-semibold text-[#4caf50]`}>All gates cleared — ready for sign-off</p>
-              <p className={`text-xs ${textSecondary} mt-0.5`}>Zero blockers remaining. 2 warnings accepted and documented.</p>
-            </div>
-          </div>
-          <div className="space-y-2">
-            {[
-              { role: "Technical Lead", name: "Sarah Johnson", signed: true, date: "Jan 14, 2024" },
-              { role: "Compliance",     name: "David Park",    signed: true, date: "Jan 14, 2024" },
-              { role: "Management",     name: "Karen Mitchell", signed: false, date: null },
-            ].map(a => (
-              <div key={a.role} className={`flex items-center gap-3 p-3 rounded-lg border ${a.signed ? "border-[#4caf50]/40" : borderColor} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center ${a.signed ? "bg-[#4caf50]" : isDarkMode ? "bg-[#1e4976]/40" : "bg-gray-200"}`}>
-                  {a.signed ? <CheckCircle className="h-4 w-4 text-white" /> : <Clock className="h-3.5 w-3.5 text-slate-400" />}
-                </div>
-                <div className="flex-1">
-                  <p className={`text-sm font-medium ${textPrimary}`}>{a.role}</p>
-                  <p className={`text-xs ${textSecondary}`}>{a.name}</p>
-                </div>
-                {a.signed ? <span className={`text-xs ${textSecondary}`}>{a.date}</span> : <Button size="sm" variant="outline" className="text-xs h-7">Approve</Button>}
-              </div>
-            ))}
-          </div>
-          <Button className="w-full bg-[#4caf50] hover:bg-[#4caf50]/80 text-white">
-            <Download className="h-4 w-4 mr-2" /> Generate Certification Pack
-          </Button>
-        </div>
-      ),
-    }
+                                                          remediationStepContent
 
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
