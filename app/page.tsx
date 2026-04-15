@@ -5348,30 +5348,96 @@ const specCompareResults = [
         <div className="space-y-4">
           <p className={`text-sm ${textSecondary} mb-4`}>Preview how the ATDL strategies will render in a trading UI:</p>
           <div className={`border ${borderColor} rounded-lg overflow-hidden`}>
-            <div className={`px-4 py-2 border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"}`}>
-              <span className={`text-sm font-medium ${textPrimary}`}>VWAP Strategy Parameters</span>
-            </div>
-            <div className="p-4 grid grid-cols-2 gap-4">
-              {[
-                { label: "Start Time", type: "time", value: "09:30" },
-                { label: "End Time", type: "time", value: "16:00" },
-                { label: "Participation Rate", type: "slider", value: "25%" },
-                { label: "Min Fill Size", type: "number", value: "100" },
-              ].map((param, i) => (
-                <div key={i}>
-                  <label className={`block text-xs ${textSecondary} mb-1`}>{param.label}</label>
-                  {param.type === "slider" ? (
-                    <div className="flex items-center gap-2">
-                      <input type="range" className="flex-1" />
-                      <span className={`text-sm ${textPrimary}`}>{param.value}</span>
-                    </div>
-                  ) : (
-                    <Input type={param.type} defaultValue={param.value} className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
-                  )}
-                </div>
+            {/* Strategy Tabs */}
+            <div className={`flex gap-1 px-4 py-2 border-b ${borderColor} overflow-x-auto ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-50"}`}>
+              {["VWAP", "TWAP", "POV"].map(strategy => (
+                <button key={strategy} className={`px-3 py-1.5 rounded text-sm font-medium whitespace-nowrap transition-colors ${strategy === "VWAP" ? "bg-[#00e5ff] text-[#0a1628]" : textSecondary}`}>
+                  {strategy}
+                </button>
               ))}
             </div>
+            
+            {/* VWAP Strategy Preview */}
+            <div className="p-6 space-y-4">
+              <h3 className={`text-sm font-semibold ${textPrimary}`}>VWAP Strategy Parameters</h3>
+              
+              {/* Row 1: Time Range */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={`block text-xs font-medium ${textSecondary} mb-2`}>Start Time</label>
+                  <div className="flex items-center gap-2">
+                    <input type="time" defaultValue="09:30" className={`flex-1 px-3 py-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : ""}`} />
+                  </div>
+                  <p className={`text-xs ${textSecondary} mt-1`}>Trading session open</p>
+                </div>
+                <div>
+                  <label className={`block text-xs font-medium ${textSecondary} mb-2`}>End Time</label>
+                  <div className="flex items-center gap-2">
+                    <input type="time" defaultValue="16:00" className={`flex-1 px-3 py-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : ""}`} />
+                  </div>
+                  <p className={`text-xs ${textSecondary} mt-1`}>Trading session close</p>
+                </div>
+              </div>
+
+              {/* Row 2: Participation Rate Slider */}
+              <div>
+                <label className={`block text-xs font-medium ${textSecondary} mb-2`}>Participation Rate</label>
+                <div className="flex items-center gap-3">
+                  <input type="range" min="0" max="100" defaultValue="25" className="flex-1" />
+                  <span className={`text-sm font-semibold ${textPrimary} min-w-12`}>25%</span>
+                </div>
+                <div className={`mt-2 px-3 py-2 rounded ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"}`}>
+                  <p className={`text-xs ${textSecondary}`}>How much of the market volume will be matched</p>
+                </div>
+              </div>
+
+              {/* Row 3: Qty Fields */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={`block text-xs font-medium ${textSecondary} mb-2`}>Min Fill Size</label>
+                  <input type="number" defaultValue="100" className={`w-full px-3 py-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : ""}`} />
+                  <p className={`text-xs ${textSecondary} mt-1`}>Minimum order size</p>
+                </div>
+                <div>
+                  <label className={`block text-xs font-medium ${textSecondary} mb-2`}>Max Order Qty</label>
+                  <input type="number" defaultValue="5000" className={`w-full px-3 py-2 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : ""}`} />
+                  <p className={`text-xs ${textSecondary} mt-1`}>Maximum order quantity</p>
+                </div>
+              </div>
+
+              {/* Row 4: Advanced Options */}
+              <div className={`border-t ${borderColor} pt-4`}>
+                <label className={`flex items-center gap-2 cursor-pointer`}>
+                  <input type="checkbox" className="accent-[#00e5ff]" defaultChecked />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Use Adaptive Participation</span>
+                </label>
+                <p className={`text-xs ${textSecondary} mt-1 ml-6`}>Automatically adjust participation based on market conditions</p>
+              </div>
+            </div>
           </div>
+
+          {/* Live Calculation Panel */}
+          <Card className={`${bgCard} border ${borderColor} p-4`}>
+            <h3 className={`text-sm font-semibold ${textPrimary} mb-3`}>Expected Execution Profile</h3>
+            <div className="grid grid-cols-4 gap-3">
+              <div className={`px-3 py-2 rounded ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-50"}`}>
+                <p className={`text-xs ${textSecondary}`}>Est. Duration</p>
+                <p className={`text-sm font-bold ${textPrimary}`}>6h 30m</p>
+              </div>
+              <div className={`px-3 py-2 rounded ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-50"}`}>
+                <p className={`text-xs ${textSecondary}`}>Est. Fills</p>
+                <p className={`text-sm font-bold ${textPrimary}`}>47-52</p>
+              </div>
+              <div className={`px-3 py-2 rounded ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-50"}`}>
+                <p className={`text-xs ${textSecondary}`}>Target VWAP</p>
+                <p className={`text-sm font-bold text-[#4caf50]`}>±2.5 bps</p>
+              </div>
+              <div className={`px-3 py-2 rounded ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-50"}`}>
+                <p className={`text-xs ${textSecondary}`}>Risk Level</p>
+                <p className={`text-sm font-bold text-[#ff9800]`}>Medium</p>
+              </div>
+            </div>
+          </Card>
         </div>
       ),
       4: (
@@ -5432,61 +5498,103 @@ const specCompareResults = [
       ),
       2: (
         <div className="space-y-4">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">12 Unchanged</span>
-            <span className="px-2 py-1 rounded text-xs bg-[#2196f3]/20 text-[#2196f3]">5 Added</span>
-            <span className="px-2 py-1 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">3 Modified</span>
-            <span className="px-2 py-1 rounded text-xs bg-[#f44336]/20 text-[#f44336]">1 Removed</span>
-          </div>
-          {[
-            { type: "added", field: "Tag 7945 (DisplayQty)", desc: "New optional parameter for iceberg orders" },
-            { type: "modified", field: "Tag 7942 (ParticipationRate)", desc: "Range changed from 0-100 to 0-50" },
-            { type: "added", field: "Strategy: Sniper", desc: "New aggressive execution strategy added" },
-            { type: "removed", field: "Tag 7948 (LegacyMode)", desc: "Deprecated parameter removed" },
-            { type: "modified", field: "Tag 7941 (EndTime)", desc: "Now required instead of optional" },
-          ].map((diff, i) => (
-            <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${
-              diff.type === "added" ? "border-[#4caf50]/30 bg-[#4caf50]/5" :
-              diff.type === "modified" ? "border-[#ff9800]/30 bg-[#ff9800]/5" :
-              "border-[#f44336]/30 bg-[#f44336]/5"
-            }`}>
-              {diff.type === "added" && <Plus className="h-4 w-4 text-[#4caf50]" />}
-              {diff.type === "modified" && <RefreshCw className="h-4 w-4 text-[#ff9800]" />}
-              {diff.type === "removed" && <Minus className="h-4 w-4 text-[#f44336]" />}
-              <span className={`text-sm font-medium ${textPrimary}`}>{diff.field}</span>
-              <span className={`text-xs ${textSecondary} flex-1`}>{diff.desc}</span>
-              <span className={`text-xs px-2 py-0.5 rounded ${
-                diff.type === "added" ? "bg-[#4caf50]/20 text-[#4caf50]" :
-                diff.type === "modified" ? "bg-[#ff9800]/20 text-[#ff9800]" :
-                "bg-[#f44336]/20 text-[#f44336]"
-              }`}>{diff.type}</span>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">12 Unchanged</span>
+              <span className="px-2 py-1 rounded text-xs bg-[#2196f3]/20 text-[#2196f3]">5 Added</span>
+              <span className="px-2 py-1 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">3 Modified</span>
+              <span className="px-2 py-1 rounded text-xs bg-[#f44336]/20 text-[#f44336]">1 Removed</span>
             </div>
-          ))}
+            <label className={`flex items-center gap-2 cursor-pointer text-sm ${textSecondary}`}>
+              <input type="checkbox" className="accent-[#00e5ff]" defaultChecked />
+              <span>Show unchanged fields</span>
+            </label>
+          </div>
+
+          {/* Detailed Diff View */}
+          <div className="space-y-2">
+            {[
+              { type: "added", field: "Tag 7945", desc: "DisplayQty", detail: "New optional parameter for iceberg orders", context: "Type: Int_t | Min: 0 | Max: 1000000" },
+              { type: "modified", field: "Tag 7942", desc: "ParticipationRate", detail: "Range changed from 0-100 to 0-50", context: "Was: 0-100 | Now: 0-50 | Default: 25" },
+              { type: "added", field: "Strategy", desc: "Sniper", detail: "New aggressive execution strategy added", context: "5 parameters | Aggressive execution | Min fill 1000 shares" },
+              { type: "removed", field: "Tag 7948", desc: "LegacyMode", detail: "Deprecated parameter removed", context: "Was: deprecated since v2.0 | Use AdaptiveParticipation instead" },
+              { type: "modified", field: "Tag 7941", desc: "EndTime", detail: "Now required instead of optional", context: "Was: optional | Now: REQUIRED | Default: 16:00" },
+            ].map((diff, i) => (
+              <div key={i} className={`border rounded-lg overflow-hidden transition-all ${
+                diff.type === "added" ? "border-[#4caf50]/30 bg-[#4caf50]/5" :
+                diff.type === "modified" ? "border-[#ff9800]/30 bg-[#ff9800]/5" :
+                "border-[#f44336]/30 bg-[#f44336]/5"
+              }`}>
+                <div className="flex items-center gap-3 px-4 py-3 hover:cursor-pointer group">
+                  <div className="flex-shrink-0">
+                    {diff.type === "added" && <Plus className="h-4 w-4 text-[#4caf50]" />}
+                    {diff.type === "modified" && <RefreshCw className="h-4 w-4 text-[#ff9800]" />}
+                    {diff.type === "removed" && <Minus className="h-4 w-4 text-[#f44336]" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className={`font-mono text-sm font-bold ${textPrimary}`}>{diff.field}</span>
+                      <span className={`text-sm ${textSecondary}`}>{diff.desc}</span>
+                    </div>
+                    <p className={`text-xs ${textSecondary} mt-0.5`}>{diff.detail}</p>
+                  </div>
+                  <span className={`text-xs px-2 py-1 rounded flex-shrink-0 ${
+                    diff.type === "added" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                    diff.type === "modified" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                    "bg-[#f44336]/20 text-[#f44336]"
+                  }`}>{diff.type}</span>
+                </div>
+                <div className={`px-4 py-2 border-t ${
+                  diff.type === "added" ? "border-[#4caf50]/20" :
+                  diff.type === "modified" ? "border-[#ff9800]/20" :
+                  "border-[#f44336]/20"
+                } ${isDarkMode ? "bg-[#0a1628]/40" : "bg-white/40"}`}>
+                  <p className={`text-xs font-mono ${textSecondary}`}>{diff.context}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       ),
       3: (
         <div className="space-y-4">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">8 Unchanged</span>
-            <span className="px-2 py-1 rounded text-xs bg-[#2196f3]/20 text-[#2196f3]">4 Added</span>
-            <span className="px-2 py-1 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">2 Modified</span>
-          </div>
-          {[
-            { type: "added", field: "Strategy: Sniper", desc: "New strategy definition with 6 parameters" },
-            { type: "modified", field: "VWAP.ParticipationRate", desc: "maxValue changed from 100 to 50" },
-            { type: "added", field: "VWAP.DisplayQty", desc: "New parameter for display quantity" },
-            { type: "modified", field: "TWAP.EndTime", desc: "use attribute changed to REQUIRED" },
-          ].map((diff, i) => (
-            <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${
-              diff.type === "added" ? "border-[#4caf50]/30 bg-[#4caf50]/5" :
-              "border-[#ff9800]/30 bg-[#ff9800]/5"
-            }`}>
-              {diff.type === "added" && <Plus className="h-4 w-4 text-[#4caf50]" />}
-              {diff.type === "modified" && <RefreshCw className="h-4 w-4 text-[#ff9800]" />}
-              <span className={`text-sm font-medium ${textPrimary}`}>{diff.field}</span>
-              <span className={`text-xs ${textSecondary} flex-1`}>{diff.desc}</span>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">8 Unchanged</span>
+              <span className="px-2 py-1 rounded text-xs bg-[#2196f3]/20 text-[#2196f3]">4 Added</span>
+              <span className="px-2 py-1 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">2 Modified</span>
             </div>
-          ))}
+            <button className={`text-xs px-3 py-1.5 rounded border ${borderColor} hover:bg-[#1e4976]/30 ${textSecondary}`}>
+              Download Diff Report
+            </button>
+          </div>
+
+          {/* ATDL-specific diffs */}
+          <div className="space-y-2">
+            {[
+              { type: "added", field: "Strategy", desc: "Sniper", detail: "New strategy definition with 6 parameters", context: "<Strategy name='Sniper' class='SniperStrategy' />" },
+              { type: "modified", field: "VWAP.ParticipationRate", desc: "UI Control Updated", detail: "maxValue changed from 100 to 50", context: "<Control xsi:type='SingleSpinner' minValue='0' maxValue='50' />" },
+              { type: "added", field: "VWAP.DisplayQty", desc: "New Parameter", detail: "New parameter for display quantity control", context: "<Parameter name='DisplayQty' mnemonic='7945' />" },
+              { type: "modified", field: "TWAP.EndTime", desc: "Required Attribute", detail: "use attribute changed to REQUIRED", context: "Was: use='optional' | Now: use='REQUIRED'" },
+            ].map((diff, i) => (
+              <div key={i} className={`border rounded-lg px-4 py-3 ${
+                diff.type === "added" ? "border-[#4caf50]/30 bg-[#4caf50]/5" :
+                "border-[#ff9800]/30 bg-[#ff9800]/5"
+              }`}>
+                <div className="flex items-center gap-3">
+                  {diff.type === "added" ? <Plus className="h-4 w-4 text-[#4caf50]" /> : <RefreshCw className="h-4 w-4 text-[#ff9800]" />}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className={`font-mono text-sm font-bold ${textPrimary}`}>{diff.field}</span>
+                      <span className={`text-sm ${textSecondary}`}>{diff.desc}</span>
+                    </div>
+                    <p className={`text-xs ${textSecondary} mt-0.5`}>{diff.detail}</p>
+                    <p className={`text-xs font-mono ${textSecondary} mt-1 ${isDarkMode ? "bg-[#0a1628]/40" : "bg-white/40"} px-2 py-1 rounded`}>{diff.context}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       ),
       4: (
@@ -5578,31 +5686,42 @@ const specCompareResults = [
         <div className="space-y-3">
           <p className={`text-sm ${textSecondary} mb-4`}>Review each issue and decide how to handle it:</p>
           {[
-            { issue: "Missing wireValue on ParticipationRate", severity: "Error", suggestion: "Add wireValue='7942'", autoFix: true },
-            { issue: "Missing wireValue on StartTime", severity: "Error", suggestion: "Add wireValue='7940'", autoFix: true },
-            { issue: "Invalid control type 'CustomSlider'", severity: "Error", suggestion: "Replace with 'SingleSpinner'", autoFix: true },
-            { issue: "Deprecated Qty_t type", severity: "Warning", suggestion: "Update to Int_t", autoFix: true },
-            { issue: "Circular edit rule reference", severity: "Warning", suggestion: "Manual review required", autoFix: false },
+            { issue: "Missing wireValue on ParticipationRate", severity: "Error", suggestion: "Add wireValue='7942'", autoFix: true, impact: "Critical - prevents deployment" },
+            { issue: "Missing wireValue on StartTime", severity: "Error", suggestion: "Add wireValue='7940'", autoFix: true, impact: "Critical - prevents deployment" },
+            { issue: "Invalid control type 'CustomSlider'", severity: "Error", suggestion: "Replace with 'SingleSpinner'", autoFix: true, impact: "Critical - breaks UI rendering" },
+            { issue: "Deprecated Qty_t type", severity: "Warning", suggestion: "Update to Int_t", autoFix: true, impact: "Medium - may cause compatibility issues" },
+            { issue: "Circular edit rule reference", severity: "Warning", suggestion: "Manual review required", autoFix: false, impact: "High - requires validation logic check" },
           ].map((issue, i) => (
-            <div key={i} className={`border ${borderColor} rounded-lg overflow-hidden`}>
-              <div className={`flex items-center gap-3 px-4 py-2 ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"}`}>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
-                  issue.severity === "Error" ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ff9800]/20 text-[#ff9800]"
+            <div key={i} className={`border rounded-lg overflow-hidden transition-all ${
+              issue.severity === "Error" ? "border-[#f44336]/40 hover:border-[#f44336]/60" : "border-[#ff9800]/40 hover:border-[#ff9800]/60"
+            }`}>
+              <div className={`flex items-center gap-3 px-4 py-3 ${
+                issue.severity === "Error" ? isDarkMode ? "bg-[#f44336]/5" : "bg-[#f44336]/5" : isDarkMode ? "bg-[#ff9800]/5" : "bg-[#ff9800]/5"
+              }`}>
+                <span className={`text-xs font-bold px-2 py-0.5 rounded ${
+                  issue.severity === "Error" ? "bg-[#f44336]/30 text-[#f44336]" : "bg-[#ff9800]/30 text-[#ff9800]"
                 }`}>{issue.severity}</span>
-                <span className={`text-sm font-medium ${textPrimary}`}>{issue.issue}</span>
+                <span className={`text-sm font-medium flex-1 ${textPrimary}`}>{issue.issue}</span>
+                {issue.autoFix && <Button size="sm" className="bg-[#4caf50] text-white hover:bg-[#4caf50]/80">
+                  <Wrench className="h-3 w-3 mr-1" /> Auto-Fix
+                </Button>}
+                {!issue.autoFix && <Button size="sm" variant="outline">Manual Review</Button>}
               </div>
-              <div className={`px-4 py-3 flex items-center justify-between ${isDarkMode ? "bg-[#0a1628]/40" : "bg-white"}`}>
-                <div>
-                  <p className={`text-xs ${textSecondary}`}>Suggested fix:</p>
-                  <p className={`text-sm ${textPrimary}`}>{issue.suggestion}</p>
+              <div className={`px-4 py-3 border-t ${issue.severity === "Error" ? "border-[#f44336]/20" : "border-[#ff9800]/20"} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-white/40"}`}>
+                <div className="grid grid-cols-3 gap-3 text-xs">
+                  <div>
+                    <p className={textSecondary}>Suggested Fix</p>
+                    <p className="font-mono mt-1">{issue.suggestion}</p>
+                  </div>
+                  <div>
+                    <p className={textSecondary}>Impact</p>
+                    <p className={`mt-1 ${issue.severity === "Error" ? "text-[#f44336]" : "text-[#ff9800]"}`}>{issue.impact}</p>
+                  </div>
+                  <div>
+                    <p className={textSecondary}>Status</p>
+                    <p className={`mt-1 px-2 py-0.5 rounded inline-block text-xs ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"}`}>Pending</p>
+                  </div>
                 </div>
-                {issue.autoFix ? (
-                  <Button size="sm" className="bg-[#4caf50] text-white hover:bg-[#4caf50]/80">
-                    <Wrench className="h-3 w-3 mr-1" /> Auto-Fix
-                  </Button>
-                ) : (
-                  <Button size="sm" variant="outline">Manual Review</Button>
-                )}
               </div>
             </div>
           ))}
@@ -5611,30 +5730,51 @@ const specCompareResults = [
       3: (
         <div className="space-y-4">
           <div className={`p-4 rounded-lg border border-[#2196f3]/40 bg-[#2196f3]/10`}>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mb-3">
               <Wrench className="h-6 w-6 text-[#2196f3]" />
               <div>
                 <p className="text-[#2196f3] font-semibold">Applying Fixes...</p>
-                <p className={`text-sm ${textSecondary}`}>4 of 5 issues have been automatically fixed.</p>
+                <p className={`text-sm ${textSecondary}`}>4 of 5 issues have been automatically fixed. 1 requires manual review.</p>
               </div>
             </div>
+            <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"} overflow-hidden`}>
+              <div className="h-full bg-[#2196f3] rounded-full transition-all" style={{ width: "80%" }} />
+            </div>
           </div>
+
+          {/* Fix Progress */}
           <div className="space-y-2">
             {[
-              { issue: "Missing wireValue on ParticipationRate", status: "fixed" },
-              { issue: "Missing wireValue on StartTime", status: "fixed" },
-              { issue: "Invalid control type 'CustomSlider'", status: "fixed" },
-              { issue: "Deprecated Qty_t type", status: "fixed" },
-              { issue: "Circular edit rule reference", status: "pending" },
+              { issue: "Missing wireValue on ParticipationRate", status: "fixed", time: "0.2s" },
+              { issue: "Missing wireValue on StartTime", status: "fixed", time: "0.2s" },
+              { issue: "Invalid control type 'CustomSlider'", status: "fixed", time: "0.3s" },
+              { issue: "Deprecated Qty_t type", status: "fixed", time: "0.1s" },
+              { issue: "Circular edit rule reference", status: "pending", time: "needs review" },
             ].map((item, i) => (
-              <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${borderColor}`}>
-                {item.status === "fixed" ? <CheckCircle className="h-4 w-4 text-[#4caf50]" /> : <Clock className="h-4 w-4 text-[#ff9800]" />}
-                <span className={`text-sm ${textPrimary}`}>{item.issue}</span>
-                <span className={`ml-auto text-xs px-2 py-0.5 rounded ${
+              <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${borderColor} ${item.status === "fixed" ? "bg-[#4caf50]/5" : "bg-[#ff9800]/5"}`}>
+                {item.status === "fixed" ? (
+                  <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                ) : (
+                  <Clock className="h-4 w-4 text-[#ff9800]" />
+                )}
+                <span className={`text-sm flex-1 ${textPrimary}`}>{item.issue}</span>
+                <span className={`text-xs px-2 py-0.5 rounded ${
                   item.status === "fixed" ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#ff9800]/20 text-[#ff9800]"
-                }`}>{item.status === "fixed" ? "Fixed" : "Needs Review"}</span>
+                }`}>{item.status === "fixed" ? `Fixed (${item.time})` : `${item.time}`}</span>
               </div>
             ))}
+          </div>
+
+          {/* Manual Review Panel */}
+          <div className={`border-2 border-[#ff9800]/30 rounded-lg p-4 ${isDarkMode ? "bg-[#ff9800]/5" : "bg-[#ff9800]/5"}`}>
+            <p className={`text-sm font-semibold ${textPrimary} mb-2`}>Manual Review Required</p>
+            <p className={`text-xs ${textSecondary} mb-3`}>Circular edit rule reference detected. Please review the rule logic:</p>
+            <div className={`px-3 py-2 rounded font-mono text-xs ${isDarkMode ? "bg-[#0a1628]" : "bg-white"} border ${borderColor}`}>
+              &lt;EditRuleRef ref="Rule_A" /&gt;&lt;EditRuleRef ref="Rule_B" /&gt;&lt;EditRuleRef ref="Rule_A" /&gt;
+            </div>
+            <Button size="sm" className="mt-2 w-full">
+              <Eye className="h-4 w-4 mr-2" /> Review in Detail
+            </Button>
           </div>
         </div>
       ),
@@ -5938,20 +6078,91 @@ const specCompareResults = [
               {stepContent[atdlWizardStep]}
             </Card>
 
-            {/* Navigation */}
-            <div className="flex items-center justify-between">
-              <Button variant="outline" onClick={() => setAtdlWizardStep(s => Math.max(0, s - 1))} disabled={atdlWizardStep === 0}>
-                <ArrowLeft className="h-4 w-4 mr-2" /> Previous
-              </Button>
-              {atdlWizardStep < steps.length - 1 ? (
-                <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80" onClick={() => simulateTask(() => setAtdlWizardStep(s => Math.min(steps.length - 1, s + 1)))}>
-                  {isLoading ? "Processing..." : "Next"} <ArrowRight className="h-4 w-4 ml-2" />
+            {/* Navigation with Progress Tracking */}
+            <div className="space-y-4">
+              {/* Progress Bar */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className={`text-xs font-semibold ${textSecondary}`}>Workflow Progress</span>
+                  <span className={`text-xs ${textSecondary}`}>{atdlWizardStep + 1} of {steps.length}</span>
+                </div>
+                <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"} overflow-hidden`}>
+                  <div 
+                    className="h-full bg-[#00e5ff] rounded-full transition-all duration-300"
+                    style={{ width: `${((atdlWizardStep + 1) / steps.length) * 100}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Step Indicators */}
+              <div className="flex gap-1 overflow-x-auto pb-1">
+                {steps.map((step, idx) => {
+                  const isActive = atdlWizardStep === idx
+                  const isDone = atdlWizardStep > idx
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => idx <= atdlWizardStep && setAtdlWizardStep(idx)}
+                      className={`flex-1 min-w-24 px-2 py-2 rounded text-xs font-medium transition-all flex items-center justify-center gap-1 ${
+                        isActive
+                          ? "bg-[#00e5ff] text-[#0a1628]"
+                          : isDone
+                          ? `${isDarkMode ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#4caf50]/20 text-[#4caf50]"}`
+                          : `${isDarkMode ? "bg-[#1e4976]/30 text-slate-400" : "bg-gray-200 text-gray-600"}`
+                      } ${idx <= atdlWizardStep ? "cursor-pointer hover:opacity-80" : "cursor-not-allowed"}`}
+                      disabled={idx > atdlWizardStep}
+                    >
+                      {isDone ? <CheckCircle className="h-3 w-3" /> : <span>{idx + 1}</span>}
+                      <span className="hidden sm:inline">{step.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Navigation Buttons */}
+              <div className="flex items-center gap-3 pt-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setAtdlWizardStep(s => Math.max(0, s - 1))} 
+                  disabled={atdlWizardStep === 0}
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" /> Previous
                 </Button>
-              ) : (
-                <Button className="bg-[#4caf50] hover:bg-[#4caf50]/80 text-white" onClick={() => setCurrentScreen("atdl-workbench" as any)}>
-                  Complete & Close <CheckCircle className="h-4 w-4 ml-2" />
-                </Button>
-              )}
+                
+                <div className="flex-1" />
+
+                {/* Step Info */}
+                <div className={`text-xs px-3 py-2 rounded ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"}`}>
+                  <span className={`font-semibold text-[#00e5ff]`}>Step {atdlWizardStep + 1}:</span>
+                  <span className={`${textSecondary} ml-1`}>{steps[atdlWizardStep].label}</span>
+                </div>
+
+                <div className="flex-1" />
+
+                {atdlWizardStep < steps.length - 1 ? (
+                  <Button 
+                    className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 transition-all" 
+                    onClick={() => simulateTask(() => setAtdlWizardStep(s => Math.min(steps.length - 1, s + 1)))}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader className="h-4 w-4 mr-2 animate-spin" /> Processing...
+                      </>
+                    ) : (
+                      <>
+                        Next <ArrowRight className="h-4 w-4 ml-2" />
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <Button 
+                    className="bg-[#4caf50] hover:bg-[#4caf50]/80 text-white transition-all" 
+                    onClick={() => setCurrentScreen("atdl-workbench" as any)}
+                  >
+                    <CheckCircle className="h-4 w-4 mr-2" /> Complete & Close
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>
