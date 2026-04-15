@@ -385,6 +385,10 @@ export default function BCometPlatform() {
   const [atdlValidationFilter, setAtdlValidationFilter] = useState<"all" | "error" | "warning" | "pass">("all")
   const [atdlDecisions, setAtdlDecisions] = useState<Record<string, string>>({})
   const [atdlRemediationFilter, setAtdlRemediationFilter] = useState<"all" | "open" | "in-progress" | "resolved">("all")
+  
+  // File upload state for ATDL workflows
+  const [uploadedFiles, setUploadedFiles] = useState<Record<string, { name: string; size: number; type: string; status: "uploading" | "complete" | "error" }>>({})
+  const [dragOver, setDragOver] = useState<string | null>(null)
   const [demoFormData, setDemoFormData] = useState({
     name: "",
     email: "",
@@ -402,6 +406,99 @@ export default function BCometPlatform() {
   const textPrimary = isDarkMode ? "text-white" : "text-[#0a1628]"
   const textSecondary = isDarkMode ? "text-[#b0bec5]" : "text-[#64748b]"
   const borderColor = isDarkMode ? "border-[#1e4976]" : "border-[#e2e8f0]"
+
+  // File upload handler
+  const handleFileUpload = (fileKey: string, files: FileList | null) => {
+    if (!files || files.length === 0) return
+    const file = files[0]
+    
+    // Validate file type
+    const validTypes = fileKey.includes("atdl") ? [".atdl", ".xml"] : [".pdf"]
+    const ext = file.name.substring(file.name.lastIndexOf(".")).toLowerCase()
+    if (!validTypes.some(t => ext === t || file.type.includes(t.replace(".", "")))) {
+      setUploadedFiles(prev => ({ ...prev, [fileKey]: { name: file.name, size: file.size, type: ext, status: "error" } }))
+      return
+    }
+    
+    // Simulate upload
+    setUploadedFiles(prev => ({ ...prev, [fileKey]: { name: file.name, size: file.size, type: ext, status: "uploading" } }))
+    setTimeout(() => {
+      setUploadedFiles(prev => ({ ...prev, [fileKey]: { ...prev[fileKey], status: "complete" } }))
+    }, 1200)
+  }
+
+  // FileUploadZone component
+  const FileUploadZone = ({ fileKey, label, acceptTypes, icon: Icon = Upload }: { fileKey: string; label: string; acceptTypes: string; icon?: React.ElementType }) => {
+    const file = uploadedFiles[fileKey]
+    const isDragging = dragOver === fileKey
+    
+    return (
+      <div
+        className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-all cursor-pointer ${
+          isDragging 
+            ? "border-[#00e5ff] bg-[#00e5ff]/10" 
+            : file?.status === "complete"
+            ? "border-[#4caf50]/50 bg-[#4caf50]/5"
+            : file?.status === "error"
+            ? "border-[#f44336]/50 bg-[#f44336]/5"
+            : `${borderColor} hover:border-[#00e5ff]/50 ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`
+        }`}
+        onDragOver={(e) => { e.preventDefault(); setDragOver(fileKey) }}
+        onDragLeave={() => setDragOver(null)}
+        onDrop={(e) => { e.preventDefault(); setDragOver(null); handleFileUpload(fileKey, e.dataTransfer.files) }}
+        onClick={() => document.getElementById(`file-input-${fileKey}`)?.click()}
+      >
+        <input
+          id={`file-input-${fileKey}`}
+          type="file"
+          accept={acceptTypes}
+          className="hidden"
+          onChange={(e) => handleFileUpload(fileKey, e.target.files)}
+        />
+        
+        {file?.status === "uploading" ? (
+          <div className="flex flex-col items-center gap-3">
+            <Loader className="h-8 w-8 text-[#00e5ff] animate-spin" />
+            <p className={`text-sm font-medium ${textPrimary}`}>Uploading {file.name}...</p>
+            <div className={`w-48 h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"} overflow-hidden`}>
+              <div className="h-full bg-[#00e5ff] rounded-full animate-pulse" style={{ width: "60%" }} />
+            </div>
+          </div>
+        ) : file?.status === "complete" ? (
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-[#4caf50]/20">
+                <FileText className="h-6 w-6 text-[#4caf50]" />
+              </div>
+              <div className="text-left">
+                <p className={`text-sm font-medium ${textPrimary}`}>{file.name}</p>
+                <p className={`text-xs ${textSecondary}`}>{(file.size / 1024).toFixed(1)} KB</p>
+              </div>
+              <CheckCircle className="h-5 w-5 text-[#4caf50]" />
+            </div>
+            <p className={`text-xs ${textSecondary} mt-1`}>Click or drop to replace</p>
+          </div>
+        ) : file?.status === "error" ? (
+          <div className="flex flex-col items-center gap-2">
+            <AlertCircle className="h-8 w-8 text-[#f44336]" />
+            <p className={`text-sm font-medium text-[#f44336]`}>Invalid file type</p>
+            <p className={`text-xs ${textSecondary}`}>Please upload {acceptTypes} files only</p>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-3">
+            <div className={`p-3 rounded-full ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-100"}`}>
+              <Icon className={`h-6 w-6 ${isDragging ? "text-[#00e5ff]" : textSecondary}`} />
+            </div>
+            <div>
+              <p className={`text-sm font-medium ${textPrimary}`}>{label}</p>
+              <p className={`text-xs ${textSecondary} mt-1`}>Drag & drop or click to browse</p>
+              <p className={`text-xs ${textSecondary}`}>Accepts: {acceptTypes}</p>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   const assetClassesList = ["Equities", "Fixed Income", "Options", "Futures", "FX", "Commodities"]
 
@@ -5460,11 +5557,7 @@ const specCompareResults = [
           </div>
           <div>
             <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Upload FIX Specification PDF</label>
-            <div className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center hover:border-[#00e5ff] transition-colors cursor-pointer`}>
-              <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-              <p className={`${textPrimary} font-medium mb-1`}>Drop FIX Spec PDF here</p>
-              <p className={`text-xs ${textSecondary}`}>or click to browse. Supports PDF format.</p>
-            </div>
+            <FileUploadZone fileKey="conversion-fix-spec" label="Drop FIX Specification PDF here" acceptTypes=".pdf" icon={FileText} />
           </div>
           <div>
             <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Target Strategies to Extract</label>
@@ -5651,34 +5744,28 @@ const specCompareResults = [
           <div className={`border-t ${borderColor}`} />
           <p className={`text-sm ${textSecondary}`}>Upload the old and new versions of your FIX specification PDFs:</p>
           <div className="grid grid-cols-2 gap-6">
-            <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#2196f3] transition-colors cursor-pointer`}>
-              <FileText className={`h-8 w-8 mx-auto mb-2 text-[#2196f3]`} />
-              <p className={`${textPrimary} font-medium mb-1`}>Old FIX Spec (v2.0)</p>
-              <p className={`text-xs ${textSecondary}`}>Drop PDF or click to upload</p>
-              <span className="inline-block mt-2 px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">Uploaded</span>
+            <div>
+              <p className={`text-xs font-medium ${textSecondary} mb-2 uppercase tracking-wider`}>Old Version</p>
+              <FileUploadZone fileKey="upgrade-old-fix" label="Old FIX Spec (v2.0)" acceptTypes=".pdf" icon={FileText} />
             </div>
-            <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#9c27b0] transition-colors cursor-pointer`}>
-              <FileText className={`h-8 w-8 mx-auto mb-2 text-[#9c27b0]`} />
-              <p className={`${textPrimary} font-medium mb-1`}>New FIX Spec (v2.1)</p>
-              <p className={`text-xs ${textSecondary}`}>Drop PDF or click to upload</p>
-              <span className="inline-block mt-2 px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">Uploaded</span>
+            <div>
+              <p className={`text-xs font-medium ${textSecondary} mb-2 uppercase tracking-wider`}>New Version</p>
+              <FileUploadZone fileKey="upgrade-new-fix" label="New FIX Spec (v2.1)" acceptTypes=".pdf" icon={FileText} />
             </div>
           </div>
         </div>
       ),
       1: (
         <div className="space-y-5">
-          <p className={`text-sm ${textSecondary} mb-4`}>Upload the corresponding ATDL files for each FIX spec version:</p>
+          <p className={`text-sm ${textSecondary}`}>Upload the corresponding ATDL files for each FIX spec version:</p>
           <div className="grid grid-cols-2 gap-6">
-            <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#2196f3] transition-colors cursor-pointer`}>
-              <Layers className={`h-8 w-8 mx-auto mb-2 text-[#2196f3]`} />
-              <p className={`${textPrimary} font-medium mb-1`}>Old ATDL (v2.0)</p>
-              <p className={`text-xs ${textSecondary}`}>Drop ATDL or click to upload</p>
+            <div>
+              <p className={`text-xs font-medium ${textSecondary} mb-2 uppercase tracking-wider`}>Old Version</p>
+              <FileUploadZone fileKey="upgrade-old-atdl" label="Old ATDL (v2.0)" acceptTypes=".atdl,.xml" icon={Layers} />
             </div>
-            <div className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center hover:border-[#9c27b0] transition-colors cursor-pointer`}>
-              <Layers className={`h-8 w-8 mx-auto mb-2 text-[#9c27b0]`} />
-              <p className={`${textPrimary} font-medium mb-1`}>New ATDL (v2.1)</p>
-              <p className={`text-xs ${textSecondary}`}>Drop ATDL or click to upload</p>
+            <div>
+              <p className={`text-xs font-medium ${textSecondary} mb-2 uppercase tracking-wider`}>New Version</p>
+              <FileUploadZone fileKey="upgrade-new-atdl" label="New ATDL (v2.1)" acceptTypes=".atdl,.xml" icon={Layers} />
             </div>
           </div>
         </div>
@@ -5833,11 +5920,7 @@ const specCompareResults = [
           <div className={`border-t ${borderColor}`} />
           <div>
             <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Upload Existing ATDL File</label>
-            <div className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center hover:border-[#00e5ff] transition-colors cursor-pointer`}>
-              <Layers className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-              <p className={`${textPrimary} font-medium mb-1`}>Drop ATDL file here</p>
-              <p className={`text-xs ${textSecondary}`}>Supports .atdl and .xml formats</p>
-            </div>
+            <FileUploadZone fileKey="remediation-atdl" label="Drop ATDL file here" acceptTypes=".atdl,.xml" icon={Layers} />
           </div>
         </div>
       ),
