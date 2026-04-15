@@ -33,6 +33,7 @@ export default function BCometPlatform() {
     { name: "Slack", description: "Team notifications", status: "not-connected" as "configured" | "not-connected" },
     { name: "Microsoft Teams", description: "Team collaboration", status: "not-connected" as "configured" | "not-connected" },
   ])
+  const [loginEmail, setLoginEmail] = useState("")
   
   // Update userProfile when currentUser changes
   useEffect(() => {
@@ -1952,8 +1953,6 @@ export default function BCometPlatform() {
 
   // Login Screen
   if (currentScreen === "login") {
-    const [loginEmail, setLoginEmail] = useState("")
-    
     const handleLogin = () => {
       // Simulate login - set current user based on manager checkbox
       const userName = isManager ? "Sarah Johnson" : "John Smith"
