@@ -1355,7 +1355,7 @@ export default function BCometPlatform() {
               </button>
             </div>
             <div className="flex items-center gap-1">
-              {["Client Setup", "Spec Compare", "Log Analysis", "ATDL Config", "Test Suite", "Scenario Gen", "Evidence", "Prod Config", "Certification"].map((step, i) => (
+              {["Dashboard", "Add Client", "Add Case", "Spec Compare", "Log Analysis", "Test Suite", "Evidence", "Prod Config", "Certification"].map((step, i) => (
                 <button 
                   key={step} 
                   onClick={() => setWalkthroughStep(i)}
@@ -1370,52 +1370,144 @@ export default function BCometPlatform() {
           
           {/* Step Content */}
           <div className="p-6">
-            {/* Step 0: Client Setup */}
+            {/* Step 0: Dashboard Overview */}
             {walkthroughStep === 0 && (
               <div className="grid grid-cols-2 gap-8">
                 <div>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00e5ff]/20 to-[#00e5ff]/5 flex items-center justify-center border border-[#00e5ff]/30">
-                      <Building2 className="h-6 w-6 text-[#00e5ff]" />
+                      <LayoutDashboard className="h-6 w-6 text-[#00e5ff]" />
                     </div>
                     <div>
-                      <h4 className={`font-bold text-xl ${textPrimary}`}>1. Client & Case Setup</h4>
-                      <p className={`text-sm ${textSecondary}`}>Register client and create onboarding case</p>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>1. Dashboard Overview</h4>
+                      <p className={`text-sm ${textSecondary}`}>See all client progress at a glance</p>
                     </div>
                   </div>
                   <div className={`space-y-4 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
                     <div className="flex items-start gap-3">
                       <div className="w-6 h-6 rounded-full bg-[#00e5ff]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-xs font-bold text-[#00e5ff]">1</span>
+                        <Target className="h-3 w-3 text-[#00e5ff]" />
                       </div>
                       <div>
-                        <p className={`text-sm font-medium ${textPrimary}`}>Add New Client</p>
-                        <p className={`text-xs ${textSecondary}`}>Enter firm details, JIRA ticket, asset classes</p>
+                        <p className={`text-sm font-medium ${textPrimary}`}>Real-time Progress Tracking</p>
+                        <p className={`text-xs ${textSecondary}`}>Monitor all active onboarding cases</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-[#00e5ff]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-xs font-bold text-[#00e5ff]">2</span>
+                      <div className="w-6 h-6 rounded-full bg-[#ff9800]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <AlertTriangle className="h-3 w-3 text-[#ff9800]" />
                       </div>
                       <div>
-                        <p className={`text-sm font-medium ${textPrimary}`}>Create Onboarding Case</p>
-                        <p className={`text-xs ${textSecondary}`}>Assign manager, set SLA, configure stages</p>
+                        <p className={`text-sm font-medium ${textPrimary}`}>Risk & Alert Visibility</p>
+                        <p className={`text-xs ${textSecondary}`}>Identify cases at risk or requiring attention</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-[#00e5ff]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-xs font-bold text-[#00e5ff]">3</span>
+                      <div className="w-6 h-6 rounded-full bg-[#4caf50]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <CheckCircle className="h-3 w-3 text-[#4caf50]" />
                       </div>
                       <div>
-                        <p className={`text-sm font-medium ${textPrimary}`}>Upload Client Specs</p>
-                        <p className={`text-xs ${textSecondary}`}>FIX specifications in PDF, Excel, or XML format</p>
+                        <p className={`text-sm font-medium ${textPrimary}`}>Approvals Pending</p>
+                        <p className={`text-xs ${textSecondary}`}>Quick access to items awaiting your approval</p>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
                   <div className={`${bgSecondary} px-4 py-2 border-b ${borderColor} flex items-center gap-2`}>
-                    <Plus className="h-4 w-4 text-[#00e5ff]" />
+                    <LayoutDashboard className="h-4 w-4 text-[#00e5ff]" />
+                    <span className={`text-sm font-medium ${textPrimary}`}>Dashboard Preview</span>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    {/* Mini KPI Cards */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className={`p-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
+                        <p className={`text-xs ${textSecondary}`}>Active Clients</p>
+                        <p className="text-xl font-bold text-[#00e5ff]">12</p>
+                      </div>
+                      <div className={`p-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
+                        <p className={`text-xs ${textSecondary}`}>Cases in Progress</p>
+                        <p className="text-xl font-bold text-[#4caf50]">24</p>
+                      </div>
+                      <div className={`p-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
+                        <p className={`text-xs ${textSecondary}`}>At Risk</p>
+                        <p className="text-xl font-bold text-[#f44336]">3</p>
+                      </div>
+                      <div className={`p-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
+                        <p className={`text-xs ${textSecondary}`}>Pending Approvals</p>
+                        <p className="text-xl font-bold text-[#ff9800]">7</p>
+                      </div>
+                    </div>
+                    {/* Mini Client List */}
+                    <div className={`p-3 rounded-lg border ${borderColor}`}>
+                      <p className={`text-xs font-medium ${textSecondary} mb-2`}>Recent Client Activity</p>
+                      {[
+                        { name: "Nexus Trading", progress: 72, status: "on-track" },
+                        { name: "Apex Capital", progress: 45, status: "at-risk" },
+                        { name: "Summit Financial", progress: 89, status: "on-track" },
+                      ].map((c, i) => (
+                        <div key={i} className={`flex items-center justify-between py-1.5 ${i > 0 ? `border-t ${borderColor}` : ""}`}>
+                          <span className={`text-xs ${textPrimary}`}>{c.name}</span>
+                          <div className="flex items-center gap-2">
+                            <div className={`w-16 h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`}>
+                              <div className={`h-full rounded-full ${c.status === "at-risk" ? "bg-[#f44336]" : "bg-[#4caf50]"}`} style={{ width: `${c.progress}%` }} />
+                            </div>
+                            <span className={`text-[10px] ${c.status === "at-risk" ? "text-[#f44336]" : "text-[#4caf50]"}`}>{c.progress}%</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 1: Add Client */}
+            {walkthroughStep === 1 && (
+              <div className="grid grid-cols-2 gap-8">
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#4caf50]/20 to-[#4caf50]/5 flex items-center justify-center border border-[#4caf50]/30">
+                      <Building2 className="h-6 w-6 text-[#4caf50]" />
+                    </div>
+                    <div>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>2. Add New Client</h4>
+                      <p className={`text-sm ${textSecondary}`}>Register a new client in the system</p>
+                    </div>
+                  </div>
+                  <div className={`space-y-4 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-[#4caf50]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-xs font-bold text-[#4caf50]">1</span>
+                      </div>
+                      <div>
+                        <p className={`text-sm font-medium ${textPrimary}`}>Enter Client Details</p>
+                        <p className={`text-xs ${textSecondary}`}>Firm name, contact info, JIRA ticket</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-[#4caf50]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-xs font-bold text-[#4caf50]">2</span>
+                      </div>
+                      <div>
+                        <p className={`text-sm font-medium ${textPrimary}`}>Select Asset Classes</p>
+                        <p className={`text-xs ${textSecondary}`}>Equities, Options, Futures, Fixed Income</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-[#4caf50]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-xs font-bold text-[#4caf50]">3</span>
+                      </div>
+                      <div>
+                        <p className={`text-sm font-medium ${textPrimary}`}>Assign Account Manager</p>
+                        <p className={`text-xs ${textSecondary}`}>Primary contact for this client</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                  <div className={`${bgSecondary} px-4 py-2 border-b ${borderColor} flex items-center gap-2`}>
+                    <Plus className="h-4 w-4 text-[#4caf50]" />
                     <span className={`text-sm font-medium ${textPrimary}`}>New Client Registration</span>
                   </div>
                   <div className="p-4 space-y-3">
@@ -1438,12 +1530,12 @@ export default function BCometPlatform() {
                       </div>
                     </div>
                     <div>
-                      <label className={`text-[10px] font-medium ${textSecondary} mb-1 block uppercase tracking-wider`}>FIX Protocol</label>
-                      <div className="px-3 py-2 rounded-lg border border-[#00e5ff] bg-[#00e5ff]/10 text-[#00e5ff] text-sm font-medium">FIX 4.4</div>
+                      <label className={`text-[10px] font-medium ${textSecondary} mb-1 block uppercase tracking-wider`}>Account Manager</label>
+                      <div className={`px-3 py-2 rounded-lg border ${borderColor} ${textPrimary} text-sm`}>Sarah Johnson</div>
                     </div>
                     <div className="pt-2">
-                      <Button size="sm" className="w-full bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">
-                        <Plus className="h-4 w-4 mr-2" /> Create Client & Case
+                      <Button size="sm" className="w-full bg-[#4caf50] hover:bg-[#4caf50]/80">
+                        <Plus className="h-4 w-4 mr-2" /> Create Client
                       </Button>
                     </div>
                   </div>
@@ -1451,8 +1543,91 @@ export default function BCometPlatform() {
               </div>
             )}
 
-            {/* Step 1: Spec Compare */}
-            {walkthroughStep === 1 && (
+            {/* Step 2: Add Case */}
+            {walkthroughStep === 2 && (
+              <div className="grid grid-cols-2 gap-8">
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#9c27b0]/20 to-[#9c27b0]/5 flex items-center justify-center border border-[#9c27b0]/30">
+                      <Briefcase className="h-6 w-6 text-[#9c27b0]" />
+                    </div>
+                    <div>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>3. Create Onboarding Case</h4>
+                      <p className={`text-sm ${textSecondary}`}>Start a new certification workflow</p>
+                    </div>
+                  </div>
+                  <div className={`space-y-4 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-[#9c27b0]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-xs font-bold text-[#9c27b0]">1</span>
+                      </div>
+                      <div>
+                        <p className={`text-sm font-medium ${textPrimary}`}>Select Asset Class & Protocol</p>
+                        <p className={`text-xs ${textSecondary}`}>e.g., Equities FIX 4.4, Options FIX 5.0</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-[#9c27b0]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-xs font-bold text-[#9c27b0]">2</span>
+                      </div>
+                      <div>
+                        <p className={`text-sm font-medium ${textPrimary}`}>Assign Team & Set Due Date</p>
+                        <p className={`text-xs ${textSecondary}`}>Assignee, manager approval, SLA target</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-[#9c27b0]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-xs font-bold text-[#9c27b0]">3</span>
+                      </div>
+                      <div>
+                        <p className={`text-sm font-medium ${textPrimary}`}>Upload Initial Specs</p>
+                        <p className={`text-xs ${textSecondary}`}>Client FIX specification documents</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                  <div className={`${bgSecondary} px-4 py-2 border-b ${borderColor} flex items-center gap-2`}>
+                    <Briefcase className="h-4 w-4 text-[#9c27b0]" />
+                    <span className={`text-sm font-medium ${textPrimary}`}>New Onboarding Case</span>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    <div>
+                      <label className={`text-[10px] font-medium ${textSecondary} mb-1 block uppercase tracking-wider`}>Client</label>
+                      <div className={`px-3 py-2 rounded-lg border ${borderColor} ${textPrimary} text-sm font-medium`}>Apex Trading LLC</div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className={`text-[10px] font-medium ${textSecondary} mb-1 block uppercase tracking-wider`}>Asset Class</label>
+                        <div className="px-3 py-2 rounded-lg border border-[#9c27b0] bg-[#9c27b0]/10 text-[#9c27b0] text-sm font-medium">Equities</div>
+                      </div>
+                      <div>
+                        <label className={`text-[10px] font-medium ${textSecondary} mb-1 block uppercase tracking-wider`}>FIX Version</label>
+                        <div className={`px-3 py-2 rounded-lg border ${borderColor} ${textPrimary} text-sm`}>FIX 4.4</div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className={`text-[10px] font-medium ${textSecondary} mb-1 block uppercase tracking-wider`}>Assignee</label>
+                        <div className={`px-3 py-2 rounded-lg border ${borderColor} ${textPrimary} text-sm`}>John Smith</div>
+                      </div>
+                      <div>
+                        <label className={`text-[10px] font-medium ${textSecondary} mb-1 block uppercase tracking-wider`}>Due Date</label>
+                        <div className={`px-3 py-2 rounded-lg border ${borderColor} ${textPrimary} text-sm`}>Feb 15, 2024</div>
+                      </div>
+                    </div>
+                    <div className="pt-2">
+                      <Button size="sm" className="w-full bg-[#9c27b0] hover:bg-[#9c27b0]/80">
+                        <Plus className="h-4 w-4 mr-2" /> Create Case
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Spec Compare */}
+            {walkthroughStep === 3 && (
               <div className="grid grid-cols-2 gap-8">
                 <div>
                   <div className="flex items-center gap-3 mb-4">
@@ -1460,7 +1635,7 @@ export default function BCometPlatform() {
                       <GitCompare className="h-6 w-6 text-[#2196f3]" />
                     </div>
                     <div>
-                      <h4 className={`font-bold text-xl ${textPrimary}`}>2. Spec Compare</h4>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>4. Spec Compare</h4>
                       <p className={`text-sm ${textSecondary}`}>AI-powered specification analysis</p>
                     </div>
                   </div>
@@ -1532,8 +1707,8 @@ export default function BCometPlatform() {
               </div>
             )}
 
-            {/* Step 2: Log Analysis */}
-            {walkthroughStep === 2 && (
+            {/* Step 4: Log Analysis */}
+            {walkthroughStep === 4 && (
               <div className="grid grid-cols-2 gap-8">
                 <div>
                   <div className="flex items-center gap-3 mb-4">
@@ -1541,7 +1716,7 @@ export default function BCometPlatform() {
                       <FileSearch className="h-6 w-6 text-[#9c27b0]" />
                     </div>
                     <div>
-                      <h4 className={`font-bold text-xl ${textPrimary}`}>3. FIX Log Analysis</h4>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>5. FIX Log Analysis</h4>
                       <p className={`text-sm ${textSecondary}`}>Parse and analyze production FIX logs</p>
                     </div>
                   </div>
@@ -1609,85 +1784,8 @@ export default function BCometPlatform() {
               </div>
             )}
 
-            {/* Step 3: ATDL Config */}
-            {walkthroughStep === 3 && (
-              <div className="grid grid-cols-2 gap-8">
-                <div>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#ff9800]/20 to-[#ff9800]/5 flex items-center justify-center border border-[#ff9800]/30">
-                      <Sliders className="h-6 w-6 text-[#ff9800]" />
-                    </div>
-                    <div>
-                      <h4 className={`font-bold text-xl ${textPrimary}`}>4. ATDL Viewer</h4>
-                      <p className={`text-sm ${textSecondary}`}>Algorithmic Trading Definition Language</p>
-                    </div>
-                  </div>
-                  <div className={`space-y-3 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
-                    <p className={`text-sm ${textPrimary} font-medium`}>ATDL Configuration:</p>
-                    <ul className={`text-sm ${textSecondary} space-y-2`}>
-                      <li className="flex items-start gap-2">
-                        <Settings className="h-4 w-4 text-[#ff9800] flex-shrink-0 mt-0.5" />
-                        <span>View & edit algo strategy parameters</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Settings className="h-4 w-4 text-[#ff9800] flex-shrink-0 mt-0.5" />
-                        <span>Configure VWAP, TWAP, POV strategies</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Settings className="h-4 w-4 text-[#ff9800] flex-shrink-0 mt-0.5" />
-                        <span>Set order parameters & constraints</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Settings className="h-4 w-4 text-[#ff9800] flex-shrink-0 mt-0.5" />
-                        <span>Export config for production deployment</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
-                  <div className={`${bgSecondary} px-4 py-2 border-b ${borderColor} flex items-center justify-between`}>
-                    <div className="flex items-center gap-2">
-                      <Sliders className="h-4 w-4 text-[#ff9800]" />
-                      <span className={`text-sm font-medium ${textPrimary}`}>ATDL Strategy: VWAP</span>
-                    </div>
-                    <span className="px-2 py-0.5 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">Active</span>
-                  </div>
-                  <div className="p-4 space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className={`text-[10px] ${textSecondary} mb-1 block`}>Start Time</label>
-                        <div className={`px-2 py-1.5 rounded border ${borderColor} text-xs ${textPrimary}`}>09:30:00</div>
-                      </div>
-                      <div>
-                        <label className={`text-[10px] ${textSecondary} mb-1 block`}>End Time</label>
-                        <div className={`px-2 py-1.5 rounded border ${borderColor} text-xs ${textPrimary}`}>16:00:00</div>
-                      </div>
-                    </div>
-                    <div>
-                      <label className={`text-[10px] ${textSecondary} mb-1 block`}>Participation Rate</label>
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 h-2 rounded-full bg-[#1e4976]/30">
-                          <div className="h-full w-1/4 rounded-full bg-[#ff9800]" />
-                        </div>
-                        <span className={`text-xs font-mono ${textPrimary}`}>25%</span>
-                      </div>
-                    </div>
-                    <div>
-                      <label className={`text-[10px] ${textSecondary} mb-1 block`}>Price Limit</label>
-                      <div className={`px-2 py-1.5 rounded border border-[#ff9800] bg-[#ff9800]/10 text-xs text-[#ff9800]`}>$145.50 (Limit)</div>
-                    </div>
-                    <div className="flex gap-2">
-                      {["Urgency: Normal", "Display: Hidden", "Venue: Any"].map(tag => (
-                        <span key={tag} className={`px-2 py-0.5 rounded text-[10px] ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>{tag}</span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 4: Test Suite */}
-            {walkthroughStep === 4 && (
+            {/* Step 5: Test Suite */}
+            {walkthroughStep === 5 && (
               <div className="grid grid-cols-2 gap-8">
                 <div>
                   <div className="flex items-center gap-3 mb-4">
@@ -1695,10 +1793,60 @@ export default function BCometPlatform() {
                       <TestTube className="h-6 w-6 text-[#4caf50]" />
                     </div>
                     <div>
-                      <h4 className={`font-bold text-xl ${textPrimary}`}>5. Test Case Execution</h4>
-                      <p className={`text-sm ${textSecondary}`}>AI-generated regression test suite</p>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>6. Test Suite Generation</h4>
+                      <p className={`text-sm ${textSecondary}`}>AI-generated regression test cases</p>
                     </div>
                   </div>
+                  <div className={`space-y-3 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                    <p className={`text-sm ${textPrimary} font-medium`}>AI Test Generation:</p>
+                    <ul className={`text-sm ${textSecondary} space-y-2`}>
+                      <li className="flex items-start gap-2">
+                        <TestTube className="h-4 w-4 text-[#4caf50] flex-shrink-0 mt-0.5" />
+                        <span>Auto-generate test cases from specs</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <TestTube className="h-4 w-4 text-[#4caf50] flex-shrink-0 mt-0.5" />
+                        <span>Create edge case & failure scenarios</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <TestTube className="h-4 w-4 text-[#4caf50] flex-shrink-0 mt-0.5" />
+                        <span>Export to VeriFIX regression suite</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <TestTube className="h-4 w-4 text-[#4caf50] flex-shrink-0 mt-0.5" />
+                        <span>Track test execution & results</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                  <div className={`${bgSecondary} px-4 py-2 border-b ${borderColor} flex items-center justify-between`}>
+                    <div className="flex items-center gap-2">
+                      <TestTube className="h-4 w-4 text-[#4caf50]" />
+                      <span className={`text-sm font-medium ${textPrimary}`}>Test Suite Results</span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">45/48 Passed</span>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    {[
+                      { name: "NewOrderSingle Validation", status: "passed", count: "12/12" },
+                      { name: "ExecutionReport Response", status: "passed", count: "10/10" },
+                      { name: "Cancel/Replace Flow", status: "passed", count: "8/8" },
+                      { name: "Reject Handling", status: "failed", count: "6/9" },
+                      { name: "Session Recovery", status: "passed", count: "9/9" },
+                    ].map((test, i) => (
+                      <div key={i} className={`flex items-center justify-between py-2 ${i > 0 ? `border-t ${borderColor}` : ""}`}>
+                        <div className="flex items-center gap-2">
+                          {test.status === "passed" ? <CheckCircle className="h-4 w-4 text-[#4caf50]" /> : <AlertCircle className="h-4 w-4 text-[#f44336]" />}
+                          <span className={`text-xs ${textPrimary}`}>{test.name}</span>
+                        </div>
+                        <span className={`text-xs font-mono ${test.status === "passed" ? "text-[#4caf50]" : "text-[#f44336]"}`}>{test.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
                   <div className={`space-y-3 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
                     <p className={`text-sm ${textPrimary} font-medium`}>Automated Testing:</p>
                     <ul className={`text-sm ${textSecondary} space-y-2`}>
@@ -1768,75 +1916,6 @@ export default function BCometPlatform() {
               </div>
             )}
 
-            {/* Step 5: Scenario Generator */}
-            {walkthroughStep === 5 && (
-              <div className="grid grid-cols-2 gap-8">
-                <div>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00e5ff]/20 to-[#00e5ff]/5 flex items-center justify-center border border-[#00e5ff]/30">
-                      <Sparkles className="h-6 w-6 text-[#00e5ff]" />
-                    </div>
-                    <div>
-                      <h4 className={`font-bold text-xl ${textPrimary}`}>6. AI Scenario Generator</h4>
-                      <p className={`text-sm ${textSecondary}`}>Generate edge case test scenarios</p>
-                    </div>
-                  </div>
-                  <div className={`space-y-3 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
-                    <p className={`text-sm ${textPrimary} font-medium`}>AI-Powered Generation:</p>
-                    <ul className={`text-sm ${textSecondary} space-y-2`}>
-                      <li className="flex items-start gap-2">
-                        <Bot className="h-4 w-4 text-[#00e5ff] flex-shrink-0 mt-0.5" />
-                        <span>Generates complex trading scenarios</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Bot className="h-4 w-4 text-[#00e5ff] flex-shrink-0 mt-0.5" />
-                        <span>Creates edge cases & failure conditions</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Bot className="h-4 w-4 text-[#00e5ff] flex-shrink-0 mt-0.5" />
-                        <span>Tests order lifecycle variations</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Bot className="h-4 w-4 text-[#00e5ff] flex-shrink-0 mt-0.5" />
-                        <span>Validates error handling paths</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
-                  <div className={`${bgSecondary} px-4 py-2 border-b ${borderColor} flex items-center justify-between`}>
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="h-4 w-4 text-[#00e5ff]" />
-                      <span className={`text-sm font-medium ${textPrimary}`}>Generated Scenarios</span>
-                    </div>
-                    <span className={`text-xs ${textSecondary}`}>15 scenarios</span>
-                  </div>
-                  <div className="p-4 space-y-2 max-h-48 overflow-auto">
-                    {[
-                      { name: "Partial Fill Chain", desc: "Order with 5 partial fills before complete", type: "Execution" },
-                      { name: "Cancel/Replace Race", desc: "Rapid cancel-replace sequence", type: "Edge Case" },
-                      { name: "Reject Recovery", desc: "Handle business reject and resend", type: "Error" },
-                      { name: "Session Disconnect", desc: "Mid-order session failure recovery", type: "Network" },
-                      { name: "Cross Order", desc: "Self-match prevention test", type: "Compliance" },
-                    ].map((scenario, i) => (
-                      <div key={i} className={`p-2.5 rounded-lg border ${borderColor} ${isDarkMode ? "hover:bg-[#1e4976]/30" : "hover:bg-gray-50"} transition-colors cursor-pointer`}>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className={`text-sm font-medium ${textPrimary}`}>{scenario.name}</span>
-                          <span className={`text-[9px] px-1.5 py-0.5 rounded ${
-                            scenario.type === "Edge Case" ? "bg-[#ff9800]/20 text-[#ff9800]" :
-                            scenario.type === "Error" ? "bg-[#f44336]/20 text-[#f44336]" :
-                            scenario.type === "Compliance" ? "bg-[#9c27b0]/20 text-[#9c27b0]" :
-                            "bg-[#2196f3]/20 text-[#2196f3]"
-                          }`}>{scenario.type}</span>
-                        </div>
-                        <p className={`text-[10px] ${textSecondary}`}>{scenario.desc}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Step 6: Evidence Vault */}
             {walkthroughStep === 6 && (
               <div className="grid grid-cols-2 gap-8">
@@ -1846,7 +1925,7 @@ export default function BCometPlatform() {
                       <FolderArchive className="h-6 w-6 text-[#9c27b0]" />
                     </div>
                     <div>
-                      <h4 className={`font-bold text-xl ${textPrimary}`}>7. Evidence Vault</h4>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>7. Evidence Collection</h4>
                       <p className={`text-sm ${textSecondary}`}>Complete audit trail & artifacts</p>
                     </div>
                   </div>
@@ -2417,7 +2496,7 @@ export default function BCometPlatform() {
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() => { console.log("[v0] Setting isManager to true"); setIsManager(true); }}
+                    onClick={() => setIsManager(true)}
                     className={`flex-1 p-3 rounded-lg border-2 transition-all ${
                       isManager 
                         ? "border-[#9c27b0] bg-[#9c27b0]/10" 
@@ -2432,7 +2511,7 @@ export default function BCometPlatform() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => { console.log("[v0] Setting isManager to false"); setIsManager(false); }}
+                    onClick={() => setIsManager(false)}
                     className={`flex-1 p-3 rounded-lg border-2 transition-all ${
                       !isManager 
                         ? "border-[#00e5ff] bg-[#00e5ff]/10" 
@@ -2446,7 +2525,7 @@ export default function BCometPlatform() {
                     <p className={`text-xs mt-1 ${textSecondary}`}>My assigned clients</p>
                   </button>
                 </div>
-                <p className={`text-xs mt-2 ${textSecondary}`}>Current selection: <span className="font-bold text-[#00e5ff]">{isManager ? "Manager" : "IC"}</span></p>
+
               </div>
             )}
             
