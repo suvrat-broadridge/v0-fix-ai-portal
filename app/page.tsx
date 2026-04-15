@@ -2,7 +2,7 @@
 
 // B- COMET Platform - FIX Protocol Testing Suite v2
 import React, { useState, useEffect } from "react"
-import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, FileText, Activity, Zap, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, Stamp, Code, ScrollText, Navigation, Sparkles, Minus, Loader, FolderArchive, Sliders, Bot } from "lucide-react"
+import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, ChevronUp, ChevronsUpDown, FileText, Activity, Zap, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, Stamp, Code, ScrollText, Navigation, Sparkles, Minus, Loader, FolderArchive, Sliders, Bot } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -423,6 +423,9 @@ export default function BCometPlatform() {
   const [ruleFixVersionFilter, setRuleFixVersionFilter] = useState("All")
   const [ruleMarketFilter, setRuleMarketFilter] = useState("All")
   const [ruleSeverityFilter, setRuleSeverityFilter] = useState("All")
+  const [ruleSourceFilter, setRuleSourceFilter] = useState("All")
+  const [ruleSortCol, setRuleSortCol] = useState<"id" | "name" | "fixVersions" | "market" | "severity" | "sourceRef" | null>(null)
+  const [ruleSortDir, setRuleSortDir] = useState<"asc" | "desc">("asc")
   const [showSourceMaterials, setShowSourceMaterials] = useState(false)
   const [expandedRuleSections, setExpandedRuleSections] = useState<Record<string, boolean>>({
     "session": true,
@@ -12053,6 +12056,8 @@ const copyToClipboard = () => {
     // Get unique values for filters
     const allFixVersions = [...new Set(ruleLibrary.flatMap(r => r.fixVersions))].sort()
     const allMarkets = [...new Set(ruleLibrary.map(r => r.market))].sort()
+    const allSeverities = [...new Set(ruleLibrary.map(r => r.severity))].sort()
+    const allSources = [...new Set(ruleLibrary.map(r => r.sourceRef))].sort()
 
     const filteredSections = ruleSections.map(section => ({
       ...section,
@@ -12066,30 +12071,123 @@ const copyToClipboard = () => {
           const matchesFix = ruleFixVersionFilter === "All" || r.fixVersions.includes(ruleFixVersionFilter)
           const matchesMarket = ruleMarketFilter === "All" || r.market === ruleMarketFilter || r.market === "All"
           const matchesSeverity = ruleSeverityFilter === "All" || r.severity === ruleSeverityFilter
-          return matchesSearch && matchesFix && matchesMarket && matchesSeverity
+          const matchesSource = ruleSourceFilter === "All" || r.sourceRef === ruleSourceFilter
+          return matchesSearch && matchesFix && matchesMarket && matchesSeverity && matchesSource
         })
       })).filter(sub => sub.rules.length > 0)
     })).filter(section => section.subsections.length > 0)
 
     const totalFilteredRules = filteredSections.reduce((acc, s) => acc + s.subsections.reduce((a, sub) => a + sub.rules.length, 0), 0)
-    const hasActiveFilters = ruleSearch || ruleFixVersionFilter !== "All" || ruleMarketFilter !== "All" || ruleSeverityFilter !== "All"
+    const hasActiveFilters = ruleSearch || ruleFixVersionFilter !== "All" || ruleMarketFilter !== "All" || ruleSeverityFilter !== "All" || ruleSourceFilter !== "All"
+
+    // Sort helper for a set of rules
+    const sortRules = (rules: typeof ruleLibrary) => {
+      if (!ruleSortCol) return rules
+      return [...rules].sort((a, b) => {
+        let aVal = ""
+        let bVal = ""
+        if (ruleSortCol === "fixVersions") {
+          aVal = a.fixVersions.join(",")
+          bVal = b.fixVersions.join(",")
+        } else {
+          aVal = String(a[ruleSortCol] ?? "")
+          bVal = String(b[ruleSortCol] ?? "")
+        }
+        const cmp = aVal.localeCompare(bVal, undefined, { numeric: true })
+        return ruleSortDir === "asc" ? cmp : -cmp
+      })
+    }
+
+    const handleRuleSort = (col: typeof ruleSortCol) => {
+      if (ruleSortCol === col) {
+        setRuleSortDir(d => d === "asc" ? "desc" : "asc")
+      } else {
+        setRuleSortCol(col)
+        setRuleSortDir("asc")
+      }
+    }
+
+    // Column header component for sortable + filterable columns
+    const ColHeader = ({
+      label, col, filterValue, setFilter, options, width
+    }: {
+      label: string
+      col: typeof ruleSortCol
+      filterValue?: string
+      setFilter?: (v: string) => void
+      options?: string[]
+      width?: string
+    }) => {
+      const isActive = ruleSortCol === col
+      const hasFilter = filterValue && filterValue !== "All"
+      return (
+        <th className={`px-3 py-2 text-left text-xs ${width ?? ""}`}>
+          <div className="flex items-center gap-1 flex-wrap">
+            <button
+              onClick={() => col && handleRuleSort(col)}
+              className={`flex items-center gap-0.5 font-medium uppercase tracking-wide hover:text-[#00e5ff] transition-colors ${isActive ? "text-[#00e5ff]" : textSecondary}`}
+            >
+              {label}
+              {col && (
+                isActive
+                  ? ruleSortDir === "asc"
+                    ? <ChevronUp className="h-3 w-3" />
+                    : <ChevronDown className="h-3 w-3" />
+                  : <ChevronsUpDown className="h-3 w-3 opacity-40" />
+              )}
+            </button>
+            {options && setFilter && (
+              <select
+                value={filterValue ?? "All"}
+                onChange={e => setFilter(e.target.value)}
+                onClick={e => e.stopPropagation()}
+                className={`text-[10px] rounded px-1 py-0.5 border cursor-pointer outline-none transition-colors
+                  ${hasFilter
+                    ? "border-[#00e5ff] text-[#00e5ff] bg-[#00e5ff]/10"
+                    : `${borderColor} ${textSecondary} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`
+                  }`}
+              >
+                <option value="All">All</option>
+                {options.map(o => <option key={o} value={o}>{o}</option>)}
+              </select>
+            )}
+          </div>
+        </th>
+      )
+    }
 
     const RuleTable = ({ rules }: { rules: typeof ruleLibrary }) => (
       <table className="w-full text-sm">
         <thead>
           <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#0a1628]/50" : "bg-gray-50"}`}>
-            <th className={`px-3 py-2 text-left font-medium ${textSecondary} text-xs`}>ID</th>
-            <th className={`px-3 py-2 text-left font-medium ${textSecondary} text-xs`}>Name</th>
-            <th className={`px-3 py-2 text-left font-medium ${textSecondary} text-xs`}>Description</th>
-            <th className={`px-3 py-2 text-left font-medium ${textSecondary} text-xs`}>FIX Versions</th>
-            <th className={`px-3 py-2 text-left font-medium ${textSecondary} text-xs`}>Market</th>
-            <th className={`px-3 py-2 text-left font-medium ${textSecondary} text-xs`}>Severity</th>
-            <th className={`px-3 py-2 text-left font-medium ${textSecondary} text-xs`}>Source</th>
-            <th className={`px-3 py-2 text-left font-medium ${textSecondary} text-xs`}>Enabled</th>
+            <ColHeader label="ID"  col="id" />
+            <ColHeader label="Name" col="name" />
+            <th className={`px-3 py-2 text-left font-medium uppercase tracking-wide text-xs ${textSecondary}`}>Description</th>
+            <ColHeader
+              label="FIX Versions" col="fixVersions"
+              filterValue={ruleFixVersionFilter} setFilter={setRuleFixVersionFilter}
+              options={allFixVersions}
+            />
+            <ColHeader
+              label="Market" col="market"
+              filterValue={ruleMarketFilter} setFilter={setRuleMarketFilter}
+              options={allMarkets}
+            />
+            <ColHeader
+              label="Severity" col="severity"
+              filterValue={ruleSeverityFilter} setFilter={setRuleSeverityFilter}
+              options={allSeverities}
+            />
+            <ColHeader
+              label="Source" col="sourceRef"
+              filterValue={ruleSourceFilter} setFilter={setRuleSourceFilter}
+              options={allSources}
+            />
+            <th className={`px-3 py-2 text-left font-medium uppercase tracking-wide text-xs ${textSecondary}`}>Enabled</th>
           </tr>
         </thead>
         <tbody>
-          {rules.map((rule) => {
+          {sortRules(rules).map((rule) => {
             const sourceDoc = ruleSourceMaterials.find(s => s.id === rule.sourceRef)
             return (
               <tr key={rule.id} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
@@ -12235,7 +12333,10 @@ const copyToClipboard = () => {
                     setRuleSearch(""); 
                     setRuleFixVersionFilter("All"); 
                     setRuleMarketFilter("All"); 
-                    setRuleSeverityFilter("All"); 
+                    setRuleSeverityFilter("All");
+                    setRuleSourceFilter("All");
+                    setRuleSortCol(null);
+                    setRuleSortDir("asc");
                   }}
                 >
                   Clear Filters
