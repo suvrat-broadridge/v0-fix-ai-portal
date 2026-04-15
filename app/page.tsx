@@ -663,6 +663,30 @@ export default function BCometPlatform() {
     return client.assetClasses.reduce((sum: number, ac: any) => sum + ac.alerts, 0)
   }
 
+  // Flatten all cases from all clients for case-centric views
+  const allCases = clients.flatMap(client => 
+    client.onboardingCases.map(c => ({
+      ...c,
+      clientId: client.id,
+      clientName: client.name,
+      jira: client.jira,
+      accountManager: client.accountManager,
+    }))
+  )
+
+  // Navigate to case workflow
+  const openCaseWorkflow = (caseItem: any, client: any) => {
+    setSelectedClient(client)
+    setSelectedCase(caseItem)
+    setCurrentScreen("case-workflow")
+  }
+
+  // Navigate to client detail
+  const openClientDetail = (client: any) => {
+    setSelectedClient(client)
+    setCurrentScreen("client-detail")
+  }
+
   // Features for landing page
   const features = [
     { icon: Building2, title: "Case-Based Onboarding", desc: "Track multiple onboarding cases per client - Equities, Options, ATDL/Algo - each with full workflow visibility" },
@@ -3129,49 +3153,44 @@ export default function BCometPlatform() {
                       </tr>
                     </thead>
                     <tbody>
-                      {clients.slice(0, 5).map((client, idx) => {
-                        const completedSteps = client.assetClasses.reduce((sum, a) => {
-                          return sum + [a.specCompare, a.logAnalysis, a.scenario, a.testCase, a.certification, a.config].filter(s => s === "completed").length
-                        }, 0)
-                        const totalSteps = client.assetClasses.length * 6
-                        const progress = Math.round((completedSteps / totalSteps) * 100)
-                        const stages = ["Setup", "Spec Analysis", "Connectivity", "Log Analysis", "Testing", "Certification"]
-                        const currentStage = stages[Math.min(Math.floor(progress / 17), 5)]
-                        const riskScore = getTotalAlerts(client) > 2 ? "High" : getTotalAlerts(client) > 0 ? "Medium" : "Low"
+                      {allCases.slice(0, 6).map((caseItem, idx) => {
+                        const client = clients.find(c => c.id === caseItem.clientId)!
+                        const caseStageNames = ["Client Setup", "Spec Compare", "Log Analysis", "ATDL Config", "Test Suite", "Scenario Gen", "Evidence", "Prod Config", "Certification"]
+                        const currentStageName = caseStageNames[caseItem.currentStage - 1] || "Setup"
+                        const riskScore = caseItem.status === "blocked" ? "High" : caseItem.progress < 30 ? "Medium" : "Low"
                         const slaStatus = idx === 0 ? "At Risk" : idx === 2 ? "Breached" : "On Track"
                         const nextActions = ["Review spec differences", "Complete log analysis", "Run test suite", "Sign certification pack", "Schedule go-live"]
-                        const caseId = `OB-2024-00${client.id}`
                         return (
-                          <tr key={client.id} className={`border-t ${borderColor} hover:bg-[#1e4976]/10 group`}>
+                          <tr key={caseItem.id} className={`border-t ${borderColor} hover:bg-[#1e4976]/10`}>
                             <td className="px-4 py-3">
-                              <button
-                                className="text-left group/case"
-                                onClick={() => { setSelectedClient(client); setCurrentScreen("client-detail"); }}
-                              >
-                                <div className={`font-mono text-sm font-semibold text-[#00e5ff] group-hover/case:underline flex items-center gap-1`}>
-                                  {caseId}
-                                  <ExternalLink className="h-3 w-3 opacity-0 group-hover/case:opacity-100 transition-opacity" />
-                                </div>
-                                <div className={`text-sm ${textPrimary} mt-0.5`}>{client.name}</div>
-                              </button>
-                            </td>
-                            <td className={`px-4 py-3 ${textSecondary}`}>
-                              <div className="flex flex-wrap gap-1">
-                                {client.assetClasses.slice(0, 2).map((ac, i) => (
-                                  <span key={i} className={`text-xs px-2 py-0.5 rounded ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"}`}>{ac.name}</span>
-                                ))}
-                                {client.assetClasses.length > 2 && <span className={`text-xs ${textSecondary}`}>+{client.assetClasses.length - 2}</span>}
+                              <div className="flex flex-col gap-0.5">
+                                <button
+                                  className="text-left group/case inline-flex items-center gap-1"
+                                  onClick={() => openCaseWorkflow(caseItem, client)}
+                                >
+                                  <span className="font-mono text-sm font-semibold text-[#00e5ff] group-hover/case:underline">{caseItem.id}</span>
+                                  <ExternalLink className="h-3 w-3 text-[#00e5ff] opacity-0 group-hover/case:opacity-100 transition-opacity" />
+                                </button>
+                                <button
+                                  className="text-left group/client"
+                                  onClick={() => openClientDetail(client)}
+                                >
+                                  <span className={`text-sm ${textPrimary} group-hover/client:text-[#00e5ff] group-hover/client:underline transition-colors`}>{caseItem.clientName}</span>
+                                </button>
                               </div>
                             </td>
+                            <td className={`px-4 py-3 ${textSecondary}`}>
+                              <span className={`text-xs px-2 py-0.5 rounded ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"}`}>{caseItem.assetClass}</span>
+                            </td>
                             <td className="px-4 py-3 text-center">
-                              <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#2196f3]/20 text-[#2196f3]" : "bg-[#2196f3]/10 text-[#2196f3]"}`}>{currentStage}</span>
+                              <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#2196f3]/20 text-[#2196f3]" : "bg-[#2196f3]/10 text-[#2196f3]"}`}>{currentStageName}</span>
                             </td>
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-2 min-w-24">
                                 <div className={`flex-1 h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
-                                  <div className="h-full rounded-full bg-[#4caf50]" style={{ width: `${progress}%` }} />
+                                  <div className={`h-full rounded-full ${caseItem.status === "blocked" ? "bg-[#f44336]" : "bg-[#4caf50]"}`} style={{ width: `${caseItem.progress}%` }} />
                                 </div>
-                                <span className={`text-xs ${textSecondary} w-8`}>{progress}%</span>
+                                <span className={`text-xs ${textSecondary} w-8`}>{caseItem.progress}%</span>
                               </div>
                             </td>
                             <td className="px-4 py-3 text-center">
@@ -3182,8 +3201,8 @@ export default function BCometPlatform() {
                               }`}>{riskScore}</span>
                             </td>
                             <td className="px-4 py-3 text-center">
-                              {getTotalAlerts(client) > 0 ? (
-                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336] text-xs font-medium">{getTotalAlerts(client)}</span>
+                              {caseItem.status === "blocked" ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336] text-xs font-medium">1</span>
                               ) : <span className={textSecondary}>-</span>}
                             </td>
                             <td className="px-4 py-3 text-center">
@@ -3632,8 +3651,8 @@ const clientProgressData = [
               <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
                 <ArrowLeft className="h-4 w-4" /> Back to Dashboard
               </button>
-              <h1 className={`text-2xl font-bold ${textPrimary}`}>{selectedClient.name} - Progress</h1>
-              <p className={textSecondary}>JIRA: {selectedClient.jira} | Manager: {selectedClient.accountManager}</p>
+              <h1 className={`text-2xl font-bold ${textPrimary}`}>{selectedClient.name}</h1>
+              <p className={textSecondary}>JIRA: {selectedClient.jira} | Account Manager: {selectedClient.accountManager} | Assigned: {selectedClient.assignedUser || "Unassigned"}</p>
             </div>
             <button className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 relative`}>
               <Bell className="h-5 w-5" />
@@ -3689,7 +3708,7 @@ const clientProgressData = [
                               </div>
                               <div>
                                 <div className="flex items-center gap-2">
-                                  <span className={`font-medium ${textPrimary}`}>{caseItem.name}</span>
+                                  <span className="font-mono text-sm font-semibold text-[#00e5ff]">{caseItem.id}</span>
                                   <span className={`px-2 py-0.5 rounded text-xs ${
                                     caseItem.status === "completed" ? "bg-[#4caf50]/20 text-[#4caf50]" :
                                     caseItem.status === "blocked" ? "bg-[#f44336]/20 text-[#f44336]" :
@@ -3699,9 +3718,8 @@ const clientProgressData = [
                                     {caseItem.status === "in-progress" ? "In Progress" : caseItem.status === "not-started" ? "Not Started" : caseItem.status.charAt(0).toUpperCase() + caseItem.status.slice(1)}
                                   </span>
                                 </div>
+                                <p className={`font-medium ${textPrimary} mt-0.5`}>{caseItem.name}</p>
                                 <div className={`text-xs ${textSecondary} flex items-center gap-3 mt-1`}>
-                                  <span className="font-mono">{caseItem.id}</span>
-                                  <span>|</span>
                                   <span>Assignee: {caseItem.assignee}</span>
                                   <span>|</span>
                                   <span>Due: {caseItem.dueDate}</span>
@@ -11125,18 +11143,51 @@ const copyToClipboard = () => {
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Priority</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>SLA Date</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Status</th>
-                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredOnboardingCases.map((caseItem) => (
-                      <tr key={caseItem.id} className={`border-b ${borderColor} hover:bg-[#1e4976]/10 cursor-pointer`}>
-                        <td className={`px-4 py-3 font-mono font-medium text-[#00e5ff]`}>{caseItem.id}</td>
-                        <td className={`px-4 py-3`}>
-                          <div>
-                            <p className={`font-medium ${textPrimary}`}>{caseItem.client}</p>
+                    {filteredOnboardingCases.map((caseItem) => {
+                      // Find matching client for navigation
+                      const matchingClient = clients.find(c => c.name === caseItem.client)
+                      // Create a case object compatible with case-workflow screen
+                      const workflowCase = {
+                        id: caseItem.id,
+                        name: `${caseItem.assetClass} ${caseItem.protocol}`,
+                        assetClass: caseItem.assetClass,
+                        status: caseItem.status === "on-track" ? "in-progress" : caseItem.status === "at-risk" ? "in-progress" : caseItem.status,
+                        currentStage: caseItem.stage,
+                        totalStages: 9,
+                        dueDate: caseItem.slaDate,
+                        assignee: caseItem.assignedUser,
+                        progress: caseItem.readinessScore || 0,
+                      }
+                      return (
+                      <tr key={caseItem.id} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
+                        <td className="px-4 py-3">
+                          <button
+                            className="group/case inline-flex items-center gap-1"
+                            onClick={() => {
+                              if (matchingClient) {
+                                setSelectedClient(matchingClient)
+                                setSelectedCase(workflowCase)
+                                setCurrentScreen("case-workflow")
+                              }
+                            }}
+                          >
+                            <span className="font-mono font-medium text-[#00e5ff] group-hover/case:underline">{caseItem.id}</span>
+                            <ExternalLink className="h-3 w-3 text-[#00e5ff] opacity-0 group-hover/case:opacity-100 transition-opacity" />
+                          </button>
+                        </td>
+                        <td className="px-4 py-3">
+                          <button
+                            className="text-left group/client"
+                            onClick={() => {
+                              if (matchingClient) openClientDetail(matchingClient)
+                            }}
+                          >
+                            <p className={`font-medium ${textPrimary} group-hover/client:text-[#00e5ff] group-hover/client:underline transition-colors`}>{caseItem.client}</p>
                             <p className={`text-xs ${textSecondary}`}>{caseItem.legalEntity}</p>
-                          </div>
+                          </button>
                         </td>
                         {isManager && (
                           <td className={`px-4 py-3`}>
@@ -11202,18 +11253,8 @@ const copyToClipboard = () => {
                             )}
                           </div>
                         </td>
-                        <td className={`px-4 py-3`}>
-                          <div className="flex gap-1">
-                            <Button size="sm" variant="outline" className="h-7" onClick={() => {
-                              const client = clients.find(c => c.name === caseItem.client)
-                              if (client) { setSelectedClient(client); setCurrentScreen("client-detail") }
-                            }}>
-                              <Eye className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </td>
                       </tr>
-                    ))}
+                    )})}
                   </tbody>
                 </table>
               </div>
