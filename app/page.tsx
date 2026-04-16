@@ -2977,9 +2977,9 @@ export default function BCometPlatform() {
                     })
                     
                     return (
-                      <div className="flex items-center gap-6">
-                        {/* Pie Chart */}
-                        <div className="relative w-32 h-32 flex-shrink-0">
+                      <div className="flex items-center gap-8">
+                        {/* Pie Chart - larger size */}
+                        <div className="relative w-44 h-44 flex-shrink-0">
                           <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
                             {segments.map((seg, i) => {
                               const circumference = 100
@@ -2993,7 +2993,7 @@ export default function BCometPlatform() {
                                   r="15.9"
                                   fill="none"
                                   stroke={seg.color}
-                                  strokeWidth="3.5"
+                                  strokeWidth="4"
                                   strokeDasharray={strokeDasharray}
                                   strokeDashoffset={strokeDashoffset}
                                   className="transition-all duration-500"
@@ -3001,21 +3001,21 @@ export default function BCometPlatform() {
                               )
                             })}
                             {/* Center background */}
-                            <circle cx="18" cy="18" r="12" fill={isDarkMode ? "#0d2847" : "#f8fafc"} />
+                            <circle cx="18" cy="18" r="11" fill={isDarkMode ? "#0d2847" : "#f8fafc"} />
                           </svg>
                           <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className={`text-2xl font-bold ${textPrimary}`}>{totalCases}</span>
-                            <span className={`text-[10px] ${textSecondary}`}>Cases</span>
+                            <span className={`text-3xl font-bold ${textPrimary}`}>{totalCases}</span>
+                            <span className={`text-xs ${textSecondary}`}>Total Cases</span>
                           </div>
                         </div>
                         
-                        {/* Legend */}
-                        <div className="grid grid-cols-2 gap-x-6 gap-y-2 flex-1">
+                        {/* Legend - larger text */}
+                        <div className="grid grid-cols-2 gap-x-8 gap-y-3 flex-1">
                           {stageCounts.map((s, i) => (
-                            <div key={i} className="flex items-center gap-2">
-                              <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }} />
-                              <span className={`text-xs ${textSecondary}`}>{s.stage}</span>
-                              <span className={`text-xs font-semibold ${textPrimary} ml-auto`}>{s.count}</span>
+                            <div key={i} className="flex items-center gap-3">
+                              <div className="w-4 h-4 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }} />
+                              <span className={`text-sm ${textSecondary}`}>{s.stage}</span>
+                              <span className={`text-sm font-bold ${textPrimary} ml-auto`}>{s.count}</span>
                             </div>
                           ))}
                         </div>
@@ -9209,34 +9209,6 @@ const specCompareResults = [
                     {assetClass.versions.map((version: any) => {
                       const hasAlgoSpec = assetClass.hasAlgoSpec && version.algoSpec?.name
 
-                      // Reusable file pill + actions
-                      const FilePill = ({ name, color, icon: Icon }: { name: string; color: string; icon: React.ElementType }) => (
-                        <div className="flex items-center gap-1.5">
-                          <div className={`flex items-center gap-2 px-2.5 py-1.5 rounded border max-w-[220px]`}
-                            style={{ borderColor: `${color}40`, backgroundColor: `${color}10` }}>
-                            <Icon className="h-3.5 w-3.5 flex-shrink-0" style={{ color }} />
-                            <span className={`text-sm truncate ${textPrimary}`}>{name}</span>
-                          </div>
-                          <button className={`p-1.5 rounded ${textSecondary} hover:text-[#00e5ff] hover:bg-[#00e5ff]/10 transition-colors`} title="View"><Eye className="h-3.5 w-3.5" /></button>
-                          <button className={`p-1.5 rounded ${textSecondary} hover:text-[#00e5ff] hover:bg-[#00e5ff]/10 transition-colors`} title="Download"><Download className="h-3.5 w-3.5" /></button>
-                          {selectedRole === "admin" && (
-                            <label className={`cursor-pointer p-1.5 rounded ${textSecondary} hover:text-[#00e5ff] hover:bg-[#00e5ff]/10 transition-colors`} title="Replace">
-                              <input type="file" className="hidden" />
-                              <Upload className="h-3.5 w-3.5" />
-                            </label>
-                          )}
-                        </div>
-                      )
-
-                      const UploadPrompt = ({ accept, color, label }: { accept: string; color: string; label: string }) => (
-                        <label className={`cursor-pointer inline-flex items-center gap-2 px-3 py-1.5 rounded border-2 border-dashed hover:bg-[${color}]/5 transition-colors`}
-                          style={{ borderColor: `${color}40` }}>
-                          <input type="file" className="hidden" accept={accept} />
-                          <Upload className="h-3.5 w-3.5" style={{ color: `${color}99` }} />
-                          <span className="text-sm" style={{ color: `${color}99` }}>{label}</span>
-                        </label>
-                      )
-
                       return (
                         <div key={`${assetClass.asset}-${version.protocol}`} className={`hover:bg-[#1e4976]/10 transition-colors`}>
 
@@ -9250,26 +9222,57 @@ const specCompareResults = [
                               <span className={`font-semibold ${textPrimary}`}>{version.protocol}</span>
                             </div>
                             {/* Admin Spec - Original */}
-                            <FilePill name={version.adminSpec.name} color="#00e5ff" icon={FileText} />
+                            <div className="flex items-center gap-1.5">
+                              <div className="flex items-center gap-2 px-2.5 py-1.5 rounded border max-w-[220px]"
+                                style={{ borderColor: "#00e5ff40", backgroundColor: "#00e5ff10" }}>
+                                <FileText className="h-3.5 w-3.5 flex-shrink-0 text-[#00e5ff]" />
+                                <span className={`text-sm truncate ${textPrimary}`}>{version.adminSpec.name}</span>
+                              </div>
+                              <button className={`p-1.5 rounded ${textSecondary} hover:text-[#00e5ff] hover:bg-[#00e5ff]/10`} title="View"><Eye className="h-3.5 w-3.5" /></button>
+                              <button className={`p-1.5 rounded ${textSecondary} hover:text-[#00e5ff] hover:bg-[#00e5ff]/10`} title="Download"><Download className="h-3.5 w-3.5" /></button>
+                              {selectedRole === "admin" && (
+                                <label className={`cursor-pointer p-1.5 rounded ${textSecondary} hover:text-[#00e5ff] hover:bg-[#00e5ff]/10`} title="Replace">
+                                  <input type="file" className="hidden" />
+                                  <Upload className="h-3.5 w-3.5" />
+                                </label>
+                              )}
+                            </div>
                             {/* Admin Spec - Standardized */}
                             <div>
-                              {version.standardizedSpec?.available
-                                ? <FilePill name={version.standardizedSpec.name} color="#4caf50" icon={CheckCircle} />
-                                : <span className={`text-sm ${textSecondary} italic`}>Not standardized</span>
-                              }
+                              {version.standardizedSpec?.available ? (
+                                <div className="flex items-center gap-1.5">
+                                  <div className="flex items-center gap-2 px-2.5 py-1.5 rounded border max-w-[220px]"
+                                    style={{ borderColor: "#4caf5040", backgroundColor: "#4caf5010" }}>
+                                    <CheckCircle className="h-3.5 w-3.5 flex-shrink-0 text-[#4caf50]" />
+                                    <span className={`text-sm truncate ${textPrimary}`}>{version.standardizedSpec.name}</span>
+                                  </div>
+                                  <button className={`p-1.5 rounded ${textSecondary} hover:text-[#00e5ff] hover:bg-[#00e5ff]/10`} title="View"><Eye className="h-3.5 w-3.5" /></button>
+                                  <button className={`p-1.5 rounded ${textSecondary} hover:text-[#00e5ff] hover:bg-[#00e5ff]/10`} title="Download"><Download className="h-3.5 w-3.5" /></button>
+                                </div>
+                              ) : (
+                                <span className={`text-sm ${textSecondary} italic`}>Not standardized</span>
+                              )}
                             </div>
                             {/* Algo Spec (only for Equities) */}
                             {assetClass.hasAlgoSpec && (
                               <div>
                                 {hasAlgoSpec ? (
                                   <div className="flex flex-col gap-1.5">
-                                    <FilePill name={version.algoSpec.name} color="#ff9800" icon={Sliders} />
+                                    <div className="flex items-center gap-1.5">
+                                      <div className="flex items-center gap-2 px-2.5 py-1.5 rounded border max-w-[220px]"
+                                        style={{ borderColor: "#ff980040", backgroundColor: "#ff980010" }}>
+                                        <Sliders className="h-3.5 w-3.5 flex-shrink-0 text-[#ff9800]" />
+                                        <span className={`text-sm truncate ${textPrimary}`}>{version.algoSpec.name}</span>
+                                      </div>
+                                      <button className={`p-1.5 rounded ${textSecondary} hover:text-[#00e5ff] hover:bg-[#00e5ff]/10`} title="View"><Eye className="h-3.5 w-3.5" /></button>
+                                      <button className={`p-1.5 rounded ${textSecondary} hover:text-[#00e5ff] hover:bg-[#00e5ff]/10`} title="Download"><Download className="h-3.5 w-3.5" /></button>
+                                    </div>
                                     {version.algoSpec.atdlFile?.uploaded && (
                                       <div className="flex items-center gap-1.5 pl-4">
                                         <ChevronRight className="h-3 w-3 text-[#8b9dc3]" />
-                                        <div className={`flex items-center gap-2 px-2 py-1 rounded border text-xs`}
+                                        <div className="flex items-center gap-2 px-2 py-1 rounded border text-xs"
                                           style={{ borderColor: "#9c27b040", backgroundColor: "#9c27b010" }}>
-                                          <FileCode className="h-3 w-3" style={{ color: "#9c27b0" }} />
+                                          <FileCode className="h-3 w-3 text-[#9c27b0]" />
                                           <span className={textPrimary}>{version.algoSpec.atdlFile.name}</span>
                                         </div>
                                         <button className={`p-1 rounded ${textSecondary} hover:text-[#00e5ff]`} title="View"><Eye className="h-3 w-3" /></button>
@@ -9285,10 +9288,24 @@ const specCompareResults = [
                             {/* My Specs */}
                             {selectedRole === "client" && (
                               <div>
-                                {version.clientSpec?.uploaded
-                                  ? <FilePill name={version.clientSpec.name} color="#4caf50" icon={CheckCircle} />
-                                  : <UploadPrompt accept=".xml,.txt,.csv" color="#00e5ff" label="Upload spec" />
-                                }
+                                {version.clientSpec?.uploaded ? (
+                                  <div className="flex items-center gap-1.5">
+                                    <div className="flex items-center gap-2 px-2.5 py-1.5 rounded border max-w-[220px]"
+                                      style={{ borderColor: "#4caf5040", backgroundColor: "#4caf5010" }}>
+                                      <CheckCircle className="h-3.5 w-3.5 flex-shrink-0 text-[#4caf50]" />
+                                      <span className={`text-sm truncate ${textPrimary}`}>{version.clientSpec.name}</span>
+                                    </div>
+                                    <button className={`p-1.5 rounded ${textSecondary} hover:text-[#00e5ff] hover:bg-[#00e5ff]/10`} title="View"><Eye className="h-3.5 w-3.5" /></button>
+                                    <button className={`p-1.5 rounded ${textSecondary} hover:text-[#00e5ff] hover:bg-[#00e5ff]/10`} title="Download"><Download className="h-3.5 w-3.5" /></button>
+                                  </div>
+                                ) : (
+                                  <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-1.5 rounded border-2 border-dashed hover:bg-[#00e5ff]/5"
+                                    style={{ borderColor: "#00e5ff40" }}>
+                                    <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+                                    <Upload className="h-3.5 w-3.5 text-[#00e5ff]/60" />
+                                    <span className="text-sm text-[#00e5ff]/60">Upload spec</span>
+                                  </label>
+                                )}
                               </div>
                             )}
                           </div>
