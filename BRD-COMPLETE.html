@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B-COMET FIX Portal - Business Requirements Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a1628;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #0a1628 0%, #1e4976 100%);
+            padding: 60px 20px;
+            text-align: center;
+            border-bottom: 3px solid #00e5ff;
+            margin-bottom: 40px;
+        }
+        
+        header h1 {
+            font-size: 3em;
+            color: #00e5ff;
+            text-shadow: 0 2px 10px rgba(0, 229, 255, 0.3);
+            margin-bottom: 10px;
+        }
+        
+        header .subtitle {
+            font-size: 1.2em;
+            color: #00bcd4;
+            margin-bottom: 10px;
+        }
+        
+        header .meta {
+            font-size: 0.9em;
+            color: #a0a0a0;
+        }
+        
+        .toc {
+            background: #0f1f2f;
+            border: 1px solid #1e4976;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .toc h2 {
+            color: #00e5ff;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .toc ul {
+            list-style: none;
+            columns: 2;
+            gap: 30px;
+        }
+        
+        .toc li {
+            margin-bottom: 12px;
+        }
+        
+        .toc a {
+            color: #00bcd4;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .toc a:hover {
+            color: #00e5ff;
+        }
+        
+        section {
+            background: #0f1f2f;
+            border: 1px solid #1e4976;
+            border-radius: 8px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #00e5ff;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #00bcd4;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #00bcd4;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 10px;
+        }
+        
+        .highlight {
+            background: rgba(0, 229, 255, 0.1);
+            border-left: 4px solid #00e5ff;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .screenshot-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #0a1628;
+            border-radius: 8px;
+        }
+        
+        .screenshot {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #00e5ff;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
+        }
+        
+        .screenshot-caption {
+            color: #00bcd4;
+            font-size: 0.9em;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .feature-card {
+            background: #1a2f45;
+            border: 1px solid #00bcd4;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .feature-card:hover {
+            border-color: #00e5ff;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+        }
+        
+        .feature-card h4 {
+            color: #00e5ff;
+            margin-bottom: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            border: 1px solid #1e4976;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background: #1e4976;
+            color: #00e5ff;
+        }
+        
+        tr:hover {
+            background: rgba(0, 229, 255, 0.05);
+        }
+        
+        .flow-container {
+            background: #1a2f45;
+            border: 2px solid #00bcd4;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+        
+        .step-number {
+            background: #00e5ff;
+            color: #0a1628;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex-grow: 1;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .metric-card {
+            background: #1a2f45;
+            border: 1px solid #00e5ff;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #00e5ff;
+        }
+        
+        .metric-label {
+            color: #00bcd4;
+            margin-top: 10px;
+        }
+        
+        .requirements-table {
+            margin: 20px 0;
+        }
+        
+        .requirement-id {
+            background: rgba(0, 229, 255, 0.1);
+            color: #00e5ff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        footer {
+            background: #0a1628;
+            border-top: 1px solid #1e4976;
+            padding: 30px;
+            text-align: center;
+            margin-top: 40px;
+            color: #707070;
+        }
+        
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #00e5ff;
+            color: #0a1628;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+            transition: all 0.3s;
+        }
+        
+        .back-to-top:hover {
+            transform: scale(1.1);
+        }
+        
+        .approval-table {
+            margin: 30px 0;
+        }
+        
+        .approval-table table {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>B-COMET FIX Portal</h1>
+            <div class="subtitle">Business Requirements Document</div>
+            <div class="meta">
+                <p>Document Version: 1.0 | Date: April 10, 2026 | Status: Draft</p>
+                <p>Product: B-COMET FIX AI Platform | Platform: Web (Next.js)</p>
+            </div>
+        </header>
+
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#executive">Executive Summary</a></li>
+                <li><a href="#business-problem">Business Problem Statement</a></li>
+                <li><a href="#objectives">Business Objectives</a></li>
+                <li><a href="#scope">Scope</a></li>
+                <li><a href="#stakeholders">Stakeholders</a></li>
+                <li><a href="#personas">User Personas</a></li>
+                <li><a href="#capabilities">Business Capabilities</a></li>
+                <li><a href="#ui-overview">UI Overview & Screenshots</a></li>
+                <li><a href="#functional">Functional Requirements</a></li>
+                <li><a href="#non-functional">Non-Functional Requirements</a></li>
+                <li><a href="#workflows">Core Workflows</a></li>
+                <li><a href="#integrations">Integrations & Dependencies</a></li>
+                <li><a href="#assumptions">Assumptions & Constraints</a></li>
+                <li><a href="#risks">Risks & Mitigations</a></li>
+                <li><a href="#success-metrics">Success Metrics (KPIs)</a></li>
+                <li><a href="#mvp">MVP Definition</a></li>
+                <li><a href="#acceptance">Acceptance Criteria</a></li>
+                <li><a href="#timeline">Implementation Timeline</a></li>
+            </ul>
+        </div>
+
+        <!-- Executive Summary -->
+        <section id="executive">
+            <h2>Executive Summary</h2>
+            <p>B-COMET (Configuration Onboarding Monitoring Evaluation and Tracking) is a role-based platform designed to streamline client FIX protocol implementations across multiple asset classes and FIX protocol versions.</p>
+            
+            <div class="highlight">
+                <strong>Core Value Proposition:</strong> Reduce onboarding cycle time by 30%, improve implementation quality, and provide complete operational transparency for both internal teams and client users.
+            </div>
+            
+            <h3>Platform Overview</h3>
+            <p>B-COMET provides end-to-end workflow coverage including:</p>
+            <ul>
+                <li>FIX specification onboarding and comparison</li>
+                <li>Log analysis and issue tracking</li>
+                <li>Scenario creation and test generation</li>
+                <li>Certification support workflows</li>
+                <li>ATDL (Algorithmic Trading Definition Language) tooling</li>
+                <li>FIX Message Creator utility</li>
+                <li>Real-time progress tracking and alerting</li>
+            </ul>
+        </section>
+
+        <!-- Business Problem -->
+        <section id="business-problem">
+            <h2>Business Problem Statement</h2>
+            <p>Current FIX onboarding and certification activities are fragmented and inefficient:</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Manual Fragmentation</h4>
+                    <p>Tools and processes scattered across manual files, email threads, and ad-hoc trackers</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Longer Timelines</h4>
+                    <p>Extended client onboarding cycles due to lack of unified workflow management</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Inconsistent Outcomes</h4>
+                    <p>Validation and comparison results vary based on manual execution</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Limited Visibility</h4>
+                    <p>No real-time view into client progress, blockers, or pending tasks</p>
+                </div>
+                <div class="feature-card">
+                    <h4>SME Dependency</h4>
+                    <p>High reliance on specialized experts for repetitive tasks</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Increased Risk</h4>
+                    <p>Operational and certification risks due to lack of standardization</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Objectives -->
+        <section id="objectives">
+            <h2>Business Objectives</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">30%</div>
+                    <div class="metric-label">Reduce Onboarding Cycle Time</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">↑</div>
+                    <div class="metric-label">First-Pass Accuracy Improvement</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">1</div>
+                    <div class="metric-label">Single Operational View</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">∞</div>
+                    <div class="metric-label">Repeatable Workflows</div>
+                </div>
+            </div>
+            
+            <h3>Key Objectives</h3>
+            <ul>
+                <li>Reduce end-to-end client FIX onboarding and validation cycle time by at least 30%</li>
+                <li>Improve first-pass accuracy of FIX specification alignment</li>
+                <li>Provide a single operational view of progress by client, asset class, and protocol version</li>
+                <li>Enable repeatable workflows for spec comparison, log analysis, and test generation</li>
+                <li>Support role-based user journeys for internal teams and external client users</li>
+                <li>Provide a foundation for production-grade integrations with backend services and external tooling</li>
+            </ul>
+        </section>
+
+        <!-- Scope -->
+        <section id="scope">
+            <h2>Scope Definition</h2>
+            
+            <h3>In Scope</h3>
+            <ul>
+                <li>Role selection and login flow (Admin and Client personas)</li>
+                <li>Admin and Client dashboard views with portfolio metrics and progress tracking</li>
+                <li>Client management workflows for admin users</li>
+                <li>Spec management: upload, comparison, and standardized conversion</li>
+                <li>Log analysis workflow with issue classification and tracking</li>
+                <li>Scenario creation and test case generation (Regression and Certification)</li>
+                <li>FIX Message Creator utility</li>
+                <li>ATDL tooling workflows (compare, convert, validate, usage representation)</li>
+                <li>Settings and administration modules</li>
+                <li>Backend connectivity visibility and health checks</li>
+            </ul>
+            
+            <h3>Out of Scope (Initial Release)</h3>
+            <ul>
+                <li>Full enterprise IAM/SSO integration (SAML/OIDC)</li>
+                <li>Production billing and subscription management</li>
+                <li>End-user self-service tenant provisioning</li>
+                <li>Complex entitlement hierarchy beyond role-based access</li>
+                <li>Advanced audit/compliance requirements</li>
+                <li>AI/ML recommendations beyond workflow support</li>
+            </ul>
+        </section>
+
+        <!-- Stakeholders -->
+        <section id="stakeholders">
+            <h2>Stakeholders</h2>
+            <table>
+                <tr>
+                    <th>Stakeholder Group</th>
+                    <th>Role & Responsibilities</th>
+                </tr>
+                <tr>
+                    <td>Business Sponsor</td>
+                    <td>Product/Business Leadership - Approval and resource allocation</td>
+                </tr>
+                <tr>
+                    <td>Product Owner</td>
+                    <td>Product Management - Vision, prioritization, and stakeholder communication</td>
+                </tr>
+                <tr>
+                    <td>Admin Users</td>
+                    <td>Internal onboarding and operations teams - Manage client lifecycle and workflows</td>
+                </tr>
+                <tr>
+                    <td>Client Users</td>
+                    <td>External client teams - Track progress and execute assigned workflows</td>
+                </tr>
+                <tr>
+                    <td>Frontend Engineering</td>
+                    <td>UI/UX development and implementation</td>
+                </tr>
+                <tr>
+                    <td>Backend Engineering</td>
+                    <td>API development, data persistence, and integration</td>
+                </tr>
+                <tr>
+                    <td>QA & Test Automation</td>
+                    <td>Quality assurance and test coverage</td>
+                </tr>
+                <tr>
+                    <td>DevOps/SRE</td>
+                    <td>Deployment, monitoring, and infrastructure</td>
+                </tr>
+                <tr>
+                    <td>Security & Compliance</td>
+                    <td>Security controls, data governance, and compliance</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- User Personas -->
+        <section id="personas">
+            <h2>User Personas</h2>
+            
+            <h3>Admin User</h3>
+            <div class="highlight">
+                <strong>Primary Goals:</strong>
+                <ul>
+                    <li>Manage client onboarding lifecycle efficiently</li>
+                    <li>Track progress across multiple clients and asset classes</li>
+                    <li>Execute advanced tooling workflows (spec comparison, test generation, certification)</li>
+                    <li>Identify and resolve blockers quickly</li>
+                </ul>
+            </div>
+            <p><strong>Responsibilities:</strong> Oversees client onboarding, spec comparison, progress tracking, task coordination, and certification workflows.</p>
+            
+            <h3>Client User</h3>
+            <div class="highlight">
+                <strong>Primary Goals:</strong>
+                <ul>
+                    <li>Understand own implementation progress clearly</li>
+                    <li>View assigned tasks and deliverables</li>
+                    <li>Execute allowed workflows with clear guidance</li>
+                    <li>Get quick feedback on specification alignment</li>
+                </ul>
+            </div>
+            <p><strong>Responsibilities:</strong> Tracks onboarding progress, reviews specifications, uses tools like spec comparison overview, log analysis, and ATDL validation.</p>
+        </section>
+
+        <!-- Business Capabilities -->
+        <section id="capabilities">
+            <h2>Business Capabilities Required</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Multi-Client Portfolio Management</h4>
+                    <p>Support multiple simultaneous client onboardings with independent tracking</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Multi-Asset & Multi-Version Support</h4>
+                    <p>Handle multiple asset classes and FIX protocol versions per client</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Spec Standardization & Comparison</h4>
+                    <p>Automated workflow for standardizing and comparing specifications</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Operational Status Tracking</h4>
+                    <p>Real-time progress visibility with alerts and notifications</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Role-Aware Navigation</h4>
+                    <p>Role-based access control and customized user experiences</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Toolchain Integration</h4>
+                    <p>Integration with conversion runners, test generators, and analysis tools</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- UI Overview and Screenshots -->
+        <section id="ui-overview">
+            <h2>UI Overview & Screenshots</h2>
+            
+            <h3>Screen 1: Homepage Landing Page</h3>
+            <p>Introduction to B-COMET platform with key features and call-to-action buttons for starting the workflow.</p>
+            <div class="screenshot-section">
+                <img src="/brd/01-homepage.png" alt="Homepage Landing Page" class="screenshot">
+                <div class="screenshot-caption">Figure 1: B-COMET Homepage - Market overview and entry point for both Admin and Client users</div>
+            </div>
+            
+            <h3>Screen 2: Admin Dashboard</h3>
+            <p>Portfolio overview with client metrics, pending tasks, alerts, and recent activity. Provides single operational view of all client progress.</p>
+            <div class="screenshot-section">
+                <img src="/brd/02-dashboard.png" alt="Admin Dashboard" class="screenshot">
+                <div class="screenshot-caption">Figure 2: Admin Dashboard - Multi-client portfolio overview with metrics and task management</div>
+            </div>
+            
+            <h3>Screen 3: FIX Message Creator Tool</h3>
+            <p>Utility for creating and editing FIX messages with field editing, sequencing, and send/receive log viewing capabilities.</p>
+            <div class="screenshot-section">
+                <img src="/brd/03-message-creator.png" alt="FIX Message Creator" class="screenshot">
+                <div class="screenshot-caption">Figure 3: FIX Message Creator - Tool for message field editing and sequencing</div>
+            </div>
+            
+            <h3>Screen 4: Presentation Mode / Demo</h3>
+            <p>Interactive presentation showcasing platform capabilities with navigation through key features and workflows.</p>
+            <div class="screenshot-section">
+                <img src="/brd/04-presentation.png" alt="Presentation Mode" class="screenshot">
+                <div class="screenshot-caption">Figure 4: Presentation Mode - Interactive demo of B-COMET capabilities</div>
+            </div>
+        </section>
+
+        <!-- Functional Requirements -->
+        <section id="functional">
+            <h2>Functional Requirements</h2>
+            
+            <h3>Core Authentication & Access</h3>
+            <table class="requirements-table">
+                <tr>
+                    <th>Requirement ID</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">FR-01</span></td>
+                    <td><strong>Role-based Access:</strong> System shall support Admin and Client roles with role-appropriate navigation, data, and actions</td>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">FR-02</span></td>
+                    <td><strong>Authentication:</strong> System shall provide login experience for each role and validate backend availability</td>
+                </tr>
+            </table>
+            
+            <h3>Dashboard & Visibility</h3>
+            <table class="requirements-table">
+                <tr>
+                    <th>Requirement ID</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">FR-03</span></td>
+                    <td><strong>Dashboard:</strong> Admin dashboard displays portfolio metrics, pending tasks, and alerts. Client dashboard shows progress by asset class</td>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">FR-16</span></td>
+                    <td><strong>Alerts & Notifications:</strong> System shall display alert counts and status indicators throughout key workflows</td>
+                </tr>
+            </table>
+            
+            <h3>Client & Spec Management</h3>
+            <table class="requirements-table">
+                <tr>
+                    <th>Requirement ID</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">FR-04</span></td>
+                    <td><strong>Client Management:</strong> Admins shall create clients with metadata (name, identifier, asset classes)</td>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">FR-05</span></td>
+                    <td><strong>Client Details:</strong> Show per-client status by asset class and version with direct tool navigation</td>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">FR-06</span></td>
+                    <td><strong>Spec Management:</strong> Support listing, uploading, and version selection of client and admin specs</td>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">FR-07</span></td>
+                    <td><strong>Conversion:</strong> Call backend conversion endpoints for spec standardization with error handling</td>
+                </tr>
+            </table>
+            
+            <h3>Workflow Tools</h3>
+            <table class="requirements-table">
+                <tr>
+                    <th>Requirement ID</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">FR-08</span></td>
+                    <td><strong>Spec Comparison:</strong> Compare client and admin specs with multi-spec visibility and difference tracking</td>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">FR-09</span></td>
+                    <td><strong>Log Analysis:</strong> Allow users to run log analysis and classify findings with status tracking</td>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">FR-10</span></td>
+                    <td><strong>Scenario Creation:</strong> Support creation and management of test scenarios</td>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">FR-11</span></td>
+                    <td><strong>Regression Tests:</strong> Convert scenarios into regression test case outputs</td>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">FR-12</span></td>
+                    <td><strong>Certification Tests:</strong> Generate certification-oriented test cases</td>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">FR-13</span></td>
+                    <td><strong>FIX Message Creator:</strong> Support field editing, sequencing, and send/receive log viewing</td>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">FR-14</span></td>
+                    <td><strong>ATDL Workflows:</strong> Compare, convert, validate, and represent ATDL-related functionality</td>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">FR-15</span></td>
+                    <td><strong>Settings:</strong> Configurable settings for general, look and feel, security, mail, questionnaires, and license</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Non-Functional Requirements -->
+        <section id="non-functional">
+            <h2>Non-Functional Requirements</h2>
+            <table>
+                <tr>
+                    <th>Requirement ID</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">NFR-01</span></td>
+                    <td><strong>Availability:</strong> Target 99.9% monthly uptime in production</td>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">NFR-02</span></td>
+                    <td><strong>Performance:</strong> Page interactions responsive under load; health checks within acceptable thresholds</td>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">NFR-03</span></td>
+                    <td><strong>Security:</strong> Role-based access enforcement, secure token handling, and protection against unauthorized access</td>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">NFR-04</span></td>
+                    <td><strong>Data Integrity:</strong> Changes to comparisons, test states, and workflow events shall be traceable</td>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">NFR-05</span></td>
+                    <td><strong>Scalability:</strong> Support growing client volume, asset classes, and parallel onboarding activities</td>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">NFR-06</span></td>
+                    <td><strong>Usability:</strong> Clear status signals, guided workflow progression, minimal training overhead</td>
+                </tr>
+                <tr>
+                    <td><span class="requirement-id">NFR-07</span></td>
+                    <td><strong>Maintainability:</strong> Modular architecture supporting expansion of tools and endpoints</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Core Workflows -->
+        <section id="workflows">
+            <h2>Core User Workflows</h2>
+            
+            <h3>Workflow 1: Client Onboarding & Progress Tracking</h3>
+            <div class="flow-container">
+                <div class="flow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content"><strong>Admin</strong> selects or creates a new client with metadata</div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content"><strong>System</strong> initializes client record with asset class and FIX version context</div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content"><strong>Admin/Client</strong> views dashboard showing progress by asset class</div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content"><strong>System</strong> reflects updated progress, alerts, and pending actions in real-time</div>
+                </div>
+            </div>
+            
+            <h3>Workflow 2: Specification Comparison</h3>
+            <div class="flow-container">
+                <div class="flow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content"><strong>User</strong> uploads or selects client FIX specification file</div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content"><strong>System</strong> calls backend conversion endpoint to standardize spec format</div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content"><strong>System</strong> compares client spec against admin reference specification</div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content"><strong>User</strong> reviews differences, flags issues, and marks comparisons complete</div>
+                </div>
+            </div>
+            
+            <h3>Workflow 3: Log Analysis & Issue Tracking</h3>
+            <div class="flow-container">
+                <div class="flow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content"><strong>User</strong> uploads FIX protocol log file for analysis</div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content"><strong>System</strong> processes log and classifies findings (errors, warnings, compliance issues)</div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content"><strong>User</strong> reviews identified issues and assigns status/notes</div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content"><strong>System</strong> tracks resolution progress and updates client status</div>
+                </div>
+            </div>
+            
+            <h3>Workflow 4: Test Generation & Certification</h3>
+            <div class="flow-container">
+                <div class="flow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content"><strong>Admin</strong> creates test scenarios for client FIX implementation</div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content"><strong>System</strong> converts scenarios into test case format (regression or certification)</div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content"><strong>System</strong> generates test cases aligned with certification requirements</div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content"><strong>User</strong> executes tests, tracks results, and updates certification status</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Integrations -->
+        <section id="integrations">
+            <h2>Integrations & Dependencies</h2>
+            
+            <h3>Backend Services Required</h3>
+            <ul>
+                <li><strong>Authentication API:</strong> User login and session management</li>
+                <li><strong>Platform Data API:</strong> Client, spec, and progress data management</li>
+                <li><strong>Conversion Runner:</strong> Spec standardization and format conversion</li>
+                <li><strong>Log Analysis Service:</strong> FIX log processing and issue classification</li>
+                <li><strong>Test Generation Service:</strong> Scenario-to-test conversion and test case generation</li>
+                <li><strong>Comparison Engine:</strong> Specification and ATDL comparison workflows</li>
+            </ul>
+            
+            <h3>External Tool Integrations</h3>
+            <ul>
+                <li><strong>VeriFIX:</strong> Regression test case generation and validation</li>
+                <li><strong>Conductor:</strong> Certification workflow orchestration</li>
+                <li><strong>ATDL Tools:</strong> Algorithm trading definition parsing and validation</li>
+            </ul>
+            
+            <h3>Infrastructure</h3>
+            <ul>
+                <li>PostgreSQL or compatible relational database</li>
+                <li>Redis for caching and session storage (optional)</li>
+                <li>WebSocket services for real-time progress updates (optional)</li>
+                <li>File storage system for specs and logs</li>
+            </ul>
+        </section>
+
+        <!-- Assumptions -->
+        <section id="assumptions">
+            <h2>Assumptions & Constraints</h2>
+            
+            <h3>Assumptions</h3>
+            <ul>
+                <li>Admin and Client roles are sufficient for initial go-live</li>
+                <li>Backend services required for full mode are available in production environments</li>
+                <li>Conversion runner and token-based control are managed securely by operations</li>
+                <li>Product and business teams will finalize process ownership for each workflow stage</li>
+                <li>API contracts and data formats will be standardized before development</li>
+            </ul>
+            
+            <h3>Constraints</h3>
+            <ul>
+                <li>Prototype contains simulated or placeholder data in selected flows</li>
+                <li>Some workflows rely on backend availability and environment configuration</li>
+                <li>Production controls for data governance, audit, and compliance may require additional scope</li>
+                <li>Frontend and backend development must proceed in parallel with clear API contracts</li>
+                <li>User training and documentation must be prepared before go-live</li>
+            </ul>
+        </section>
+
+        <!-- Risks & Mitigations -->
+        <section id="risks">
+            <h2>Risks & Mitigations</h2>
+            
+            <table>
+                <tr>
+                    <th>Risk</th>
+                    <th>Impact</th>
+                    <th>Mitigation</th>
+                </tr>
+                <tr>
+                    <td>Prototype-to-production gaps in data persistence and validation</td>
+                    <td>High</td>
+                    <td>Define MVP acceptance criteria and UAT checkpoints per module</td>
+                </tr>
+                <tr>
+                    <td>Dependency on local runner tooling creates environment inconsistencies</td>
+                    <td>Medium</td>
+                    <td>Standardize runtime profiles and deployment runbooks</td>
+                </tr>
+                <tr>
+                    <td>Role and entitlement requirements may expand after pilot</td>
+                    <td>Medium</td>
+                    <td>Add entitlement extensibility in access-control design</td>
+                </tr>
+                <tr>
+                    <td>Incomplete audit/compliance capabilities at first release</td>
+                    <td>High</td>
+                    <td>Plan phase-2 compliance controls with security stakeholders</td>
+                </tr>
+                <tr>
+                    <td>Backend service unavailability impacts all workflows</td>
+                    <td>High</td>
+                    <td>Implement graceful degradation and offline mode where possible</td>
+                </tr>
+                <tr>
+                    <td>User adoption slower than expected</td>
+                    <td>Medium</td>
+                    <td>Plan comprehensive training program and in-app guidance</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Success Metrics -->
+        <section id="success-metrics">
+            <h2>Success Metrics (KPIs)</h2>
+            
+            <h3>Business KPIs</h3>
+            <table>
+                <tr>
+                    <th>Metric</th>
+                    <th>Target</th>
+                    <th>Measurement</th>
+                </tr>
+                <tr>
+                    <td>Average onboarding cycle time reduction</td>
+                    <td>30% reduction</td>
+                    <td>Compare pre/post platform implementation</td>
+                </tr>
+                <tr>
+                    <td>Specs standardized without manual rework</td>
+                    <td>85%+</td>
+                    <td>Track successful conversions vs. manual fixes</td>
+                </tr>
+                <tr>
+                    <td>First-pass comparison acceptance rate</td>
+                    <td>75%+</td>
+                    <td>Monitor comparison outcomes requiring no rework</td>
+                </tr>
+            </table>
+            
+            <h3>Platform KPIs</h3>
+            <table>
+                <tr>
+                    <th>Metric</th>
+                    <th>Target</th>
+                    <th>Measurement</th>
+                </tr>
+                <tr>
+                    <td>System availability</td>
+                    <td>99.9%</td>
+                    <td>Monthly uptime monitoring</td>
+                </tr>
+                <tr>
+                    <td>Average page load time</td>
+                    <td>&lt; 2 seconds</td>
+                    <td>Real user monitoring (RUM)</td>
+                </tr>
+                <tr>
+                    <td>API response time (p95)</td>
+                    <td>&lt; 500ms</td>
+                    <td>Backend performance monitoring</td>
+                </tr>
+            </table>
+            
+            <h3>User Adoption KPIs</h3>
+            <table>
+                <tr>
+                    <th>Metric</th>
+                    <th>Target</th>
+                    <th>Measurement</th>
+                </tr>
+                <tr>
+                    <td>Client/user adoption rate</td>
+                    <td>80%+</td>
+                    <td>Percentage of eligible users with activity</td>
+                </tr>
+                <tr>
+                    <td>Monthly active users (MAU)</td>
+                    <td>Growth trend</td>
+                    <td>Track unique users per month</td>
+                </tr>
+                <tr>
+                    <td>Reduction in escalations</td>
+                    <td>40% reduction</td>
+                    <td>Support ticket analysis</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- MVP -->
+        <section id="mvp">
+            <h2>MVP Definition</h2>
+            
+            <div class="highlight">
+                <strong>Minimum Viable Product Scope:</strong>
+                <p>The MVP focuses on core workflows that directly impact onboarding cycle time reduction and operational visibility.</p>
+            </div>
+            
+            <h3>Included in MVP</h3>
+            <ul>
+                <li><strong>Authentication & Access Control</strong>
+                    <ul>
+                        <li>Role-based login for Admin and Client roles</li>
+                        <li>Session management and logout functionality</li>
+                    </ul>
+                </li>
+                <li><strong>Dashboards</strong>
+                    <ul>
+                        <li>Admin portfolio overview with metrics and task visibility</li>
+                        <li>Client progress dashboard by asset class</li>
+                    </ul>
+                </li>
+                <li><strong>Client Management</strong>
+                    <ul>
+                        <li>Create and manage clients</li>
+                        <li>Track client details and asset class assignments</li>
+                    </ul>
+                </li>
+                <li><strong>Specification Workflows</strong>
+                    <ul>
+                        <li>Upload and manage client specs</li>
+                        <li>Standardized conversion integration</li>
+                        <li>Spec comparison (basic)</li>
+                    </ul>
+                </li>
+                <li><strong>Log Analysis (Baseline)</strong>
+                    <ul>
+                        <li>Log upload and processing</li>
+                        <li>Issue classification and tracking</li>
+                    </ul>
+                </li>
+                <li><strong>Test & Certification Shells</strong>
+                    <ul>
+                        <li>Scenario creation interface</li>
+                        <li>Test generation workflow entry points</li>
+                    </ul>
+                </li>
+                <li><strong>ATDL Entry Points</strong>
+                    <ul>
+                        <li>ATDL comparison basic workflow</li>
+                        <li>ATDL validation interface</li>
+                    </ul>
+                </li>
+                <li><strong>Settings & Configuration</strong>
+                    <ul>
+                        <li>General platform settings</li>
+                        <li>User preferences</li>
+                    </ul>
+                </li>
+            </ul>
+            
+            <h3>Not Included in MVP (Phase 2+)</h3>
+            <ul>
+                <li>Advanced analytics and reporting</li>
+                <li>Enterprise IAM/SSO integration</li>
+                <li>Full audit and compliance controls</li>
+                <li>Advanced ML/AI recommendations</li>
+                <li>Multi-tenant self-service provisioning</li>
+            </ul>
+        </section>
+
+        <!-- Acceptance Criteria -->
+        <section id="acceptance">
+            <h2>Acceptance Criteria</h2>
+            
+            <h3>Business-Level Acceptance Criteria</h3>
+            <ul>
+                <li><strong>Admin User Journey:</strong> Admin users can successfully onboard new clients, assign asset classes and FIX versions, track progress, and access all core tools</li>
+                <li><strong>Client User Journey:</strong> Client users can view own status, navigate assigned specs, access log analysis and ATDL tools, and track pending tasks</li>
+                <li><strong>Spec Workflows:</strong> Spec conversion and comparison flows operate with clear success/failure feedback and proper error messaging</li>
+                <li><strong>Status Visibility:</strong> Onboarding status is visible at both dashboard and detail levels with meaningful progress indicators</li>
+                <li><strong>Performance:</strong> Page loads within 3 seconds and API responses under 500ms for 95th percentile</li>
+                <li><strong>Operational Reporting:</strong> Business stakeholders can generate weekly progress reports from platform data</li>
+            </ul>
+            
+            <h3>Technical Acceptance Criteria</h3>
+            <ul>
+                <li>All functional requirements (FR-01 through FR-16) implemented and tested</li>
+                <li>All non-functional requirements (NFR-01 through NFR-07) met or documented</li>
+                <li>Backend API contracts finalized and documented</li>
+                <li>Unit test coverage ≥ 80% for critical paths</li>
+                <li>UAT testing completed with stakeholder sign-off</li>
+                <li>Production deployment runbook completed and tested</li>
+            </ul>
+        </section>
+
+        <!-- Timeline -->
+        <section id="timeline">
+            <h2>Implementation Timeline</h2>
+            
+            <h3>Phase 1: MVP (Q2 2026)</h3>
+            <div class="flow-container">
+                <p><strong>Duration:</strong> 8 weeks | <strong>Objective:</strong> Launch core platform with essential workflows</p>
+                <ul>
+                    <li>Weeks 1-2: Backend API development and database schema</li>
+                    <li>Weeks 2-4: Frontend implementation (auth, dashboards, client management)</li>
+                    <li>Weeks 4-6: Workflow implementation (spec, log analysis, test shells)</li>
+                    <li>Weeks 6-7: Integration testing and bug fixes</li>
+                    <li>Week 8: UAT and production deployment</li>
+                </ul>
+            </div>
+            
+            <h3>Phase 2: Enhanced Workflows (Q3 2026)</h3>
+            <div class="flow-container">
+                <p><strong>Duration:</strong> 6 weeks | <strong>Objective:</strong> Deepen workflow automation and add advanced features</p>
+                <ul>
+                    <li>Advanced spec comparison with multi-version support</li>
+                    <li>Enhanced test generation with VeriFIX and Conductor integration</li>
+                    <li>ATDL workflow completion</li>
+                    <li>Audit and compliance controls (phase 1)</li>
+                </ul>
+            </div>
+            
+            <h3>Phase 3: Platform Hardening (Q4 2026)</h3>
+            <div class="flow-container">
+                <p><strong>Duration:</strong> 8 weeks | <strong>Objective:</strong> Enterprise scale and optimization</p>
+                <ul>
+                    <li>Enterprise IAM/SSO integration</li>
+                    <li>Advanced analytics and reporting</li>
+                    <li>Performance optimization</li>
+                    <li>Full compliance controls and audit trails</li>
+                    <li>Multi-language support</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Open Items -->
+        <section>
+            <h2>Open Items for Business Sign-Off</h2>
+            <ul>
+                <li>Confirm production role model and any additional personas beyond Admin/Client</li>
+                <li>Confirm scope split between MVP and later phases for each major workflow</li>
+                <li>Confirm compliance requirements (audit retention, legal hold, data residency)</li>
+                <li>Confirm operational ownership and SLAs for conversion/test tooling</li>
+                <li>Confirm reporting requirements for executive and operational dashboards</li>
+                <li>Confirm user training and documentation strategy</li>
+                <li>Confirm production support model and escalation procedures</li>
+            </ul>
+        </section>
+
+        <!-- Approval Signoff -->
+        <section>
+            <h2>Document Approval Sign-Off</h2>
+            <table class="approval-table">
+                <tr>
+                    <th>Role / Title</th>
+                    <th>Name</th>
+                    <th>Signature</th>
+                    <th>Date</th>
+                </tr>
+                <tr>
+                    <td>Product Owner</td>
+                    <td>_________________</td>
+                    <td>_________________</td>
+                    <td>_________________</td>
+                </tr>
+                <tr>
+                    <td>Technical Lead</td>
+                    <td>_________________</td>
+                    <td>_________________</td>
+                    <td>_________________</td>
+                </tr>
+                <tr>
+                    <td>Business Sponsor</td>
+                    <td>_________________</td>
+                    <td>_________________</td>
+                    <td>_________________</td>
+                </tr>
+                <tr>
+                    <td>QA Lead</td>
+                    <td>_________________</td>
+                    <td>_________________</td>
+                    <td>_________________</td>
+                </tr>
+            </table>
+        </section>
+    </div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</div>
+
+    <!-- Footer -->
+    <footer>
+        <p>B-COMET FIX Portal Business Requirements Document v1.0</p>
+        <p>Confidential - Internal Use Only</p>
+        <p>For questions or feedback, contact the Product Management team</p>
+    </footer>
+</body>
+</html>
