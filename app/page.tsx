@@ -2939,51 +2939,66 @@ export default function BCometPlatform() {
                 <Card className={`${bgCard} border ${borderColor} p-4 col-span-2`}>
                   <h3 className={`font-semibold ${textPrimary} mb-4`}>Stage Funnel</h3>
                   <div className="flex items-end justify-between gap-2 h-32">
-                    {[
-                      { stage: "Setup", count: 2, color: "#2196f3" },
-                      { stage: "Spec Analysis", count: 3, color: "#9c27b0" },
-                      { stage: "Connectivity", count: 1, color: "#00bcd4" },
-                      { stage: "Log Analysis", count: 2, color: "#ff9800" },
-                      { stage: "Testing", count: 1, color: "#e91e63" },
-                      { stage: "Certification", count: 1, color: "#4caf50" },
-                      { stage: "Live", count: 0, color: "#00e5ff" },
-                    ].map((s, i) => (
+                    {(() => {
+                      // Calculate stage counts from allCases
+                      const stageCounts = [
+                        { stage: "Setup", stageNums: [1, 2], color: "#2196f3" },
+                        { stage: "Spec Compare", stageNums: [3], color: "#9c27b0" },
+                        { stage: "Log Analysis", stageNums: [4], color: "#00bcd4" },
+                        { stage: "ATDL Config", stageNums: [5], color: "#ff9800" },
+                        { stage: "Testing", stageNums: [6, 7], color: "#e91e63" },
+                        { stage: "Certification", stageNums: [8], color: "#4caf50" },
+                        { stage: "Live", stageNums: [9], color: "#00e5ff" },
+                      ].map(s => ({
+                        ...s,
+                        count: allCases.filter(c => s.stageNums.includes(c.currentStage)).length
+                      }))
+                      const maxCount = Math.max(...stageCounts.map(s => s.count), 1)
+                      return stageCounts.map((s, i) => (
                       <div key={i} className="flex-1 flex flex-col items-center gap-2">
                         <div 
                           className="w-full rounded-t-sm transition-all hover:opacity-80 cursor-pointer"
-                          style={{ backgroundColor: s.color, height: `${Math.max(s.count * 25, 8)}px` }}
+                          style={{ backgroundColor: s.color, height: `${Math.max((s.count / maxCount) * 100, 8)}px` }}
                         />
                         <span className={`text-[10px] ${textSecondary} text-center`}>{s.stage}</span>
                         <span className={`text-xs font-semibold ${textPrimary}`}>{s.count}</span>
                       </div>
-                    ))}
+                    ))})()}
                   </div>
                 </Card>
                 <Card className={`${bgCard} border ${borderColor} p-4`}>
                   <h3 className={`font-semibold ${textPrimary} mb-4`}>SLA Forecast</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className={`text-sm ${textSecondary}`}>On Track</span>
-                      <span className="text-sm font-semibold text-[#4caf50]">6 cases</span>
+                  {(() => {
+                    const totalCases = allCases.length || 1
+                    const completedCases = allCases.filter(c => c.status === "completed").length
+                    const blockedCases = allCases.filter(c => c.status === "blocked").length
+                    const inProgressCases = allCases.filter(c => c.status === "in-progress" && c.progress >= 50).length
+                    const atRiskCases = allCases.filter(c => c.status === "in-progress" && c.progress < 50).length
+                    return (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm ${textSecondary}`}>On Track</span>
+                        <span className="text-sm font-semibold text-[#4caf50]">{completedCases + inProgressCases} cases</span>
+                      </div>
+                      <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`}>
+                        <div className="h-full rounded-full bg-[#4caf50]" style={{ width: `${((completedCases + inProgressCases) / totalCases) * 100}%` }} />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm ${textSecondary}`}>At Risk</span>
+                        <span className="text-sm font-semibold text-[#ff9800]">{atRiskCases} cases</span>
+                      </div>
+                      <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`}>
+                        <div className="h-full rounded-full bg-[#ff9800]" style={{ width: `${(atRiskCases / totalCases) * 100}%` }} />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm ${textSecondary}`}>Blocked</span>
+                        <span className="text-sm font-semibold text-[#f44336]">{blockedCases} cases</span>
+                      </div>
+                      <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`}>
+                        <div className="h-full rounded-full bg-[#f44336]" style={{ width: `${(blockedCases / totalCases) * 100}%` }} />
+                      </div>
                     </div>
-                    <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`}>
-                      <div className="h-full rounded-full bg-[#4caf50]" style={{ width: "60%" }} />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className={`text-sm ${textSecondary}`}>At Risk</span>
-                      <span className="text-sm font-semibold text-[#ff9800]">3 cases</span>
-                    </div>
-                    <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`}>
-                      <div className="h-full rounded-full bg-[#ff9800]" style={{ width: "30%" }} />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className={`text-sm ${textSecondary}`}>Breached</span>
-                      <span className="text-sm font-semibold text-[#f44336]">1 case</span>
-                    </div>
-                    <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`}>
-                      <div className="h-full rounded-full bg-[#f44336]" style={{ width: "10%" }} />
-                    </div>
-                  </div>
+                  )})()}
                 </Card>
               </div>
 
