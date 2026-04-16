@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "case-workflow" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "approvals" | "evidence-vault" | "prod-config" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "case-workflow" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "onboarding-case-detail" | "approvals" | "evidence-vault" | "prod-config" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case">("home")
   const [settingsTab, setSettingsTab] = useState<"profile" | "notifications" | "security" | "integrations" | "appearance" | "api-keys">("profile")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [isManager, setIsManager] = useState(false)
@@ -192,28 +192,55 @@ export default function BCometPlatform() {
     "production-config": false,
   })
   
-  // Onboarding Cases data with assigned users
-  const [onboardingCases] = useState([
-    { id: "OB-2024-001", client: "Nexus Trading Group", legalEntity: "Nexus Trading LLC", region: "AMER", assetClass: "Equities", protocol: "FIX 4.2", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Medium", owner: "John Smith", assignedUser: "John Smith", slaDate: "Feb 15, 2024", blockers: 0, status: "on-track", createdDate: "Jan 2, 2024", readinessScore: 85 },
-    { id: "OB-2024-002", client: "Apex Capital Partners", legalEntity: "Apex Capital Inc", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.4", environment: "Cert", stage: 3, stageLabel: "Connectivity", priority: "Critical", riskRating: "High", owner: "Sarah Johnson", assignedUser: "John Smith", slaDate: "Jan 30, 2024", blockers: 2, status: "at-risk", createdDate: "Dec 15, 2023", readinessScore: 62 },
-    { id: "OB-2024-003", client: "Horizon Investments", legalEntity: "Horizon Fund Management", region: "APAC", assetClass: "Futures", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "Medium", riskRating: "Low", owner: "Mike Chen", assignedUser: "John Smith", slaDate: "Mar 1, 2024", blockers: 0, status: "on-track", createdDate: "Jan 8, 2024", readinessScore: 78 },
-    { id: "OB-2024-004", client: "Velocity Securities", legalEntity: "Velocity Trading Ltd", region: "AMER", assetClass: "Equities", protocol: "FIX 4.4", environment: "Prod", stage: 6, stageLabel: "Certification", priority: "High", riskRating: "Low", owner: "Lisa Wang", assignedUser: "Alice Brown", slaDate: "Jan 20, 2024", blockers: 0, status: "on-track", createdDate: "Nov 20, 2023", readinessScore: 95 },
-    { id: "OB-2024-005", client: "Summit Financial", legalEntity: "Summit Advisory Group", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.4", environment: "UAT", stage: 1, stageLabel: "Setup", priority: "Low", riskRating: "Medium", owner: "Tom Brown", assignedUser: "John Smith", slaDate: "Apr 1, 2024", blockers: 1, status: "blocked", createdDate: "Jan 10, 2024", readinessScore: 45 },
-    { id: "OB-2024-006", client: "Quantum Asset Management", legalEntity: "Quantum Holdings LLC", region: "AMER", assetClass: "Commodities", protocol: "FIX 4.4", environment: "UAT", stage: 4, stageLabel: "Log Analysis", priority: "Medium", riskRating: "Medium", owner: "John Smith", assignedUser: "John Smith", slaDate: "Feb 28, 2024", blockers: 1, status: "at-risk", createdDate: "Jan 5, 2024", readinessScore: 72 },
-    { id: "OB-2024-007", client: "Atlantic Trading Corp", legalEntity: "Atlantic Trading Inc", region: "AMER", assetClass: "Drop Copy", protocol: "FIX 4.4", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Low", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Feb 18, 2024", blockers: 0, status: "on-track", createdDate: "Jan 3, 2024", readinessScore: 88 },
-    { id: "OB-2024-008", client: "Atlantic Trading Corp", legalEntity: "Atlantic Trading Inc", region: "AMER", assetClass: "Market Data", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 3, stageLabel: "Connectivity", priority: "Medium", riskRating: "Medium", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Mar 1, 2024", blockers: 1, status: "at-risk", createdDate: "Jan 5, 2024", readinessScore: 55 },
-    { id: "OB-2024-009", client: "Blackstone Global Markets", legalEntity: "Blackstone Securities LLC", region: "AMER", assetClass: "Fixed Income", protocol: "FIX 4.4", environment: "Prod", stage: 9, stageLabel: "Live", priority: "High", riskRating: "Low", owner: "Mike Chen", assignedUser: "John Smith", slaDate: "Jan 15, 2024", blockers: 0, status: "completed", createdDate: "Oct 10, 2023", readinessScore: 100 },
-    { id: "OB-2024-010", client: "Blackstone Global Markets", legalEntity: "Blackstone Securities LLC", region: "AMER", assetClass: "Credit", protocol: "FIX 4.4", environment: "UAT", stage: 4, stageLabel: "Log Analysis", priority: "Medium", riskRating: "Low", owner: "Mike Chen", assignedUser: "John Smith", slaDate: "Feb 28, 2024", blockers: 0, status: "on-track", createdDate: "Jan 8, 2024", readinessScore: 65 },
-    { id: "OB-2024-011", client: "Pacific Hedge Fund", legalEntity: "Pacific Asset Management", region: "APAC", assetClass: "Equities", protocol: "FIX 4.2", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Low", owner: "Lisa Wang", assignedUser: "Alice Brown", slaDate: "Feb 20, 2024", blockers: 0, status: "on-track", createdDate: "Dec 20, 2023", readinessScore: 80 },
-    { id: "OB-2024-012", client: "Pacific Hedge Fund", legalEntity: "Pacific Asset Management", region: "APAC", assetClass: "ETF", protocol: "FIX 4.4", environment: "UAT", stage: 3, stageLabel: "Connectivity", priority: "Medium", riskRating: "Medium", owner: "Lisa Wang", assignedUser: "Alice Brown", slaDate: "Mar 5, 2024", blockers: 1, status: "at-risk", createdDate: "Jan 10, 2024", readinessScore: 48 },
-    { id: "OB-2024-013", client: "Pacific Hedge Fund", legalEntity: "Pacific Asset Management", region: "APAC", assetClass: "Drop Copy", protocol: "FIX 4.4", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "Low", riskRating: "Low", owner: "Lisa Wang", assignedUser: "Alice Brown", slaDate: "Mar 15, 2024", blockers: 0, status: "on-track", createdDate: "Jan 12, 2024", readinessScore: 35 },
-    { id: "OB-2024-014", client: "Sterling Investment Bank", legalEntity: "Sterling Investments Ltd", region: "EMEA", assetClass: "Market Data", protocol: "FIX 5.0", environment: "Cert", stage: 8, stageLabel: "Prod Config", priority: "Critical", riskRating: "Low", owner: "John Smith", assignedUser: "John Smith", slaDate: "Feb 8, 2024", blockers: 0, status: "on-track", createdDate: "Nov 15, 2023", readinessScore: 92 },
-    { id: "OB-2024-015", client: "Sterling Investment Bank", legalEntity: "Sterling Investments Ltd", region: "EMEA", assetClass: "Rates", protocol: "FIX 4.4", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Medium", owner: "John Smith", assignedUser: "John Smith", slaDate: "Feb 25, 2024", blockers: 1, status: "at-risk", createdDate: "Dec 5, 2023", readinessScore: 70 },
-    { id: "OB-2024-016", client: "Nordic Securities AS", legalEntity: "Nordic Capital Group", region: "EMEA", assetClass: "FX", protocol: "FIX 4.4", environment: "Prod", stage: 9, stageLabel: "Live", priority: "High", riskRating: "Low", owner: "Tom Brown", assignedUser: "John Smith", slaDate: "Jan 20, 2024", blockers: 0, status: "completed", createdDate: "Sep 25, 2023", readinessScore: 100 },
-    { id: "OB-2024-017", client: "Nordic Securities AS", legalEntity: "Nordic Capital Group", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.2", environment: "UAT", stage: 4, stageLabel: "Log Analysis", priority: "Medium", riskRating: "Low", owner: "Tom Brown", assignedUser: "John Smith", slaDate: "Feb 28, 2024", blockers: 0, status: "on-track", createdDate: "Jan 6, 2024", readinessScore: 60 },
-    { id: "OB-2024-018", client: "Nordic Securities AS", legalEntity: "Nordic Capital Group", region: "EMEA", assetClass: "Drop Copy", protocol: "FIX 4.4", environment: "Cert", stage: 8, stageLabel: "Prod Config", priority: "High", riskRating: "Low", owner: "Tom Brown", assignedUser: "John Smith", slaDate: "Feb 10, 2024", blockers: 0, status: "on-track", createdDate: "Nov 1, 2023", readinessScore: 90 },
-    { id: "OB-2024-019", client: "Meridian Capital LLC", legalEntity: "Meridian Holdings", region: "AMER", assetClass: "Options", protocol: "FIX 4.4", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "High", riskRating: "High", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Feb 15, 2024", blockers: 2, status: "blocked", createdDate: "Jan 8, 2024", readinessScore: 25 },
-    { id: "OB-2024-020", client: "Meridian Capital LLC", legalEntity: "Meridian Holdings", region: "AMER", assetClass: "Futures", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "Medium", riskRating: "Medium", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Mar 1, 2024", blockers: 1, status: "at-risk", createdDate: "Jan 10, 2024", readinessScore: 30 },
+  // Onboarding Cases data with gates, owners, and blockers
+  const [onboardingCases, setOnboardingCases] = useState([
+    { 
+      id: "OB-2024-001", client: "Nexus Trading Group", legalEntity: "Nexus Trading LLC", region: "AMER", assetClass: "Equities", protocol: "FIX 4.2", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Medium", owner: "John Smith", assignedUser: "John Smith", slaDate: "Feb 15, 2024", blockers: 0, status: "on-track", createdDate: "Jan 2, 2024", readinessScore: 85,
+      gateA: { status: "passed" as "locked" | "unlocked" | "passed", unlockedDate: "Jan 5, 2024", passedDate: "Jan 8, 2024" },
+      gateB: { status: "passed" as "locked" | "unlocked" | "passed", unlockedDate: "Jan 8, 2024", passedDate: "Jan 12, 2024" },
+      gateC: { status: "unlocked" as "locked" | "unlocked" | "passed", unlockedDate: "Jan 12, 2024", passedDate: null },
+      owners: {
+        onboardingManager: { name: "John Smith", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } },
+        techLead: { name: "David Park", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } },
+        qaLead: { name: "Karen Mitchell", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } },
+        businessApprover: { name: "Michael Torres", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } }
+      },
+      criticalBlockers: []
+    },
+    { 
+      id: "OB-2024-002", client: "Apex Capital Partners", legalEntity: "Apex Capital Inc", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.4", environment: "Cert", stage: 3, stageLabel: "Connectivity", priority: "Critical", riskRating: "High", owner: "Sarah Johnson", assignedUser: "John Smith", slaDate: "Jan 30, 2024", blockers: 2, status: "at-risk", createdDate: "Dec 15, 2023", readinessScore: 62,
+      gateA: { status: "passed" as "locked" | "unlocked" | "passed", unlockedDate: "Dec 20, 2023", passedDate: "Dec 23, 2023" },
+      gateB: { status: "unlocked" as "locked" | "unlocked" | "passed", unlockedDate: "Jan 2, 2024", passedDate: null },
+      gateC: { status: "locked" as "locked" | "unlocked" | "passed", unlockedDate: null, passedDate: null },
+      owners: {
+        onboardingManager: { name: "Sarah Johnson", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } },
+        techLead: { name: "Robert Chen", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } },
+        qaLead: { name: "Lisa Anderson", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } },
+        businessApprover: { name: "Jennifer Lee", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } }
+      },
+      criticalBlockers: [
+        { id: "BLK-001", title: "SWIFT Gateway Integration Pending", severity: "critical" as "critical" | "high" | "medium" | "low", owner: "Robert Chen", dueDate: "Jan 25, 2024" },
+        { id: "BLK-002", title: "Regulatory Approval Awaited", severity: "critical" as "critical" | "high" | "medium" | "low", owner: "Jennifer Lee", dueDate: "Jan 28, 2024" }
+      ]
+    },
+    { id: "OB-2024-003", client: "Horizon Investments", legalEntity: "Horizon Fund Management", region: "APAC", assetClass: "Futures", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "Medium", riskRating: "Low", owner: "Mike Chen", assignedUser: "John Smith", slaDate: "Mar 1, 2024", blockers: 0, status: "on-track", createdDate: "Jan 8, 2024", readinessScore: 78, gateA: { status: "passed", unlockedDate: "Jan 10, 2024", passedDate: "Jan 12, 2024" }, gateB: { status: "locked", unlockedDate: null, passedDate: null }, gateC: { status: "locked", unlockedDate: null, passedDate: null }, owners: { onboardingManager: { name: "Mike Chen", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Alex Kumar", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Patricia White", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Richard Davis", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
+    { id: "OB-2024-004", client: "Velocity Securities", legalEntity: "Velocity Trading Ltd", region: "AMER", assetClass: "Equities", protocol: "FIX 4.4", environment: "Prod", stage: 6, stageLabel: "Certification", priority: "High", riskRating: "Low", owner: "Lisa Wang", assignedUser: "Alice Brown", slaDate: "Jan 20, 2024", blockers: 0, status: "on-track", createdDate: "Nov 20, 2023", readinessScore: 95, gateA: { status: "passed", unlockedDate: "Dec 1, 2023", passedDate: "Dec 5, 2023" }, gateB: { status: "passed", unlockedDate: "Dec 5, 2023", passedDate: "Dec 10, 2023" }, gateC: { status: "passed", unlockedDate: "Dec 10, 2023", passedDate: "Dec 15, 2023" }, owners: { onboardingManager: { name: "Lisa Wang", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Steven Brown", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Michelle Garcia", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "William Martinez", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
+    { id: "OB-2024-005", client: "Summit Financial", legalEntity: "Summit Advisory Group", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.4", environment: "UAT", stage: 1, stageLabel: "Setup", priority: "Low", riskRating: "Medium", owner: "Tom Brown", assignedUser: "John Smith", slaDate: "Apr 1, 2024", blockers: 1, status: "blocked", createdDate: "Jan 10, 2024", readinessScore: 45, gateA: { status: "locked", unlockedDate: null, passedDate: null }, gateB: { status: "locked", unlockedDate: null, passedDate: null }, gateC: { status: "locked", unlockedDate: null, passedDate: null }, owners: { onboardingManager: { name: "Tom Brown", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Christopher Hall", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Amanda Lewis", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Daniel Robinson", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [{ id: "BLK-003", title: "Client Sign-off Delayed", severity: "critical", owner: "Tom Brown", dueDate: "Jan 20, 2024" }] },
+    { id: "OB-2024-006", client: "Quantum Asset Management", legalEntity: "Quantum Holdings LLC", region: "AMER", assetClass: "Commodities", protocol: "FIX 4.4", environment: "UAT", stage: 4, stageLabel: "Log Analysis", priority: "Medium", riskRating: "Medium", owner: "John Smith", assignedUser: "John Smith", slaDate: "Feb 28, 2024", blockers: 1, status: "at-risk", createdDate: "Jan 5, 2024", readinessScore: 72, gateA: { status: "passed", unlockedDate: "Jan 6, 2024", passedDate: "Jan 9, 2024" }, gateB: { status: "passed", unlockedDate: "Jan 9, 2024", passedDate: "Jan 13, 2024" }, gateC: { status: "unlocked", unlockedDate: "Jan 13, 2024", passedDate: null }, owners: { onboardingManager: { name: "John Smith", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "James Miller", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Emily Davis", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Charles Wilson", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
+    { id: "OB-2024-007", client: "Atlantic Trading Corp", legalEntity: "Atlantic Trading Inc", region: "AMER", assetClass: "Drop Copy", protocol: "FIX 4.4", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Low", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Feb 18, 2024", blockers: 0, status: "on-track", createdDate: "Jan 3, 2024", readinessScore: 88, gateA: { status: "passed", unlockedDate: "Jan 4, 2024", passedDate: "Jan 7, 2024" }, gateB: { status: "passed", unlockedDate: "Jan 7, 2024", passedDate: "Jan 11, 2024" }, gateC: { status: "unlocked", unlockedDate: "Jan 11, 2024", passedDate: null }, owners: { onboardingManager: { name: "Sarah Johnson", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Paul Harris", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Susan Clark", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "George Taylor", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
+    { id: "OB-2024-008", client: "Atlantic Trading Corp", legalEntity: "Atlantic Trading Inc", region: "AMER", assetClass: "Market Data", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 3, stageLabel: "Connectivity", priority: "Medium", riskRating: "Medium", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Mar 1, 2024", blockers: 1, status: "at-risk", createdDate: "Jan 5, 2024", readinessScore: 55, gateA: { status: "passed", unlockedDate: "Jan 6, 2024", passedDate: "Jan 9, 2024" }, gateB: { status: "unlocked", unlockedDate: "Jan 12, 2024", passedDate: null }, gateC: { status: "locked", unlockedDate: null, passedDate: null }, owners: { onboardingManager: { name: "Sarah Johnson", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Mark Jackson", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Nancy Thomas", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Frank Anderson", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [{ id: "BLK-004", title: "Schema Validation Failure", severity: "high", owner: "Mark Jackson", dueDate: "Jan 22, 2024" }] },
+    { id: "OB-2024-009", client: "Blackstone Global Markets", legalEntity: "Blackstone Securities LLC", region: "AMER", assetClass: "Fixed Income", protocol: "FIX 4.4", environment: "Prod", stage: 9, stageLabel: "Live", priority: "High", riskRating: "Low", owner: "Mike Chen", assignedUser: "John Smith", slaDate: "Jan 15, 2024", blockers: 0, status: "completed", createdDate: "Oct 10, 2023", readinessScore: 100, gateA: { status: "passed", unlockedDate: "Oct 15, 2023", passedDate: "Oct 18, 2023" }, gateB: { status: "passed", unlockedDate: "Oct 20, 2023", passedDate: "Oct 25, 2023" }, gateC: { status: "passed", unlockedDate: "Oct 25, 2023", passedDate: "Oct 30, 2023" }, owners: { onboardingManager: { name: "Mike Chen", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Kevin White", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Rachel Moore", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Thomas Johnson", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
+    { id: "OB-2024-010", client: "Blackstone Global Markets", legalEntity: "Blackstone Securities LLC", region: "AMER", assetClass: "Credit", protocol: "FIX 4.4", environment: "UAT", stage: 4, stageLabel: "Log Analysis", priority: "Medium", riskRating: "Low", owner: "Mike Chen", assignedUser: "John Smith", slaDate: "Feb 28, 2024", blockers: 0, status: "on-track", createdDate: "Jan 8, 2024", readinessScore: 65, gateA: { status: "passed", unlockedDate: "Jan 9, 2024", passedDate: "Jan 12, 2024" }, gateB: { status: "unlocked", unlockedDate: "Jan 15, 2024", passedDate: null }, gateC: { status: "locked", unlockedDate: null, passedDate: null }, owners: { onboardingManager: { name: "Mike Chen", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Ryan Scott", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Angela Green", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Edward Martin", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
+    { id: "OB-2024-011", client: "Pacific Hedge Fund", legalEntity: "Pacific Asset Management", region: "APAC", assetClass: "Equities", protocol: "FIX 4.2", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Low", owner: "Lisa Wang", assignedUser: "Alice Brown", slaDate: "Feb 20, 2024", blockers: 0, status: "on-track", createdDate: "Dec 20, 2023", readinessScore: 80, gateA: { status: "passed", unlockedDate: "Dec 23, 2023", passedDate: "Dec 26, 2023" }, gateB: { status: "passed", unlockedDate: "Dec 26, 2023", passedDate: "Dec 30, 2023" }, gateC: { status: "unlocked", unlockedDate: "Dec 30, 2023", passedDate: null }, owners: { onboardingManager: { name: "Lisa Wang", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Jason Wright", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Laura Young", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Joseph King", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
+    { id: "OB-2024-012", client: "Pacific Hedge Fund", legalEntity: "Pacific Asset Management", region: "APAC", assetClass: "ETF", protocol: "FIX 4.4", environment: "UAT", stage: 3, stageLabel: "Connectivity", priority: "Medium", riskRating: "Medium", owner: "Lisa Wang", assignedUser: "Alice Brown", slaDate: "Mar 5, 2024", blockers: 1, status: "at-risk", createdDate: "Jan 10, 2024", readinessScore: 48, gateA: { status: "passed", unlockedDate: "Jan 11, 2024", passedDate: "Jan 14, 2024" }, gateB: { status: "unlocked", unlockedDate: "Jan 17, 2024", passedDate: null }, gateC: { status: "locked", unlockedDate: null, passedDate: null }, owners: { onboardingManager: { name: "Lisa Wang", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Matthew Lopez", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Barbara Hall", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Donald Perez", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
+    { id: "OB-2024-013", client: "Pacific Hedge Fund", legalEntity: "Pacific Asset Management", region: "APAC", assetClass: "Drop Copy", protocol: "FIX 4.4", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "Low", riskRating: "Low", owner: "Lisa Wang", assignedUser: "Alice Brown", slaDate: "Mar 15, 2024", blockers: 0, status: "on-track", createdDate: "Jan 12, 2024", readinessScore: 35, gateA: { status: "passed", unlockedDate: "Jan 13, 2024", passedDate: "Jan 15, 2024" }, gateB: { status: "locked", unlockedDate: null, passedDate: null }, gateC: { status: "locked", unlockedDate: null, passedDate: null }, owners: { onboardingManager: { name: "Lisa Wang", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Daniel Garcia", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Carol Martinez", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Robert Garcia", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
+    { id: "OB-2024-014", client: "Sterling Investment Bank", legalEntity: "Sterling Investments Ltd", region: "EMEA", assetClass: "Market Data", protocol: "FIX 5.0", environment: "Cert", stage: 8, stageLabel: "Prod Config", priority: "Critical", riskRating: "Low", owner: "John Smith", assignedUser: "John Smith", slaDate: "Feb 8, 2024", blockers: 0, status: "on-track", createdDate: "Nov 15, 2023", readinessScore: 92, gateA: { status: "passed", unlockedDate: "Nov 18, 2023", passedDate: "Nov 21, 2023" }, gateB: { status: "passed", unlockedDate: "Nov 21, 2023", passedDate: "Nov 26, 2023" }, gateC: { status: "passed", unlockedDate: "Nov 26, 2023", passedDate: "Dec 2, 2023" }, owners: { onboardingManager: { name: "John Smith", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Andrew Rodriguez", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Linda Thompson", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Paul Thompson", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
+    { id: "OB-2024-015", client: "Sterling Investment Bank", legalEntity: "Sterling Investments Ltd", region: "EMEA", assetClass: "Rates", protocol: "FIX 4.4", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Medium", owner: "John Smith", assignedUser: "John Smith", slaDate: "Feb 25, 2024", blockers: 1, status: "at-risk", createdDate: "Dec 5, 2023", readinessScore: 70, gateA: { status: "passed", unlockedDate: "Dec 8, 2023", passedDate: "Dec 11, 2023" }, gateB: { status: "passed", unlockedDate: "Dec 11, 2023", passedDate: "Dec 16, 2023" }, gateC: { status: "unlocked", unlockedDate: "Dec 16, 2023", passedDate: null }, owners: { onboardingManager: { name: "John Smith", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Jeffrey Martinez", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Donna Jackson", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Mark White", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [{ id: "BLK-005", title: "Load Test Performance Degradation", severity: "high", owner: "Jeffrey Martinez", dueDate: "Jan 19, 2024" }] },
+    { id: "OB-2024-016", client: "Nordic Securities AS", legalEntity: "Nordic Capital Group", region: "EMEA", assetClass: "FX", protocol: "FIX 4.4", environment: "Prod", stage: 9, stageLabel: "Live", priority: "High", riskRating: "Low", owner: "Tom Brown", assignedUser: "John Smith", slaDate: "Jan 20, 2024", blockers: 0, status: "completed", createdDate: "Sep 25, 2023", readinessScore: 100, gateA: { status: "passed", unlockedDate: "Sep 28, 2023", passedDate: "Oct 1, 2023" }, gateB: { status: "passed", unlockedDate: "Oct 5, 2023", passedDate: "Oct 10, 2023" }, gateC: { status: "passed", unlockedDate: "Oct 10, 2023", passedDate: "Oct 15, 2023" }, owners: { onboardingManager: { name: "Tom Brown", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Gerald Anderson", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Joyce Lee", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Ralph Williams", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
+    { id: "OB-2024-017", client: "Nordic Securities AS", legalEntity: "Nordic Capital Group", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.2", environment: "UAT", stage: 4, stageLabel: "Log Analysis", priority: "Medium", riskRating: "Low", owner: "Tom Brown", assignedUser: "John Smith", slaDate: "Feb 28, 2024", blockers: 0, status: "on-track", createdDate: "Jan 6, 2024", readinessScore: 60, gateA: { status: "passed", unlockedDate: "Jan 7, 2024", passedDate: "Jan 10, 2024" }, gateB: { status: "unlocked", unlockedDate: "Jan 13, 2024", passedDate: null }, gateC: { status: "locked", unlockedDate: null, passedDate: null }, owners: { onboardingManager: { name: "Tom Brown", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Raymond Stewart", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Diane Rogers", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Ronald Morris", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
+    { id: "OB-2024-018", client: "Nordic Securities AS", legalEntity: "Nordic Capital Group", region: "EMEA", assetClass: "Drop Copy", protocol: "FIX 4.4", environment: "Cert", stage: 8, stageLabel: "Prod Config", priority: "High", riskRating: "Low", owner: "Tom Brown", assignedUser: "John Smith", slaDate: "Feb 10, 2024", blockers: 0, status: "on-track", createdDate: "Nov 1, 2023", readinessScore: 90, gateA: { status: "passed", unlockedDate: "Nov 4, 2023", passedDate: "Nov 7, 2023" }, gateB: { status: "passed", unlockedDate: "Nov 10, 2023", passedDate: "Nov 15, 2023" }, gateC: { status: "passed", unlockedDate: "Nov 15, 2023", passedDate: "Nov 22, 2023" }, owners: { onboardingManager: { name: "Tom Brown", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Harry Rogers", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Pamela Edwards", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Eugene Collins", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
+    { id: "OB-2024-019", client: "Meridian Capital LLC", legalEntity: "Meridian Holdings", region: "AMER", assetClass: "Options", protocol: "FIX 4.4", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "High", riskRating: "High", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Feb 15, 2024", blockers: 2, status: "blocked", createdDate: "Jan 8, 2024", readinessScore: 25, gateA: { status: "locked", unlockedDate: null, passedDate: null }, gateB: { status: "locked", unlockedDate: null, passedDate: null }, gateC: { status: "locked", unlockedDate: null, passedDate: null }, owners: { onboardingManager: { name: "Sarah Johnson", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Jonathan Sanders", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Janice Bell", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Lawrence Bennett", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [{ id: "BLK-006", title: "Client Not Responding to Requests", severity: "critical", owner: "Sarah Johnson", dueDate: "Jan 18, 2024" }, { id: "BLK-007", title: "Complex Custom Routing Rules", severity: "critical", owner: "Jonathan Sanders", dueDate: "Jan 21, 2024" }] },
+    { id: "OB-2024-020", client: "Meridian Capital LLC", legalEntity: "Meridian Holdings", region: "AMER", assetClass: "Futures", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "Medium", riskRating: "Medium", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Mar 1, 2024", blockers: 1, status: "at-risk", createdDate: "Jan 10, 2024", readinessScore: 30, gateA: { status: "locked", unlockedDate: null, passedDate: null }, gateB: { status: "locked", unlockedDate: null, passedDate: null }, gateC: { status: "locked", unlockedDate: null, passedDate: null }, owners: { onboardingManager: { name: "Sarah Johnson", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Willie Price", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Evelyn Bennett", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Louis Sanchez", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
   ])
 
   // Approvals data
@@ -270,6 +297,28 @@ export default function BCometPlatform() {
     // Step 5: Risk Assessment - auto-calculated
     // Step 6: Confirm
   })
+  
+  // Save draft to localStorage
+  const saveCaseDraft = () => {
+    localStorage.setItem("caseCreationDraft", JSON.stringify({ step: createCaseStep, data: createCaseData }))
+  }
+  
+  // Load draft from localStorage
+  const loadCaseDraft = () => {
+    const draft = localStorage.getItem("caseCreationDraft")
+    if (draft) {
+      const parsed = JSON.parse(draft)
+      setCreateCaseStep(parsed.step)
+      setCreateCaseData(parsed.data)
+      return true
+    }
+    return false
+  }
+  
+  // Clear draft
+  const clearCaseDraft = () => {
+    localStorage.removeItem("caseCreationDraft")
+  }
   const [expandedApprovalClients, setExpandedApprovalClients] = useState<Record<string, boolean>>({})
   const [selectedApproval, setSelectedApproval] = useState<typeof allApprovals[0] | null>(null)
 
@@ -11295,11 +11344,8 @@ const copyToClipboard = () => {
                           <button
                             className="group/case inline-flex items-center gap-1"
                             onClick={() => {
-                              if (matchingClient) {
-                                setSelectedClient(matchingClient)
-                                setSelectedCase(workflowCase)
-                                setCurrentScreen("case-workflow")
-                              }
+                              setSelectedOnboardingCase(caseItem)
+                              setCurrentScreen("onboarding-case-detail")
                             }}
                           >
                             <span className="font-mono font-medium text-[#00e5ff] group-hover/case:underline">{caseItem.id}</span>
@@ -11445,7 +11491,7 @@ const copyToClipboard = () => {
                   <p className={`text-sm ${textSecondary}`}>Step {createCaseStep} of 6: {wizardSteps[createCaseStep - 1].title}</p>
                 </div>
               </div>
-              <Button variant="outline" onClick={() => { setCurrentScreen("onboarding-cases"); setCreateCaseStep(1); }}>
+              <Button variant="outline" onClick={() => { saveCaseDraft(); alert("Case draft saved successfully!"); }}>
                 Save Draft
               </Button>
             </div>
@@ -11983,15 +12029,253 @@ const copyToClipboard = () => {
                     Cancel
                   </Button>
                   {createCaseStep < 6 ? (
-                    <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80" onClick={() => setCreateCaseStep(createCaseStep + 1)}>
+                    <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80" onClick={() => { saveCaseDraft(); setCreateCaseStep(createCaseStep + 1); }}>
                       Next <ArrowRight className="h-4 w-4 ml-2" />
                     </Button>
                   ) : (
-                    <Button className="bg-[#4caf50] hover:bg-[#4caf50]/80" onClick={() => { setCurrentScreen("onboarding-cases"); setCreateCaseStep(1); }}>
+                    <Button className="bg-[#4caf50] hover:bg-[#4caf50]/80" onClick={() => {
+                      // Create new case from form data
+                      const newCaseId = `OB-${new Date().getFullYear()}-${String(onboardingCases.length + 1).padStart(3, "0")}`
+                      const selectedClient = clients.find(c => c.id === createCaseData.clientId)
+                      const newCase = {
+                        id: newCaseId,
+                        client: selectedClient?.name || createCaseData.caseName,
+                        legalEntity: createCaseData.legalEntity,
+                        region: selectedClient?.assetClasses?.[0] || "AMER",
+                        assetClass: createCaseData.assetClasses[0] || "Equities",
+                        protocol: createCaseData.fixVersions[createCaseData.assetClasses[0]] || "FIX 4.4",
+                        environment: createCaseData.connectivityEnvironment === "uat" ? "UAT" : createCaseData.connectivityEnvironment === "prod" ? "Prod" : "Cert",
+                        stage: 1,
+                        stageLabel: "Setup",
+                        priority: "High",
+                        riskRating: "Medium",
+                        owner: createCaseData.onboardingManager,
+                        assignedUser: currentUser?.name || "John Smith",
+                        slaDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+                        blockers: createCaseData.blockers.filter(b => b.isCriticalPath).length,
+                        status: "on-track",
+                        createdDate: new Date().toLocaleDateString(),
+                        readinessScore: 40,
+                        gateA: { status: "locked" as const, unlockedDate: null, passedDate: null },
+                        gateB: { status: "locked" as const, unlockedDate: null, passedDate: null },
+                        gateC: { status: "locked" as const, unlockedDate: null, passedDate: null },
+                        owners: {
+                          onboardingManager: { name: createCaseData.onboardingManager || "Unassigned", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } },
+                          techLead: { name: createCaseData.technicalLead || "Unassigned", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } },
+                          qaLead: { name: createCaseData.qaCertLead || "Unassigned", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } },
+                          businessApprover: { name: createCaseData.businessApprover || "Unassigned", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } }
+                        },
+                        criticalBlockers: createCaseData.blockers.filter(b => b.isCriticalPath).map((b, i) => ({
+                          id: `BLK-${i + 1}`,
+                          title: b.description,
+                          severity: "critical" as const,
+                          owner: createCaseData.onboardingManager,
+                          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()
+                        }))
+                      }
+                      setOnboardingCases([...onboardingCases, newCase])
+                      clearCaseDraft()
+                      alert(`Case ${newCaseId} created successfully!`)
+                      setCurrentScreen("onboarding-cases")
+                      setCreateCaseStep(1)
+                    }}>
                       <Rocket className="h-4 w-4 mr-2" /> Launch Case
                     </Button>
                   )}
                 </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Onboarding Case Detail Screen
+  const [selectedOnboardingCase, setSelectedOnboardingCase] = useState<any>(null)
+  const [caseBlockers, setCaseBlockers] = useState<any[]>([])
+  
+  if (currentScreen === "onboarding-case-detail") {
+    const caseItem = onboardingCases.find(c => c.id === selectedOnboardingCase?.id)
+    if (!caseItem) return null
+    
+    // Calculate readiness score
+    const completedApprovals = allApprovals.filter(a => a.caseId === caseItem.id && a.status === "approved").length
+    const totalRequiredApprovals = allApprovals.filter(a => a.caseId === caseItem.id).length || 1
+    const evidenceCount = evidenceItems.filter(e => e.caseId === caseItem.id).length
+    const targetEvidence = 3
+    const hasNoCriticalBlockers = caseItem.criticalBlockers?.length === 0
+    
+    const readinessScore = Math.min(100, Math.round(
+      (completedApprovals / totalRequiredApprovals) * 40 +
+      (Math.min(evidenceCount, targetEvidence) / targetEvidence) * 30 +
+      (hasNoCriticalBlockers ? 30 : 0)
+    ))
+    
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
+            <div className="flex items-center gap-3">
+              <button onClick={() => setCurrentScreen("onboarding-cases")} className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}>
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <div>
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>{caseItem.id} - {caseItem.client}</h1>
+                <p className={`text-sm ${textSecondary}`}>{caseItem.assetClass} · {caseItem.protocol} · Stage {caseItem.stage}</p>
+              </div>
+            </div>
+            <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80">Actions</Button>
+          </header>
+          
+          <div className="p-6 space-y-6">
+            {/* Gates Panel */}
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h2 className={`text-lg font-bold ${textPrimary} mb-4`}>Gate Progression</h2>
+              <div className="space-y-4">
+                {[
+                  { name: "Gate A", gate: caseItem.gateA, minScore: 60, stage: 2, desc: "Scoping" },
+                  { name: "Gate B", gate: caseItem.gateB, minScore: 75, stage: 3, desc: "Architecture" },
+                  { name: "Gate C", gate: caseItem.gateC, minScore: 85, stage: 4, desc: "Development" }
+                ].map((g) => {
+                  const canUnlock = caseItem.stage >= g.stage && readinessScore >= g.minScore && caseItem.criticalBlockers?.length === 0
+                  const isLocked = g.gate.status === "locked"
+                  return (
+                    <div key={g.name} className={`p-4 rounded-lg border ${borderColor} ${g.gate.status === "passed" ? "bg-[#4caf50]/10" : g.gate.status === "unlocked" ? "bg-[#00e5ff]/10" : "bg-[#f44336]/10"}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <h3 className={`font-semibold ${textPrimary}`}>{g.name} - {g.desc}</h3>
+                          <p className={`text-xs ${textSecondary}`}>Status: <span className={g.gate.status === "passed" ? "text-[#4caf50]" : g.gate.status === "unlocked" ? "text-[#00e5ff]" : "text-[#f44336]"}>{g.gate.status.toUpperCase()}</span></p>
+                        </div>
+                        {g.gate.status === "passed" && <CheckCircle className="h-5 w-5 text-[#4caf50]" />}
+                        {g.gate.status === "unlocked" && <Lock className="h-5 w-5 text-[#00e5ff]" />}
+                        {g.gate.status === "locked" && <Lock className="h-5 w-5 text-[#f44336]" />}
+                      </div>
+                      {isLocked && !canUnlock && (
+                        <div className={`text-xs ${textSecondary} mt-2`}>
+                          <p>Locked - Requires: Stage {g.stage}+, {g.minScore}% readiness (current: {readinessScore}%), No critical blockers</p>
+                        </div>
+                      )}
+                      {canUnlock && isLocked && (
+                        <Button size="sm" className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 mt-2" onClick={() => {
+                          caseItem.gateA.status = "unlocked"
+                          alert(`${g.name} unlocked!`)
+                        }}>
+                          Ready to Unlock
+                        </Button>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </Card>
+            
+            {/* Blockers Panel */}
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className={`text-lg font-bold ${textPrimary}`}>Critical Blockers ({caseItem.criticalBlockers?.length || 0})</h2>
+                <Button size="sm" className="bg-[#f44336] hover:bg-[#f44336]/80" onClick={() => {
+                  const newBlocker = { 
+                    id: `BLK-${caseItem.criticalBlockers?.length + 1}`,
+                    title: "New Blocker",
+                    severity: "high" as const,
+                    owner: caseItem.owners.onboardingManager.name,
+                    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+                    createdDate: new Date().toLocaleDateString(),
+                    status: "open" as const
+                  }
+                  caseItem.criticalBlockers = [...(caseItem.criticalBlockers || []), newBlocker]
+                  setOnboardingCases([...onboardingCases])
+                }}>
+                  + Add Blocker
+                </Button>
+              </div>
+              {caseItem.criticalBlockers?.length ? (
+                <div className="space-y-3">
+                  {caseItem.criticalBlockers.map((b: any, idx: number) => (
+                    <div key={b.id} className={`p-4 rounded-lg border ${b.severity === "critical" ? "border-[#f44336]/30 bg-[#f44336]/5" : "border-[#ff9800]/30 bg-[#ff9800]/5"}`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className={`font-medium ${textPrimary}`}>{b.title}</p>
+                            <span className={`px-2 py-0.5 text-xs font-medium rounded ${b.severity === "critical" ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>
+                              {b.severity.toUpperCase()}
+                            </span>
+                          </div>
+                          <p className={`text-xs ${textSecondary} mb-2`}>Owner: {b.owner} · Due: {b.dueDate} · Created: {b.createdDate || "N/A"}</p>
+                          {b.status === "resolved" && (
+                            <p className={`text-xs text-[#4caf50] font-medium`}>Resolved: {b.resolutionNotes || "No notes"}</p>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          {b.status !== "resolved" && (
+                            <Button size="sm" variant="outline" className="text-xs" onClick={() => {
+                              b.status = "resolved"
+                              b.resolutionNotes = "Marked as resolved"
+                              setOnboardingCases([...onboardingCases])
+                            }}>
+                              Resolve
+                            </Button>
+                          )}
+                          <Button size="sm" variant="outline" className="text-xs text-[#f44336]" onClick={() => {
+                            caseItem.criticalBlockers = caseItem.criticalBlockers.filter((_: any, i: number) => i !== idx)
+                            setOnboardingCases([...onboardingCases])
+                          }}>
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className={`text-sm ${textSecondary}`}>No critical blockers</p>
+              )}
+            </Card>
+            
+            {/* Ownership & SLAs */}
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h2 className={`text-lg font-bold ${textPrimary} mb-4`}>Role-Based Ownership & SLAs</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {[
+                  { role: "Onboarding Manager", key: "onboardingManager", owner: caseItem.owners.onboardingManager },
+                  { role: "Tech Lead", key: "techLead", owner: caseItem.owners.techLead },
+                  { role: "QA Lead", key: "qaLead", owner: caseItem.owners.qaLead },
+                  { role: "Business Approver", key: "businessApprover", owner: caseItem.owners.businessApprover }
+                ].map((item) => {
+                  const stageSLA = item.owner.slaByStage[caseItem.stage as keyof typeof item.owner.slaByStage]
+                  const slaDate = new Date(Date.now() + (stageSLA * 24 * 60 * 60 * 1000)).toLocaleDateString()
+                  const isOverdue = new Date(slaDate) < new Date()
+                  
+                  return (
+                    <div key={item.role} className={`p-4 rounded-lg border ${isOverdue ? "border-[#f44336]/30 bg-[#f44336]/5" : "border-[#1e4976]"}`}>
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <p className={`text-xs font-semibold text-[#00e5ff] uppercase`}>{item.role}</p>
+                          <p className={`font-semibold ${textPrimary} mt-1`}>{item.owner.name}</p>
+                        </div>
+                        <Button size="sm" variant="ghost" className="text-xs">Reassign</Button>
+                      </div>
+                      <div className="space-y-1 text-sm">
+                        <div className="flex justify-between">
+                          <span className={textSecondary}>Stage {caseItem.stage} SLA:</span>
+                          <span className={`font-medium ${isOverdue ? "text-[#f44336]" : textPrimary}`}>{stageSLA} days</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className={textSecondary}>Due Date:</span>
+                          <span className={`font-medium ${isOverdue ? "text-[#f44336]" : textPrimary}`}>{slaDate}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className={textSecondary}>Status:</span>
+                          <span className={`px-2 py-0.5 rounded text-xs font-medium ${isOverdue ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#4caf50]/20 text-[#4caf50]"}`}>
+                            {isOverdue ? "Overdue" : "On Track"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             </Card>
           </div>
