@@ -11344,10 +11344,13 @@ const copyToClipboard = () => {
                       <tr key={caseItem.id} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
                         <td className="px-4 py-3">
                           <button
-                            className="group/case inline-flex items-center gap-1"
-                            onClick={() => {
+                            className="group/case inline-flex items-center gap-1 cursor-pointer"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              console.log("[v0] Clicking case:", caseItem.id, caseItem)
                               setSelectedOnboardingCase(caseItem)
-                              setCurrentScreen("onboarding-case-detail")
+                              setTimeout(() => setCurrentScreen("onboarding-case-detail"), 0)
                             }}
                           >
                             <span className="font-mono font-medium text-[#00e5ff] group-hover/case:underline">{caseItem.id}</span>
@@ -12101,7 +12104,11 @@ const copyToClipboard = () => {
   }
 
   // Onboarding Case Detail Screen
-  if (currentScreen === "onboarding-case-detail" && selectedOnboardingCase) {
+  if (currentScreen === "onboarding-case-detail") {
+    if (!selectedOnboardingCase) {
+      return <div className={`min-h-screen ${bgPrimary} flex items-center justify-center`}><p className={textPrimary}>Loading case...</p></div>
+    }
+    
     const caseItem = selectedOnboardingCase
     
     // Calculate readiness score
