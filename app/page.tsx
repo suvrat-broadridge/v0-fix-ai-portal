@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "case-workflow" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "onboarding-case-detail" | "approvals" | "evidence-vault" | "prod-config" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case" | "presentation">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "case-workflow" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "onboarding-case-detail" | "approvals" | "evidence-vault" | "prod-config" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case" | "presentation" | "client-cert-report">("home")
   const [settingsTab, setSettingsTab] = useState<"profile" | "notifications" | "security" | "integrations" | "appearance" | "api-keys">("profile")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [isManager, setIsManager] = useState(false)
@@ -157,6 +157,20 @@ export default function BCometPlatform() {
     "Equities-FIX 4.2": { suiteName: "EQ_FIX42_CertTests_v1.2", testCount: 32, lastGenerated: "Jan 15, 2024" },
     "Options-FIX 4.4": { suiteName: "OPT_FIX44_CertTests_v2.0", testCount: 28, lastGenerated: "Jan 10, 2024" },
   })
+  // Client Certification Report state
+  const [certReportStep, setCertReportStep] = useState<"upload" | "results" | "delta" | "generate">("upload")
+  const [conductorFileUploaded, setConductorFileUploaded] = useState(false)
+  const [clientLogUploaded, setClientLogUploaded] = useState(false)
+  const [gatewayMappingUploaded, setGatewayMappingUploaded] = useState(false)
+  const [certResultsTab, setCertResultsTab] = useState<"all" | "matched" | "unmatched" | "deltas">("all")
+  const [selectedDeltaTest, setSelectedDeltaTest] = useState<string | null>("TC-002")
+  const [certTimeTolerance, setCertTimeTolerance] = useState("±500ms")
+  const [certFixVersion, setCertFixVersion] = useState("4.2")
+  const [certPrimaryKey, setCertPrimaryKey] = useState("ClOrdID")
+  const [certGatewayType, setCertGatewayType] = useState("Standard")
+  const [certReportOptions, setCertReportOptions] = useState({ clientMessages: true, passFailResults: true, gatewayNotes: true, rawConductor: false, unmatchedCases: false })
+  const [certClientName, setCertClientName] = useState("Goldman Sachs")
+  const [certReportTitle, setCertReportTitle] = useState("FIX 4.2 Equities Certification Report")
   const [showContactPanel, setShowContactPanel] = useState(false)
   const [showDemoForm, setShowDemoForm] = useState(false)
   const [showWalkthrough, setShowWalkthrough] = useState(false)
@@ -1243,6 +1257,20 @@ export default function BCometPlatform() {
   >
   <ConductorLogo size={16} />
         <span>Certification</span>
+  </button>
+  )}
+  {/* Client Cert Report - Admin only */}
+  {selectedRole === "admin" && (
+  <button
+  onClick={() => { setCurrentScreen("client-cert-report"); setIsAdHocMode(true); setSelectedClient(null); setSelectedAssetClass(null); }}
+  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
+  currentScreen === "client-cert-report"
+  ? "bg-[#00e5ff]/10 text-[#00e5ff]"
+  : `${textSecondary} hover:bg-[#1e4976]/30`
+  }`}
+  >
+  <FileText className="h-4 w-4" />
+        <span>Client Cert Report</span>
   </button>
   )}
   </div>
@@ -10704,6 +10732,671 @@ const copyToClipboard = () => {
                 )
               })}
             </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Client Certification Report Screen
+  if (currentScreen === "client-cert-report") {
+    // Simulated correlation results (shown after "Correlate & Generate" is clicked)
+    const correlationResults = [
+      { testId: "TC-001", category: "Order Entry", description: "New Order Single - Market Order", matchKey: "ClOrdID: ORD-001", matchConfidence: 95, matchStrategy: "ClOrdID", conductorMsg: "8=FIX.4.2|35=D|49=GW_NORM_001|56=INT_ROUTER|11=ORD-001|55=AAPL|54=1|38=1000|40=1", clientMsg: "8=FIX.4.2|35=D|49=CLIENT_PROD|56=EXCHANGE_A|11=ORD-001|55=AAPL|54=1|38=1000|40=1", result: "PASS", deltas: [] },
+      { testId: "TC-002", category: "Order Modification", description: "Cancel Order Request", matchKey: "ClOrdID: ORD-002", matchConfidence: 95, matchStrategy: "ClOrdID", conductorMsg: "8=FIX.4.2|35=F|49=GW_NORM_001|56=INT_ROUTER|11=ORD-002|41=ORD-001|55=AAPL|54=1|38=1000", clientMsg: "8=FIX.4.2|35=F|49=CLIENT_PROD|56=EXCHANGE_A|115=DESK_ALPHA|11=ORD-002|41=ORD-001|55=AAPL|54=1|38=1000", result: "FAIL", failureReason: "Tag 115 (OnBehalfOfCompID) removed by gateway caused routing failure at venue.", deltas: [{ tag: 49, field: "SenderCompID", client: "CLIENT_PROD", conductor: "GW_NORM_001", type: "EXPECTED_TRANSFORM" }, { tag: 56, field: "TargetCompID", client: "EXCHANGE_A", conductor: "INT_ROUTER", type: "EXPECTED_TRANSFORM" }, { tag: 115, field: "OnBehalfOfCompID", client: "DESK_ALPHA", conductor: "(removed)", type: "VALUE_CHANGE" }] },
+      { testId: "TC-003", category: "Order Entry", description: "New Order Single - Limit Order", matchKey: "ClOrdID: ORD-003", matchConfidence: 95, matchStrategy: "ClOrdID", conductorMsg: "8=FIX.4.2|35=D|49=GW_NORM_001|56=INT_ROUTER|11=ORD-003|55=MSFT|54=1|38=500|40=2|44=145.50", clientMsg: "8=FIX.4.2|35=D|49=CLIENT_PROD|56=EXCHANGE_A|11=ORD-003|55=MSFT|54=1|38=500|40=2|44=145.50", result: "PASS", deltas: [{ tag: 49, field: "SenderCompID", client: "CLIENT_PROD", conductor: "GW_NORM_001", type: "EXPECTED_TRANSFORM" }, { tag: 56, field: "TargetCompID", client: "EXCHANGE_A", conductor: "INT_ROUTER", type: "EXPECTED_TRANSFORM" }] },
+      { testId: "TC-004", category: "Execution", description: "Execution Report - Partial Fill", matchKey: "ExecID+OrderID", matchConfidence: 90, matchStrategy: "OrderID+ExecID", conductorMsg: "8=FIX.4.2|35=8|49=GW_NORM_001|56=INT_ROUTER|37=EXEC-001|17=FILL-001|150=1|39=1", clientMsg: "8=FIX.4.2|35=8|49=CLIENT_PROD|56=EXCHANGE_A|37=EXEC-001|17=FILL-001|150=1|39=1", result: "PASS", deltas: [] },
+      { testId: "TC-005", category: "Order Entry", description: "New Order Single - IOC", matchKey: "ClOrdID: ORD-005", matchConfidence: 95, matchStrategy: "ClOrdID", conductorMsg: "8=FIX.4.2|35=D|49=GW_NORM_001|56=INT_ROUTER|11=ORD-005|55=GOOG|54=2|38=200|40=2|44=2800.00|59=3", clientMsg: "8=FIX.4.2|35=D|49=CLIENT_PROD|56=EXCHANGE_A|11=ORD-005|55=GOOG|54=2|38=200|40=2|44=2800.00|59=3", result: "WARN", failureReason: "TimeInForce=IOC processed but no acknowledgement received within tolerance window.", deltas: [{ tag: 49, field: "SenderCompID", client: "CLIENT_PROD", conductor: "GW_NORM_001", type: "EXPECTED_TRANSFORM" }] },
+      { testId: "TC-006", category: "Error Handling", description: "Business Message Reject", matchKey: "Timestamp+MsgType", matchConfidence: 80, matchStrategy: "Composite", conductorMsg: "8=FIX.4.2|35=j|49=GW_NORM_001|56=INT_ROUTER|380=0|58=Invalid field value", clientMsg: "8=FIX.4.2|35=j|49=CLIENT_PROD|56=EXCHANGE_A|380=0|58=Invalid field value", result: "PASS", deltas: [] },
+      { testId: "TC-007", category: "Session", description: "Heartbeat Exchange", matchKey: "Sequence position", matchConfidence: 50, matchStrategy: "Sequence", conductorMsg: "8=FIX.4.2|35=0|49=GW_NORM_001|112=TEST-1", clientMsg: null, result: "PASS", deltas: [] },
+      { testId: "TC-008", category: "Order Modification", description: "Cancel/Replace Request", matchKey: "—", matchConfidence: 0, matchStrategy: "None", conductorMsg: "8=FIX.4.2|35=G|49=GW_NORM_001|56=INT_ROUTER|11=ORD-008|41=ORD-007", clientMsg: null, result: "FAIL", failureReason: "No matching client message found. Message may have been generated internally by gateway.", deltas: [] },
+      { testId: "TC-009", category: "Execution", description: "Execution Report - Full Fill", matchKey: "ClOrdID: ORD-009", matchConfidence: 95, matchStrategy: "ClOrdID", conductorMsg: "8=FIX.4.2|35=8|49=GW_NORM_001|56=INT_ROUTER|37=EXEC-009|17=FILL-009|150=2|39=2", clientMsg: "8=FIX.4.2|35=8|49=CLIENT_PROD|56=EXCHANGE_A|37=EXEC-009|17=FILL-009|150=2|39=2", result: "PASS", deltas: [] },
+      { testId: "TC-010", category: "Session", description: "Logon Validation", matchKey: "Timestamp+MsgType", matchConfidence: 80, matchStrategy: "Composite", conductorMsg: "8=FIX.4.2|35=A|49=GW_NORM_001|56=INT_ROUTER|98=0|108=30", clientMsg: "8=FIX.4.2|35=A|49=CLIENT_PROD|56=EXCHANGE_A|98=0|108=30", result: "PASS", deltas: [] },
+    ]
+
+    const totalTests = correlationResults.length
+    const matched = correlationResults.filter(r => r.clientMsg !== null).length
+    const unmatched = correlationResults.filter(r => r.clientMsg === null).length
+    const passed = correlationResults.filter(r => r.result === "PASS").length
+    const failed = correlationResults.filter(r => r.result === "FAIL").length
+    const warnings = correlationResults.filter(r => r.result === "WARN").length
+    const gatewayDeltas = correlationResults.filter(r => r.deltas.some(d => d.type === "VALUE_CHANGE")).length
+    const matchRate = Math.round((matched / totalTests) * 100)
+
+    const timeTolerance = certTimeTolerance
+    const fixVersion = certFixVersion
+    const primaryKey = certPrimaryKey
+    const gatewayType = certGatewayType
+    const reportOptions = certReportOptions
+    const selectedClientForReport = certClientName
+    const reportTitle = certReportTitle
+
+    const filteredResults = certResultsTab === "all" ? correlationResults
+      : certResultsTab === "matched" ? correlationResults.filter(r => r.clientMsg !== null)
+      : certResultsTab === "unmatched" ? correlationResults.filter(r => r.clientMsg === null)
+      : correlationResults.filter(r => r.deltas.some(d => d.type === "VALUE_CHANGE"))
+
+    const selectedDeltaData = correlationResults.find(r => r.testId === selectedDeltaTest)
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          {/* Header */}
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+            </button>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-[#00e5ff]/10">
+                  <FileText className="h-6 w-6 text-[#00e5ff]" />
+                </div>
+                <div>
+                  <h1 className={`text-2xl font-bold ${textPrimary}`}>Client Certification Report</h1>
+                  <p className={`text-sm ${textSecondary}`}>Match Conductor results to original client messages and generate a client-facing report</p>
+                </div>
+              </div>
+              {/* Step tabs */}
+              <div className="flex items-center gap-1">
+                {([
+                  { key: "upload", label: "1. Upload", },
+                  { key: "results", label: "2. Correlation", },
+                  { key: "delta", label: "3. Gateway Deltas", },
+                  { key: "generate", label: "4. Generate", },
+                ] as const).map((s, i) => (
+                  <button
+                    key={s.key}
+                    onClick={() => certReportStep !== "upload" || conductorFileUploaded ? setCertReportStep(s.key) : undefined}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      certReportStep === s.key
+                        ? "bg-[#00e5ff]/10 text-[#00e5ff] border border-[#00e5ff]/40"
+                        : `${textSecondary} hover:bg-[#1e4976]/30`
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </header>
+
+          <div className="p-6 space-y-6">
+
+            {/* ═══════════════════════════════════════════════════════
+                STEP 1: UPLOAD
+            ═══════════════════════════════════════════════════════ */}
+            {certReportStep === "upload" && (
+              <div className="space-y-6">
+                {/* Upload Cards */}
+                <div className="grid grid-cols-3 gap-4">
+                  {/* Conductor Report */}
+                  <Card className={`${bgCard} border ${borderColor} p-6`}>
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className={`p-1.5 rounded ${conductorFileUploaded ? "bg-[#4caf50]/20" : "bg-[#00e5ff]/10"}`}>
+                        <FileText className={`h-5 w-5 ${conductorFileUploaded ? "text-[#4caf50]" : "text-[#00e5ff]"}`} />
+                      </div>
+                      <h3 className={`font-semibold ${textPrimary}`}>Conductor Report</h3>
+                      {conductorFileUploaded && <span className="ml-auto text-xs text-[#4caf50] font-medium">Loaded</span>}
+                    </div>
+                    <div
+                      onClick={() => setConductorFileUploaded(true)}
+                      className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                        conductorFileUploaded
+                          ? "border-[#4caf50]/40 bg-[#4caf50]/5"
+                          : `border-[#1e4976]/60 hover:border-[#00e5ff]/60 hover:bg-[#00e5ff]/5`
+                      }`}
+                    >
+                      {conductorFileUploaded ? (
+                        <div>
+                          <CheckCircle className="h-8 w-8 text-[#4caf50] mx-auto mb-2" />
+                          <p className={`text-sm font-medium ${textPrimary}`}>report_v3.xml</p>
+                          <p className={`text-xs ${textSecondary} mt-1`}>234 test cases parsed</p>
+                        </div>
+                      ) : (
+                        <div>
+                          <Upload className="h-8 w-8 mx-auto mb-2 text-[#1e4976]" />
+                          <p className={`text-sm ${textSecondary}`}>Drop file or click to browse</p>
+                          <p className={`text-xs ${textSecondary} mt-1`}>XML / JSON / CSV</p>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+
+                  {/* Client FIX Log */}
+                  <Card className={`${bgCard} border ${borderColor} p-6`}>
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className={`p-1.5 rounded ${clientLogUploaded ? "bg-[#4caf50]/20" : "bg-[#9c27b0]/10"}`}>
+                        <FileSearch className={`h-5 w-5 ${clientLogUploaded ? "text-[#4caf50]" : "text-[#9c27b0]"}`} />
+                      </div>
+                      <h3 className={`font-semibold ${textPrimary}`}>Client FIX Log</h3>
+                      {clientLogUploaded && <span className="ml-auto text-xs text-[#4caf50] font-medium">Loaded</span>}
+                    </div>
+                    <div
+                      onClick={() => setClientLogUploaded(true)}
+                      className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                        clientLogUploaded
+                          ? "border-[#4caf50]/40 bg-[#4caf50]/5"
+                          : `border-[#1e4976]/60 hover:border-[#00e5ff]/60 hover:bg-[#00e5ff]/5`
+                      }`}
+                    >
+                      {clientLogUploaded ? (
+                        <div>
+                          <CheckCircle className="h-8 w-8 text-[#4caf50] mx-auto mb-2" />
+                          <p className={`text-sm font-medium ${textPrimary}`}>client_fix.log</p>
+                          <p className={`text-xs ${textSecondary} mt-1`}>1,847 messages parsed</p>
+                        </div>
+                      ) : (
+                        <div>
+                          <Upload className="h-8 w-8 mx-auto mb-2 text-[#1e4976]" />
+                          <p className={`text-sm ${textSecondary}`}>Drop file or click to browse</p>
+                          <p className={`text-xs ${textSecondary} mt-1`}>FIX log / .txt / .log</p>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+
+                  {/* Gateway Mapping (Optional) */}
+                  <Card className={`${bgCard} border ${borderColor} p-6`}>
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className={`p-1.5 rounded ${gatewayMappingUploaded ? "bg-[#4caf50]/20" : "bg-[#ff9800]/10"}`}>
+                        <GitCompare className={`h-5 w-5 ${gatewayMappingUploaded ? "text-[#4caf50]" : "text-[#ff9800]"}`} />
+                      </div>
+                      <h3 className={`font-semibold ${textPrimary}`}>Gateway Mapping</h3>
+                      <span className={`ml-auto text-xs px-2 py-0.5 rounded ${isDarkMode ? "bg-[#1e4976]/50 text-[#90caf9]" : "bg-gray-100 text-gray-500"}`}>Optional</span>
+                    </div>
+                    <div
+                      onClick={() => setGatewayMappingUploaded(!gatewayMappingUploaded)}
+                      className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                        gatewayMappingUploaded
+                          ? "border-[#4caf50]/40 bg-[#4caf50]/5"
+                          : `border-[#1e4976]/60 hover:border-[#00e5ff]/60 hover:bg-[#00e5ff]/5`
+                      }`}
+                    >
+                      {gatewayMappingUploaded ? (
+                        <div>
+                          <CheckCircle className="h-8 w-8 text-[#4caf50] mx-auto mb-2" />
+                          <p className={`text-sm font-medium ${textPrimary}`}>gw_id_map.csv</p>
+                          <p className={`text-xs ${textSecondary} mt-1`}>312 ID mappings loaded</p>
+                        </div>
+                      ) : (
+                        <div>
+                          <Upload className="h-8 w-8 mx-auto mb-2 text-[#1e4976]" />
+                          <p className={`text-sm ${textSecondary}`}>Upload gateway ID mapping table</p>
+                          <p className={`text-xs ${textSecondary} mt-1`}>CSV / JSON — highest match accuracy</p>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Correlation Settings */}
+                <Card className={`${bgCard} border ${borderColor} p-6`}>
+                  <h3 className={`font-semibold ${textPrimary} mb-4`}>Correlation Settings</h3>
+                  <div className="grid grid-cols-4 gap-4">
+                    <div>
+                      <label className={`text-xs font-medium ${textSecondary} block mb-2`}>Time Tolerance</label>
+                      <select value={timeTolerance} onChange={e => setCertTimeTolerance(e.target.value)} className={`w-full px-3 py-2 rounded-lg border ${borderColor} ${bgCard} ${textPrimary} text-sm`}>
+                        <option>±100ms</option>
+                        <option>±500ms</option>
+                        <option>±1000ms</option>
+                        <option>±5000ms</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className={`text-xs font-medium ${textSecondary} block mb-2`}>FIX Version</label>
+                      <select value={fixVersion} onChange={e => setCertFixVersion(e.target.value)} className={`w-full px-3 py-2 rounded-lg border ${borderColor} ${bgCard} ${textPrimary} text-sm`}>
+                        <option>4.2</option>
+                        <option>4.4</option>
+                        <option>5.0 SP2</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className={`text-xs font-medium ${textSecondary} block mb-2`}>Primary Key</label>
+                      <select value={primaryKey} onChange={e => setCertPrimaryKey(e.target.value)} className={`w-full px-3 py-2 rounded-lg border ${borderColor} ${bgCard} ${textPrimary} text-sm`}>
+                        <option>ClOrdID</option>
+                        <option>OrderID+ExecID</option>
+                        <option>OrigClOrdID</option>
+                        <option>Timestamp+MsgType</option>
+                        <option>Sequence</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className={`text-xs font-medium ${textSecondary} block mb-2`}>Gateway Profile</label>
+                      <select value={gatewayType} onChange={e => setCertGatewayType(e.target.value)} className={`w-full px-3 py-2 rounded-lg border ${borderColor} ${bgCard} ${textPrimary} text-sm`}>
+                        <option>Standard</option>
+                        <option>Fidessa</option>
+                        <option>Flextrade</option>
+                        <option>Custom</option>
+                      </select>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Correlation Strategy Info */}
+                <Card className={`${bgCard} border ${borderColor} p-5`}>
+                  <h3 className={`font-semibold ${textPrimary} mb-3`}>Correlation Strategy (Multi-Key, Priority Order)</h3>
+                  <div className="space-y-2">
+                    {[
+                      { priority: 1, key: "Gateway Mapping Table", reliability: "Highest", note: "Direct lookup if gateway exports ID translation table", color: "text-[#4caf50]", bg: "bg-[#4caf50]/10" },
+                      { priority: 2, key: "ClOrdID (Tag 11)", reliability: "High", note: "Usually preserved end-to-end through gateway", color: "text-[#00e5ff]", bg: "bg-[#00e5ff]/10" },
+                      { priority: 3, key: "OrderID (Tag 37) + ExecID (Tag 17)", reliability: "High", note: "Execution reports — gateway may remap but often preserved", color: "text-[#00e5ff]", bg: "bg-[#00e5ff]/10" },
+                      { priority: 4, key: "OrigClOrdID (Tag 41)", reliability: "High", note: "Cancel/replace chains — links amendments to originals", color: "text-[#00e5ff]", bg: "bg-[#00e5ff]/10" },
+                      { priority: 5, key: "Timestamp + MsgType + Side + Symbol", reliability: "Medium", note: `Fuzzy match with configurable time tolerance (${timeTolerance})`, color: "text-[#ff9800]", bg: "bg-[#ff9800]/10" },
+                      { priority: 6, key: "Sequence Fingerprint", reliability: "Medium", note: "Message type sequence pattern matching when IDs are remapped", color: "text-[#ff9800]", bg: "bg-[#ff9800]/10" },
+                    ].map(s => (
+                      <div key={s.priority} className={`flex items-start gap-3 p-3 rounded-lg ${s.bg}`}>
+                        <span className={`text-xs font-bold font-mono ${s.color} w-6 flex-shrink-0 mt-0.5`}>P{s.priority}</span>
+                        <div className="flex-1 min-w-0">
+                          <span className={`text-sm font-medium ${textPrimary}`}>{s.key}</span>
+                          <span className={`text-xs ${textSecondary} ml-2`}>— {s.note}</span>
+                        </div>
+                        <span className={`text-xs font-medium ${s.color} flex-shrink-0`}>{s.reliability}</span>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+
+                {/* Correlate Button */}
+                <div className="flex justify-end">
+                  <Button
+                    onClick={() => { if (conductorFileUploaded && clientLogUploaded) setCertReportStep("results") }}
+                    disabled={!conductorFileUploaded || !clientLogUploaded}
+                    className={`px-8 py-3 text-base font-semibold flex items-center gap-2 ${
+                      conductorFileUploaded && clientLogUploaded
+                        ? "bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
+                        : "opacity-40 cursor-not-allowed bg-[#1e4976] text-[#64b5f6]"
+                    }`}
+                  >
+                    <Zap className="h-5 w-5" /> Correlate &amp; Generate
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* ═══════════════════════════════════════════════════════
+                STEP 2: CORRELATION RESULTS
+            ═══════════════════════════════════════════════════════ */}
+            {certReportStep === "results" && (
+              <div className="space-y-6">
+                {/* KPI Row 1 */}
+                <div className="grid grid-cols-4 gap-4">
+                  {[
+                    { label: "Total Tests", value: totalTests, icon: TestTube, color: "text-[#00e5ff]", bg: "bg-[#00e5ff]/10" },
+                    { label: "Matched", value: matched, icon: CheckCircle, color: "text-[#4caf50]", bg: "bg-[#4caf50]/10" },
+                    { label: "Unmatched", value: unmatched, icon: AlertTriangle, color: "text-[#ff9800]", bg: "bg-[#ff9800]/10" },
+                    { label: "Match Rate", value: `${matchRate}%`, icon: TrendingUp, color: "text-[#00e5ff]", bg: "bg-[#00e5ff]/10" },
+                  ].map(kpi => (
+                    <Card key={kpi.label} className={`${bgCard} border ${borderColor} p-4`}>
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${kpi.bg}`}><kpi.icon className={`h-5 w-5 ${kpi.color}`} /></div>
+                        <div>
+                          <p className={`text-2xl font-bold ${textPrimary}`}>{kpi.value}</p>
+                          <p className={`text-xs ${textSecondary}`}>{kpi.label}</p>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* KPI Row 2 */}
+                <div className="grid grid-cols-4 gap-4">
+                  {[
+                    { label: "Passed", value: passed, color: "text-[#4caf50]", bg: "bg-[#4caf50]/10" },
+                    { label: "Failed", value: failed, color: "text-[#f44336]", bg: "bg-[#f44336]/10" },
+                    { label: "Warnings", value: warnings, color: "text-[#ff9800]", bg: "bg-[#ff9800]/10" },
+                    { label: "Gateway Deltas", value: gatewayDeltas, color: "text-[#9c27b0]", bg: "bg-[#9c27b0]/10" },
+                  ].map(kpi => (
+                    <Card key={kpi.label} className={`${bgCard} border ${borderColor} p-4`}>
+                      <div className={`text-3xl font-bold ${kpi.color} mb-1`}>{kpi.value}</div>
+                      <div className={`text-xs ${textSecondary}`}>{kpi.label}</div>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Filter Tabs */}
+                <div className={`flex items-center gap-1 border-b ${borderColor}`}>
+                  {([
+                    { key: "all", label: `All (${totalTests})` },
+                    { key: "matched", label: `Matched (${matched})` },
+                    { key: "unmatched", label: `Unmatched (${unmatched})` },
+                    { key: "deltas", label: `Gateway Deltas (${gatewayDeltas})` },
+                  ] as const).map(tab => (
+                    <button
+                      key={tab.key}
+                      onClick={() => setCertResultsTab(tab.key)}
+                      className={`px-4 py-2.5 text-sm font-medium transition-colors ${
+                        certResultsTab === tab.key
+                          ? `text-[#00e5ff] border-b-2 border-[#00e5ff]`
+                          : `${textSecondary} hover:text-[#00e5ff]`
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Results Table */}
+                <Card className={`${bgCard} border ${borderColor}`}>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
+                          <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Test Case</th>
+                          <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Category</th>
+                          <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Conductor Message</th>
+                          <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Client Message</th>
+                          <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Match Key</th>
+                          <th className={`px-4 py-3 text-center font-semibold ${textPrimary}`}>Confidence</th>
+                          <th className={`px-4 py-3 text-center font-semibold ${textPrimary}`}>Result</th>
+                          <th className={`px-4 py-3 text-center font-semibold ${textPrimary}`}>Deltas</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredResults.map((r) => (
+                          <tr key={r.testId} className={`border-b ${borderColor} hover:bg-[#1e4976]/10 transition-colors`}>
+                            <td className="px-4 py-3">
+                              <div className={`font-mono text-xs font-bold ${textPrimary}`}>{r.testId}</div>
+                              <div className={`text-xs ${textSecondary} mt-0.5`}>{r.description}</div>
+                            </td>
+                            <td className={`px-4 py-3 text-xs ${textSecondary}`}>{r.category}</td>
+                            <td className="px-4 py-3">
+                              <code className={`text-xs px-2 py-1 rounded font-mono ${isDarkMode ? "bg-[#1e4976]/50 text-[#90caf9]" : "bg-gray-100 text-gray-600"} block max-w-[180px] truncate`}
+                                title={r.conductorMsg}>
+                                {r.conductorMsg.split("|").slice(0,4).join("|")}…
+                              </code>
+                            </td>
+                            <td className="px-4 py-3">
+                              {r.clientMsg ? (
+                                <code className={`text-xs px-2 py-1 rounded font-mono ${isDarkMode ? "bg-[#1e4976]/50 text-[#b3e5fc]" : "bg-blue-50 text-blue-700"} block max-w-[180px] truncate`}
+                                  title={r.clientMsg}>
+                                  {r.clientMsg.split("|").slice(0,4).join("|")}…
+                                </code>
+                              ) : (
+                                <span className={`text-xs px-2 py-1 rounded bg-[#ff9800]/10 text-[#ff9800] font-medium`}>No Match</span>
+                              )}
+                            </td>
+                            <td className={`px-4 py-3 text-xs font-mono ${textSecondary}`}>{r.matchKey}</td>
+                            <td className="px-4 py-3 text-center">
+                              {r.matchConfidence > 0 ? (
+                                <div className="flex flex-col items-center gap-1">
+                                  <span className={`text-xs font-bold ${r.matchConfidence >= 90 ? "text-[#4caf50]" : r.matchConfidence >= 70 ? "text-[#ff9800]" : "text-[#f44336]"}`}>
+                                    {r.matchConfidence}%
+                                  </span>
+                                  <div className={`w-12 h-1 rounded-full ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"} overflow-hidden`}>
+                                    <div className={`h-full rounded-full ${r.matchConfidence >= 90 ? "bg-[#4caf50]" : r.matchConfidence >= 70 ? "bg-[#ff9800]" : "bg-[#f44336]"}`}
+                                      style={{ width: `${r.matchConfidence}%` }} />
+                                  </div>
+                                </div>
+                              ) : <span className={`text-xs ${textSecondary}`}>—</span>}
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <span className={`text-xs font-bold px-2 py-1 rounded ${
+                                r.result === "PASS" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                                r.result === "FAIL" ? "bg-[#f44336]/20 text-[#f44336]" :
+                                "bg-[#ff9800]/20 text-[#ff9800]"
+                              }`}>
+                                {r.result === "PASS" ? "Pass" : r.result === "FAIL" ? "Fail" : "Warn"}
+                              </span>
+                              {r.failureReason && (
+                                <div className={`text-[10px] ${textSecondary} mt-1 max-w-[120px] leading-tight`}>{r.failureReason.slice(0, 50)}…</div>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              {r.deltas.length > 0 ? (
+                                <button
+                                  onClick={() => { setSelectedDeltaTest(r.testId); setCertReportStep("delta"); }}
+                                  className={`text-xs font-bold px-2 py-1 rounded ${
+                                    r.deltas.some(d => d.type === "VALUE_CHANGE")
+                                      ? "bg-[#9c27b0]/20 text-[#9c27b0] hover:bg-[#9c27b0]/30"
+                                      : "bg-[#1e4976]/40 text-[#64b5f6] hover:bg-[#1e4976]/60"
+                                  } transition-colors`}
+                                >
+                                  {r.deltas.length} {r.deltas.some(d => d.type === "VALUE_CHANGE") ? "⚠" : ""}
+                                </button>
+                              ) : <span className={`text-xs ${textSecondary}`}>—</span>}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
+
+                <div className="flex justify-end gap-3">
+                  <Button variant="outline" onClick={() => setCertReportStep("upload")} className={`${textSecondary}`}>
+                    Back
+                  </Button>
+                  <Button onClick={() => setCertReportStep("delta")} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] font-semibold">
+                    View Gateway Delta Analysis
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* ═══════════════════════════════════════════════════════
+                STEP 3: GATEWAY DELTA ANALYSIS
+            ═══════════════════════════════════════════════════════ */}
+            {certReportStep === "delta" && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-3 gap-4">
+                  {correlationResults.filter(r => r.deltas.length > 0).map(r => (
+                    <button
+                      key={r.testId}
+                      onClick={() => setSelectedDeltaTest(r.testId)}
+                      className={`text-left p-4 rounded-lg border-2 transition-all ${
+                        selectedDeltaTest === r.testId
+                          ? "border-[#00e5ff] bg-[#00e5ff]/10"
+                          : `${borderColor} hover:border-[#00e5ff]/50 ${bgCard}`
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className={`text-xs font-bold font-mono ${textPrimary}`}>{r.testId}</span>
+                        <span className={`text-xs px-1.5 py-0.5 rounded ${r.result === "FAIL" ? "bg-[#f44336]/20 text-[#f44336]" : r.result === "WARN" ? "bg-[#ff9800]/20 text-[#ff9800]" : "bg-[#4caf50]/20 text-[#4caf50]"}`}>{r.result}</span>
+                      </div>
+                      <p className={`text-xs ${textSecondary} mb-2`}>{r.description}</p>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-medium ${r.deltas.some(d => d.type === "VALUE_CHANGE") ? "text-[#9c27b0]" : "text-[#64b5f6]"}`}>
+                          {r.deltas.length} delta{r.deltas.length !== 1 ? "s" : ""}
+                        </span>
+                        {r.deltas.some(d => d.type === "VALUE_CHANGE") && (
+                          <span className="text-xs text-[#f44336]">Unexpected change</span>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {selectedDeltaData && (
+                  <Card className={`${bgCard} border ${borderColor}`}>
+                    <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
+                      <div>
+                        <h3 className={`font-bold ${textPrimary}`}>{selectedDeltaData.testId} — {selectedDeltaData.description}</h3>
+                        <p className={`text-xs ${textSecondary} mt-0.5`}>{selectedDeltaData.deltas.length} field-level differences between client original and gateway-normalized message</p>
+                      </div>
+                      <span className={`text-sm font-bold px-3 py-1 rounded ${selectedDeltaData.result === "FAIL" ? "bg-[#f44336]/20 text-[#f44336]" : selectedDeltaData.result === "WARN" ? "bg-[#ff9800]/20 text-[#ff9800]" : "bg-[#4caf50]/20 text-[#4caf50]"}`}>
+                        {selectedDeltaData.result}
+                      </span>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
+                            <th className={`px-5 py-3 text-left font-semibold ${textPrimary}`}>Tag</th>
+                            <th className={`px-5 py-3 text-left font-semibold ${textPrimary}`}>Field Name</th>
+                            <th className={`px-5 py-3 text-left font-semibold ${textPrimary}`}>Client Value</th>
+                            <th className={`px-5 py-3 text-left font-semibold ${textPrimary}`}>Gateway Value</th>
+                            <th className={`px-5 py-3 text-left font-semibold ${textPrimary}`}>Classification</th>
+                            <th className={`px-5 py-3 text-left font-semibold ${textPrimary}`}>Impact</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedDeltaData.deltas.map((d, i) => (
+                            <tr key={i} className={`border-b ${borderColor} ${d.type === "VALUE_CHANGE" ? isDarkMode ? "bg-[#f44336]/5" : "bg-red-50" : ""}`}>
+                              <td className={`px-5 py-3 font-mono font-bold text-xs ${textPrimary}`}>{d.tag}</td>
+                              <td className={`px-5 py-3 font-medium ${textPrimary}`}>{d.field}</td>
+                              <td className="px-5 py-3">
+                                <code className={`text-xs px-2 py-1 rounded font-mono ${isDarkMode ? "bg-[#1e4976]/50 text-[#b3e5fc]" : "bg-blue-50 text-blue-700"}`}>{d.client}</code>
+                              </td>
+                              <td className="px-5 py-3">
+                                <code className={`text-xs px-2 py-1 rounded font-mono ${
+                                  d.conductor === "(removed)"
+                                    ? isDarkMode ? "bg-[#f44336]/20 text-[#f44336]" : "bg-red-100 text-red-700"
+                                    : isDarkMode ? "bg-[#1e4976]/50 text-[#90caf9]" : "bg-gray-100 text-gray-600"
+                                }`}>{d.conductor}</code>
+                              </td>
+                              <td className="px-5 py-3">
+                                <span className={`text-xs font-medium px-2 py-1 rounded ${
+                                  d.type === "EXPECTED_TRANSFORM" ? "bg-[#4caf50]/15 text-[#4caf50]" : "bg-[#9c27b0]/15 text-[#9c27b0]"
+                                }`}>
+                                  {d.type === "EXPECTED_TRANSFORM" ? "Expected Transform" : "Unexpected Change"}
+                                </span>
+                              </td>
+                              <td className={`px-5 py-3 text-xs ${textSecondary}`}>
+                                {d.type === "EXPECTED_TRANSFORM"
+                                  ? "Normal gateway routing behavior. No client action required."
+                                  : "Unexpected transformation. Client must investigate this field for venue compliance."}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    {selectedDeltaData.failureReason && (
+                      <div className={`px-6 py-4 border-t ${borderColor} flex items-start gap-3 ${isDarkMode ? "bg-[#f44336]/5" : "bg-red-50"}`}>
+                        <AlertTriangle className="h-4 w-4 text-[#f44336] flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className={`text-sm font-medium text-[#f44336]`}>Failure Reason</p>
+                          <p className={`text-sm ${textSecondary} mt-0.5`}>{selectedDeltaData.failureReason}</p>
+                        </div>
+                      </div>
+                    )}
+                  </Card>
+                )}
+
+                <div className="flex justify-end gap-3">
+                  <Button variant="outline" onClick={() => setCertReportStep("results")} className={`${textSecondary}`}>Back</Button>
+                  <Button onClick={() => setCertReportStep("generate")} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] font-semibold">
+                    Configure &amp; Generate Report
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* ═══════════════════════════════════════════════════════
+                STEP 4: GENERATE CLIENT REPORT
+            ═══════════════════════════════════════════════════════ */}
+            {certReportStep === "generate" && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-6">
+                  {/* Report Configuration */}
+                  <Card className={`${bgCard} border ${borderColor} p-6`}>
+                    <h3 className={`font-bold ${textPrimary} mb-5`}>Report Configuration</h3>
+                    <div className="space-y-4">
+                      {[
+                        { key: "clientMessages", label: "Include client original messages", sub: "Shows client's actual FIX messages, not internal gateway format" },
+                        { key: "passFailResults", label: "Include pass/fail results per test case", sub: "Result for each of the 234 test cases" },
+                        { key: "gatewayNotes", label: "Include gateway transformation notes", sub: "Annotates expected transforms vs unexpected changes" },
+                        { key: "rawConductor", label: "Include raw Conductor report", sub: "Internal format reference — typically for internal use only" },
+                        { key: "unmatchedCases", label: "Include unmatched test cases", sub: `${unmatched} test cases with no client message match` },
+                      ].map(opt => (
+                        <label key={opt.key} className="flex items-start gap-3 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={reportOptions[opt.key as keyof typeof reportOptions]}
+                            onChange={e => setCertReportOptions(prev => ({ ...prev, [opt.key]: e.target.checked }))}
+                            className="mt-1 accent-[#00e5ff]"
+                          />
+                          <div>
+                            <p className={`text-sm font-medium ${textPrimary} group-hover:text-[#00e5ff] transition-colors`}>{opt.label}</p>
+                            <p className={`text-xs ${textSecondary} mt-0.5`}>{opt.sub}</p>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  </Card>
+
+                  {/* Report Metadata */}
+                  <div className="space-y-4">
+                    <Card className={`${bgCard} border ${borderColor} p-6`}>
+                      <h3 className={`font-bold ${textPrimary} mb-4`}>Report Metadata</h3>
+                      <div className="space-y-4">
+                        <div>
+                          <label className={`text-xs font-medium ${textSecondary} block mb-2`}>Client Name</label>
+                          <select value={selectedClientForReport} onChange={e => setCertClientName(e.target.value)}
+                            className={`w-full px-3 py-2 rounded-lg border ${borderColor} ${bgCard} ${textPrimary} text-sm`}>
+                            <option>Goldman Sachs</option>
+                            <option>BlackRock</option>
+                            <option>Vanguard</option>
+                            <option>Fidelity</option>
+                            <option>State Street</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className={`text-xs font-medium ${textSecondary} block mb-2`}>Report Title</label>
+                          <input
+                            value={reportTitle}
+                            onChange={e => setCertReportTitle(e.target.value)}
+                            className={`w-full px-3 py-2 rounded-lg border ${borderColor} ${bgCard} ${textPrimary} text-sm`}
+                          />
+                        </div>
+                      </div>
+                    </Card>
+
+                    {/* Report Summary Preview */}
+                    <Card className={`${bgCard} border ${borderColor} p-6`}>
+                      <h3 className={`font-bold ${textPrimary} mb-4`}>Report Preview</h3>
+                      <div className={`p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} border ${borderColor} space-y-3`}>
+                        <div className="flex items-center justify-between">
+                          <span className={`text-xs font-medium ${textSecondary}`}>Overall Result</span>
+                          <span className={`text-sm font-bold px-2 py-0.5 rounded ${failed > 5 ? "bg-[#f44336]/20 text-[#f44336]" : failed > 0 ? "bg-[#ff9800]/20 text-[#ff9800]" : "bg-[#4caf50]/20 text-[#4caf50]"}`}>
+                            {failed > 5 ? "FAIL" : failed > 0 ? "CONDITIONAL PASS" : "PASS"}
+                          </span>
+                        </div>
+                        <div className={`border-t ${borderColor} pt-3 space-y-1.5`}>
+                          {[
+                            { label: "Client", value: selectedClientForReport },
+                            { label: "FIX Version", value: fixVersion },
+                            { label: "Certification Date", value: "Apr 16, 2026" },
+                            { label: "Test Cases", value: `${passed}/${totalTests} passed` },
+                            { label: "Match Rate", value: `${matchRate}%` },
+                          ].map(row => (
+                            <div key={row.label} className="flex justify-between">
+                              <span className={`text-xs ${textSecondary}`}>{row.label}</span>
+                              <span className={`text-xs font-medium ${textPrimary}`}>{row.value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <Card className={`${bgCard} border ${borderColor} p-5`}>
+                  <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div className="flex items-center gap-3">
+                      <Button variant="outline" onClick={() => setCertReportStep("delta")} className={`${textSecondary}`}>Back</Button>
+                      <Button variant="outline" className={`flex items-center gap-2 ${textSecondary}`}>
+                        <Eye className="h-4 w-4" /> Preview Report
+                      </Button>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Button className="bg-[#2196f3] text-white hover:bg-[#1976d2] flex items-center gap-2 font-semibold">
+                        <Download className="h-4 w-4" /> Export PDF
+                      </Button>
+                      <Button className="bg-[#4caf50] text-white hover:bg-[#388e3c] flex items-center gap-2 font-semibold">
+                        <Download className="h-4 w-4" /> Export JSON
+                      </Button>
+                      <Button className="bg-[#9c27b0] text-white hover:bg-[#7b1fa2] flex items-center gap-2 font-semibold">
+                        <Archive className="h-4 w-4" /> Save to Evidence Vault
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            )}
+
           </div>
         </div>
       </div>
