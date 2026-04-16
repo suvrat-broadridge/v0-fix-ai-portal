@@ -198,8 +198,22 @@ export default function BCometPlatform() {
     { id: "OB-2024-002", client: "Apex Capital Partners", legalEntity: "Apex Capital Inc", region: "EMEA", assetClass: "Options", protocol: "FIX 4.4", environment: "Cert", stage: 3, stageLabel: "Connectivity", priority: "Critical", riskRating: "High", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Jan 30, 2024", blockers: 2, status: "at-risk", createdDate: "Dec 15, 2023", readinessScore: 62 },
     { id: "OB-2024-003", client: "Horizon Investments", legalEntity: "Horizon Fund Management", region: "APAC", assetClass: "Futures", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "Medium", riskRating: "Low", owner: "Mike Chen", assignedUser: "Bob Wilson", slaDate: "Mar 1, 2024", blockers: 0, status: "on-track", createdDate: "Jan 8, 2024", readinessScore: 78 },
     { id: "OB-2024-004", client: "Velocity Securities", legalEntity: "Velocity Trading Ltd", region: "AMER", assetClass: "Equities", protocol: "FIX 4.4", environment: "Prod", stage: 6, stageLabel: "Certification", priority: "High", riskRating: "Low", owner: "Lisa Wang", assignedUser: "Alice Brown", slaDate: "Jan 20, 2024", blockers: 0, status: "on-track", createdDate: "Nov 20, 2023", readinessScore: 95 },
-    { id: "OB-2024-005", client: "Summit Financial", legalEntity: "Summit Advisory Group", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.2", environment: "UAT", stage: 1, stageLabel: "Setup", priority: "Low", riskRating: "Medium", owner: "Tom Brown", assignedUser: "Charlie Davis", slaDate: "Apr 1, 2024", blockers: 1, status: "blocked", createdDate: "Jan 10, 2024", readinessScore: 45 },
+    { id: "OB-2024-005", client: "Summit Financial", legalEntity: "Summit Advisory Group", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.4", environment: "UAT", stage: 1, stageLabel: "Setup", priority: "Low", riskRating: "Medium", owner: "Tom Brown", assignedUser: "Charlie Davis", slaDate: "Apr 1, 2024", blockers: 1, status: "blocked", createdDate: "Jan 10, 2024", readinessScore: 45 },
     { id: "OB-2024-006", client: "Quantum Asset Management", legalEntity: "Quantum Holdings LLC", region: "AMER", assetClass: "Commodities", protocol: "FIX 4.4", environment: "UAT", stage: 4, stageLabel: "Log Analysis", priority: "Medium", riskRating: "Medium", owner: "John Smith", assignedUser: "John Smith", slaDate: "Feb 28, 2024", blockers: 1, status: "at-risk", createdDate: "Jan 5, 2024", readinessScore: 72 },
+    { id: "OB-2024-007", client: "Atlantic Trading Corp", legalEntity: "Atlantic Trading Inc", region: "AMER", assetClass: "Drop Copy", protocol: "FIX 4.4", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Low", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Feb 18, 2024", blockers: 0, status: "on-track", createdDate: "Jan 3, 2024", readinessScore: 88 },
+    { id: "OB-2024-008", client: "Atlantic Trading Corp", legalEntity: "Atlantic Trading Inc", region: "AMER", assetClass: "Market Data", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 3, stageLabel: "Connectivity", priority: "Medium", riskRating: "Medium", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Mar 1, 2024", blockers: 1, status: "at-risk", createdDate: "Jan 5, 2024", readinessScore: 55 },
+    { id: "OB-2024-009", client: "Blackstone Global Markets", legalEntity: "Blackstone Securities LLC", region: "AMER", assetClass: "Fixed Income", protocol: "FIX 4.4", environment: "Prod", stage: 9, stageLabel: "Live", priority: "High", riskRating: "Low", owner: "Mike Chen", assignedUser: "Bob Wilson", slaDate: "Jan 15, 2024", blockers: 0, status: "completed", createdDate: "Oct 10, 2023", readinessScore: 100 },
+    { id: "OB-2024-010", client: "Blackstone Global Markets", legalEntity: "Blackstone Securities LLC", region: "AMER", assetClass: "Credit", protocol: "FIX 4.4", environment: "UAT", stage: 4, stageLabel: "Log Analysis", priority: "Medium", riskRating: "Low", owner: "Mike Chen", assignedUser: "Bob Wilson", slaDate: "Feb 28, 2024", blockers: 0, status: "on-track", createdDate: "Jan 8, 2024", readinessScore: 65 },
+    { id: "OB-2024-011", client: "Pacific Hedge Fund", legalEntity: "Pacific Asset Management", region: "APAC", assetClass: "Equities", protocol: "FIX 4.2", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Low", owner: "Lisa Wang", assignedUser: "Alice Brown", slaDate: "Feb 20, 2024", blockers: 0, status: "on-track", createdDate: "Dec 20, 2023", readinessScore: 80 },
+    { id: "OB-2024-012", client: "Pacific Hedge Fund", legalEntity: "Pacific Asset Management", region: "APAC", assetClass: "ETF", protocol: "FIX 4.4", environment: "UAT", stage: 3, stageLabel: "Connectivity", priority: "Medium", riskRating: "Medium", owner: "Lisa Wang", assignedUser: "Alice Brown", slaDate: "Mar 5, 2024", blockers: 1, status: "at-risk", createdDate: "Jan 10, 2024", readinessScore: 48 },
+    { id: "OB-2024-013", client: "Pacific Hedge Fund", legalEntity: "Pacific Asset Management", region: "APAC", assetClass: "Drop Copy", protocol: "FIX 4.4", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "Low", riskRating: "Low", owner: "Lisa Wang", assignedUser: "Alice Brown", slaDate: "Mar 15, 2024", blockers: 0, status: "on-track", createdDate: "Jan 12, 2024", readinessScore: 35 },
+    { id: "OB-2024-014", client: "Sterling Investment Bank", legalEntity: "Sterling Investments Ltd", region: "EMEA", assetClass: "Market Data", protocol: "FIX 5.0", environment: "Cert", stage: 8, stageLabel: "Prod Config", priority: "Critical", riskRating: "Low", owner: "John Smith", assignedUser: "Charlie Davis", slaDate: "Feb 8, 2024", blockers: 0, status: "on-track", createdDate: "Nov 15, 2023", readinessScore: 92 },
+    { id: "OB-2024-015", client: "Sterling Investment Bank", legalEntity: "Sterling Investments Ltd", region: "EMEA", assetClass: "Rates", protocol: "FIX 4.4", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Medium", owner: "John Smith", assignedUser: "Charlie Davis", slaDate: "Feb 25, 2024", blockers: 1, status: "at-risk", createdDate: "Dec 5, 2023", readinessScore: 70 },
+    { id: "OB-2024-016", client: "Nordic Securities AS", legalEntity: "Nordic Capital Group", region: "EMEA", assetClass: "FX", protocol: "FIX 4.4", environment: "Prod", stage: 9, stageLabel: "Live", priority: "High", riskRating: "Low", owner: "Tom Brown", assignedUser: "John Smith", slaDate: "Jan 20, 2024", blockers: 0, status: "completed", createdDate: "Sep 25, 2023", readinessScore: 100 },
+    { id: "OB-2024-017", client: "Nordic Securities AS", legalEntity: "Nordic Capital Group", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.2", environment: "UAT", stage: 4, stageLabel: "Log Analysis", priority: "Medium", riskRating: "Low", owner: "Tom Brown", assignedUser: "John Smith", slaDate: "Feb 28, 2024", blockers: 0, status: "on-track", createdDate: "Jan 6, 2024", readinessScore: 60 },
+    { id: "OB-2024-018", client: "Nordic Securities AS", legalEntity: "Nordic Capital Group", region: "EMEA", assetClass: "Drop Copy", protocol: "FIX 4.4", environment: "Cert", stage: 8, stageLabel: "Prod Config", priority: "High", riskRating: "Low", owner: "Tom Brown", assignedUser: "John Smith", slaDate: "Feb 10, 2024", blockers: 0, status: "on-track", createdDate: "Nov 1, 2023", readinessScore: 90 },
+    { id: "OB-2024-019", client: "Meridian Capital LLC", legalEntity: "Meridian Holdings", region: "AMER", assetClass: "Options", protocol: "FIX 4.4", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "High", riskRating: "High", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Feb 15, 2024", blockers: 2, status: "blocked", createdDate: "Jan 8, 2024", readinessScore: 25 },
+    { id: "OB-2024-020", client: "Meridian Capital LLC", legalEntity: "Meridian Holdings", region: "AMER", assetClass: "Futures", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "Medium", riskRating: "Medium", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Mar 1, 2024", blockers: 1, status: "at-risk", createdDate: "Jan 10, 2024", readinessScore: 30 },
   ])
 
   // Approvals data
@@ -2934,37 +2948,48 @@ export default function BCometPlatform() {
                 </Card>
               </div>
 
-              {/* Stage Funnel + SLA Forecast Strip */}
+              {/* Stage Pipeline + SLA Forecast Strip */}
               <div className="grid grid-cols-3 gap-4">
                 <Card className={`${bgCard} border ${borderColor} p-4 col-span-2`}>
-                  <h3 className={`font-semibold ${textPrimary} mb-4`}>Stage Funnel</h3>
-                  <div className="flex items-end justify-between gap-2 h-32">
-                    {(() => {
-                      // Calculate stage counts from allCases
-                      const stageCounts = [
-                        { stage: "Setup", stageNums: [1, 2], color: "#2196f3" },
-                        { stage: "Spec Compare", stageNums: [3], color: "#9c27b0" },
-                        { stage: "Log Analysis", stageNums: [4], color: "#00bcd4" },
-                        { stage: "ATDL Config", stageNums: [5], color: "#ff9800" },
-                        { stage: "Testing", stageNums: [6, 7], color: "#e91e63" },
-                        { stage: "Certification", stageNums: [8], color: "#4caf50" },
-                        { stage: "Live", stageNums: [9], color: "#00e5ff" },
-                      ].map(s => ({
-                        ...s,
-                        count: allCases.filter(c => s.stageNums.includes(c.currentStage)).length
-                      }))
-                      const maxCount = Math.max(...stageCounts.map(s => s.count), 1)
-                      return stageCounts.map((s, i) => (
-                      <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                        <div 
-                          className="w-full rounded-t-sm transition-all hover:opacity-80 cursor-pointer"
-                          style={{ backgroundColor: s.color, height: `${Math.max((s.count / maxCount) * 100, 8)}px` }}
-                        />
-                        <span className={`text-[10px] ${textSecondary} text-center`}>{s.stage}</span>
-                        <span className={`text-xs font-semibold ${textPrimary}`}>{s.count}</span>
+                  <h3 className={`font-semibold ${textPrimary} mb-3`}>Cases by Stage</h3>
+                  {(() => {
+                    const stageCounts = [
+                      { stage: "Setup", stageNums: [1, 2], icon: FileText },
+                      { stage: "Spec", stageNums: [3], icon: GitCompare },
+                      { stage: "Logs", stageNums: [4], icon: FileSearch },
+                      { stage: "ATDL", stageNums: [5], icon: Sliders },
+                      { stage: "Test", stageNums: [6, 7], icon: TestTube },
+                      { stage: "Cert", stageNums: [8], icon: Award },
+                      { stage: "Live", stageNums: [9], icon: Rocket },
+                    ].map(s => ({
+                      ...s,
+                      count: allCases.filter(c => s.stageNums.includes(c.currentStage)).length
+                    }))
+                    const totalCases = allCases.length
+                    return (
+                      <div className="flex items-center">
+                        {stageCounts.map((s, i) => {
+                          const StageIcon = s.icon
+                          const isLast = i === stageCounts.length - 1
+                          const hasItems = s.count > 0
+                          return (
+                            <div key={i} className="flex items-center flex-1">
+                              <div className={`flex flex-col items-center flex-1 p-2 rounded-lg transition-all cursor-pointer hover:bg-[#1e4976]/20 ${hasItems ? "" : "opacity-50"}`}>
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-1 ${hasItems ? "bg-[#00e5ff]/20" : isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"}`}>
+                                  <StageIcon className={`h-4 w-4 ${hasItems ? "text-[#00e5ff]" : textSecondary}`} />
+                                </div>
+                                <span className={`text-lg font-bold ${hasItems ? "text-[#00e5ff]" : textSecondary}`}>{s.count}</span>
+                                <span className={`text-[10px] ${textSecondary}`}>{s.stage}</span>
+                              </div>
+                              {!isLast && (
+                                <ChevronRight className={`h-4 w-4 ${textSecondary} opacity-30 flex-shrink-0`} />
+                              )}
+                            </div>
+                          )
+                        })}
                       </div>
-                    ))})()}
-                  </div>
+                    )
+                  })()}
                 </Card>
                 <Card className={`${bgCard} border ${borderColor} p-4`}>
                   <h3 className={`font-semibold ${textPrimary} mb-4`}>SLA Forecast</h3>
@@ -9059,6 +9084,43 @@ const specCompareResults = [
         versions: [
           { protocol: "FIX 4.4", adminSpec: { name: "FX_FIX44_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: null, uploaded: false } },
           { protocol: "FIX 5.0 SP2", adminSpec: { name: "FX_FIX50SP2_v1.1.xml", uploaded: true }, standardizedSpec: { name: "FX_FIX50SP2_v1.1_Standardized.xlsx", available: true }, clientSpec: { name: "client_fx_50sp2.xml", uploaded: true }, atdlFile: { name: "FX_FIX50SP2_AlgoSuite.atdl", uploaded: true } },
+        ]
+      },
+      { 
+        asset: "Drop Copy", 
+        versions: [
+          { protocol: "FIX 4.2", adminSpec: { name: "DC_FIX42_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: null, uploaded: false } },
+          { protocol: "FIX 4.4", adminSpec: { name: "DC_FIX44_v2.0.xml", uploaded: true }, standardizedSpec: { name: "DC_FIX44_v2.0_Standardized.xlsx", available: true }, clientSpec: { name: "client_dc_44.xml", uploaded: true }, atdlFile: { name: null, uploaded: false } },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "DC_FIX50SP2_v1.0.xml", uploaded: true }, standardizedSpec: { name: "DC_FIX50SP2_v1.0_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: null, uploaded: false } },
+        ]
+      },
+      { 
+        asset: "Market Data", 
+        versions: [
+          { protocol: "FIX 4.4", adminSpec: { name: "MD_FIX44_v1.5.xml", uploaded: true }, standardizedSpec: { name: "MD_FIX44_v1.5_Standardized.xlsx", available: true }, clientSpec: { name: "client_md_44.xml", uploaded: true }, atdlFile: { name: null, uploaded: false } },
+          { protocol: "FIX 5.0", adminSpec: { name: "MD_FIX50_v2.0.xml", uploaded: true }, standardizedSpec: { name: "MD_FIX50_v2.0_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: null, uploaded: false } },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "MD_FIX50SP2_v2.1.xml", uploaded: true }, standardizedSpec: { name: "MD_FIX50SP2_v2.1_Standardized.xlsx", available: true }, clientSpec: { name: "client_md_50sp2.xml", uploaded: true }, atdlFile: { name: null, uploaded: false } },
+        ]
+      },
+      { 
+        asset: "Credit", 
+        versions: [
+          { protocol: "FIX 4.4", adminSpec: { name: "CR_FIX44_v1.0.xml", uploaded: true }, standardizedSpec: { name: "CR_FIX44_v1.0_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: "CR_FIX44_AlgoSuite.atdl", uploaded: true } },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "CR_FIX50SP2_v1.1.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: "client_cr_50sp2.xml", uploaded: true }, atdlFile: { name: "CR_FIX50SP2_AlgoSuite.atdl", uploaded: true } },
+        ]
+      },
+      { 
+        asset: "Rates", 
+        versions: [
+          { protocol: "FIX 4.4", adminSpec: { name: "RT_FIX44_v1.2.xml", uploaded: true }, standardizedSpec: { name: "RT_FIX44_v1.2_Standardized.xlsx", available: true }, clientSpec: { name: "client_rt_44.xml", uploaded: true }, atdlFile: { name: "RT_FIX44_AlgoSuite.atdl", uploaded: true } },
+          { protocol: "FIX 5.0", adminSpec: { name: "RT_FIX50_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: null, uploaded: false } },
+        ]
+      },
+      { 
+        asset: "ETF", 
+        versions: [
+          { protocol: "FIX 4.4", adminSpec: { name: "ETF_FIX44_v1.0.xml", uploaded: true }, standardizedSpec: { name: "ETF_FIX44_v1.0_Standardized.xlsx", available: true }, clientSpec: { name: "client_etf_44.xml", uploaded: true }, atdlFile: { name: "ETF_FIX44_AlgoSuite.atdl", uploaded: true } },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "ETF_FIX50SP2_v1.1.xml", uploaded: true }, standardizedSpec: { name: "ETF_FIX50SP2_v1.1_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: "ETF_FIX50SP2_AlgoSuite.atdl", uploaded: true } },
         ]
       },
     ]
