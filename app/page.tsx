@@ -12101,9 +12101,8 @@ const copyToClipboard = () => {
   }
 
   // Onboarding Case Detail Screen
-  if (currentScreen === "onboarding-case-detail") {
-    const caseItem = onboardingCases.find(c => c.id === selectedOnboardingCase?.id)
-    if (!caseItem) return null
+  if (currentScreen === "onboarding-case-detail" && selectedOnboardingCase) {
+    const caseItem = selectedOnboardingCase
     
     // Calculate readiness score
     const completedApprovals = allApprovals.filter(a => a.caseId === caseItem.id && a.status === "approved").length
