@@ -3791,6 +3791,70 @@ export default function BCometPlatform() {
                   </div>
                 </Card>
                 
+                <Card className={`${bgCard} border ${borderColor} p-4 mb-4`}>
+                  <h4 className={`text-sm font-bold ${textPrimary} mb-3 flex items-center gap-2`}>
+                    <Clock className="h-4 w-4 text-[#9c27b0]" /> Time Tracking
+                  </h4>
+                  {(() => {
+                    const caseData = onboardingCases.find(c => c.id === selectedCase.id)
+                    const createdDate = caseData?.createdDate ? new Date(caseData.createdDate) : new Date()
+                    const now = new Date("Feb 1, 2024")
+                    const totalElapsed = Math.floor((now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24))
+                    const stageNames = ["Client Setup", "Spec Compare", "Log Analysis", "ATDL Config", "Test Suite", "Scenario Gen", "Evidence", "Prod Config", "Certification"]
+                    // Distribute elapsed days proportionally across completed stages
+                    const completedStages = selectedCase.currentStage - 1
+                    const avgDaysPerStage = completedStages > 0 ? Math.round(totalElapsed / selectedCase.currentStage) : 0
+                    const expectedTotal = selectedCase.totalStages * 7
+                    const pace = totalElapsed <= (selectedCase.currentStage * 7)
+                    return (
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className={`text-xs ${textSecondary}`}>Total Elapsed</span>
+                          <span className={`text-sm font-bold font-mono ${textPrimary}`}>{totalElapsed} days</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className={`text-xs ${textSecondary}`}>Avg per Stage</span>
+                          <span className={`text-sm font-mono ${textPrimary}`}>{avgDaysPerStage}d</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className={`text-xs ${textSecondary}`}>Est. Total</span>
+                          <span className={`text-sm font-mono ${textSecondary}`}>~{expectedTotal}d target</span>
+                        </div>
+                        <div className={`h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"} overflow-hidden`}>
+                          <div
+                            className={`h-full rounded-full ${pace ? "bg-[#4caf50]" : "bg-[#f44336]"}`}
+                            style={{ width: `${Math.min((totalElapsed / expectedTotal) * 100, 100)}%` }}
+                          />
+                        </div>
+                        <p className={`text-[10px] font-medium ${pace ? "text-[#4caf50]" : "text-[#f44336]"}`}>
+                          {pace ? `On pace — ${(selectedCase.currentStage * 7) - totalElapsed}d ahead of expected` : `${totalElapsed - (selectedCase.currentStage * 7)}d behind expected pace`}
+                        </p>
+                        <div className={`border-t ${borderColor} pt-3 mt-1`}>
+                          <p className={`text-[10px] uppercase tracking-wide ${textSecondary} mb-2`}>Stage Breakdown</p>
+                          <div className="space-y-1.5">
+                            {stageNames.slice(0, selectedCase.currentStage).map((name, i) => {
+                              const isCurrentStage = i === selectedCase.currentStage - 1
+                              const stageDays = isCurrentStage
+                                ? totalElapsed - (avgDaysPerStage * (selectedCase.currentStage - 1))
+                                : avgDaysPerStage
+                              return (
+                                <div key={i} className="flex justify-between items-center">
+                                  <span className={`text-[10px] ${isCurrentStage ? "text-[#00e5ff]" : textSecondary}`}>
+                                    {isCurrentStage ? "→ " : ""}{name}
+                                  </span>
+                                  <span className={`text-[10px] font-mono font-medium ${isCurrentStage ? "text-[#00e5ff]" : textSecondary}`}>
+                                    {stageDays}d{isCurrentStage ? " ▲" : ""}
+                                  </span>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })()}
+                </Card>
+
                 <Card className={`${bgCard} border ${borderColor} p-4`}>
                   <h4 className={`text-sm font-bold ${textPrimary} mb-3`}>Quick Actions</h4>
                   <div className="space-y-2">
@@ -11259,7 +11323,7 @@ const copyToClipboard = () => {
             </Card>
 
             {/* Summary Stats */}
-            <div className="grid grid-cols-6 gap-4 mb-6">
+            <div className="grid grid-cols-7 gap-4 mb-6">
               <Card className={`${bgCard} border ${borderColor} p-4`}>
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-[#2196f3]/20"><Briefcase className="h-5 w-5 text-[#2196f3]" /></div>
@@ -11314,6 +11378,21 @@ const copyToClipboard = () => {
                   </div>
                 </div>
               </Card>
+              <Card className={`${bgCard} border ${borderColor} p-4`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[#9c27b0]/20"><Clock className="h-5 w-5 text-[#9c27b0]" /></div>
+                  <div>
+                    <p className={`text-2xl font-bold ${textPrimary}`}>
+                      {Math.round(filteredOnboardingCases.reduce((acc, c) => {
+                        const created = new Date(c.createdDate)
+                        const now = new Date("Feb 1, 2024")
+                        return acc + Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24))
+                      }, 0) / filteredOnboardingCases.length)}d
+                    </p>
+                    <p className={`text-xs ${textSecondary}`}>Avg Elapsed</p>
+                  </div>
+                </div>
+              </Card>
             </div>
 
             {/* Cases Table */}
@@ -11329,6 +11408,7 @@ const copyToClipboard = () => {
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Stage</th>
                       <th className={`px-4 py-3 text-center font-semibold ${textPrimary}`}>Readiness</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Priority</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Elapsed</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>SLA Date</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Status</th>
                     </tr>
@@ -11420,6 +11500,24 @@ const copyToClipboard = () => {
                           }`}>
                             {caseItem.priority}
                           </span>
+                        </td>
+                        <td className={`px-4 py-3`}>
+                          {(() => {
+                            const created = new Date(caseItem.createdDate)
+                            const now = new Date("Feb 1, 2024") // simulated "today"
+                            const elapsed = Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24))
+                            // Expected days based on ~7d per stage average SLA
+                            const expectedDays = caseItem.stage * 7
+                            const isPace = elapsed <= expectedDays
+                            return (
+                              <div className="flex flex-col gap-0.5">
+                                <span className={`text-sm font-medium font-mono ${textPrimary}`}>{elapsed}d</span>
+                                <span className={`text-[10px] font-medium ${isPace ? "text-[#4caf50]" : "text-[#f44336]"}`}>
+                                  {isPace ? `${expectedDays - elapsed}d ahead` : `${elapsed - expectedDays}d over`}
+                                </span>
+                              </div>
+                            )
+                          })()}
                         </td>
                         <td className={`px-4 py-3 ${textSecondary}`}>{caseItem.slaDate}</td>
                         <td className={`px-4 py-3`}>
