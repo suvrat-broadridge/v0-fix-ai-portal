@@ -12036,48 +12036,55 @@ const copyToClipboard = () => {
                     <Button className="bg-[#4caf50] hover:bg-[#4caf50]/80" onClick={() => {
                       // Create new case from form data
                       const newCaseId = `OB-${new Date().getFullYear()}-${String(onboardingCases.length + 1).padStart(3, "0")}`
-                      const selectedClient = clients.find(c => c.id === createCaseData.clientId)
+                      const selectedClient = clients.find(c => String(c.id) === String(createCaseData.clientId))
+                      const firstAssetClass = createCaseData.assetClasses?.[0] || "Equities"
                       const newCase = {
                         id: newCaseId,
-                        client: selectedClient?.name || createCaseData.caseName,
-                        legalEntity: createCaseData.legalEntity,
-                        region: selectedClient?.assetClasses?.[0] || "AMER",
-                        assetClass: createCaseData.assetClasses[0] || "Equities",
-                        protocol: createCaseData.fixVersions[createCaseData.assetClasses[0]] || "FIX 4.4",
+                        client: selectedClient?.name || createCaseData.caseName || "New Client",
+                        legalEntity: createCaseData.legalEntity || "Unknown Entity",
+                        region: "AMER",
+                        assetClass: firstAssetClass,
+                        protocol: createCaseData.fixVersions?.[firstAssetClass] || "FIX 4.4",
                         environment: createCaseData.connectivityEnvironment === "uat" ? "UAT" : createCaseData.connectivityEnvironment === "prod" ? "Prod" : "Cert",
                         stage: 1,
                         stageLabel: "Setup",
                         priority: "High",
                         riskRating: "Medium",
-                        owner: createCaseData.onboardingManager,
+                        owner: createCaseData.onboardingManager || "Unassigned",
                         assignedUser: currentUser?.name || "John Smith",
                         slaDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
-                        blockers: createCaseData.blockers.filter(b => b.isCriticalPath).length,
-                        status: "on-track",
+                        blockers: (createCaseData.blockers || []).filter(b => b.isCriticalPath).length,
+                        status: "on-track" as const,
                         createdDate: new Date().toLocaleDateString(),
                         readinessScore: 40,
-                        gateA: { status: "locked" as const, unlockedDate: null, passedDate: null },
-                        gateB: { status: "locked" as const, unlockedDate: null, passedDate: null },
-                        gateC: { status: "locked" as const, unlockedDate: null, passedDate: null },
+                        gateA: { status: "locked" as "locked" | "unlocked" | "passed", unlockedDate: null, passedDate: null },
+                        gateB: { status: "locked" as "locked" | "unlocked" | "passed", unlockedDate: null, passedDate: null },
+                        gateC: { status: "locked" as "locked" | "unlocked" | "passed", unlockedDate: null, passedDate: null },
                         owners: {
                           onboardingManager: { name: createCaseData.onboardingManager || "Unassigned", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } },
                           techLead: { name: createCaseData.technicalLead || "Unassigned", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } },
                           qaLead: { name: createCaseData.qaCertLead || "Unassigned", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } },
                           businessApprover: { name: createCaseData.businessApprover || "Unassigned", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } }
                         },
-                        criticalBlockers: createCaseData.blockers.filter(b => b.isCriticalPath).map((b, i) => ({
+                        criticalBlockers: (createCaseData.blockers || []).filter(b => b.isCriticalPath).map((b, i) => ({
                           id: `BLK-${i + 1}`,
                           title: b.description,
-                          severity: "critical" as const,
-                          owner: createCaseData.onboardingManager,
+                          severity: "critical" as "critical" | "high" | "medium" | "low",
+                          owner: createCaseData.onboardingManager || "Unassigned",
                           dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()
                         }))
                       }
                       setOnboardingCases([...onboardingCases, newCase])
                       clearCaseDraft()
-                      alert(`Case ${newCaseId} created successfully!`)
                       setCurrentScreen("onboarding-cases")
                       setCreateCaseStep(1)
+                      // Reset form data
+                      setCreateCaseData({
+                        caseName: "", clientId: "", legalEntity: "", primaryContact: "",
+                        assetClasses: [], fixVersions: {}, venueProfiles: [], onboardingTracks: [],
+                        clientSpecStatus: "pending", connectivityEnvironment: "uat", certificationWindow: "", thirdPartyDeps: "",
+                        blockers: [], onboardingManager: "", technicalLead: "", qaCertLead: "", businessApprover: ""
+                      })
                     }}>
                       <Rocket className="h-4 w-4 mr-2" /> Launch Case
                     </Button>
