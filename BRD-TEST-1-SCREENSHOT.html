@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B-COMET Test - Single Screenshot</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background-color: #0a1628; color: #e0e7ff; padding: 40px 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { color: #00e5ff; margin-bottom: 30px; }
+        .screenshot { background: #0f2a4d; border: 2px solid #00bcd4; padding: 20px; border-radius: 8px; margin: 30px 0; }
+        .screenshot img { width: 100%; height: auto; border-radius: 4px; }
+        .caption { color: #90caf9; margin-top: 10px; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>B-COMET Test - Single Screenshot</h1>
+        
+        <h2 style="color: #64b5f6; margin-top: 40px;">Homepage Screenshot</h2>
+        <p>Test embedding a single screenshot with base64 data URI:</p>
+        
+        <div class="screenshot">
+            <img src="data:image/png;base64,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" alt="B-COMET Homepage">
+            <p class="caption">Figure 1: B-COMET Homepage</p>
+        </div>
+        
+        <p style="margin-top: 40px; color: #b3e5fc;">
+            If the screenshot above displays correctly, we can proceed to embed all 4 screenshots in the full BRD.
+        </p>
+    </div>
+</body>
+</html>
