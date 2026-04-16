@@ -195,20 +195,20 @@ export default function BCometPlatform() {
   // Onboarding Cases data with assigned users
   const [onboardingCases] = useState([
     { id: "OB-2024-001", client: "Nexus Trading Group", legalEntity: "Nexus Trading LLC", region: "AMER", assetClass: "Equities", protocol: "FIX 4.2", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Medium", owner: "John Smith", assignedUser: "John Smith", slaDate: "Feb 15, 2024", blockers: 0, status: "on-track", createdDate: "Jan 2, 2024", readinessScore: 85 },
-    { id: "OB-2024-002", client: "Apex Capital Partners", legalEntity: "Apex Capital Inc", region: "EMEA", assetClass: "Options", protocol: "FIX 4.4", environment: "Cert", stage: 3, stageLabel: "Connectivity", priority: "Critical", riskRating: "High", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Jan 30, 2024", blockers: 2, status: "at-risk", createdDate: "Dec 15, 2023", readinessScore: 62 },
-    { id: "OB-2024-003", client: "Horizon Investments", legalEntity: "Horizon Fund Management", region: "APAC", assetClass: "Futures", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "Medium", riskRating: "Low", owner: "Mike Chen", assignedUser: "Bob Wilson", slaDate: "Mar 1, 2024", blockers: 0, status: "on-track", createdDate: "Jan 8, 2024", readinessScore: 78 },
+    { id: "OB-2024-002", client: "Apex Capital Partners", legalEntity: "Apex Capital Inc", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.4", environment: "Cert", stage: 3, stageLabel: "Connectivity", priority: "Critical", riskRating: "High", owner: "Sarah Johnson", assignedUser: "John Smith", slaDate: "Jan 30, 2024", blockers: 2, status: "at-risk", createdDate: "Dec 15, 2023", readinessScore: 62 },
+    { id: "OB-2024-003", client: "Horizon Investments", legalEntity: "Horizon Fund Management", region: "APAC", assetClass: "Futures", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "Medium", riskRating: "Low", owner: "Mike Chen", assignedUser: "John Smith", slaDate: "Mar 1, 2024", blockers: 0, status: "on-track", createdDate: "Jan 8, 2024", readinessScore: 78 },
     { id: "OB-2024-004", client: "Velocity Securities", legalEntity: "Velocity Trading Ltd", region: "AMER", assetClass: "Equities", protocol: "FIX 4.4", environment: "Prod", stage: 6, stageLabel: "Certification", priority: "High", riskRating: "Low", owner: "Lisa Wang", assignedUser: "Alice Brown", slaDate: "Jan 20, 2024", blockers: 0, status: "on-track", createdDate: "Nov 20, 2023", readinessScore: 95 },
-    { id: "OB-2024-005", client: "Summit Financial", legalEntity: "Summit Advisory Group", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.4", environment: "UAT", stage: 1, stageLabel: "Setup", priority: "Low", riskRating: "Medium", owner: "Tom Brown", assignedUser: "Charlie Davis", slaDate: "Apr 1, 2024", blockers: 1, status: "blocked", createdDate: "Jan 10, 2024", readinessScore: 45 },
+    { id: "OB-2024-005", client: "Summit Financial", legalEntity: "Summit Advisory Group", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.4", environment: "UAT", stage: 1, stageLabel: "Setup", priority: "Low", riskRating: "Medium", owner: "Tom Brown", assignedUser: "John Smith", slaDate: "Apr 1, 2024", blockers: 1, status: "blocked", createdDate: "Jan 10, 2024", readinessScore: 45 },
     { id: "OB-2024-006", client: "Quantum Asset Management", legalEntity: "Quantum Holdings LLC", region: "AMER", assetClass: "Commodities", protocol: "FIX 4.4", environment: "UAT", stage: 4, stageLabel: "Log Analysis", priority: "Medium", riskRating: "Medium", owner: "John Smith", assignedUser: "John Smith", slaDate: "Feb 28, 2024", blockers: 1, status: "at-risk", createdDate: "Jan 5, 2024", readinessScore: 72 },
     { id: "OB-2024-007", client: "Atlantic Trading Corp", legalEntity: "Atlantic Trading Inc", region: "AMER", assetClass: "Drop Copy", protocol: "FIX 4.4", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Low", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Feb 18, 2024", blockers: 0, status: "on-track", createdDate: "Jan 3, 2024", readinessScore: 88 },
     { id: "OB-2024-008", client: "Atlantic Trading Corp", legalEntity: "Atlantic Trading Inc", region: "AMER", assetClass: "Market Data", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 3, stageLabel: "Connectivity", priority: "Medium", riskRating: "Medium", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Mar 1, 2024", blockers: 1, status: "at-risk", createdDate: "Jan 5, 2024", readinessScore: 55 },
-    { id: "OB-2024-009", client: "Blackstone Global Markets", legalEntity: "Blackstone Securities LLC", region: "AMER", assetClass: "Fixed Income", protocol: "FIX 4.4", environment: "Prod", stage: 9, stageLabel: "Live", priority: "High", riskRating: "Low", owner: "Mike Chen", assignedUser: "Bob Wilson", slaDate: "Jan 15, 2024", blockers: 0, status: "completed", createdDate: "Oct 10, 2023", readinessScore: 100 },
-    { id: "OB-2024-010", client: "Blackstone Global Markets", legalEntity: "Blackstone Securities LLC", region: "AMER", assetClass: "Credit", protocol: "FIX 4.4", environment: "UAT", stage: 4, stageLabel: "Log Analysis", priority: "Medium", riskRating: "Low", owner: "Mike Chen", assignedUser: "Bob Wilson", slaDate: "Feb 28, 2024", blockers: 0, status: "on-track", createdDate: "Jan 8, 2024", readinessScore: 65 },
+    { id: "OB-2024-009", client: "Blackstone Global Markets", legalEntity: "Blackstone Securities LLC", region: "AMER", assetClass: "Fixed Income", protocol: "FIX 4.4", environment: "Prod", stage: 9, stageLabel: "Live", priority: "High", riskRating: "Low", owner: "Mike Chen", assignedUser: "John Smith", slaDate: "Jan 15, 2024", blockers: 0, status: "completed", createdDate: "Oct 10, 2023", readinessScore: 100 },
+    { id: "OB-2024-010", client: "Blackstone Global Markets", legalEntity: "Blackstone Securities LLC", region: "AMER", assetClass: "Credit", protocol: "FIX 4.4", environment: "UAT", stage: 4, stageLabel: "Log Analysis", priority: "Medium", riskRating: "Low", owner: "Mike Chen", assignedUser: "John Smith", slaDate: "Feb 28, 2024", blockers: 0, status: "on-track", createdDate: "Jan 8, 2024", readinessScore: 65 },
     { id: "OB-2024-011", client: "Pacific Hedge Fund", legalEntity: "Pacific Asset Management", region: "APAC", assetClass: "Equities", protocol: "FIX 4.2", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Low", owner: "Lisa Wang", assignedUser: "Alice Brown", slaDate: "Feb 20, 2024", blockers: 0, status: "on-track", createdDate: "Dec 20, 2023", readinessScore: 80 },
     { id: "OB-2024-012", client: "Pacific Hedge Fund", legalEntity: "Pacific Asset Management", region: "APAC", assetClass: "ETF", protocol: "FIX 4.4", environment: "UAT", stage: 3, stageLabel: "Connectivity", priority: "Medium", riskRating: "Medium", owner: "Lisa Wang", assignedUser: "Alice Brown", slaDate: "Mar 5, 2024", blockers: 1, status: "at-risk", createdDate: "Jan 10, 2024", readinessScore: 48 },
     { id: "OB-2024-013", client: "Pacific Hedge Fund", legalEntity: "Pacific Asset Management", region: "APAC", assetClass: "Drop Copy", protocol: "FIX 4.4", environment: "UAT", stage: 2, stageLabel: "Spec Analysis", priority: "Low", riskRating: "Low", owner: "Lisa Wang", assignedUser: "Alice Brown", slaDate: "Mar 15, 2024", blockers: 0, status: "on-track", createdDate: "Jan 12, 2024", readinessScore: 35 },
-    { id: "OB-2024-014", client: "Sterling Investment Bank", legalEntity: "Sterling Investments Ltd", region: "EMEA", assetClass: "Market Data", protocol: "FIX 5.0", environment: "Cert", stage: 8, stageLabel: "Prod Config", priority: "Critical", riskRating: "Low", owner: "John Smith", assignedUser: "Charlie Davis", slaDate: "Feb 8, 2024", blockers: 0, status: "on-track", createdDate: "Nov 15, 2023", readinessScore: 92 },
-    { id: "OB-2024-015", client: "Sterling Investment Bank", legalEntity: "Sterling Investments Ltd", region: "EMEA", assetClass: "Rates", protocol: "FIX 4.4", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Medium", owner: "John Smith", assignedUser: "Charlie Davis", slaDate: "Feb 25, 2024", blockers: 1, status: "at-risk", createdDate: "Dec 5, 2023", readinessScore: 70 },
+    { id: "OB-2024-014", client: "Sterling Investment Bank", legalEntity: "Sterling Investments Ltd", region: "EMEA", assetClass: "Market Data", protocol: "FIX 5.0", environment: "Cert", stage: 8, stageLabel: "Prod Config", priority: "Critical", riskRating: "Low", owner: "John Smith", assignedUser: "John Smith", slaDate: "Feb 8, 2024", blockers: 0, status: "on-track", createdDate: "Nov 15, 2023", readinessScore: 92 },
+    { id: "OB-2024-015", client: "Sterling Investment Bank", legalEntity: "Sterling Investments Ltd", region: "EMEA", assetClass: "Rates", protocol: "FIX 4.4", environment: "UAT", stage: 5, stageLabel: "Testing", priority: "High", riskRating: "Medium", owner: "John Smith", assignedUser: "John Smith", slaDate: "Feb 25, 2024", blockers: 1, status: "at-risk", createdDate: "Dec 5, 2023", readinessScore: 70 },
     { id: "OB-2024-016", client: "Nordic Securities AS", legalEntity: "Nordic Capital Group", region: "EMEA", assetClass: "FX", protocol: "FIX 4.4", environment: "Prod", stage: 9, stageLabel: "Live", priority: "High", riskRating: "Low", owner: "Tom Brown", assignedUser: "John Smith", slaDate: "Jan 20, 2024", blockers: 0, status: "completed", createdDate: "Sep 25, 2023", readinessScore: 100 },
     { id: "OB-2024-017", client: "Nordic Securities AS", legalEntity: "Nordic Capital Group", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.2", environment: "UAT", stage: 4, stageLabel: "Log Analysis", priority: "Medium", riskRating: "Low", owner: "Tom Brown", assignedUser: "John Smith", slaDate: "Feb 28, 2024", blockers: 0, status: "on-track", createdDate: "Jan 6, 2024", readinessScore: 60 },
     { id: "OB-2024-018", client: "Nordic Securities AS", legalEntity: "Nordic Capital Group", region: "EMEA", assetClass: "Drop Copy", protocol: "FIX 4.4", environment: "Cert", stage: 8, stageLabel: "Prod Config", priority: "High", riskRating: "Low", owner: "Tom Brown", assignedUser: "John Smith", slaDate: "Feb 10, 2024", blockers: 0, status: "on-track", createdDate: "Nov 1, 2023", readinessScore: 90 },
@@ -612,23 +612,23 @@ export default function BCometPlatform() {
       ]
     },
     { 
-      id: 2, name: "Apex Capital Partners", jira: "ACP-002", accountManager: "Sarah Johnson", assignedUser: "Jane Doe",
+      id: 2, name: "Apex Capital Partners", jira: "ACP-002", accountManager: "Sarah Johnson", assignedUser: "John Smith",
       assetClasses: [
         { name: "Fixed Income", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "in-progress", certification: "not-started", config: "completed", alerts: 0 },
       ],
       onboardingCases: [
-        { id: "CASE-ACP-FI-001", name: "Fixed Income FIX 4.2", assetClass: "Fixed Income", status: "in-progress", currentStage: 6, totalStages: 9, dueDate: "2024-02-10", assignee: "Jane Doe", progress: 67 },
+        { id: "CASE-ACP-FI-001", name: "Fixed Income FIX 4.2", assetClass: "Fixed Income", status: "in-progress", currentStage: 6, totalStages: 9, dueDate: "2024-02-10", assignee: "John Smith", progress: 67 },
       ]
     },
     { 
-      id: 3, name: "Horizon Investments", jira: "HI-003", accountManager: "Mike Chen", assignedUser: "Bob Wilson",
+      id: 3, name: "Horizon Investments", jira: "HI-003", accountManager: "Mike Chen", assignedUser: "John Smith",
       assetClasses: [
         { name: "Futures", specCompare: "in-progress", logAnalysis: "not-started", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "in-progress", alerts: 3 },
         { name: "FX", specCompare: "completed", logAnalysis: "in-progress", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "completed", alerts: 2 },
       ],
       onboardingCases: [
-        { id: "CASE-HI-FUT-001", name: "Futures FIX 5.0", assetClass: "Futures", status: "in-progress", currentStage: 2, totalStages: 9, dueDate: "2024-03-01", assignee: "Bob Wilson", progress: 22 },
-        { id: "CASE-HI-FX-001", name: "FX FIX 4.4", assetClass: "FX", status: "in-progress", currentStage: 3, totalStages: 9, dueDate: "2024-02-28", assignee: "Bob Wilson", progress: 33 },
+        { id: "CASE-HI-FUT-001", name: "Futures FIX 5.0", assetClass: "Futures", status: "in-progress", currentStage: 2, totalStages: 9, dueDate: "2024-03-01", assignee: "John Smith", progress: 22 },
+        { id: "CASE-HI-FX-001", name: "FX FIX 4.4", assetClass: "FX", status: "in-progress", currentStage: 3, totalStages: 9, dueDate: "2024-02-28", assignee: "John Smith", progress: 33 },
       ]
     },
     { 
@@ -641,15 +641,15 @@ export default function BCometPlatform() {
       ]
     },
     { 
-      id: 5, name: "Quantum Asset Management", jira: "QAM-005", accountManager: "John Smith", assignedUser: "Charlie Davis",
+      id: 5, name: "Quantum Asset Management", jira: "QAM-005", accountManager: "John Smith", assignedUser: "John Smith",
       assetClasses: [
         { name: "Commodities", specCompare: "error", logAnalysis: "in-progress", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "error", alerts: 5 },
         { name: "Equities", specCompare: "completed", logAnalysis: "completed", scenario: "in-progress", testCase: "not-started", certification: "not-started", config: "completed", alerts: 3 },
       ],
       onboardingCases: [
-        { id: "CASE-QAM-COM-001", name: "Commodities FIX 4.4", assetClass: "Commodities", status: "blocked", currentStage: 2, totalStages: 9, dueDate: "2024-02-25", assignee: "Charlie Davis", progress: 22 },
-        { id: "CASE-QAM-EQ-001", name: "Equities FIX 4.4", assetClass: "Equities", status: "in-progress", currentStage: 4, totalStages: 9, dueDate: "2024-03-05", assignee: "Charlie Davis", progress: 44 },
-        { id: "CASE-QAM-ALGO-001", name: "ATDL/Algo Trading", assetClass: "Algo", status: "not-started", currentStage: 1, totalStages: 9, dueDate: "2024-03-15", assignee: "Charlie Davis", progress: 0 },
+        { id: "CASE-QAM-COM-001", name: "Commodities FIX 4.4", assetClass: "Commodities", status: "blocked", currentStage: 2, totalStages: 9, dueDate: "2024-02-25", assignee: "John Smith", progress: 22 },
+        { id: "CASE-QAM-EQ-001", name: "Equities FIX 4.4", assetClass: "Equities", status: "in-progress", currentStage: 4, totalStages: 9, dueDate: "2024-03-05", assignee: "John Smith", progress: 44 },
+        { id: "CASE-QAM-ALGO-001", name: "ATDL/Algo Trading", assetClass: "Algo", status: "not-started", currentStage: 1, totalStages: 9, dueDate: "2024-03-15", assignee: "John Smith", progress: 0 },
       ]
     },
     { 
@@ -673,14 +673,14 @@ export default function BCometPlatform() {
       ]
     },
     { 
-      id: 8, name: "Blackstone Global Markets", jira: "BGM-008", accountManager: "Mike Chen", assignedUser: "Bob Wilson",
+      id: 8, name: "Blackstone Global Markets", jira: "BGM-008", accountManager: "Mike Chen", assignedUser: "John Smith",
       assetClasses: [
         { name: "Fixed Income", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "completed", certification: "completed", config: "completed", alerts: 0 },
         { name: "Credit", specCompare: "completed", logAnalysis: "completed", scenario: "in-progress", testCase: "not-started", certification: "not-started", config: "completed", alerts: 0 },
       ],
       onboardingCases: [
-        { id: "CASE-BGM-FI-001", name: "Fixed Income FIX 4.4", assetClass: "Fixed Income", status: "completed", currentStage: 9, totalStages: 9, dueDate: "2024-01-15", assignee: "Bob Wilson", progress: 100 },
-        { id: "CASE-BGM-CR-001", name: "Credit FIX 4.4", assetClass: "Credit", status: "in-progress", currentStage: 4, totalStages: 9, dueDate: "2024-02-28", assignee: "Bob Wilson", progress: 44 },
+        { id: "CASE-BGM-FI-001", name: "Fixed Income FIX 4.4", assetClass: "Fixed Income", status: "completed", currentStage: 9, totalStages: 9, dueDate: "2024-01-15", assignee: "John Smith", progress: 100 },
+        { id: "CASE-BGM-CR-001", name: "Credit FIX 4.4", assetClass: "Credit", status: "in-progress", currentStage: 4, totalStages: 9, dueDate: "2024-02-28", assignee: "John Smith", progress: 44 },
       ]
     },
     { 
@@ -697,14 +697,14 @@ export default function BCometPlatform() {
       ]
     },
     { 
-      id: 10, name: "Sterling Investment Bank", jira: "SIB-010", accountManager: "John Smith", assignedUser: "Charlie Davis",
+      id: 10, name: "Sterling Investment Bank", jira: "SIB-010", accountManager: "John Smith", assignedUser: "John Smith",
       assetClasses: [
         { name: "Market Data", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "completed", certification: "in-progress", config: "completed", alerts: 0 },
         { name: "Rates", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "in-progress", certification: "not-started", config: "completed", alerts: 1 },
       ],
       onboardingCases: [
-        { id: "CASE-SIB-MD-001", name: "Market Data FIX 5.0", assetClass: "Market Data", status: "in-progress", currentStage: 8, totalStages: 9, dueDate: "2024-02-08", assignee: "Charlie Davis", progress: 89 },
-        { id: "CASE-SIB-RT-001", name: "Rates FIX 4.4", assetClass: "Rates", status: "in-progress", currentStage: 5, totalStages: 9, dueDate: "2024-02-25", assignee: "Charlie Davis", progress: 56 },
+        { id: "CASE-SIB-MD-001", name: "Market Data FIX 5.0", assetClass: "Market Data", status: "in-progress", currentStage: 8, totalStages: 9, dueDate: "2024-02-08", assignee: "John Smith", progress: 89 },
+        { id: "CASE-SIB-RT-001", name: "Rates FIX 4.4", assetClass: "Rates", status: "in-progress", currentStage: 5, totalStages: 9, dueDate: "2024-02-25", assignee: "John Smith", progress: 56 },
       ]
     },
     { 
