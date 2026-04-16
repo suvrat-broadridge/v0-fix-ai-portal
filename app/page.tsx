@@ -2948,45 +2948,77 @@ export default function BCometPlatform() {
                 </Card>
               </div>
 
-              {/* Stage Pipeline + SLA Forecast Strip */}
+              {/* Stage Pie Chart + SLA Forecast Strip */}
               <div className="grid grid-cols-3 gap-4">
                 <Card className={`${bgCard} border ${borderColor} p-4 col-span-2`}>
                   <h3 className={`font-semibold ${textPrimary} mb-3`}>Cases by Stage</h3>
                   {(() => {
                     const stageCounts = [
-                      { stage: "Setup", stageNums: [1, 2], icon: FileText },
-                      { stage: "Spec", stageNums: [3], icon: GitCompare },
-                      { stage: "Logs", stageNums: [4], icon: FileSearch },
-                      { stage: "ATDL", stageNums: [5], icon: Sliders },
-                      { stage: "Test", stageNums: [6, 7], icon: TestTube },
-                      { stage: "Cert", stageNums: [8], icon: Award },
-                      { stage: "Live", stageNums: [9], icon: Rocket },
+                      { stage: "Setup", stageNums: [1, 2], color: "#2196f3" },
+                      { stage: "Spec Compare", stageNums: [3], color: "#9c27b0" },
+                      { stage: "Log Analysis", stageNums: [4], color: "#00bcd4" },
+                      { stage: "Config", stageNums: [5], color: "#ff9800" },
+                      { stage: "Testing", stageNums: [6, 7], color: "#e91e63" },
+                      { stage: "Certification", stageNums: [8], color: "#4caf50" },
+                      { stage: "Live", stageNums: [9], color: "#00e5ff" },
                     ].map(s => ({
                       ...s,
                       count: allCases.filter(c => s.stageNums.includes(c.currentStage)).length
                     }))
-                    const totalCases = allCases.length
+                    const totalCases = allCases.length || 1
+                    
+                    // Calculate pie chart segments
+                    let cumulativePercent = 0
+                    const segments = stageCounts.filter(s => s.count > 0).map(s => {
+                      const percent = (s.count / totalCases) * 100
+                      const startPercent = cumulativePercent
+                      cumulativePercent += percent
+                      return { ...s, percent, startPercent, endPercent: cumulativePercent }
+                    })
+                    
                     return (
-                      <div className="flex items-center">
-                        {stageCounts.map((s, i) => {
-                          const StageIcon = s.icon
-                          const isLast = i === stageCounts.length - 1
-                          const hasItems = s.count > 0
-                          return (
-                            <div key={i} className="flex items-center flex-1">
-                              <div className={`flex flex-col items-center flex-1 p-2 rounded-lg transition-all cursor-pointer hover:bg-[#1e4976]/20 ${hasItems ? "" : "opacity-50"}`}>
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-1 ${hasItems ? "bg-[#00e5ff]/20" : isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"}`}>
-                                  <StageIcon className={`h-4 w-4 ${hasItems ? "text-[#00e5ff]" : textSecondary}`} />
-                                </div>
-                                <span className={`text-lg font-bold ${hasItems ? "text-[#00e5ff]" : textSecondary}`}>{s.count}</span>
-                                <span className={`text-[10px] ${textSecondary}`}>{s.stage}</span>
-                              </div>
-                              {!isLast && (
-                                <ChevronRight className={`h-4 w-4 ${textSecondary} opacity-30 flex-shrink-0`} />
-                              )}
+                      <div className="flex items-center gap-6">
+                        {/* Pie Chart */}
+                        <div className="relative w-32 h-32 flex-shrink-0">
+                          <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+                            {segments.map((seg, i) => {
+                              const circumference = 100
+                              const strokeDasharray = `${seg.percent} ${circumference - seg.percent}`
+                              const strokeDashoffset = -seg.startPercent
+                              return (
+                                <circle
+                                  key={i}
+                                  cx="18"
+                                  cy="18"
+                                  r="15.9"
+                                  fill="none"
+                                  stroke={seg.color}
+                                  strokeWidth="3.5"
+                                  strokeDasharray={strokeDasharray}
+                                  strokeDashoffset={strokeDashoffset}
+                                  className="transition-all duration-500"
+                                />
+                              )
+                            })}
+                            {/* Center background */}
+                            <circle cx="18" cy="18" r="12" fill={isDarkMode ? "#0d2847" : "#f8fafc"} />
+                          </svg>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <span className={`text-2xl font-bold ${textPrimary}`}>{totalCases}</span>
+                            <span className={`text-[10px] ${textSecondary}`}>Cases</span>
+                          </div>
+                        </div>
+                        
+                        {/* Legend */}
+                        <div className="grid grid-cols-2 gap-x-6 gap-y-2 flex-1">
+                          {stageCounts.map((s, i) => (
+                            <div key={i} className="flex items-center gap-2">
+                              <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }} />
+                              <span className={`text-xs ${textSecondary}`}>{s.stage}</span>
+                              <span className={`text-xs font-semibold ${textPrimary} ml-auto`}>{s.count}</span>
                             </div>
-                          )
-                        })}
+                          ))}
+                        </div>
                       </div>
                     )
                   })()}
@@ -9048,79 +9080,93 @@ const specCompareResults = [
 
   // Admin Specs Screen - Two column layout: Admin Specs | My Specs (or Client Specs for admin)
   if (currentScreen === "admin-specs") {
+    // Equities is the only asset class with Algo Specs (ATDL files)
     const specsData = [
       { 
         asset: "Equities", 
+        hasAlgoSpec: true,
         versions: [
-          { protocol: "FIX 4.2", adminSpec: { name: "EQ_FIX42_v1.2.xml", uploaded: true }, standardizedSpec: { name: "EQ_FIX42_v1.2_Standardized.xlsx", available: true }, clientSpec: { name: "client_eq_42.xml", uploaded: true }, atdlFile: { name: "EQ_FIX42_AlgoSuite.atdl", uploaded: true } },
-          { protocol: "FIX 4.4", adminSpec: { name: "EQ_FIX44_v2.1.xml", uploaded: true }, standardizedSpec: { name: "EQ_FIX44_v2.1_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: "EQ_FIX44_AlgoSuite.atdl", uploaded: true } },
-          { protocol: "FIX 5.0", adminSpec: { name: "EQ_FIX50_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: "client_eq_50.xml", uploaded: true }, atdlFile: { name: null, uploaded: false } },
+          { protocol: "FIX 4.2", adminSpec: { name: "EQ_FIX42_v1.2.xml", uploaded: true }, standardizedSpec: { name: "EQ_FIX42_v1.2_Standardized.xlsx", available: true }, clientSpec: { name: "client_eq_42.xml", uploaded: true }, algoSpec: { name: "EQ_FIX42_AlgoParams.xml", uploaded: true, atdlFile: { name: "EQ_FIX42_AlgoSuite.atdl", uploaded: true } } },
+          { protocol: "FIX 4.4", adminSpec: { name: "EQ_FIX44_v2.1.xml", uploaded: true }, standardizedSpec: { name: "EQ_FIX44_v2.1_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false }, algoSpec: { name: "EQ_FIX44_AlgoParams.xml", uploaded: true, atdlFile: { name: "EQ_FIX44_AlgoSuite.atdl", uploaded: true } } },
+          { protocol: "FIX 5.0", adminSpec: { name: "EQ_FIX50_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: "client_eq_50.xml", uploaded: true }, algoSpec: { name: null, uploaded: false, atdlFile: { name: null, uploaded: false } } },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "EQ_FIX50SP2_v1.0.xml", uploaded: true }, standardizedSpec: { name: "EQ_FIX50SP2_v1.0_Standardized.xlsx", available: true }, clientSpec: { name: "client_eq_50sp2.xml", uploaded: true }, algoSpec: { name: "EQ_FIX50SP2_AlgoParams.xml", uploaded: true, atdlFile: { name: "EQ_FIX50SP2_AlgoSuite.atdl", uploaded: true } } },
         ]
       },
       { 
         asset: "Options", 
+        hasAlgoSpec: false,
         versions: [
-          { protocol: "FIX 4.2", adminSpec: { name: "OPT_FIX42_v1.1.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: null, uploaded: false } },
-          { protocol: "FIX 4.4", adminSpec: { name: "OPT_FIX44_v2.0.xml", uploaded: true }, standardizedSpec: { name: "OPT_FIX44_v2.0_Standardized.xlsx", available: true }, clientSpec: { name: "client_opt_44.xml", uploaded: true }, atdlFile: { name: "OPT_FIX44_AlgoSuite.atdl", uploaded: true } },
+          { protocol: "FIX 4.2", adminSpec: { name: "OPT_FIX42_v1.1.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 4.4", adminSpec: { name: "OPT_FIX44_v2.0.xml", uploaded: true }, standardizedSpec: { name: "OPT_FIX44_v2.0_Standardized.xlsx", available: true }, clientSpec: { name: "client_opt_44.xml", uploaded: true } },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "OPT_FIX50SP2_v1.0.xml", uploaded: true }, standardizedSpec: { name: "OPT_FIX50SP2_v1.0_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false } },
         ]
       },
       { 
         asset: "Futures", 
+        hasAlgoSpec: false,
         versions: [
-          { protocol: "FIX 4.2", adminSpec: { name: "FUT_FIX42_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: null, uploaded: false } },
-          { protocol: "FIX 4.4", adminSpec: { name: "FUT_FIX44_v1.1.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: "FUT_FIX44_AlgoSuite.atdl", uploaded: true } },
-          { protocol: "FIX 5.0 SP2", adminSpec: { name: "FUT_FIX50SP2_v2.0.xml", uploaded: true }, standardizedSpec: { name: "FUT_FIX50SP2_v2.0_Standardized.xlsx", available: true }, clientSpec: { name: "client_fut_50sp2.xml", uploaded: true }, atdlFile: { name: "FUT_FIX50SP2_AlgoSuite.atdl", uploaded: true } },
+          { protocol: "FIX 4.2", adminSpec: { name: "FUT_FIX42_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 4.4", adminSpec: { name: "FUT_FIX44_v1.1.xml", uploaded: true }, standardizedSpec: { name: "FUT_FIX44_v1.1_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "FUT_FIX50SP2_v2.0.xml", uploaded: true }, standardizedSpec: { name: "FUT_FIX50SP2_v2.0_Standardized.xlsx", available: true }, clientSpec: { name: "client_fut_50sp2.xml", uploaded: true } },
         ]
       },
       { 
         asset: "Fixed Income", 
+        hasAlgoSpec: false,
         versions: [
-          { protocol: "FIX 4.4", adminSpec: { name: "FI_FIX44_v1.2.xml", uploaded: true }, standardizedSpec: { name: "FI_FIX44_v1.2_Standardized.xlsx", available: true }, clientSpec: { name: "client_fi_44.xml", uploaded: true }, atdlFile: { name: "FI_FIX44_AlgoSuite.atdl", uploaded: true } },
-          { protocol: "FIX 5.0", adminSpec: { name: "FI_FIX50_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: null, uploaded: false } },
+          { protocol: "FIX 4.2", adminSpec: { name: "FI_FIX42_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 4.4", adminSpec: { name: "FI_FIX44_v1.2.xml", uploaded: true }, standardizedSpec: { name: "FI_FIX44_v1.2_Standardized.xlsx", available: true }, clientSpec: { name: "client_fi_44.xml", uploaded: true } },
+          { protocol: "FIX 5.0", adminSpec: { name: "FI_FIX50_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false } },
         ]
       },
       { 
         asset: "FX", 
+        hasAlgoSpec: false,
         versions: [
-          { protocol: "FIX 4.4", adminSpec: { name: "FX_FIX44_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: null, uploaded: false } },
-          { protocol: "FIX 5.0 SP2", adminSpec: { name: "FX_FIX50SP2_v1.1.xml", uploaded: true }, standardizedSpec: { name: "FX_FIX50SP2_v1.1_Standardized.xlsx", available: true }, clientSpec: { name: "client_fx_50sp2.xml", uploaded: true }, atdlFile: { name: "FX_FIX50SP2_AlgoSuite.atdl", uploaded: true } },
+          { protocol: "FIX 4.4", adminSpec: { name: "FX_FIX44_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "FX_FIX50SP2_v1.1.xml", uploaded: true }, standardizedSpec: { name: "FX_FIX50SP2_v1.1_Standardized.xlsx", available: true }, clientSpec: { name: "client_fx_50sp2.xml", uploaded: true } },
         ]
       },
       { 
         asset: "Drop Copy", 
+        hasAlgoSpec: false,
         versions: [
-          { protocol: "FIX 4.2", adminSpec: { name: "DC_FIX42_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: null, uploaded: false } },
-          { protocol: "FIX 4.4", adminSpec: { name: "DC_FIX44_v2.0.xml", uploaded: true }, standardizedSpec: { name: "DC_FIX44_v2.0_Standardized.xlsx", available: true }, clientSpec: { name: "client_dc_44.xml", uploaded: true }, atdlFile: { name: null, uploaded: false } },
-          { protocol: "FIX 5.0 SP2", adminSpec: { name: "DC_FIX50SP2_v1.0.xml", uploaded: true }, standardizedSpec: { name: "DC_FIX50SP2_v1.0_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: null, uploaded: false } },
+          { protocol: "FIX 4.2", adminSpec: { name: "DC_FIX42_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 4.4", adminSpec: { name: "DC_FIX44_v2.0.xml", uploaded: true }, standardizedSpec: { name: "DC_FIX44_v2.0_Standardized.xlsx", available: true }, clientSpec: { name: "client_dc_44.xml", uploaded: true } },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "DC_FIX50SP2_v1.0.xml", uploaded: true }, standardizedSpec: { name: "DC_FIX50SP2_v1.0_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false } },
         ]
       },
       { 
         asset: "Market Data", 
+        hasAlgoSpec: false,
         versions: [
-          { protocol: "FIX 4.4", adminSpec: { name: "MD_FIX44_v1.5.xml", uploaded: true }, standardizedSpec: { name: "MD_FIX44_v1.5_Standardized.xlsx", available: true }, clientSpec: { name: "client_md_44.xml", uploaded: true }, atdlFile: { name: null, uploaded: false } },
-          { protocol: "FIX 5.0", adminSpec: { name: "MD_FIX50_v2.0.xml", uploaded: true }, standardizedSpec: { name: "MD_FIX50_v2.0_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: null, uploaded: false } },
-          { protocol: "FIX 5.0 SP2", adminSpec: { name: "MD_FIX50SP2_v2.1.xml", uploaded: true }, standardizedSpec: { name: "MD_FIX50SP2_v2.1_Standardized.xlsx", available: true }, clientSpec: { name: "client_md_50sp2.xml", uploaded: true }, atdlFile: { name: null, uploaded: false } },
+          { protocol: "FIX 4.4", adminSpec: { name: "MD_FIX44_v1.5.xml", uploaded: true }, standardizedSpec: { name: "MD_FIX44_v1.5_Standardized.xlsx", available: true }, clientSpec: { name: "client_md_44.xml", uploaded: true } },
+          { protocol: "FIX 5.0", adminSpec: { name: "MD_FIX50_v2.0.xml", uploaded: true }, standardizedSpec: { name: "MD_FIX50_v2.0_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "MD_FIX50SP2_v2.1.xml", uploaded: true }, standardizedSpec: { name: "MD_FIX50SP2_v2.1_Standardized.xlsx", available: true }, clientSpec: { name: "client_md_50sp2.xml", uploaded: true } },
         ]
       },
       { 
         asset: "Credit", 
+        hasAlgoSpec: false,
         versions: [
-          { protocol: "FIX 4.4", adminSpec: { name: "CR_FIX44_v1.0.xml", uploaded: true }, standardizedSpec: { name: "CR_FIX44_v1.0_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: "CR_FIX44_AlgoSuite.atdl", uploaded: true } },
-          { protocol: "FIX 5.0 SP2", adminSpec: { name: "CR_FIX50SP2_v1.1.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: "client_cr_50sp2.xml", uploaded: true }, atdlFile: { name: "CR_FIX50SP2_AlgoSuite.atdl", uploaded: true } },
+          { protocol: "FIX 4.4", adminSpec: { name: "CR_FIX44_v1.0.xml", uploaded: true }, standardizedSpec: { name: "CR_FIX44_v1.0_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false } },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "CR_FIX50SP2_v1.1.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: "client_cr_50sp2.xml", uploaded: true } },
         ]
       },
       { 
         asset: "Rates", 
+        hasAlgoSpec: false,
         versions: [
-          { protocol: "FIX 4.4", adminSpec: { name: "RT_FIX44_v1.2.xml", uploaded: true }, standardizedSpec: { name: "RT_FIX44_v1.2_Standardized.xlsx", available: true }, clientSpec: { name: "client_rt_44.xml", uploaded: true }, atdlFile: { name: "RT_FIX44_AlgoSuite.atdl", uploaded: true } },
-          { protocol: "FIX 5.0", adminSpec: { name: "RT_FIX50_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: null, uploaded: false } },
+          { protocol: "FIX 4.4", adminSpec: { name: "RT_FIX44_v1.2.xml", uploaded: true }, standardizedSpec: { name: "RT_FIX44_v1.2_Standardized.xlsx", available: true }, clientSpec: { name: "client_rt_44.xml", uploaded: true } },
+          { protocol: "FIX 5.0", adminSpec: { name: "RT_FIX50_v1.0.xml", uploaded: true }, standardizedSpec: { name: null, available: false }, clientSpec: { name: null, uploaded: false } },
         ]
       },
       { 
         asset: "ETF", 
+        hasAlgoSpec: false,
         versions: [
-          { protocol: "FIX 4.4", adminSpec: { name: "ETF_FIX44_v1.0.xml", uploaded: true }, standardizedSpec: { name: "ETF_FIX44_v1.0_Standardized.xlsx", available: true }, clientSpec: { name: "client_etf_44.xml", uploaded: true }, atdlFile: { name: "ETF_FIX44_AlgoSuite.atdl", uploaded: true } },
-          { protocol: "FIX 5.0 SP2", adminSpec: { name: "ETF_FIX50SP2_v1.1.xml", uploaded: true }, standardizedSpec: { name: "ETF_FIX50SP2_v1.1_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false }, atdlFile: { name: "ETF_FIX50SP2_AlgoSuite.atdl", uploaded: true } },
+          { protocol: "FIX 4.4", adminSpec: { name: "ETF_FIX44_v1.0.xml", uploaded: true }, standardizedSpec: { name: "ETF_FIX44_v1.0_Standardized.xlsx", available: true }, clientSpec: { name: "client_etf_44.xml", uploaded: true } },
+          { protocol: "FIX 5.0 SP2", adminSpec: { name: "ETF_FIX50SP2_v1.1.xml", uploaded: true }, standardizedSpec: { name: "ETF_FIX50SP2_v1.1_Standardized.xlsx", available: true }, clientSpec: { name: null, uploaded: false } },
         ]
       },
     ]
@@ -9142,20 +9188,26 @@ const specCompareResults = [
                     <h2 className={`text-lg font-bold ${textPrimary}`}>{assetClass.asset}</h2>
                   </div>
                   
-                  {/* Table Header */}
-                  <div className={`grid ${selectedRole === "admin" ? "grid-cols-[180px_1fr_1fr]" : "grid-cols-[180px_1fr_1fr_1fr]"} gap-4 px-6 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} border-b ${borderColor}`}>
+                  {/* Table Header - dynamic columns based on asset class */}
+                  <div className={`grid ${assetClass.hasAlgoSpec 
+                    ? (selectedRole === "admin" ? "grid-cols-[140px_1fr_1fr_1fr]" : "grid-cols-[140px_1fr_1fr_1fr_1fr]")
+                    : (selectedRole === "admin" ? "grid-cols-[140px_1fr_1fr]" : "grid-cols-[140px_1fr_1fr_1fr]")
+                  } gap-4 px-6 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} border-b ${borderColor}`}>
                     <div className={`font-semibold text-sm ${textPrimary}`}>Protocol</div>
-                    <div className={`font-semibold text-sm ${textPrimary}`}>Algo Spec (Original)</div>
-                    <div className={`font-semibold text-sm ${textPrimary}`}>Algo Spec (Standardized)</div>
+                    <div className={`font-semibold text-sm ${textPrimary}`}>Admin Spec (Original)</div>
+                    <div className={`font-semibold text-sm ${textPrimary}`}>Admin Spec (Standardized)</div>
+                    {assetClass.hasAlgoSpec && (
+                      <div className={`font-semibold text-sm ${textPrimary}`}>Algo Spec (ATDL)</div>
+                    )}
                     {selectedRole === "client" && (
                       <div className={`font-semibold text-sm ${textPrimary}`}>My Specs</div>
                     )}
                   </div>
 
-                  {/* Table Rows — each version may render 2 sub-rows if ATDL exists */}
+                  {/* Table Rows */}
                   <div className="divide-y divide-[#1e4976]/30">
                     {assetClass.versions.map((version: any) => {
-                      const hasAtdl = !!version.atdlFile?.name
+                      const hasAlgoSpec = assetClass.hasAlgoSpec && version.algoSpec?.name
 
                       // Reusable file pill + actions
                       const FilePill = ({ name, color, icon: Icon }: { name: string; color: string; icon: React.ElementType }) => (
@@ -9188,22 +9240,48 @@ const specCompareResults = [
                       return (
                         <div key={`${assetClass.asset}-${version.protocol}`} className={`hover:bg-[#1e4976]/10 transition-colors`}>
 
-                          {/* Row 1 — FIX Spec */}
-                          <div className={`grid ${selectedRole === "admin" ? "grid-cols-[180px_1fr_1fr]" : "grid-cols-[180px_1fr_1fr_1fr]"} gap-4 px-6 py-3 items-center`}>
-                            {/* Protocol — spans both sub-rows via rowspan simulation: only shown on row 1 */}
+                          {/* Row — FIX Spec with optional Algo Spec column */}
+                          <div className={`grid ${assetClass.hasAlgoSpec 
+                            ? (selectedRole === "admin" ? "grid-cols-[140px_1fr_1fr_1fr]" : "grid-cols-[140px_1fr_1fr_1fr_1fr]")
+                            : (selectedRole === "admin" ? "grid-cols-[140px_1fr_1fr]" : "grid-cols-[140px_1fr_1fr_1fr]")
+                          } gap-4 px-6 py-3 items-center`}>
+                            {/* Protocol */}
                             <div className="flex flex-col gap-0.5">
                               <span className={`font-semibold ${textPrimary}`}>{version.protocol}</span>
-                              {hasAtdl && <span className={`text-xs px-1.5 py-0.5 rounded w-fit`} style={{ backgroundColor: "#00e5ff15", color: "#00e5ff" }}>FIX Spec</span>}
                             </div>
-                            {/* Original spec */}
+                            {/* Admin Spec - Original */}
                             <FilePill name={version.adminSpec.name} color="#00e5ff" icon={FileText} />
-                            {/* Standardized spec */}
+                            {/* Admin Spec - Standardized */}
                             <div>
                               {version.standardizedSpec?.available
                                 ? <FilePill name={version.standardizedSpec.name} color="#4caf50" icon={CheckCircle} />
                                 : <span className={`text-sm ${textSecondary} italic`}>Not standardized</span>
                               }
                             </div>
+                            {/* Algo Spec (only for Equities) */}
+                            {assetClass.hasAlgoSpec && (
+                              <div>
+                                {hasAlgoSpec ? (
+                                  <div className="flex flex-col gap-1.5">
+                                    <FilePill name={version.algoSpec.name} color="#ff9800" icon={Sliders} />
+                                    {version.algoSpec.atdlFile?.uploaded && (
+                                      <div className="flex items-center gap-1.5 pl-4">
+                                        <ChevronRight className="h-3 w-3 text-[#8b9dc3]" />
+                                        <div className={`flex items-center gap-2 px-2 py-1 rounded border text-xs`}
+                                          style={{ borderColor: "#9c27b040", backgroundColor: "#9c27b010" }}>
+                                          <FileCode className="h-3 w-3" style={{ color: "#9c27b0" }} />
+                                          <span className={textPrimary}>{version.algoSpec.atdlFile.name}</span>
+                                        </div>
+                                        <button className={`p-1 rounded ${textSecondary} hover:text-[#00e5ff]`} title="View"><Eye className="h-3 w-3" /></button>
+                                        <button className={`p-1 rounded ${textSecondary} hover:text-[#00e5ff]`} title="Download"><Download className="h-3 w-3" /></button>
+                                      </div>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <span className={`text-sm ${textSecondary} italic`}>No algo spec</span>
+                                )}
+                              </div>
+                            )}
                             {/* My Specs */}
                             {selectedRole === "client" && (
                               <div>
@@ -9214,23 +9292,6 @@ const specCompareResults = [
                               </div>
                             )}
                           </div>
-
-                          {/* Row 2 — ATDL (only if present) */}
-                          {hasAtdl && (
-                            <div className={`grid ${selectedRole === "admin" ? "grid-cols-[180px_1fr_1fr]" : "grid-cols-[180px_1fr_1fr_1fr]"} gap-4 px-6 py-3 items-center border-t border-dashed ${isDarkMode ? "border-[#9c27b0]/20" : "border-[#9c27b0]/15"} ${isDarkMode ? "bg-[#9c27b0]/5" : "bg-[#9c27b0]/3"}`}>
-                              <div>
-                                <span className={`text-xs px-1.5 py-0.5 rounded`} style={{ backgroundColor: "#9c27b015", color: "#9c27b0" }}>ATDL</span>
-                              </div>
-                              {/* ATDL file */}
-                              {version.atdlFile.uploaded
-                                ? <FilePill name={version.atdlFile.name} color="#9c27b0" icon={Layers} />
-                                : <UploadPrompt accept=".atdl,.xml" color="#9c27b0" label="Upload ATDL" />
-                              }
-                              {/* Placeholder for standardized / my specs columns to keep grid aligned */}
-                              <div />
-                              {selectedRole === "client" && <div />}
-                            </div>
-                          )}
 
                         </div>
                       )
