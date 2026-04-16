@@ -3766,7 +3766,7 @@ const clientProgressData = [
               </div>
             </Card>
 
-            {/* Progress Stepper */}
+            {/* Cumulative Onboarding Progress - derived from all cases */}
             {(() => {
               const stages = [
                 { num: 1, name: "Setup", icon: FileText, description: "Client onboarding & spec upload" },
@@ -3777,26 +3777,58 @@ const clientProgressData = [
                 { num: 6, name: "Certification", icon: Award, description: "Certification & sign-off" },
                 { num: 7, name: "Go-Live", icon: Rocket, description: "Production cutover" },
               ]
-              const clientStage = clientStages[selectedClient.name] || { stage: 1, stageStatus: { 1: "in-progress", 2: "pending", 3: "pending", 4: "pending", 5: "pending", 6: "pending", 7: "pending" } }
+              
+              // Calculate cumulative progress from all cases
+              const cases = selectedClient.onboardingCases || []
+              const totalCases = cases.length || 1
+              
+              // For each stage, check if ALL cases have completed it (completed), SOME have (in-progress), or NONE have (pending)
+              const stageStatus: Record<number, string> = {}
+              for (let s = 1; s <= 7; s++) {
+                // Map case stages (1-9) to client stages (1-7): stages 1-2 -> 1, 3 -> 2, 4 -> 3, 5 -> 4, 6-7 -> 5, 8 -> 6, 9 -> 7
+                const caseStageMapping = (caseStage: number) => {
+                  if (caseStage <= 2) return 1
+                  if (caseStage === 3) return 2
+                  if (caseStage === 4) return 3
+                  if (caseStage === 5) return 4
+                  if (caseStage <= 7) return 5
+                  if (caseStage === 8) return 6
+                  return 7
+                }
+                const casesCompletedThisStage = cases.filter((c: any) => caseStageMapping(c.currentStage) > s || (c.status === "completed")).length
+                const casesInThisStage = cases.filter((c: any) => caseStageMapping(c.currentStage) === s).length
+                
+                if (casesCompletedThisStage === totalCases) {
+                  stageStatus[s] = "completed"
+                } else if (casesCompletedThisStage > 0 || casesInThisStage > 0) {
+                  stageStatus[s] = "in-progress"
+                } else {
+                  stageStatus[s] = "pending"
+                }
+              }
+              
+              // Current overall stage = lowest stage that's not fully completed
+              const currentOverallStage = Object.entries(stageStatus).find(([, status]) => status !== "completed")?.[0] || "7"
+              const avgProgress = cases.length > 0 ? Math.round(cases.reduce((sum: number, c: any) => sum + (c.progress || 0), 0) / cases.length) : 0
               
               return (
                 <Card className={`${bgCard} border ${borderColor} mb-6 p-6`}>
                   <div className="flex items-center justify-between mb-4">
                     <h2 className={`text-lg font-bold ${textPrimary}`}>Onboarding Progress</h2>
-                    <span className={`text-sm ${textSecondary}`}>Stage {clientStage.stage} of 7</span>
+                    <span className={`text-sm ${textSecondary}`}>Stage {currentOverallStage} of 7 ({avgProgress}% overall)</span>
                   </div>
                   <div className="flex items-center justify-between relative">
                     {/* Progress line */}
                     <div className={`absolute top-6 left-0 right-0 h-1 ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"}`}>
                       <div 
                         className="h-full bg-gradient-to-r from-[#00e5ff] to-[#4caf50] transition-all duration-500"
-                        style={{ width: `${((clientStage.stage - 1) / 6) * 100}%` }}
+                        style={{ width: `${((parseInt(currentOverallStage) - 1) / 6) * 100}%` }}
                       />
                     </div>
                     
                     {stages.map((stage) => {
-                      const status = clientStage.stageStatus[stage.num] || "pending"
-                      const isActive = stage.num === clientStage.stage
+                      const status = stageStatus[stage.num] || "pending"
+                      const isActive = stage.num === parseInt(currentOverallStage)
                       const StageIcon = stage.icon
                       
                       return (
