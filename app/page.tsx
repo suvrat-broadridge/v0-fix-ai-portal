@@ -62,6 +62,8 @@ export default function BCometPlatform() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [selectedClient, setSelectedClient] = useState<any>(null)
   const [selectedCase, setSelectedCase] = useState<any>(null)
+  const [selectedOnboardingCase, setSelectedOnboardingCase] = useState<any>(null)
+  const [caseBlockers, setCaseBlockers] = useState<any[]>([])
   const [selectedAssetClass, setSelectedAssetClass] = useState<string | null>(null)
   const [selectedFixVersion, setSelectedFixVersion] = useState<string | null>(null)
   const [showSpecResults, setShowSpecResults] = useState(false)
@@ -12099,9 +12101,6 @@ const copyToClipboard = () => {
   }
 
   // Onboarding Case Detail Screen
-  const [selectedOnboardingCase, setSelectedOnboardingCase] = useState<any>(null)
-  const [caseBlockers, setCaseBlockers] = useState<any[]>([])
-  
   if (currentScreen === "onboarding-case-detail") {
     const caseItem = onboardingCases.find(c => c.id === selectedOnboardingCase?.id)
     if (!caseItem) return null
