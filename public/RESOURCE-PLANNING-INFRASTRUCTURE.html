@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B-COMET Resource Planning & Infrastructure</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background-color: #0a1628; color: #e0e7ff; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        header { text-align: center; margin-bottom: 60px; padding: 40px 0; border-bottom: 2px solid #00bcd4; }
+        h1 { font-size: 3.5rem; margin-bottom: 10px; background: linear-gradient(135deg, #00e5ff 0%, #0091ea 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .subtitle { font-size: 1.5rem; color: #64b5f6; margin-bottom: 10px; }
+        .date { color: #90caf9; font-size: 1rem; }
+        section { margin: 60px 0; }
+        h2 { font-size: 2rem; color: #00e5ff; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #00bcd4; }
+        h3 { font-size: 1.4rem; color: #64b5f6; margin-top: 30px; margin-bottom: 15px; }
+        p { margin-bottom: 20px; font-size: 1.1rem; line-height: 1.8; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th { text-align: left; padding: 15px; color: #00e5ff; background-color: #0f2a4d; border-bottom: 1px solid #00bcd4; }
+        td { padding: 15px; border-bottom: 1px solid #1a3a52; }
+        tr:last-child td { border-bottom: 2px solid #00bcd4; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 30px 0; }
+        .feature-card { background-color: #0f2a4d; border: 1px solid #00bcd4; border-radius: 8px; padding: 25px; }
+        .feature-card h4 { color: #00e5ff; margin-bottom: 10px; }
+        .feature-card p { color: #b3e5fc; font-size: 0.95rem; margin-bottom: 0; }
+        ul, ol { margin-left: 30px; margin-bottom: 20px; }
+        li { margin-bottom: 10px; }
+        .requirement { background-color: #0f2a4d; border-left: 4px solid #00e5ff; padding: 20px; margin: 15px 0; border-radius: 4px; }
+        .requirement strong { color: #00e5ff; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0; }
+        .metric { background: linear-gradient(135deg, #0f2a4d 0%, #1a3a52 100%); border: 1px solid #00bcd4; padding: 25px; border-radius: 8px; text-align: center; }
+        .metric-value { font-size: 2.5rem; font-weight: bold; color: #00e5ff; margin-bottom: 10px; }
+        .metric-label { color: #90caf9; font-size: 0.95rem; }
+        footer { margin-top: 80px; padding-top: 40px; border-top: 2px solid #00bcd4; text-align: center; color: #64b5f6; }
+        .toc { background-color: #0f2a4d; border: 1px solid #00bcd4; border-radius: 8px; padding: 30px; margin: 40px 0; }
+        .toc h2 { color: #00e5ff; margin-bottom: 20px; font-size: 1.5rem; border: none; }
+        .toc ul { list-style: none; columns: 2; margin: 0; }
+        .toc li { margin-bottom: 12px; padding-left: 20px; position: relative; }
+        .toc li:before { content: "▸"; position: absolute; left: 0; color: #00e5ff; }
+        .toc a { color: #64b5f6; text-decoration: none; }
+        .toc a:hover { color: #00e5ff; }
+        .highlight { background-color: rgba(0, 229, 255, 0.1); padding: 20px; border-radius: 8px; border-left: 4px solid #00e5ff; margin: 20px 0; }
+        .money { color: #4db8ff; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>B-COMET</h1>
+            <p class="subtitle">Resource Planning & Infrastructure Blueprint</p>
+            <p class="date">Strategic Planning Document | April 16, 2026</p>
+        </header>
+
+        <div class="toc">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#executive-summary">Executive Summary</a></li>
+                <li><a href="#resource-estimation">Resource Estimation</a></li>
+                <li><a href="#timeline">Project Timeline</a></li>
+                <li><a href="#cost-analysis">Cost Analysis</a></li>
+                <li><a href="#infrastructure">Infrastructure Requirements</a></li>
+                <li><a href="#implementation-roadmap">Implementation Roadmap</a></li>
+                <li><a href="#risk-mitigation">Risk Mitigation</a></li>
+            </ul>
+        </div>
+
+        <section id="executive-summary">
+            <h2>1. Executive Summary</h2>
+            <p>This document outlines the comprehensive resource requirements, project timeline, financial investment, and infrastructure architecture needed to deliver B-COMET as a fully functional, production-ready platform. The project spans 52 weeks (12 months) with a total investment of <span class="money">$3.09 million</span> for development, infrastructure, and compliance activities.</p>
+            
+            <div class="highlight">
+                <strong>Key Highlights:</strong>
+                <ul>
+                    <li>Core team of 14 full-time personnel + specialized contractors</li>
+                    <li>6-phase delivery model with quarterly milestones</li>
+                    <li>Development: <span class="money">$2.22M</span> | Infrastructure: <span class="money">$360K</span> | Compliance & Contingency: <span class="money">$505K</span></li>
+                    <li>Ongoing run rate: <span class="money">$780K/year</span> post-launch</li>
+                    <li>Enterprise-grade infrastructure with 99.9% uptime SLA</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="resource-estimation">
+            <h2>2. Resource Estimation</h2>
+
+            <h3>2.1 Core Development Team (14 Full-Time Personnel)</h3>
+            <table>
+                <tr>
+                    <th>Role</th>
+                    <th>Count</th>
+                    <th>Key Responsibilities</th>
+                    <th>Duration</th>
+                    <th>Monthly Cost</th>
+                </tr>
+                <tr>
+                    <td>Technical Architect</td>
+                    <td>1</td>
+                    <td>System design, tech decisions, quality standards</td>
+                    <td>12 months</td>
+                    <td><span class="money">$18,000</span></td>
+                </tr>
+                <tr>
+                    <td>Senior Full-Stack Developers</td>
+                    <td>3</td>
+                    <td>Core platform, API design, frontend architecture</td>
+                    <td>12 months</td>
+                    <td><span class="money">$45,000</span></td>
+                </tr>
+                <tr>
+                    <td>Mid-Level Developers</td>
+                    <td>4</td>
+                    <td>Feature implementation, testing, bug fixes</td>
+                    <td>12 months</td>
+                    <td><span class="money">$48,000</span></td>
+                </tr>
+                <tr>
+                    <td>UI/UX Designer</td>
+                    <td>1</td>
+                    <td>Interface design, user research, design system</td>
+                    <td>10 months</td>
+                    <td><span class="money">$12,000</span></td>
+                </tr>
+                <tr>
+                    <td>DevOps Engineer</td>
+                    <td>1</td>
+                    <td>Infrastructure, CI/CD, monitoring, security</td>
+                    <td>12 months</td>
+                    <td><span class="money">$14,000</span></td>
+                </tr>
+                <tr>
+                    <td>QA Engineers</td>
+                    <td>2</td>
+                    <td>Test automation, performance testing, UAT</td>
+                    <td>10 months</td>
+                    <td><span class="money">$20,000</span></td>
+                </tr>
+                <tr>
+                    <td>Product Manager</td>
+                    <td>1</td>
+                    <td>Requirements, stakeholder management, roadmap</td>
+                    <td>12 months</td>
+                    <td><span class="money">$15,000</span></td>
+                </tr>
+                <tr>
+                    <td>Business Analyst</td>
+                    <td>1</td>
+                    <td>Requirements documentation, user stories, analysis</td>
+                    <td>10 months</td>
+                    <td><span class="money">$10,000</span></td>
+                </tr>
+            </table>
+
+            <h3>2.2 Specialized Contract Resources</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>FIX Protocol SME</h4>
+                    <p><strong>Allocation:</strong> 50% for 6 months<br><strong>Cost:</strong> <span class="money">$45,000</span><br>Expert on FIX standards, message formats, industry best practices.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Security Consultant</h4>
+                    <p><strong>Allocation:</strong> 25% for 4 months<br><strong>Cost:</strong> <span class="money">$30,000</span><br>SOC 2 compliance, penetration testing, security architecture.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>AI/ML Engineer</h4>
+                    <p><strong>Allocation:</strong> 75% for 6 months<br><strong>Cost:</strong> <span class="money">$45,000</span><br>AI-powered spec comparison, test generation algorithms.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Database Administrator</h4>
+                    <p><strong>Allocation:</strong> 25% for 8 months<br><strong>Cost:</strong> <span class="money">$20,000</span><br>Database optimization, migrations, backup strategies.</p>
+                </div>
+            </div>
+
+            <h3>2.3 Team Structure & Communication</h3>
+            <div class="requirement">
+                <strong>Organizational Structure:</strong> The team operates in 2 cross-functional squads (7 people each) plus shared services. Each squad owns specific features and operates with autonomy. Weekly all-hands syncs, daily standup within squads, and bi-weekly sprint reviews ensure alignment.
+            </div>
+            <div class="requirement">
+                <strong>Onboarding & Ramp-up:</strong> 2-week onboarding period for new team members. Access to codebase, documentation, and pair programming with existing team. First delivery expected by week 3-4.
+            </div>
+        </section>
+
+        <section id="timeline">
+            <h2>3. Project Timeline</h2>
+
+            <h3>3.1 Six-Phase Delivery Model (52 Weeks)</h3>
+            <table>
+                <tr>
+                    <th>Phase</th>
+                    <th>Timeline</th>
+                    <th>Duration</th>
+                    <th>Key Deliverables</th>
+                </tr>
+                <tr>
+                    <td><strong>Phase 1: Discovery & Planning</strong></td>
+                    <td>Weeks 1-6</td>
+                    <td>6 weeks</td>
+                    <td>Requirements finalization, architecture design, tech stack, CI/CD setup, design system</td>
+                </tr>
+                <tr>
+                    <td><strong>Phase 2: Foundation & Auth</strong></td>
+                    <td>Weeks 7-18</td>
+                    <td>12 weeks</td>
+                    <td>User auth, RBAC, database schema, API framework, React components, case management core</td>
+                </tr>
+                <tr>
+                    <td><strong>Phase 3: Core Features</strong></td>
+                    <td>Weeks 19-34</td>
+                    <td>16 weeks</td>
+                    <td>FIX spec tools, message creator, AI comparison, test generation, approval workflows, dashboard</td>
+                </tr>
+                <tr>
+                    <td><strong>Phase 4: Integration & Testing</strong></td>
+                    <td>Weeks 35-42</td>
+                    <td>8 weeks</td>
+                    <td>System integration, load testing, security audit, UAT, performance optimization</td>
+                </tr>
+                <tr>
+                    <td><strong>Phase 5: Pilot & Refinement</strong></td>
+                    <td>Weeks 43-48</td>
+                    <td>6 weeks</td>
+                    <td>Pilot deployment (2-3 clients), feedback loops, documentation, training materials</td>
+                </tr>
+                <tr>
+                    <td><strong>Phase 6: Production Launch</strong></td>
+                    <td>Weeks 49-52</td>
+                    <td>4 weeks</td>
+                    <td>Production deployment, staff training, go-live support, monitoring activation</td>
+                </tr>
+            </table>
+
+            <div class="metrics-grid">
+                <div class="metric"><div class="metric-value">52</div><div class="metric-label">Total Weeks</div></div>
+                <div class="metric"><div class="metric-value">12</div><div class="metric-label">Months</div></div>
+                <div class="metric"><div class="metric-value">6</div><div class="metric-label">Phases</div></div>
+                <div class="metric"><div class="metric-value">4</div><div class="metric-label">Quarters</div></div>
+            </div>
+
+            <h3>3.2 Detailed Phase Breakdown</h3>
+
+            <div class="requirement">
+                <strong>Phase 1 (Weeks 1-6) - Discovery & Planning:</strong> Requirements workshops with stakeholders, finalize business logic, select technology stack (Next.js, Node.js, PostgreSQL, React), establish development standards, create design system, set up Git workflow, implement CI/CD pipeline, provision development environments.
+            </div>
+
+            <div class="requirement">
+                <strong>Phase 2 (Weeks 7-18) - Foundation & Authentication:</strong> Implement user authentication (SSO, OAuth), role-based access control (RBAC) system, design and implement database schema, build REST API framework, create React component library, develop case management CRUD operations, set up logging and monitoring infrastructure.
+            </div>
+
+            <div class="requirement">
+                <strong>Phase 3 (Weeks 19-34) - Core Feature Development:</strong> Build FIX specification editor with validation, develop message creator tool with field editing, implement AI-powered spec comparison engine, create automated test generation from specs, build multi-level approval workflows, develop evidence vault with versioning, create admin dashboard with real-time metrics, implement advanced search capabilities.
+            </div>
+
+            <div class="requirement">
+                <strong>Phase 4 (Weeks 35-42) - Integration & Testing:</strong> End-to-end integration testing, performance/load testing (target 500+ concurrent users), security penetration testing, SOC 2 compliance verification, user acceptance testing (UAT) with stakeholders, bug fixing and optimization, documentation completion.
+            </div>
+
+            <div class="requirement">
+                <strong>Phase 5 (Weeks 43-48) - Pilot & Refinement:</strong> Deploy to pilot environment with 2-3 selected clients, conduct training sessions, collect and prioritize feedback, implement critical improvements, finalize all documentation, create training materials and runbooks, prepare go-live checklist.
+            </div>
+
+            <div class="requirement">
+                <strong>Phase 6 (Weeks 49-52) - Production Launch:</strong> Deploy to production, conduct staff training, provide on-call support for first 2 weeks, monitor system health metrics, gather initial user feedback, document lessons learned, transition to maintenance team.
+            </div>
+
+            <h3>3.3 Key Milestones</h3>
+            <ul>
+                <li><strong>Week 6:</strong> Architecture & Design Finalization</li>
+                <li><strong>Week 18:</strong> Core Platform (Auth, DB, API) Ready for Feature Development</li>
+                <li><strong>Week 34:</strong> All Features Implemented & Ready for QA</li>
+                <li><strong>Week 42:</strong> Production-Ready Release Candidate</li>
+                <li><strong>Week 48:</strong> Pilot Feedback Incorporated</li>
+                <li><strong>Week 52:</strong> Go-Live</li>
+            </ul>
+        </section>
+
+        <section id="cost-analysis">
+            <h2>4. Cost Analysis</h2>
+
+            <h3>4.1 Development Costs (12 Months)</h3>
+            <table>
+                <tr>
+                    <th>Resource</th>
+                    <th>Monthly Rate</th>
+                    <th>Duration</th>
+                    <th>Total Cost</th>
+                </tr>
+                <tr>
+                    <td>Technical Architect (1)</td>
+                    <td><span class="money">$18,000</span></td>
+                    <td>12 months</td>
+                    <td><span class="money">$216,000</span></td>
+                </tr>
+                <tr>
+                    <td>Senior Full-Stack Developers (3)</td>
+                    <td><span class="money">$45,000</span></td>
+                    <td>12 months</td>
+                    <td><span class="money">$540,000</span></td>
+                </tr>
+                <tr>
+                    <td>Mid-Level Developers (4)</td>
+                    <td><span class="money">$48,000</span></td>
+                    <td>12 months</td>
+                    <td><span class="money">$576,000</span></td>
+                </tr>
+                <tr>
+                    <td>UI/UX Designer (1)</td>
+                    <td><span class="money">$12,000</span></td>
+                    <td>10 months</td>
+                    <td><span class="money">$120,000</span></td>
+                </tr>
+                <tr>
+                    <td>DevOps Engineer (1)</td>
+                    <td><span class="money">$14,000</span></td>
+                    <td>12 months</td>
+                    <td><span class="money">$168,000</span></td>
+                </tr>
+                <tr>
+                    <td>QA Engineers (2)</td>
+                    <td><span class="money">$20,000</span></td>
+                    <td>10 months</td>
+                    <td><span class="money">$200,000</span></td>
+                </tr>
+                <tr>
+                    <td>Product Manager (1)</td>
+                    <td><span class="money">$15,000</span></td>
+                    <td>12 months</td>
+                    <td><span class="money">$180,000</span></td>
+                </tr>
+                <tr>
+                    <td>Business Analyst (1)</td>
+                    <td><span class="money">$10,000</span></td>
+                    <td>10 months</td>
+                    <td><span class="money">$100,000</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Development Subtotal</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td><span class="money"><strong>$2,100,000</strong></span></td>
+                </tr>
+            </table>
+
+            <h3>4.2 Specialized Contract Costs</h3>
+            <table>
+                <tr>
+                    <th>Consultant</th>
+                    <th>Rate</th>
+                    <th>Allocation & Duration</th>
+                    <th>Total Cost</th>
+                </tr>
+                <tr>
+                    <td>FIX Protocol SME</td>
+                    <td><span class="money">$200/hour</span></td>
+                    <td>50% for 6 months</td>
+                    <td><span class="money">$45,000</span></td>
+                </tr>
+                <tr>
+                    <td>Security Consultant</td>
+                    <td><span class="money">$250/hour</span></td>
+                    <td>25% for 4 months</td>
+                    <td><span class="money">$30,000</span></td>
+                </tr>
+                <tr>
+                    <td>AI/ML Engineer</td>
+                    <td><span class="money">$180/hour</span></td>
+                    <td>75% for 6 months</td>
+                    <td><span class="money">$45,000</span></td>
+                </tr>
+                <tr>
+                    <td>Database Administrator</td>
+                    <td><span class="money">$150/hour</span></td>
+                    <td>25% for 8 months</td>
+                    <td><span class="money">$20,000</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Contract Subtotal</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td><span class="money"><strong>$140,000</strong></span></td>
+                </tr>
+            </table>
+
+            <h3>4.3 Infrastructure & Tools (Year 1)</h3>
+            <table>
+                <tr>
+                    <th>Category</th>
+                    <th>Monthly Cost</th>
+                    <th>Annual Cost</th>
+                    <th>Notes</th>
+                </tr>
+                <tr>
+                    <td>Cloud Infrastructure (AWS/Azure)</td>
+                    <td><span class="money">$15,000</span></td>
+                    <td><span class="money">$180,000</span></td>
+                    <td>Dev, staging, production environments with 3-region redundancy</td>
+                </tr>
+                <tr>
+                    <td>Database Services (PostgreSQL, Redis)</td>
+                    <td><span class="money">$4,000</span></td>
+                    <td><span class="money">$48,000</span></td>
+                    <td>RDS multi-AZ, read replicas, automated backups</td>
+                </tr>
+                <tr>
+                    <td>AI/ML Services (OpenAI, etc.)</td>
+                    <td><span class="money">$3,000</span></td>
+                    <td><span class="money">$36,000</span></td>
+                    <td>API costs for AI spec comparison and test generation</td>
+                </tr>
+                <tr>
+                    <td>Monitoring & Logging (Datadog)</td>
+                    <td><span class="money">$2,000</span></td>
+                    <td><span class="money">$24,000</span></td>
+                    <td>APM, logs, metrics, alerting</td>
+                </tr>
+                <tr>
+                    <td>Security Tools (WAF, SIEM)</td>
+                    <td><span class="money">$2,500</span></td>
+                    <td><span class="money">$30,000</span></td>
+                    <td>Web application firewall, intrusion detection</td>
+                </tr>
+                <tr>
+                    <td>Development Tools (GitHub, Jira, etc.)</td>
+                    <td><span class="money">$1,500</span></td>
+                    <td><span class="money">$18,000</span></td>
+                    <td>Source control, project management, design tools</td>
+                </tr>
+                <tr>
+                    <td>Third-Party Integrations</td>
+                    <td><span class="money">$2,000</span></td>
+                    <td><span class="money">$24,000</span></td>
+                    <td>APIs, payment processing, communication services</td>
+                </tr>
+                <tr>
+                    <td><strong>Infrastructure Subtotal</strong></td>
+                    <td><span class="money"><strong>$30,000</strong></span></td>
+                    <td><span class="money"><strong>$360,000</strong></span></td>
+                    <td></td>
+                </tr>
+            </table>
+
+            <h3>4.4 Compliance & Additional Costs</h3>
+            <table>
+                <tr>
+                    <th>Item</th>
+                    <th>Cost</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>SOC 2 Type II Certification</td>
+                    <td><span class="money">$50,000</span></td>
+                    <td>Audit and certification process (6-month engagement)</td>
+                </tr>
+                <tr>
+                    <td>Security Penetration Testing</td>
+                    <td><span class="money">$25,000</span></td>
+                    <td>External security assessment and remediation</td>
+                </tr>
+                <tr>
+                    <td>Training & Documentation</td>
+                    <td><span class="money">$30,000</span></td>
+                    <td>User guides, admin guides, API documentation, training videos</td>
+                </tr>
+                <tr>
+                    <td>Contingency Buffer (15%)</td>
+                    <td><span class="money">$400,000</span></td>
+                    <td>Unforeseen costs, scope changes, additional resources</td>
+                </tr>
+                <tr>
+                    <td><strong>Additional Subtotal</strong></td>
+                    <td><span class="money"><strong>$505,000</strong></span></td>
+                    <td></td>
+                </tr>
+            </table>
+
+            <div class="metrics-grid">
+                <div class="metric"><div class="metric-value">$2.22M</div><div class="metric-label">Development</div></div>
+                <div class="metric"><div class="metric-value">$360K</div><div class="metric-label">Infrastructure (Y1)</div></div>
+                <div class="metric"><div class="metric-value">$505K</div><div class="metric-label">Compliance & Contingency</div></div>
+                <div class="metric"><div class="metric-value">$3.09M</div><div class="metric-label">Total Year 1 Investment</div></div>
+            </div>
+
+            <h3>4.5 Post-Launch Annual Operating Costs</h3>
+            <div class="requirement">
+                <strong>Maintenance Team:</strong> <span class="money">$480,000/year</span> (2 senior developers, 2 mid-level developers, 1 DevOps, 1 support engineer)<br>
+                Handles bug fixes, minor features, system maintenance, and 24/7 on-call rotation.
+            </div>
+            <div class="requirement">
+                <strong>Infrastructure:</strong> <span class="money">$240,000/year</span><br>
+                Production environment scaling, database management, backups, CDN, and monitoring.
+            </div>
+            <div class="requirement">
+                <strong>Licensing & Tools:</strong> <span class="money">$60,000/year</span><br>
+                Cloud services, monitoring tools, development tools, and third-party APIs.
+            </div>
+            <div class="requirement">
+                <strong>Total Annual Run Rate (Post-Launch):</strong> <span class="money">$780,000/year</span>
+            </div>
+        </section>
+
+        <section id="infrastructure">
+            <h2>5. Infrastructure Requirements</h2>
+
+            <h3>5.1 Cloud Architecture Overview</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Compute Layer</h4>
+                    <p>Kubernetes cluster on AWS/Azure with auto-scaling. 3 environments: Dev, Staging, Production. Production: 8 nodes minimum, 16 at peak.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Data Layer</h4>
+                    <p>PostgreSQL RDS Multi-AZ for transactional data, Redis cluster for sessions & caching, Elasticsearch for search and analytics.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Storage Layer</h4>
+                    <p>S3/Blob storage for documents and artifacts. Encrypted at rest with customer-managed KMS keys. Lifecycle policies for cost optimization.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Network Layer</h4>
+                    <p>VPC with private subnets, ALB with WAF, VPN for internal access, CloudFront CDN for static assets and API acceleration.</p>
+                </div>
+            </div>
+
+            <h3>5.2 Production Environment Specifications</h3>
+            <table>
+                <tr>
+                    <th>Component</th>
+                    <th>Configuration</th>
+                    <th>vCPU/RAM</th>
+                    <th>Quantity</th>
+                    <th>Purpose</th>
+                </tr>
+                <tr>
+                    <td>Application Servers</td>
+                    <td>m5.xlarge (K8s nodes)</td>
+                    <td>4 vCPU / 16GB</td>
+                    <td>8</td>
+                    <td>API & Web application workloads</td>
+                </tr>
+                <tr>
+                    <td>Database Primary</td>
+                    <td>RDS db.r5.2xlarge</td>
+                    <td>8 vCPU / 64GB</td>
+                    <td>1</td>
+                    <td>PostgreSQL primary instance</td>
+                </tr>
+                <tr>
+                    <td>Database Replicas</td>
+                    <td>RDS db.r5.xlarge</td>
+                    <td>4 vCPU / 32GB</td>
+                    <td>2</td>
+                    <td>Read replicas & failover</td>
+                </tr>
+                <tr>
+                    <td>Redis Cluster</td>
+                    <td>cache.r5.large</td>
+                    <td>2 vCPU / 16GB</td>
+                    <td>3</td>
+                    <td>Session storage & caching</td>
+                </tr>
+                <tr>
+                    <td>Elasticsearch</td>
+                    <td>m5.large.search</td>
+                    <td>2 vCPU / 8GB</td>
+                    <td>3</td>
+                    <td>Search indexing & log analytics</td>
+                </tr>
+                <tr>
+                    <td>Storage</td>
+                    <td>S3 Standard + Glacier</td>
+                    <td>-</td>
+                    <td>5TB + 20TB</td>
+                    <td>Documents, archives, backups</td>
+                </tr>
+            </table>
+
+            <h3>5.3 Security Architecture</h3>
+            <div class="requirement">
+                <strong>Authentication & Authorization:</strong> SSO integration (SAML 2.0 / OAuth 2.0), multi-factor authentication (MFA) enforcement, JWT tokens with 1-hour access token TTL and 30-day refresh token TTL.
+            </div>
+            <div class="requirement">
+                <strong>Encryption:</strong> TLS 1.3 for all data in transit, AES-256 for data at rest, customer-managed KMS keys in AWS Key Management Service for sensitive data.
+            </div>
+            <div class="requirement">
+                <strong>Network Security:</strong> Web Application Firewall (AWS WAF) with managed rule groups, DDoS protection (AWS Shield), private subnets for all databases, network ACLs and security groups with least-privilege rules.
+            </div>
+            <div class="requirement">
+                <strong>Monitoring & Compliance:</strong> SIEM integration with security logs, intrusion detection system, real-time alerting for security events, audit logging with 7-year retention for compliance.
+            </div>
+
+            <h3>5.4 Disaster Recovery & Business Continuity</h3>
+            <table>
+                <tr>
+                    <th>Metric</th>
+                    <th>Target</th>
+                    <th>Implementation</th>
+                </tr>
+                <tr>
+                    <td>Recovery Time Objective (RTO)</td>
+                    <td>4 hours</td>
+                    <td>Multi-AZ deployment with automated failover, secondary region standby</td>
+                </tr>
+                <tr>
+                    <td>Recovery Point Objective (RPO)</td>
+                    <td>1 hour</td>
+                    <td>Continuous replication, automated hourly snapshots, transaction logs</td>
+                </tr>
+                <tr>
+                    <td>Backup Frequency</td>
+                    <td>Hourly</td>
+                    <td>Automated snapshots with point-in-time recovery capability</td>
+                </tr>
+                <tr>
+                    <td>Backup Retention</td>
+                    <td>90 days hot, 7 years cold</td>
+                    <td>Graduated backup lifecycle with S3 Glacier for long-term archival</td>
+                </tr>
+                <tr>
+                    <td>Failover Region</td>
+                    <td>Active-passive</td>
+                    <td>Secondary region with standby capacity, DNS failover via Route 53</td>
+                </tr>
+            </table>
+
+            <h3>5.5 DevOps & CI/CD Pipeline</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Source Control</h4>
+                    <p>GitHub Enterprise with branch protection rules, mandatory code reviews, automated security scanning (SAST/DAST).</p>
+                </div>
+                <div class="feature-card">
+                    <h4>CI/CD Pipeline</h4>
+                    <p>GitHub Actions for automated builds and testing. ArgoCD for GitOps-based Kubernetes deployments. Automated deployments to dev on every commit, staged rollouts to production.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Monitoring & Observability</h4>
+                    <p>Datadog for APM, metrics collection, and log aggregation. PagerDuty for incident alerting. Sentry for real-time error tracking and performance monitoring.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Infrastructure as Code</h4>
+                    <p>Terraform for cloud resource provisioning. Helm charts for Kubernetes deployments. HashiCorp Vault for secrets management and rotation.</p>
+                </div>
+            </div>
+
+            <h3>5.6 Performance & Scalability</h3>
+            <div class="requirement">
+                <strong>Target Performance:</strong> API response time < 500ms (p95), dashboard load time < 2 seconds, page load time < 3 seconds with 500+ concurrent users.
+            </div>
+            <div class="requirement">
+                <strong>Database Performance:</strong> Query optimization with proper indexing, connection pooling with PgBouncer, read replica load balancing, caching layer for frequently accessed data.
+            </div>
+            <div class="requirement">
+                <strong>Auto-scaling Strategy:</strong> Horizontal pod autoscaling based on CPU/memory utilization. Database connection scaling with read replicas. Cache warming for predictable traffic patterns.
+            </div>
+            <div class="requirement">
+                <strong>Load Testing Plan:</strong> Conduct monthly load tests simulating 500+ concurrent users, stress testing to identify breaking points, chaos engineering exercises for resilience validation.
+            </div>
+        </section>
+
+        <section id="implementation-roadmap">
+            <h2>6. Implementation Roadmap</h2>
+
+            <h3>6.1 Quarterly Milestones</h3>
+            <div class="requirement">
+                <strong>Q1 (Weeks 1-13):</strong> Complete Phase 1 (Discovery & Planning) and most of Phase 2 (Foundation & Auth). Deliverables: Architecture finalized, CI/CD pipeline operational, authentication system live, database schema implemented, API framework ready.
+            </div>
+            <div class="requirement">
+                <strong>Q2 (Weeks 14-26):</strong> Complete Phase 2 and Phase 3 (Core Features). Deliverables: Case management working, FIX spec tools operational, message creator tool live, approval workflows implemented, dashboard showing real-time metrics.
+            </div>
+            <div class="requirement">
+                <strong>Q3 (Weeks 27-39):</strong> Complete Phase 3, Phase 4 (Integration & Testing), and begin Phase 5 (Pilot). Deliverables: Full feature set integrated, performance optimized, security audit passed, pilot clients onboarded, UAT complete.
+            </div>
+            <div class="requirement">
+                <strong>Q4 (Weeks 40-52):</strong> Complete Phase 5 and Phase 6 (Production Launch). Deliverables: All pilot feedback incorporated, production deployment, go-live with full monitoring and support infrastructure active.
+            </div>
+
+            <h3>6.2 Success Criteria</h3>
+            <ul>
+                <li>On-time delivery within 52-week timeline</li>
+                <li>Budget adherence within 10% variance</li>
+                <li>Zero critical bugs in production for first 30 days</li>
+                <li>99.9% uptime achieved by week 8 of production</li>
+                <li>SOC 2 Type II certification obtained</li>
+                <li>All 500+ concurrent user load tests pass</li>
+                <li>Zero data breaches or security incidents</li>
+                <li>User satisfaction score > 4.5/5.0</li>
+            </ul>
+        </section>
+
+        <section id="risk-mitigation">
+            <h2>7. Risk Mitigation</h2>
+
+            <h3>7.1 Key Risks & Mitigations</h3>
+            <div class="requirement">
+                <strong>Risk: Scope Creep</strong><br>
+                Mitigation: Strict change control board, documented scope freezes at phase gates, clear prioritization of nice-to-have vs must-have features, weekly scope review meetings.
+            </div>
+            <div class="requirement">
+                <strong>Risk: Resource Availability</strong><br>
+                Mitigation: Early team assembly (4 weeks before start), backup resources identified for key roles, knowledge sharing via pair programming and documentation.
+            </div>
+            <div class="requirement">
+                <strong>Risk: Technical Complexity</strong><br>
+                Mitigation: POC development for AI features in Phase 1, architecture review by external experts, technology decision documentation, early integration testing.
+            </div>
+            <div class="requirement">
+                <strong>Risk: Client Adoption</strong><br>
+                Mitigation: User research during Phase 1, pilot program with early adopters, comprehensive training programs, dedicated support during first 90 days.
+            </div>
+            <div class="requirement">
+                <strong>Risk: Security Compliance</strong><br>
+                Mitigation: Security consultant on board from Phase 1, regular security assessments, penetration testing before pilot, SOC 2 audit preparation throughout project.
+            </div>
+
+            <h3>7.2 Contingency Planning</h3>
+            <ul>
+                <li><strong>Schedule Contingency:</strong> 15% buffer built into timeline (8 weeks) for unforeseen delays</li>
+                <li><strong>Budget Contingency:</strong> <span class="money">$400,000</span> (15%) reserved for scope changes and overruns</li>
+                <li><strong>Resource Contingency:</strong> Backup contractors identified and on standby for critical roles</li>
+                <li><strong>Technical Contingency:</strong> Alternative vendors/tools identified if primary choices fail</li>
+            </ul>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 Broadridge Technologies. Confidential - For Internal Use Only.</p>
+            <p>B-COMET Resource Planning & Infrastructure Document | April 2026</p>
+        </footer>
+    </div>
+</body>
+</html>
