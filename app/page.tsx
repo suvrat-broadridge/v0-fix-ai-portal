@@ -303,11 +303,14 @@ export default function BCometPlatform() {
   
   // Save draft to localStorage
   const saveCaseDraft = () => {
-    localStorage.setItem("caseCreationDraft", JSON.stringify({ step: createCaseStep, data: createCaseData }))
+    if (typeof window !== "undefined") {
+      localStorage.setItem("caseCreationDraft", JSON.stringify({ step: createCaseStep, data: createCaseData }))
+    }
   }
   
   // Load draft from localStorage
   const loadCaseDraft = () => {
+    if (typeof window === "undefined") return false
     const draft = localStorage.getItem("caseCreationDraft")
     if (draft) {
       const parsed = JSON.parse(draft)
@@ -320,7 +323,9 @@ export default function BCometPlatform() {
   
   // Clear draft
   const clearCaseDraft = () => {
-    localStorage.removeItem("caseCreationDraft")
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("caseCreationDraft")
+    }
   }
   const [expandedApprovalClients, setExpandedApprovalClients] = useState<Record<string, boolean>>({})
   const [selectedApproval, setSelectedApproval] = useState<typeof allApprovals[0] | null>(null)
