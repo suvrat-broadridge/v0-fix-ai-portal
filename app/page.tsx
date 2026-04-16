@@ -647,6 +647,76 @@ export default function BCometPlatform() {
         { id: "CASE-SF-FI-001", name: "Fixed Income FIX 4.2", assetClass: "Fixed Income", status: "not-started", currentStage: 1, totalStages: 9, dueDate: "2024-03-20", assignee: "John Smith", progress: 0 },
       ]
     },
+    { 
+      id: 7, name: "Atlantic Trading Corp", jira: "ATC-007", accountManager: "Sarah Johnson", assignedUser: "Jane Doe",
+      assetClasses: [
+        { name: "Drop Copy", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "in-progress", certification: "not-started", config: "completed", alerts: 0 },
+        { name: "Market Data", specCompare: "completed", logAnalysis: "in-progress", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "completed", alerts: 1 },
+      ],
+      onboardingCases: [
+        { id: "CASE-ATC-DC-001", name: "Drop Copy FIX 4.4", assetClass: "Drop Copy", status: "in-progress", currentStage: 5, totalStages: 9, dueDate: "2024-02-18", assignee: "Jane Doe", progress: 56 },
+        { id: "CASE-ATC-MD-001", name: "Market Data FIX 5.0 SP2", assetClass: "Market Data", status: "in-progress", currentStage: 3, totalStages: 9, dueDate: "2024-03-01", assignee: "Jane Doe", progress: 33 },
+      ]
+    },
+    { 
+      id: 8, name: "Blackstone Global Markets", jira: "BGM-008", accountManager: "Mike Chen", assignedUser: "Bob Wilson",
+      assetClasses: [
+        { name: "Fixed Income", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "completed", certification: "completed", config: "completed", alerts: 0 },
+        { name: "Credit", specCompare: "completed", logAnalysis: "completed", scenario: "in-progress", testCase: "not-started", certification: "not-started", config: "completed", alerts: 0 },
+      ],
+      onboardingCases: [
+        { id: "CASE-BGM-FI-001", name: "Fixed Income FIX 4.4", assetClass: "Fixed Income", status: "completed", currentStage: 9, totalStages: 9, dueDate: "2024-01-15", assignee: "Bob Wilson", progress: 100 },
+        { id: "CASE-BGM-CR-001", name: "Credit FIX 4.4", assetClass: "Credit", status: "in-progress", currentStage: 4, totalStages: 9, dueDate: "2024-02-28", assignee: "Bob Wilson", progress: 44 },
+      ]
+    },
+    { 
+      id: 9, name: "Pacific Hedge Fund", jira: "PHF-009", accountManager: "Lisa Wang", assignedUser: "Alice Brown",
+      assetClasses: [
+        { name: "Equities", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "in-progress", certification: "not-started", config: "completed", alerts: 0 },
+        { name: "ETF", specCompare: "completed", logAnalysis: "in-progress", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "completed", alerts: 1 },
+        { name: "Drop Copy", specCompare: "in-progress", logAnalysis: "not-started", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "in-progress", alerts: 0 },
+      ],
+      onboardingCases: [
+        { id: "CASE-PHF-EQ-001", name: "Equities FIX 4.2", assetClass: "Equities", status: "in-progress", currentStage: 5, totalStages: 9, dueDate: "2024-02-20", assignee: "Alice Brown", progress: 56 },
+        { id: "CASE-PHF-ETF-001", name: "ETF FIX 4.4", assetClass: "ETF", status: "in-progress", currentStage: 3, totalStages: 9, dueDate: "2024-03-05", assignee: "Alice Brown", progress: 33 },
+        { id: "CASE-PHF-DC-001", name: "Drop Copy FIX 4.4", assetClass: "Drop Copy", status: "in-progress", currentStage: 2, totalStages: 9, dueDate: "2024-03-15", assignee: "Alice Brown", progress: 22 },
+      ]
+    },
+    { 
+      id: 10, name: "Sterling Investment Bank", jira: "SIB-010", accountManager: "John Smith", assignedUser: "Charlie Davis",
+      assetClasses: [
+        { name: "Market Data", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "completed", certification: "in-progress", config: "completed", alerts: 0 },
+        { name: "Rates", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "in-progress", certification: "not-started", config: "completed", alerts: 1 },
+      ],
+      onboardingCases: [
+        { id: "CASE-SIB-MD-001", name: "Market Data FIX 5.0", assetClass: "Market Data", status: "in-progress", currentStage: 8, totalStages: 9, dueDate: "2024-02-08", assignee: "Charlie Davis", progress: 89 },
+        { id: "CASE-SIB-RT-001", name: "Rates FIX 4.4", assetClass: "Rates", status: "in-progress", currentStage: 5, totalStages: 9, dueDate: "2024-02-25", assignee: "Charlie Davis", progress: 56 },
+      ]
+    },
+    { 
+      id: 11, name: "Nordic Securities AS", jira: "NS-011", accountManager: "Tom Brown", assignedUser: "John Smith",
+      assetClasses: [
+        { name: "FX", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "completed", certification: "completed", config: "completed", alerts: 0 },
+        { name: "Fixed Income", specCompare: "completed", logAnalysis: "completed", scenario: "in-progress", testCase: "not-started", certification: "not-started", config: "completed", alerts: 0 },
+        { name: "Drop Copy", specCompare: "completed", logAnalysis: "completed", scenario: "completed", testCase: "completed", certification: "in-progress", config: "completed", alerts: 0 },
+      ],
+      onboardingCases: [
+        { id: "CASE-NS-FX-001", name: "FX FIX 4.4", assetClass: "FX", status: "completed", currentStage: 9, totalStages: 9, dueDate: "2024-01-20", assignee: "John Smith", progress: 100 },
+        { id: "CASE-NS-FI-001", name: "Fixed Income FIX 4.2", assetClass: "Fixed Income", status: "in-progress", currentStage: 4, totalStages: 9, dueDate: "2024-02-28", assignee: "John Smith", progress: 44 },
+        { id: "CASE-NS-DC-001", name: "Drop Copy FIX 4.4", assetClass: "Drop Copy", status: "in-progress", currentStage: 8, totalStages: 9, dueDate: "2024-02-10", assignee: "John Smith", progress: 89 },
+      ]
+    },
+    { 
+      id: 12, name: "Meridian Capital LLC", jira: "MC-012", accountManager: "Sarah Johnson", assignedUser: "Jane Doe",
+      assetClasses: [
+        { name: "Options", specCompare: "error", logAnalysis: "not-started", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "in-progress", alerts: 2 },
+        { name: "Futures", specCompare: "in-progress", logAnalysis: "not-started", scenario: "not-started", testCase: "not-started", certification: "not-started", config: "in-progress", alerts: 1 },
+      ],
+      onboardingCases: [
+        { id: "CASE-MC-OPT-001", name: "Options FIX 4.4", assetClass: "Options", status: "blocked", currentStage: 2, totalStages: 9, dueDate: "2024-02-15", assignee: "Jane Doe", progress: 11 },
+        { id: "CASE-MC-FUT-001", name: "Futures FIX 5.0 SP2", assetClass: "Futures", status: "in-progress", currentStage: 2, totalStages: 9, dueDate: "2024-03-01", assignee: "Jane Doe", progress: 22 },
+      ]
+    },
   ])
 
   // Calculate aggregate status for a client
@@ -3765,136 +3835,6 @@ const clientProgressData = [
                 )}
               </div>
             </Card>
-
-            {/* Cumulative Onboarding Progress - derived from all cases */}
-            {(() => {
-              const stages = [
-                { num: 1, name: "Setup", icon: FileText, description: "Client onboarding & spec upload" },
-                { num: 2, name: "Spec Analysis", icon: GitCompare, description: "Comparison & field mapping" },
-                { num: 3, name: "Connectivity", icon: Server, description: "Session configuration & testing" },
-                { num: 4, name: "Log Analysis", icon: FileSearch, description: "Message pattern extraction" },
-                { num: 5, name: "Testing", icon: TestTube, description: "Regression test execution" },
-                { num: 6, name: "Certification", icon: Award, description: "Certification & sign-off" },
-                { num: 7, name: "Go-Live", icon: Rocket, description: "Production cutover" },
-              ]
-              
-              // Calculate cumulative progress from all cases
-              const cases = selectedClient.onboardingCases || []
-              const totalCases = cases.length || 1
-              
-              // For each stage, check if ALL cases have completed it (completed), SOME have (in-progress), or NONE have (pending)
-              const stageStatus: Record<number, string> = {}
-              for (let s = 1; s <= 7; s++) {
-                // Map case stages (1-9) to client stages (1-7): stages 1-2 -> 1, 3 -> 2, 4 -> 3, 5 -> 4, 6-7 -> 5, 8 -> 6, 9 -> 7
-                const caseStageMapping = (caseStage: number) => {
-                  if (caseStage <= 2) return 1
-                  if (caseStage === 3) return 2
-                  if (caseStage === 4) return 3
-                  if (caseStage === 5) return 4
-                  if (caseStage <= 7) return 5
-                  if (caseStage === 8) return 6
-                  return 7
-                }
-                const casesCompletedThisStage = cases.filter((c: any) => caseStageMapping(c.currentStage) > s || (c.status === "completed")).length
-                const casesInThisStage = cases.filter((c: any) => caseStageMapping(c.currentStage) === s).length
-                
-                if (casesCompletedThisStage === totalCases) {
-                  stageStatus[s] = "completed"
-                } else if (casesCompletedThisStage > 0 || casesInThisStage > 0) {
-                  stageStatus[s] = "in-progress"
-                } else {
-                  stageStatus[s] = "pending"
-                }
-              }
-              
-              // Current overall stage = lowest stage that's not fully completed
-              const currentOverallStage = Object.entries(stageStatus).find(([, status]) => status !== "completed")?.[0] || "7"
-              const avgProgress = cases.length > 0 ? Math.round(cases.reduce((sum: number, c: any) => sum + (c.progress || 0), 0) / cases.length) : 0
-              
-              return (
-                <Card className={`${bgCard} border ${borderColor} mb-6 p-6`}>
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className={`text-lg font-bold ${textPrimary}`}>Onboarding Progress</h2>
-                    <span className={`text-sm ${textSecondary}`}>Stage {currentOverallStage} of 7 ({avgProgress}% overall)</span>
-                  </div>
-                  <div className="flex items-center justify-between relative">
-                    {/* Progress line */}
-                    <div className={`absolute top-6 left-0 right-0 h-1 ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"}`}>
-                      <div 
-                        className="h-full bg-gradient-to-r from-[#00e5ff] to-[#4caf50] transition-all duration-500"
-                        style={{ width: `${((parseInt(currentOverallStage) - 1) / 6) * 100}%` }}
-                      />
-                    </div>
-                    
-                    {stages.map((stage) => {
-                      const status = stageStatus[stage.num] || "pending"
-                      const isActive = stage.num === parseInt(currentOverallStage)
-                      const StageIcon = stage.icon
-                      
-                      return (
-                        <div key={stage.num} className="flex flex-col items-center relative z-10" style={{ width: "14%" }}>
-                          <div 
-                            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-                              status === "completed" ? "bg-[#4caf50] text-white" :
-                              status === "in-progress" ? "bg-[#00e5ff] text-[#0a1628] ring-4 ring-[#00e5ff]/30" :
-                              status === "blocked" ? "bg-[#f44336] text-white" :
-                              isDarkMode ? "bg-[#1e4976]/50 text-[#8b9dc3]" : "bg-gray-200 text-gray-500"
-                            }`}
-                          >
-                            {status === "completed" ? <CheckCircle className="h-5 w-5" /> : 
-                             status === "blocked" ? <Lock className="h-5 w-5" /> :
-                             <StageIcon className="h-5 w-5" />}
-                          </div>
-                          <span className={`text-xs font-medium mt-2 text-center ${isActive ? "text-[#00e5ff]" : status === "completed" ? "text-[#4caf50]" : textSecondary}`}>
-                            {stage.name}
-                          </span>
-                          <span className={`text-[10px] ${textSecondary} text-center mt-0.5 hidden lg:block`}>{stage.description}</span>
-                        </div>
-                      )
-                    })}
-                  </div>
-                  
-                  {/* Stage action buttons */}
-                  <div className="flex gap-3 mt-6 pt-4 border-t border-[#1e4976]/30">
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => setCurrentScreen("session-config")}
-                    >
-                      <Server className="h-4 w-4 mr-2" /> Configure Sessions
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => setCurrentScreen("field-mapping")}
-                    >
-                      <Link2 className="h-4 w-4 mr-2" /> Field Mappings
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => setCurrentScreen("test-results")}
-                    >
-                      <BarChart3 className="h-4 w-4 mr-2" /> Test Results
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => setCurrentScreen("go-live")}
-                    >
-                      <Rocket className="h-4 w-4 mr-2" /> Go-Live Checklist
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => setCurrentScreen("reports")}
-                    >
-                      <FileCheck className="h-4 w-4 mr-2" /> Reports
-                    </Button>
-                  </div>
-                </Card>
-              )
-            })()}
 
             {/* Client Specs Section */}
             <Card className={`${bgCard} border ${borderColor} mb-6`}>
