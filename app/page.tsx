@@ -2,14 +2,14 @@
 
 // B- COMET Platform - FIX Protocol Testing Suite v2
 import React, { useState, useEffect } from "react"
-import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, ChevronUp, ChevronsUpDown, FileText, Activity, Zap, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, Stamp, Code, ScrollText, Navigation, Sparkles, Minus, Loader, FolderArchive, Sliders, Bot, ExternalLink, GitMerge, FileCode } from "lucide-react"
+import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, ChevronUp, ChevronsUpDown, FileText, Activity, Zap, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, Stamp, Code, ScrollText, Navigation, Sparkles, Minus, Loader, FolderArchive, Sliders, Bot, ExternalLink, GitMerge, FileCode, Presentation } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "case-workflow" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "onboarding-case-detail" | "approvals" | "evidence-vault" | "prod-config" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "dashboard" | "clients" | "client-detail" | "case-workflow" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "onboarding-case-detail" | "approvals" | "evidence-vault" | "prod-config" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case" | "presentation">("home")
   const [settingsTab, setSettingsTab] = useState<"profile" | "notifications" | "security" | "integrations" | "appearance" | "api-keys">("profile")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [isManager, setIsManager] = useState(false)
@@ -64,6 +64,7 @@ export default function BCometPlatform() {
   const [selectedCase, setSelectedCase] = useState<any>(null)
   const [selectedOnboardingCase, setSelectedOnboardingCase] = useState<any>(null)
   const [caseBlockers, setCaseBlockers] = useState<any[]>([])
+  const [currentSlide, setCurrentSlide] = useState(0)
   const [selectedAssetClass, setSelectedAssetClass] = useState<string | null>(null)
   const [selectedFixVersion, setSelectedFixVersion] = useState<string | null>(null)
   const [showSpecResults, setShowSpecResults] = useState(false)
@@ -1375,6 +1376,9 @@ export default function BCometPlatform() {
   <Button size="lg" onClick={() => setShowContactPanel(true)} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-semibold">Start Here</Button>
   <Button size="lg" variant="outline" onClick={() => setCurrentScreen("fix-msg-creator")} className={`font-semibold ${isDarkMode ? "border-[#00e5ff] text-[#00e5ff] hover:bg-[#00e5ff]/10" : "border-[#0091ea] text-[#0091ea] hover:bg-[#0091ea]/10"}`}>
     <MessageSquare className="h-5 w-5 mr-2" /> Try Message Creator Free
+  </Button>
+  <Button size="lg" variant="outline" onClick={() => { setCurrentSlide(0); setCurrentScreen("presentation") }} className={`font-semibold ${isDarkMode ? "border-[#4caf50] text-[#4caf50] hover:bg-[#4caf50]/10" : "border-[#4caf50] text-[#4caf50] hover:bg-[#4caf50]/10"}`}>
+    <BookOpen className="h-5 w-5 mr-2" /> View Demo
   </Button>
   </div>
 
@@ -12292,6 +12296,166 @@ const copyToClipboard = () => {
             </Card>
           </div>
         </div>
+      </div>
+    )
+  }
+
+  // Presentation / Demo Screen - COMET Slides
+  if (currentScreen === "presentation") {
+    const slides = [
+      {
+        title: "Project Comet",
+        subtitle: "Configuration Onboarding Monitoring Evaluation and Tracking",
+        date: "April 15th, 2026",
+        content: null,
+        layout: "title"
+      },
+      {
+        title: "COMET",
+        sections: [
+          {
+            heading: "The Opportunity",
+            points: [
+              "Client onboarding is a critical path to revenue",
+              "Current FIX setup is time-intensive and resource-heavy",
+              "Delays impact client experience and time-to-market"
+            ]
+          },
+          {
+            heading: "BTCS",
+            points: [
+              "Leader in FIX Connectivity",
+              "Leader in FIX tools for testing, certification, and consulting"
+            ]
+          },
+          {
+            heading: "Our Goal",
+            points: [
+              "Provide best-in-class FIX tooling",
+              "Accelerate onboarding and revenue recognition",
+              "Improve end client experience",
+              "Reduce cost of maintenance",
+              "Utilize FIX community standards"
+            ]
+          }
+        ],
+        layout: "content"
+      },
+      {
+        title: "Next Steps",
+        sections: [
+          {
+            heading: "The Opportunity",
+            points: [
+              "Current clients are looking for simplification",
+              "Competitors don't have our penetration or background",
+              "There is a strong appetite for streamlining processes"
+            ]
+          },
+          {
+            heading: "Call to Action",
+            points: [
+              "Continue investment in automation and integration",
+              "Commit resources to making this a reality",
+              "Deliver new best in class experience for our clients"
+            ]
+          }
+        ],
+        layout: "content"
+      }
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex flex-col`}>
+        {/* Header */}
+        <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <button onClick={() => setCurrentScreen("home")} className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}>
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <h1 className={`text-xl font-bold ${textPrimary}`}>B- COMET Presentation</h1>
+            <div className={`text-sm ${textSecondary}`}>{currentSlide + 1} / {slides.length}</div>
+          </div>
+        </header>
+
+        {/* Slides Container */}
+        <div className="flex-1 flex items-center justify-center p-6">
+          <div className={`w-full max-w-4xl ${bgCard} border ${borderColor} rounded-2xl p-12 shadow-2xl min-h-96 flex flex-col justify-center`}>
+            {slides[currentSlide].layout === "title" ? (
+              <div className="text-center space-y-6">
+                <div>
+                  <h1 className={`text-6xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]`}>
+                    {slides[currentSlide].title}
+                  </h1>
+                  <p className={`text-2xl font-semibold ${textSecondary} mb-2`}>
+                    {slides[currentSlide].subtitle}
+                  </p>
+                  <p className={`text-lg ${textSecondary}`}>
+                    {slides[currentSlide].date}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-8">
+                <h1 className={`text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#00e5ff] to-[#0091ea]`}>
+                  {slides[currentSlide].title}
+                </h1>
+                <div className="space-y-6">
+                  {slides[currentSlide].sections?.map((section: any, idx: number) => (
+                    <div key={idx}>
+                      <h2 className={`text-2xl font-bold ${textPrimary} mb-3 flex items-center gap-3`}>
+                        <span className="w-2 h-2 rounded-full bg-[#00e5ff]" />
+                        {section.heading}
+                      </h2>
+                      <ul className="space-y-2 ml-6">
+                        {section.points.map((point: string, pidx: number) => (
+                          <li key={pidx} className={`text-lg ${textSecondary} flex items-start gap-3`}>
+                            <span className="text-[#00e5ff] mt-1">•</span>
+                            <span>{point}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Navigation Footer */}
+        <footer className={`${bgSecondary} border-t ${borderColor} px-6 py-4`}>
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <Button 
+              onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
+              disabled={currentSlide === 0}
+              variant="outline"
+              className={`${currentSlide === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              <ChevronLeft className="h-4 w-4 mr-2" /> Previous
+            </Button>
+            <div className="flex gap-2">
+              {slides.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentSlide(idx)}
+                  className={`h-2 rounded-full transition-all ${
+                    idx === currentSlide 
+                      ? "bg-[#00e5ff] w-8" 
+                      : "bg-[#1e4976] w-2 hover:bg-[#2a5f8f]"
+                  }`}
+                />
+              ))}
+            </div>
+            <Button 
+              onClick={() => setCurrentSlide(Math.min(slides.length - 1, currentSlide + 1))}
+              disabled={currentSlide === slides.length - 1}
+              className={`bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 ${currentSlide === slides.length - 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              Next <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        </footer>
       </div>
     )
   }
