@@ -665,7 +665,7 @@ export default function BCometPlatform() {
 
   // Flatten all cases from all clients for case-centric views
   const allCases = clients.flatMap(client => 
-    client.onboardingCases.map(c => ({
+    (client.onboardingCases || []).map(c => ({
       ...c,
       clientId: client.id,
       clientName: client.name,
@@ -3154,7 +3154,8 @@ export default function BCometPlatform() {
                     </thead>
                     <tbody>
                       {allCases.slice(0, 6).map((caseItem, idx) => {
-                        const client = clients.find(c => c.id === caseItem.clientId)!
+                        const client = clients.find(c => c.id === caseItem.clientId)
+                        if (!client) return null
                         const caseStageNames = ["Client Setup", "Spec Compare", "Log Analysis", "ATDL Config", "Test Suite", "Scenario Gen", "Evidence", "Prod Config", "Certification"]
                         const currentStageName = caseStageNames[caseItem.currentStage - 1] || "Setup"
                         const riskScore = caseItem.status === "blocked" ? "High" : caseItem.progress < 30 ? "Medium" : "Low"
