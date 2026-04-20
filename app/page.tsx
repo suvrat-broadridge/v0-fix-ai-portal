@@ -171,12 +171,26 @@ export default function BCometPlatform() {
   const [certReportOptions, setCertReportOptions] = useState({ clientMessages: true, passFailResults: true, gatewayNotes: true, rawConductor: false, unmatchedCases: false })
   const [certClientName, setCertClientName] = useState("Goldman Sachs")
   const [certReportTitle, setCertReportTitle] = useState("FIX 4.2 Equities Certification Report")
-  // AI Assistant state
+  // AI Assistant state - GitHub Copilot style with actions
   const [showAIAssistant, setShowAIAssistant] = useState(false)
   const [aiAgentMode, setAiAgentMode] = useState<"general" | "spec-compare" | "log-analysis" | "test-gen" | "certification" | "atdl">("general")
   const [aiChatInput, setAiChatInput] = useState("")
-  const [aiChatHistory, setAiChatHistory] = useState<Array<{role: "user" | "assistant", content: string, timestamp: Date, agent?: string}>>([
-    { role: "assistant", content: "Hello! I'm your B-COMET AI assistant. I can help you navigate the platform, answer questions about FIX protocols, and guide you through workflows. What would you like to do today?", timestamp: new Date(), agent: "general" }
+  const [aiWorkflowMode, setAiWorkflowMode] = useState(false)
+  const [aiWorkflowStep, setAiWorkflowStep] = useState(0)
+  const [aiPendingActions, setAiPendingActions] = useState<Array<{id: string, type: "navigate" | "create" | "upload" | "execute" | "configure", label: string, target?: string, data?: any, status: "pending" | "applied" | "skipped"}>>([])
+  const [aiChatHistory, setAiChatHistory] = useState<Array<{
+    role: "user" | "assistant", 
+    content: string, 
+    timestamp: Date, 
+    agent?: string,
+    actions?: Array<{id: string, type: "navigate" | "create" | "upload" | "execute" | "configure", label: string, target?: string, data?: any}>
+  }>>([
+    { 
+      role: "assistant", 
+      content: "Hello! I'm your B-COMET AI assistant. I can execute actions, navigate screens, create files, and guide you through workflows.\n\nTry commands like:\n- \"Go to Spec Compare\"\n- \"Create a new onboarding case\"\n- \"Start certification workflow\"\n- \"Show me at-risk cases\"", 
+      timestamp: new Date(), 
+      agent: "general" 
+    }
   ])
   const [aiIsTyping, setAiIsTyping] = useState(false)
   const [showContactPanel, setShowContactPanel] = useState(false)
@@ -1383,43 +1397,188 @@ export default function BCometPlatform() {
     return suggestions[currentScreen] || ["How can I help?", "Show me around", "What can you do?"]
   }
 
-  // Simulated AI response handler
+  // Execute AI action
+  const executeAiAction = (action: {id: string, type: string, target?: string, data?: any}) => {
+    if (action.type === "navigate" && action.target) {
+      setCurrentScreen(action.target as any)
+      setAiChatHistory(prev => [...prev, { 
+        role: "assistant", 
+        content: `Navigated to ${action.target?.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}`, 
+        timestamp: new Date(), 
+        agent: aiAgentMode 
+      }])
+    } else if (action.type === "create" && action.target === "case") {
+      setCurrentScreen("create-case")
+      setAiChatHistory(prev => [...prev, { 
+        role: "assistant", 
+        content: "Opening Create Case form. Fill in the details and I'll help you complete it.", 
+        timestamp: new Date(), 
+        agent: aiAgentMode 
+      }])
+    } else if (action.type === "execute" && action.target === "workflow") {
+      setAiWorkflowMode(true)
+      setAiWorkflowStep(0)
+      setAiChatHistory(prev => [...prev, { 
+        role: "assistant", 
+        content: "Workflow mode activated! I'll guide you step-by-step. Just type 'yes' or 'y' to proceed, 'skip' to skip a step, or 'stop' to exit.\n\n**Step 1/5: Navigate to Onboarding Cases**\nI'll take you to the cases list first.\n\nProceed? (yes/no)", 
+        timestamp: new Date(), 
+        agent: aiAgentMode,
+        actions: [{ id: "wf-1", type: "navigate", label: "Go to Onboarding Cases", target: "onboarding-cases" }]
+      }])
+    }
+    // Mark action as applied in pending list
+    setAiPendingActions(prev => prev.map(a => a.id === action.id ? { ...a, status: "applied" } : a))
+  }
+
+  // Simulated AI response handler with executable actions
   const handleAISend = () => {
     if (!aiChatInput.trim()) return
-    const userMsg = aiChatInput.trim()
-    setAiChatHistory(prev => [...prev, { role: "user", content: userMsg, timestamp: new Date() }])
+    const userMsg = aiChatInput.trim().toLowerCase()
+    const userMsgOriginal = aiChatInput.trim()
+    setAiChatHistory(prev => [...prev, { role: "user", content: userMsgOriginal, timestamp: new Date() }])
     setAiChatInput("")
+    
+    // Handle workflow mode responses
+    if (aiWorkflowMode) {
+      if (userMsg === "yes" || userMsg === "y") {
+        const workflowSteps = [
+          { screen: "onboarding-cases", msg: "Step 1 complete. Now viewing Onboarding Cases.\n\n**Step 2/5: Review At-Risk Cases**\nI found 2 cases that need attention. Want me to filter to show only at-risk cases?\n\nProceed? (yes/no)" },
+          { screen: "onboarding-cases", msg: "Filtered to at-risk cases.\n\n**Step 3/5: Open Goldman Sachs Case**\nThis case is at 78% but has pending approvals. Want me to open the workflow view?\n\nProceed? (yes/no)" },
+          { screen: "case-workflow", msg: "Viewing Goldman Sachs - Equities workflow.\n\n**Step 4/5: Check Pending Stage**\nCurrent stage: ATDL Configuration. There's a validation warning. Want me to run the ATDL validator?\n\nProceed? (yes/no)" },
+          { screen: "case-workflow", msg: "ATDL validation complete - 2 warnings found.\n\n**Step 5/5: Generate Progress Report**\nWant me to generate a summary report for this case?\n\nProceed? (yes/no)" },
+          { screen: "case-workflow", msg: "Workflow complete! Here's what we accomplished:\n\n- Reviewed 2 at-risk cases\n- Identified Goldman Sachs as priority\n- Found 2 ATDL validation warnings\n- Generated progress report\n\nWorkflow mode ended. How else can I help?" },
+        ]
+        
+        if (aiWorkflowStep < workflowSteps.length) {
+          const step = workflowSteps[aiWorkflowStep]
+          setCurrentScreen(step.screen as any)
+          setAiChatHistory(prev => [...prev, { 
+            role: "assistant", 
+            content: step.msg, 
+            timestamp: new Date(), 
+            agent: aiAgentMode 
+          }])
+          setAiWorkflowStep(prev => prev + 1)
+          if (aiWorkflowStep === workflowSteps.length - 1) {
+            setAiWorkflowMode(false)
+          }
+        }
+        return
+      } else if (userMsg === "skip") {
+        setAiWorkflowStep(prev => prev + 1)
+        setAiChatHistory(prev => [...prev, { 
+          role: "assistant", 
+          content: "Skipped. Moving to next step...", 
+          timestamp: new Date(), 
+          agent: aiAgentMode 
+        }])
+        return
+      } else if (userMsg === "stop" || userMsg === "exit" || userMsg === "quit") {
+        setAiWorkflowMode(false)
+        setAiWorkflowStep(0)
+        setAiChatHistory(prev => [...prev, { 
+          role: "assistant", 
+          content: "Workflow mode ended. How else can I help?", 
+          timestamp: new Date(), 
+          agent: aiAgentMode 
+        }])
+        return
+      }
+    }
+    
     setAiIsTyping(true)
     
     // Simulate AI response delay
     setTimeout(() => {
       let response = ""
+      let actions: Array<{id: string, type: "navigate" | "create" | "upload" | "execute" | "configure", label: string, target?: string, data?: any}> = []
       const agent = aiAgents[aiAgentMode]
       
-      // Context-aware responses
-      if (userMsg.toLowerCase().includes("help") || userMsg.toLowerCase().includes("what can you do")) {
-        response = `As the ${agent.name}, I can help you with:\n\n• Navigate to any tool or screen\n• Answer questions about FIX protocols\n• Guide you through workflows step-by-step\n• Explain errors and suggest fixes\n• Generate reports and documentation\n\nTry asking me something specific!`
-      } else if (userMsg.toLowerCase().includes("case") || userMsg.toLowerCase().includes("onboarding")) {
-        response = `I see you're interested in onboarding cases. Here's what I found:\n\n• **5 active cases** currently in progress\n• **2 cases** are at-risk and need attention\n• **Goldman Sachs - Equities** is at 78% completion\n\nWould you like me to take you to the Onboarding Cases screen, or show details on a specific case?`
-      } else if (userMsg.toLowerCase().includes("spec") || userMsg.toLowerCase().includes("compare")) {
-        response = `I can help you compare FIX specifications. To get started:\n\n1. Upload your source spec (FIX 4.2, 4.4, or 5.0)\n2. Upload the target spec to compare against\n3. I'll analyze differences in message types, fields, and values\n\nWould you like me to navigate to the Spec Compare tool?`
-      } else if (userMsg.toLowerCase().includes("log") || userMsg.toLowerCase().includes("error")) {
-        response = `For log analysis, I can:\n\n• Parse FIX message logs and identify errors\n• Explain message sequences and flows\n• Highlight protocol violations\n• Suggest fixes for common issues\n\nUpload a log file or paste a FIX message, and I'll analyze it for you.`
-      } else if (userMsg.toLowerCase().includes("test") || userMsg.toLowerCase().includes("generate")) {
-        response = `I can generate test cases based on your FIX specification. Options include:\n\n• **Positive tests** - Valid message flows\n• **Negative tests** - Invalid inputs and edge cases\n• **Boundary tests** - Field length and value limits\n• **Sequence tests** - Multi-message scenarios\n\nWhich type of tests would you like to generate?`
-      } else if (userMsg.toLowerCase().includes("navigate") || userMsg.toLowerCase().includes("go to") || userMsg.toLowerCase().includes("take me")) {
-        response = `I can navigate you to any screen. Just tell me where:\n\n• "Take me to Dashboard"\n• "Go to Spec Compare"\n• "Open Log Analysis"\n• "Show Certification"\n\nOr click on any tool in the sidebar.`
-      } else {
-        response = `I understand you're asking about "${userMsg.slice(0, 50)}${userMsg.length > 50 ? "..." : ""}". Let me help you with that.\n\nBased on your current context (${currentScreen.replace(/-/g, " ")}), I suggest:\n\n• Check the relevant documentation\n• Review similar past cases\n• Contact support if needed\n\nWould you like me to elaborate on any of these?`
+      // Navigation commands - immediate execution
+      if (userMsg.includes("go to") || userMsg.includes("take me") || userMsg.includes("open") || userMsg.includes("navigate to") || userMsg.includes("show me")) {
+        const screenMap: Record<string, string> = {
+          "dashboard": "dashboard", "home": "dashboard",
+          "spec compare": "spec-compare", "spec": "spec-compare", "compare": "spec-compare",
+          "log analysis": "log-analysis", "log": "log-analysis", "logs": "log-analysis",
+          "test": "test-case-gen", "test gen": "test-case-gen", "test case": "test-case-gen",
+          "certification": "certification-gen", "cert": "certification-gen",
+          "atdl": "atdl-viewer", "algo": "atdl-viewer",
+          "onboarding": "onboarding-cases", "cases": "onboarding-cases", "onboarding cases": "onboarding-cases",
+          "clients": "clients", "client list": "clients",
+          "field mapping": "field-mapping", "mapping": "field-mapping",
+          "client cert report": "client-cert-report", "cert report": "client-cert-report",
+        }
+        
+        let targetScreen = ""
+        for (const [key, screen] of Object.entries(screenMap)) {
+          if (userMsg.includes(key)) {
+            targetScreen = screen
+            break
+          }
+        }
+        
+        if (targetScreen) {
+          response = `Navigating to ${targetScreen.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}...`
+          actions = [{ id: `nav-${Date.now()}`, type: "navigate", label: `Open ${targetScreen.replace(/-/g, " ")}`, target: targetScreen }]
+        } else {
+          response = "I can navigate you to:\n\n- Dashboard\n- Spec Compare\n- Log Analysis\n- Test Case Generator\n- Certification\n- ATDL Viewer\n- Onboarding Cases\n- Field Mapping\n\nWhich screen would you like?"
+        }
+      }
+      // Create commands
+      else if (userMsg.includes("create") || userMsg.includes("new") || userMsg.includes("add")) {
+        if (userMsg.includes("case") || userMsg.includes("onboarding")) {
+          response = "I'll open the Create Case form for you. Click the button below or I can auto-fill some fields if you tell me:\n\n- Client name\n- Asset class (Equities, Fixed Income, etc.)\n- FIX version"
+          actions = [{ id: `create-${Date.now()}`, type: "create", label: "Create New Case", target: "case" }]
+        } else if (userMsg.includes("test")) {
+          response = "I can generate test cases for you. What type?\n\n- Positive flow tests\n- Negative/error handling tests\n- Boundary tests\n- Full regression suite"
+          actions = [{ id: `create-${Date.now()}`, type: "navigate", label: "Open Test Generator", target: "test-case-gen" }]
+        } else {
+          response = "I can create:\n\n- New onboarding case\n- Test case suite\n- Certification report\n- Field mapping rules\n\nWhat would you like to create?"
+        }
+      }
+      // Workflow commands
+      else if (userMsg.includes("workflow") || userMsg.includes("guide me") || userMsg.includes("step by step") || userMsg.includes("start") && userMsg.includes("certification")) {
+        response = "I can guide you through complete workflows. Available workflows:\n\n**1. Onboarding Review** - Check at-risk cases and take action\n**2. Certification Run** - Full certification flow with reporting\n**3. Spec Migration** - Compare specs and generate mapping\n\nType \"start [workflow name]\" or click below to begin."
+        actions = [
+          { id: `wf-onboard-${Date.now()}`, type: "execute", label: "Start Onboarding Review", target: "workflow", data: { workflow: "onboarding" } },
+          { id: `wf-cert-${Date.now()}`, type: "execute", label: "Start Certification", target: "workflow", data: { workflow: "certification" } },
+        ]
+      }
+      // Status/info commands  
+      else if (userMsg.includes("status") || userMsg.includes("at-risk") || userMsg.includes("pending") || userMsg.includes("what") && userMsg.includes("cases")) {
+        const atRiskCount = onboardingCases.filter(c => c.status === "at-risk").length
+        const pendingCount = onboardingCases.filter(c => c.status === "pending").length
+        const activeCount = onboardingCases.filter(c => c.status === "on-track").length
+        
+        response = `**Live System Status**\n\n- **${onboardingCases.length}** total onboarding cases\n- **${atRiskCount}** at-risk (need attention)\n- **${pendingCount}** pending approval\n- **${activeCount}** on track\n\nCurrent screen: ${currentScreen.replace(/-/g, " ")}\n\nWant me to show you the at-risk cases?`
+        actions = [
+          { id: `nav-risk-${Date.now()}`, type: "navigate", label: "View At-Risk Cases", target: "onboarding-cases" },
+        ]
+      }
+      // Help
+      else if (userMsg.includes("help") || userMsg.includes("what can you do")) {
+        response = `I'm your AI copilot for B-COMET. I can:\n\n**Execute Actions**\n- "Go to Spec Compare" - Navigate instantly\n- "Create new case" - Open forms\n- "Run certification" - Execute workflows\n\n**Live Awareness**\n- "What's the status?" - System overview\n- "Show at-risk cases" - Filter and display\n\n**Guided Workflows**\n- "Start workflow" - Step-by-step guidance\n- Just type "yes" to proceed through steps\n\nTry a command!`
+      }
+      // Default contextual response
+      else {
+        response = `I understand you're asking about "${userMsgOriginal.slice(0, 40)}${userMsgOriginal.length > 40 ? "..." : ""}".\n\nBased on your current context (${currentScreen.replace(/-/g, " ")}), here are some actions I can take:`
+        actions = [
+          { id: `ctx-nav-${Date.now()}`, type: "navigate", label: "View Dashboard", target: "dashboard" },
+          { id: `ctx-cases-${Date.now()}`, type: "navigate", label: "Check Cases", target: "onboarding-cases" },
+        ]
       }
       
-      setAiChatHistory(prev => [...prev, { role: "assistant", content: response, timestamp: new Date(), agent: aiAgentMode }])
+      setAiChatHistory(prev => [...prev, { role: "assistant", content: response, timestamp: new Date(), agent: aiAgentMode, actions }])
       setAiIsTyping(false)
-    }, 1200)
+    }, 800)
   }
 
-  // AI Assistant Floating Button & Panel
-  const AIAssistant = () => (
+  // AI Assistant Floating Button & Panel - GitHub Copilot Style
+  const AIAssistant = () => {
+    const atRiskCount = onboardingCases.filter(c => c.status === "at-risk").length
+    const pendingCount = onboardingCases.filter(c => c.status === "pending").length
+    
+    return (
     <>
       {/* Floating AI Button */}
       {selectedRole && currentScreen !== "home" && currentScreen !== "role-select" && currentScreen !== "login" && (
@@ -1431,28 +1590,38 @@ export default function BCometPlatform() {
           style={{ boxShadow: "0 0 20px rgba(0, 229, 255, 0.4)" }}
         >
           <Sparkles className="h-6 w-6" />
+          {atRiskCount > 0 && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#f44336] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+              {atRiskCount}
+            </span>
+          )}
         </button>
       )}
 
       {/* AI Assistant Panel */}
       <div className={`fixed top-0 right-0 h-full z-50 transition-transform duration-300 ease-in-out ${
         showAIAssistant ? "translate-x-0" : "translate-x-full"
-      }`} style={{ width: "420px" }}>
+      }`} style={{ width: "440px" }}>
         <div className={`h-full flex flex-col ${isDarkMode ? "bg-[#0d2137]" : "bg-white"} border-l ${borderColor} shadow-2xl`}>
           {/* Header */}
           <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-[#00e5ff]/10">
-                <Sparkles className="h-5 w-5 text-[#00e5ff]" />
+              <div className="p-2 rounded-lg bg-gradient-to-br from-[#00e5ff] to-[#0091ea]">
+                <Sparkles className="h-5 w-5 text-[#0a1628]" />
               </div>
               <div>
-                <h3 className={`font-semibold ${textPrimary}`}>B-COMET AI</h3>
-                <p className={`text-xs ${textSecondary}`}>Powered by AI agents</p>
+                <h3 className={`font-semibold ${textPrimary}`}>B-COMET Copilot</h3>
+                <p className={`text-xs ${textSecondary}`}>AI-powered assistant</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              {aiWorkflowMode && (
+                <span className="px-2 py-1 rounded text-[10px] font-bold bg-[#4caf50]/20 text-[#4caf50] mr-2">
+                  WORKFLOW MODE
+                </span>
+              )}
               <button
-                onClick={() => { setAiChatHistory([{ role: "assistant", content: "Chat cleared. How can I help you?", timestamp: new Date(), agent: "general" }]); }}
+                onClick={() => { setAiChatHistory([{ role: "assistant", content: "Chat cleared. I'm ready to help!\n\nTry: \"Go to dashboard\" or \"Start workflow\"", timestamp: new Date(), agent: "general" }]); setAiWorkflowMode(false); }}
                 className={`p-1.5 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}
                 title="Clear chat"
               >
@@ -1464,6 +1633,31 @@ export default function BCometPlatform() {
               >
                 <X className="h-5 w-5" />
               </button>
+            </div>
+          </div>
+
+          {/* Live System Status Bar */}
+          <div className={`px-4 py-2 ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} border-b ${borderColor}`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2 h-2 rounded-full bg-[#4caf50] animate-pulse" />
+                  <span className={`text-[10px] font-medium ${textSecondary}`}>LIVE</span>
+                </div>
+                <span className={`text-xs ${textPrimary}`}>{currentScreen.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                {atRiskCount > 0 && (
+                  <span className="flex items-center gap-1 text-[10px] font-medium text-[#f44336]">
+                    <AlertTriangle className="h-3 w-3" /> {atRiskCount} at-risk
+                  </span>
+                )}
+                {pendingCount > 0 && (
+                  <span className="flex items-center gap-1 text-[10px] font-medium text-[#ff9800]">
+                    <Clock className="h-3 w-3" /> {pendingCount} pending
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -1487,21 +1681,11 @@ export default function BCometPlatform() {
             </div>
           </div>
 
-          {/* Context Banner */}
-          <div className={`px-4 py-2 ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"} border-b ${borderColor}`}>
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full bg-[#4caf50] animate-pulse`} />
-              <span className={`text-xs ${textSecondary}`}>
-                Context: <span className={`font-medium ${textPrimary}`}>{currentScreen.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}</span>
-              </span>
-            </div>
-          </div>
-
           {/* Chat Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {aiChatHistory.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[85%] ${msg.role === "user" ? "order-1" : "order-2"}`}>
+                <div className={`max-w-[90%] ${msg.role === "user" ? "order-1" : "order-2"}`}>
                   {msg.role === "assistant" && msg.agent && (
                     <div className="flex items-center gap-1.5 mb-1">
                       {(() => {
@@ -1524,6 +1708,34 @@ export default function BCometPlatform() {
                   }`}>
                     {msg.content}
                   </div>
+                  
+                  {/* Action Buttons - GitHub Copilot Style */}
+                  {msg.role === "assistant" && msg.actions && msg.actions.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {msg.actions.map((action) => (
+                        <button
+                          key={action.id}
+                          onClick={() => executeAiAction(action)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:scale-105 ${
+                            action.type === "navigate" 
+                              ? "bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
+                              : action.type === "create"
+                              ? "bg-[#4caf50] text-white hover:bg-[#388e3c]"
+                              : action.type === "execute"
+                              ? "bg-[#9c27b0] text-white hover:bg-[#7b1fa2]"
+                              : "bg-[#2196f3] text-white hover:bg-[#1976d2]"
+                          }`}
+                        >
+                          {action.type === "navigate" && <ArrowRight className="h-3 w-3" />}
+                          {action.type === "create" && <Plus className="h-3 w-3" />}
+                          {action.type === "execute" && <Play className="h-3 w-3" />}
+                          {action.type === "configure" && <Settings className="h-3 w-3" />}
+                          {action.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  
                   <p className={`text-[10px] ${textSecondary} mt-1 ${msg.role === "user" ? "text-right" : "text-left"}`}>
                     {msg.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </p>
@@ -1533,30 +1745,39 @@ export default function BCometPlatform() {
             {aiIsTyping && (
               <div className="flex justify-start">
                 <div className={`px-4 py-3 rounded-xl ${isDarkMode ? "bg-[#1e4976]/40" : "bg-gray-100"}`}>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1.5">
                     <div className="w-2 h-2 rounded-full bg-[#00e5ff] animate-bounce" style={{ animationDelay: "0ms" }} />
                     <div className="w-2 h-2 rounded-full bg-[#00e5ff] animate-bounce" style={{ animationDelay: "150ms" }} />
                     <div className="w-2 h-2 rounded-full bg-[#00e5ff] animate-bounce" style={{ animationDelay: "300ms" }} />
+                    <span className={`text-xs ${textSecondary} ml-2`}>Thinking...</span>
                   </div>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Quick Suggestions */}
+          {/* Quick Actions Bar */}
           <div className={`px-3 py-2 border-t ${borderColor}`}>
+            <div className="flex items-center gap-2 mb-2">
+              <span className={`text-[10px] font-medium ${textSecondary}`}>QUICK ACTIONS</span>
+            </div>
             <div className="flex flex-wrap gap-1.5">
-              {getContextSuggestions().map((suggestion, i) => (
+              {[
+                { label: "Go to Dashboard", cmd: "go to dashboard" },
+                { label: "View Cases", cmd: "go to onboarding cases" },
+                { label: "Start Workflow", cmd: "start workflow" },
+                { label: "System Status", cmd: "what's the status" },
+              ].map((action, i) => (
                 <button
                   key={i}
-                  onClick={() => { setAiChatInput(suggestion); }}
-                  className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                  onClick={() => { setAiChatInput(action.cmd); handleAISend(); }}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors border ${
                     isDarkMode
-                      ? "bg-[#1e4976]/40 text-[#90caf9] hover:bg-[#1e4976]/60"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      ? "border-[#1e4976] text-[#90caf9] hover:bg-[#1e4976]/40 hover:border-[#00e5ff]"
+                      : "border-gray-200 text-gray-600 hover:bg-gray-100 hover:border-gray-300"
                   }`}
                 >
-                  {suggestion}
+                  {action.label}
                 </button>
               ))}
             </div>
@@ -1564,12 +1785,19 @@ export default function BCometPlatform() {
 
           {/* Input Area */}
           <div className={`p-3 border-t ${borderColor}`}>
+            {aiWorkflowMode && (
+              <div className={`mb-2 px-3 py-2 rounded-lg ${isDarkMode ? "bg-[#4caf50]/10 border border-[#4caf50]/30" : "bg-green-50 border border-green-200"}`}>
+                <p className={`text-xs font-medium ${isDarkMode ? "text-[#4caf50]" : "text-green-700"}`}>
+                  Workflow Mode: Type "yes" to proceed, "skip" to skip, or "stop" to exit
+                </p>
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <Input
                 value={aiChatInput}
                 onChange={e => setAiChatInput(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleAISend(); } }}
-                placeholder={`Ask ${aiAgents[aiAgentMode].name}...`}
+                placeholder={aiWorkflowMode ? "yes / skip / stop" : "Ask me anything or give a command..."}
                 className={`flex-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder-[#64b5f6]" : ""}`}
               />
               <Button
@@ -1580,9 +1808,14 @@ export default function BCometPlatform() {
                 <Send className="h-4 w-4" />
               </Button>
             </div>
-            <p className={`text-[10px] ${textSecondary} mt-2 text-center`}>
-              Press Enter to send • Cmd+K to toggle
-            </p>
+            <div className="flex items-center justify-between mt-2">
+              <p className={`text-[10px] ${textSecondary}`}>
+                Enter to send
+              </p>
+              <p className={`text-[10px] ${textSecondary}`}>
+                Powered by B-COMET AI
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -1595,7 +1828,7 @@ export default function BCometPlatform() {
         />
       )}
     </>
-  )
+  )}
 
   // Home Screen
   if (currentScreen === "home") {
