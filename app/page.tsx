@@ -171,8 +171,23 @@ export default function BCometPlatform() {
   const [certReportOptions, setCertReportOptions] = useState({ clientMessages: true, passFailResults: true, gatewayNotes: true, rawConductor: false, unmatchedCases: false })
   const [certClientName, setCertClientName] = useState("Goldman Sachs")
   const [certReportTitle, setCertReportTitle] = useState("FIX 4.2 Equities Certification Report")
-  // AI Assistant state - GitHub Copilot style with actions
-  const [showAIAssistant, setShowAIAssistant] = useState(false)
+  // AI Assistant state - GitHub Copilot style with actions (persisted to localStorage)
+  const getDefaultAiWelcomeMessage = () => [
+    { 
+      role: "assistant" as const, 
+      content: "Hello! I'm your B-COMET AI assistant. I can execute actions, navigate screens, create files, and guide you through workflows.\n\nTry commands like:\n- \"Go to Spec Compare\"\n- \"Create a new onboarding case\"\n- \"Start certification workflow\"\n- \"Show me at-risk cases\"", 
+      timestamp: new Date(), 
+      agent: "general" 
+    }
+  ]
+  
+  const [showAIAssistant, setShowAIAssistant] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('bcomet_ai_panel_open')
+      return saved ? JSON.parse(saved) : false
+    }
+    return false
+  })
   const [aiAgentMode, setAiAgentMode] = useState<"general" | "spec-compare" | "log-analysis" | "test-gen" | "certification" | "atdl">("general")
   const [aiChatInput, setAiChatInput] = useState("")
   const [aiWorkflowMode, setAiWorkflowMode] = useState(false)
@@ -184,15 +199,35 @@ export default function BCometPlatform() {
     timestamp: Date, 
     agent?: string,
     actions?: Array<{id: string, type: "navigate" | "create" | "upload" | "execute" | "configure", label: string, target?: string, data?: any}>
-  }>>([
-    { 
-      role: "assistant", 
-      content: "Hello! I'm your B-COMET AI assistant. I can execute actions, navigate screens, create files, and guide you through workflows.\n\nTry commands like:\n- \"Go to Spec Compare\"\n- \"Create a new onboarding case\"\n- \"Start certification workflow\"\n- \"Show me at-risk cases\"", 
-      timestamp: new Date(), 
-      agent: "general" 
+  }>>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('bcomet_ai_chat_history')
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved)
+          return parsed.map((msg: any) => ({ ...msg, timestamp: new Date(msg.timestamp) }))
+        } catch {
+          return getDefaultAiWelcomeMessage()
+        }
+      }
     }
-  ])
+    return getDefaultAiWelcomeMessage()
+  })
   const [aiIsTyping, setAiIsTyping] = useState(false)
+  
+  // Persist AI panel open/closed state to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('bcomet_ai_panel_open', JSON.stringify(showAIAssistant))
+    }
+  }, [showAIAssistant])
+  
+  // Persist AI chat history to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('bcomet_ai_chat_history', JSON.stringify(aiChatHistory))
+    }
+  }, [aiChatHistory])
   const [showContactPanel, setShowContactPanel] = useState(false)
   const [showDemoForm, setShowDemoForm] = useState(false)
   const [showWalkthrough, setShowWalkthrough] = useState(false)
@@ -1621,7 +1656,7 @@ export default function BCometPlatform() {
                 </span>
               )}
               <button
-                onClick={() => { setAiChatHistory([{ role: "assistant", content: "Chat cleared. I'm ready to help!\n\nTry: \"Go to dashboard\" or \"Start workflow\"", timestamp: new Date(), agent: "general" }]); setAiWorkflowMode(false); }}
+                onClick={() => { setAiChatHistory(getDefaultAiWelcomeMessage()); setAiWorkflowMode(false); }}
                 className={`p-1.5 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}
                 title="Clear chat"
               >
