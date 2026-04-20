@@ -171,6 +171,14 @@ export default function BCometPlatform() {
   const [certReportOptions, setCertReportOptions] = useState({ clientMessages: true, passFailResults: true, gatewayNotes: true, rawConductor: false, unmatchedCases: false })
   const [certClientName, setCertClientName] = useState("Goldman Sachs")
   const [certReportTitle, setCertReportTitle] = useState("FIX 4.2 Equities Certification Report")
+  // AI Assistant state
+  const [showAIAssistant, setShowAIAssistant] = useState(false)
+  const [aiAgentMode, setAiAgentMode] = useState<"general" | "spec-compare" | "log-analysis" | "test-gen" | "certification" | "atdl">("general")
+  const [aiChatInput, setAiChatInput] = useState("")
+  const [aiChatHistory, setAiChatHistory] = useState<Array<{role: "user" | "assistant", content: string, timestamp: Date, agent?: string}>>([
+    { role: "assistant", content: "Hello! I'm your B-COMET AI assistant. I can help you navigate the platform, answer questions about FIX protocols, and guide you through workflows. What would you like to do today?", timestamp: new Date(), agent: "general" }
+  ])
+  const [aiIsTyping, setAiIsTyping] = useState(false)
   const [showContactPanel, setShowContactPanel] = useState(false)
   const [showDemoForm, setShowDemoForm] = useState(false)
   const [showWalkthrough, setShowWalkthrough] = useState(false)
@@ -1348,6 +1356,245 @@ export default function BCometPlatform() {
         </button>
       </div>
     </div>
+  )
+
+  // AI Agent configurations
+  const aiAgents = {
+    general: { name: "General Assistant", icon: Bot, color: "text-[#00e5ff]", bg: "bg-[#00e5ff]/10", description: "Navigate platform, answer questions" },
+    "spec-compare": { name: "Spec Compare Agent", icon: GitCompare, color: "text-[#4caf50]", bg: "bg-[#4caf50]/10", description: "Compare FIX specifications" },
+    "log-analysis": { name: "Log Analysis Agent", icon: FileSearch, color: "text-[#ff9800]", bg: "bg-[#ff9800]/10", description: "Parse and analyze FIX logs" },
+    "test-gen": { name: "Test Generation Agent", icon: TestTube, color: "text-[#9c27b0]", bg: "bg-[#9c27b0]/10", description: "Generate test scenarios" },
+    certification: { name: "Certification Agent", icon: Award, color: "text-[#2196f3]", bg: "bg-[#2196f3]/10", description: "Guide certification workflow" },
+    atdl: { name: "ATDL Agent", icon: Code, color: "text-[#e91e63]", bg: "bg-[#e91e63]/10", description: "Validate ATDL configurations" },
+  }
+
+  // Context-aware suggestions based on current screen
+  const getContextSuggestions = () => {
+    const suggestions: Record<string, string[]> = {
+      dashboard: ["Show me pending approvals", "What cases need attention?", "Summarize today's activity"],
+      "onboarding-cases": ["Create a new case", "Show at-risk cases", "What's the average onboarding time?"],
+      "spec-compare": ["Compare these two specs", "What are the key differences?", "Generate a diff report"],
+      "log-analysis": ["Parse this FIX log", "Find errors in the log", "Explain message sequence"],
+      "test-case-gen": ["Generate edge cases", "Add negative test scenarios", "Explain coverage gaps"],
+      "certification-gen": ["Run full certification", "Explain failing tests", "Generate cert report"],
+      "case-workflow": ["What's the next step?", "Show case history", "Who needs to approve?"],
+      "client-cert-report": ["Correlate messages", "Explain gateway deltas", "Generate client report"],
+    }
+    return suggestions[currentScreen] || ["How can I help?", "Show me around", "What can you do?"]
+  }
+
+  // Simulated AI response handler
+  const handleAISend = () => {
+    if (!aiChatInput.trim()) return
+    const userMsg = aiChatInput.trim()
+    setAiChatHistory(prev => [...prev, { role: "user", content: userMsg, timestamp: new Date() }])
+    setAiChatInput("")
+    setAiIsTyping(true)
+    
+    // Simulate AI response delay
+    setTimeout(() => {
+      let response = ""
+      const agent = aiAgents[aiAgentMode]
+      
+      // Context-aware responses
+      if (userMsg.toLowerCase().includes("help") || userMsg.toLowerCase().includes("what can you do")) {
+        response = `As the ${agent.name}, I can help you with:\n\n• Navigate to any tool or screen\n• Answer questions about FIX protocols\n• Guide you through workflows step-by-step\n• Explain errors and suggest fixes\n• Generate reports and documentation\n\nTry asking me something specific!`
+      } else if (userMsg.toLowerCase().includes("case") || userMsg.toLowerCase().includes("onboarding")) {
+        response = `I see you're interested in onboarding cases. Here's what I found:\n\n• **5 active cases** currently in progress\n• **2 cases** are at-risk and need attention\n• **Goldman Sachs - Equities** is at 78% completion\n\nWould you like me to take you to the Onboarding Cases screen, or show details on a specific case?`
+      } else if (userMsg.toLowerCase().includes("spec") || userMsg.toLowerCase().includes("compare")) {
+        response = `I can help you compare FIX specifications. To get started:\n\n1. Upload your source spec (FIX 4.2, 4.4, or 5.0)\n2. Upload the target spec to compare against\n3. I'll analyze differences in message types, fields, and values\n\nWould you like me to navigate to the Spec Compare tool?`
+      } else if (userMsg.toLowerCase().includes("log") || userMsg.toLowerCase().includes("error")) {
+        response = `For log analysis, I can:\n\n• Parse FIX message logs and identify errors\n• Explain message sequences and flows\n• Highlight protocol violations\n• Suggest fixes for common issues\n\nUpload a log file or paste a FIX message, and I'll analyze it for you.`
+      } else if (userMsg.toLowerCase().includes("test") || userMsg.toLowerCase().includes("generate")) {
+        response = `I can generate test cases based on your FIX specification. Options include:\n\n• **Positive tests** - Valid message flows\n• **Negative tests** - Invalid inputs and edge cases\n• **Boundary tests** - Field length and value limits\n• **Sequence tests** - Multi-message scenarios\n\nWhich type of tests would you like to generate?`
+      } else if (userMsg.toLowerCase().includes("navigate") || userMsg.toLowerCase().includes("go to") || userMsg.toLowerCase().includes("take me")) {
+        response = `I can navigate you to any screen. Just tell me where:\n\n• "Take me to Dashboard"\n• "Go to Spec Compare"\n• "Open Log Analysis"\n• "Show Certification"\n\nOr click on any tool in the sidebar.`
+      } else {
+        response = `I understand you're asking about "${userMsg.slice(0, 50)}${userMsg.length > 50 ? "..." : ""}". Let me help you with that.\n\nBased on your current context (${currentScreen.replace(/-/g, " ")}), I suggest:\n\n• Check the relevant documentation\n• Review similar past cases\n• Contact support if needed\n\nWould you like me to elaborate on any of these?`
+      }
+      
+      setAiChatHistory(prev => [...prev, { role: "assistant", content: response, timestamp: new Date(), agent: aiAgentMode }])
+      setAiIsTyping(false)
+    }, 1200)
+  }
+
+  // AI Assistant Floating Button & Panel
+  const AIAssistant = () => (
+    <>
+      {/* Floating AI Button */}
+      {selectedRole && currentScreen !== "home" && currentScreen !== "role-select" && currentScreen !== "login" && (
+        <button
+          onClick={() => setShowAIAssistant(true)}
+          className={`fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110 ${
+            showAIAssistant ? "opacity-0 pointer-events-none" : "opacity-100"
+          } ${isDarkMode ? "bg-[#00e5ff] text-[#0a1628]" : "bg-[#0a1628] text-white"}`}
+          style={{ boxShadow: "0 0 20px rgba(0, 229, 255, 0.4)" }}
+        >
+          <Sparkles className="h-6 w-6" />
+        </button>
+      )}
+
+      {/* AI Assistant Panel */}
+      <div className={`fixed top-0 right-0 h-full z-50 transition-transform duration-300 ease-in-out ${
+        showAIAssistant ? "translate-x-0" : "translate-x-full"
+      }`} style={{ width: "420px" }}>
+        <div className={`h-full flex flex-col ${isDarkMode ? "bg-[#0d2137]" : "bg-white"} border-l ${borderColor} shadow-2xl`}>
+          {/* Header */}
+          <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-[#00e5ff]/10">
+                <Sparkles className="h-5 w-5 text-[#00e5ff]" />
+              </div>
+              <div>
+                <h3 className={`font-semibold ${textPrimary}`}>B-COMET AI</h3>
+                <p className={`text-xs ${textSecondary}`}>Powered by AI agents</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => { setAiChatHistory([{ role: "assistant", content: "Chat cleared. How can I help you?", timestamp: new Date(), agent: "general" }]); }}
+                className={`p-1.5 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}
+                title="Clear chat"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setShowAIAssistant(false)}
+                className={`p-1.5 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Agent Selector */}
+          <div className={`px-3 py-2 border-b ${borderColor} overflow-x-auto`}>
+            <div className="flex items-center gap-1.5" style={{ minWidth: "max-content" }}>
+              {(Object.entries(aiAgents) as [keyof typeof aiAgents, typeof aiAgents[keyof typeof aiAgents]][]).map(([key, agent]) => (
+                <button
+                  key={key}
+                  onClick={() => setAiAgentMode(key)}
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
+                    aiAgentMode === key
+                      ? `${agent.bg} ${agent.color} ring-1 ring-current`
+                      : `${textSecondary} hover:bg-[#1e4976]/30`
+                  }`}
+                >
+                  <agent.icon className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">{agent.name.split(" ")[0]}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Context Banner */}
+          <div className={`px-4 py-2 ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"} border-b ${borderColor}`}>
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full bg-[#4caf50] animate-pulse`} />
+              <span className={`text-xs ${textSecondary}`}>
+                Context: <span className={`font-medium ${textPrimary}`}>{currentScreen.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Chat Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {aiChatHistory.map((msg, i) => (
+              <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div className={`max-w-[85%] ${msg.role === "user" ? "order-1" : "order-2"}`}>
+                  {msg.role === "assistant" && msg.agent && (
+                    <div className="flex items-center gap-1.5 mb-1">
+                      {(() => {
+                        const agent = aiAgents[msg.agent as keyof typeof aiAgents]
+                        return agent ? (
+                          <>
+                            <agent.icon className={`h-3 w-3 ${agent.color}`} />
+                            <span className={`text-[10px] font-medium ${agent.color}`}>{agent.name}</span>
+                          </>
+                        ) : null
+                      })()}
+                    </div>
+                  )}
+                  <div className={`px-3 py-2 rounded-xl text-sm whitespace-pre-line ${
+                    msg.role === "user"
+                      ? "bg-[#00e5ff] text-[#0a1628] rounded-br-md"
+                      : isDarkMode
+                        ? "bg-[#1e4976]/40 text-[#e0f7fa] rounded-bl-md"
+                        : "bg-gray-100 text-gray-800 rounded-bl-md"
+                  }`}>
+                    {msg.content}
+                  </div>
+                  <p className={`text-[10px] ${textSecondary} mt-1 ${msg.role === "user" ? "text-right" : "text-left"}`}>
+                    {msg.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </p>
+                </div>
+              </div>
+            ))}
+            {aiIsTyping && (
+              <div className="flex justify-start">
+                <div className={`px-4 py-3 rounded-xl ${isDarkMode ? "bg-[#1e4976]/40" : "bg-gray-100"}`}>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-[#00e5ff] animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <div className="w-2 h-2 rounded-full bg-[#00e5ff] animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <div className="w-2 h-2 rounded-full bg-[#00e5ff] animate-bounce" style={{ animationDelay: "300ms" }} />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Quick Suggestions */}
+          <div className={`px-3 py-2 border-t ${borderColor}`}>
+            <div className="flex flex-wrap gap-1.5">
+              {getContextSuggestions().map((suggestion, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setAiChatInput(suggestion); }}
+                  className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                    isDarkMode
+                      ? "bg-[#1e4976]/40 text-[#90caf9] hover:bg-[#1e4976]/60"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Input Area */}
+          <div className={`p-3 border-t ${borderColor}`}>
+            <div className="flex items-center gap-2">
+              <Input
+                value={aiChatInput}
+                onChange={e => setAiChatInput(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleAISend(); } }}
+                placeholder={`Ask ${aiAgents[aiAgentMode].name}...`}
+                className={`flex-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder-[#64b5f6]" : ""}`}
+              />
+              <Button
+                onClick={handleAISend}
+                disabled={!aiChatInput.trim() || aiIsTyping}
+                className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] disabled:opacity-50"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+            <p className={`text-[10px] ${textSecondary} mt-2 text-center`}>
+              Press Enter to send • Cmd+K to toggle
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Backdrop */}
+      {showAIAssistant && (
+        <div
+          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
+          onClick={() => setShowAIAssistant(false)}
+        />
+      )}
+    </>
   )
 
   // Home Screen
@@ -2724,6 +2971,7 @@ export default function BCometPlatform() {
       return (
         <div className={`min-h-screen ${bgPrimary} flex`}>
           <Sidebar />
+          <AIAssistant />
           <div className="flex-1 overflow-auto">
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
               <div>
@@ -2907,6 +3155,7 @@ export default function BCometPlatform() {
       return (
         <div className={`min-h-screen ${bgPrimary} flex`}>
           <Sidebar />
+          <AIAssistant />
           <div className="flex-1 overflow-auto">
             {/* Header with title */}
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
@@ -3516,6 +3765,7 @@ export default function BCometPlatform() {
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
+        <AIAssistant />
         {addClientModalJSX}
         
         <div className="flex-1 overflow-auto">
@@ -3940,6 +4190,7 @@ const clientProgressData = [
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
+        <AIAssistant />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
             <div>
@@ -4918,6 +5169,7 @@ const specCompareResults = [
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
+        <AIAssistant />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
 <button onClick={() => { setShowSpecResults(false); setShowStandardizedSpecs(false); setSelectedAdminSpecForResults(null); setCurrentScreen("dashboard"); }} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
@@ -6429,6 +6681,7 @@ const specCompareResults = [
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
+        <AIAssistant />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => setCurrentScreen("asset-tools")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
@@ -10781,6 +11034,7 @@ const copyToClipboard = () => {
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
+        <AIAssistant />
         <div className="flex-1 overflow-auto">
           {/* Header */}
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
@@ -11014,7 +11268,7 @@ const copyToClipboard = () => {
               </div>
             )}
 
-            {/* ═══════════════════════════════════════════════════════
+            {/* ══════════════════════���════════════════════════════════
                 STEP 2: CORRELATION RESULTS
             ═══════════════════════════════════════════════════════ */}
             {certReportStep === "results" && (
@@ -11844,10 +12098,11 @@ const copyToClipboard = () => {
       { id: "field-mapping", name: "Field Mapping Report", description: "All field mappings and transformation rules", icon: Link2, format: "Excel" },
       { id: "audit-trail", name: "Audit Trail Report", description: "Complete history of all actions and changes", icon: Clock, format: "PDF/Excel" },
     ]
-
+    
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
+        <AIAssistant />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => selectedClient ? setCurrentScreen("client-detail") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
