@@ -5492,7 +5492,21 @@ const tools = [
 
   // Case Workflow Screen - 8-Phase Lifecycle View
   if (currentScreen === "case-workflow") {
-    const currentPhase = casePhases.find(p => p.num === currentCasePhase) || casePhases[0]
+    // Ensure currentCasePhase is valid
+    const validPhase = Math.max(1, Math.min(currentCasePhase || 1, 8))
+    const currentPhase = casePhases.find(p => p.num === validPhase) || casePhases[0]
+    
+    // Safety check - if currentPhase is somehow undefined, show error UI
+    if (!currentPhase || !currentPhase.tools) {
+      return (
+        <div className={`min-h-screen ${bgPrimary} flex items-center justify-center`}>
+          <div className="text-center">
+            <p className={textPrimary}>Error loading workflow. Please go back and try again.</p>
+            <Button className="mt-4" onClick={() => setCurrentScreen("onboarding-cases")}>Back to Cases</Button>
+          </div>
+        </div>
+      )
+    }
     const getPhaseStatus = (phaseNum: number) => {
       if (phaseNum < currentCasePhase) return "completed"
       if (phaseNum === currentCasePhase) return "in-progress"
@@ -13587,13 +13601,16 @@ const copyToClipboard = () => {
                             onClick={(e) => {
                               e.preventDefault()
                               e.stopPropagation()
+                              // Set all relevant state for case-workflow screen
                               setSelectedOnboardingCase(caseItem)
                               setSelectedCaseId(caseItem.id)
-                              setCurrentCasePhase(Math.min(caseItem.stage, 8))
+                              setSelectedToolId(null) // Reset selected tool
+                              const safePhase = Math.max(1, Math.min(caseItem.stage || 1, 8))
+                              setCurrentCasePhase(safePhase)
                               // Also set selectedCase and selectedClient for compatibility
                               setSelectedCase(workflowCase)
-                              if (matchingClient) setSelectedClient(matchingClient)
-                              setTimeout(() => setCurrentScreen("case-workflow"), 0)
+                              setSelectedClient(matchingClient || null)
+                              setCurrentScreen("case-workflow")
                             }}
                           >
                             <span className="font-mono font-medium text-[#00e5ff] group-hover/case:underline">{caseItem.id}</span>
