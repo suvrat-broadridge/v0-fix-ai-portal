@@ -173,7 +173,38 @@ export default function BCometPlatform() {
   const [certReportTitle, setCertReportTitle] = useState("FIX 4.2 Equities Certification Report")
   // Intake Portal state
   const [intakeStep, setIntakeStep] = useState(0)
-  const [intakeData, setIntakeData] = useState({
+  const [intakeData, setIntakeData] = useState<{
+    legalEntityName: string
+    lei: string
+    contactName: string
+    contactEmail: string
+    contactPhone: string
+    businessSponsor: string
+    jiraTicket: string
+    environments: string[]
+    businessLines: string[]
+    useCases: string[]
+    fixVersion: string
+    sessionRole: string
+    senderCompId: string
+    targetCompId: string
+    targetSubId: string
+    heartbeat: number
+    resetSeqPolicy: string
+    primaryHost: string
+    primaryPort: string
+    drHost: string
+    drPort: string
+    connectivity: string
+    sourceIps: string
+    tlsRequired: boolean
+    certMethod: string
+    authentication: string
+    encryptionNotes: string
+    uploadedFiles: {name: string, size: string, type: string}[]
+    autoExtract: boolean
+    confirmAccurate: boolean
+  }>({
     legalEntityName: "",
     lei: "",
     contactName: "",
@@ -181,9 +212,9 @@ export default function BCometPlatform() {
     contactPhone: "",
     businessSponsor: "",
     jiraTicket: "",
-    environments: [] as string[],
-    businessLines: [] as string[],
-    useCases: [] as string[],
+    environments: [],
+    businessLines: [],
+    useCases: [],
     fixVersion: "5.0",
     sessionRole: "initiator",
     senderCompId: "",
@@ -201,7 +232,7 @@ export default function BCometPlatform() {
     certMethod: "Manual",
     authentication: "None",
     encryptionNotes: "",
-    uploadedFiles: [] as {name: string, size: string, type: string}[],
+    uploadedFiles: [],
     autoExtract: false,
     confirmAccurate: false,
   })
@@ -5230,9 +5261,9 @@ const tools = [
       setIntakeData(prev => ({ ...prev, [field]: value }))
     }
 
-    const toggleCheckbox = (field: string, value: string) => {
+    const toggleCheckbox = (field: "environments" | "businessLines" | "useCases", value: string) => {
       setIntakeData(prev => {
-        const array = prev[field as keyof typeof prev] as string[]
+        const array = prev[field]
         return { ...prev, [field]: array.includes(value) ? array.filter(v => v !== value) : [...array, value] }
       })
     }
