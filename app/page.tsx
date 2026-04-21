@@ -238,9 +238,12 @@ export default function BCometPlatform() {
     confirmAccurate: false,
   })
   // Case Workflow state - 8-phase lifecycle tracking
-  const [currentCasePhase, setCurrentCasePhase] = useState(1)
+  const [currentCasePhase, setCurrentCasePhase] = useState(1) // Which phase is being VIEWED
+  const [highestCompletedPhase, setHighestCompletedPhase] = useState(4) // Actual progress - phases 1-4 completed
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null)
   const [selectedToolId, setSelectedToolId] = useState<string | null>(null)
+  const [currentToolIndex, setCurrentToolIndex] = useState(0) // Track current tool within a phase
+  const [showPhaseConfirmDialog, setShowPhaseConfirmDialog] = useState(false)
   const casePhases = [
     {
       num: 1,
@@ -5529,17 +5532,25 @@ const tools = [
     }
     
     const getPhaseStatus = (phaseNum: number): "completed" | "in-progress" | "available" | "blocked" => {
-      // Check if this phase has been passed (completed)
-      if (phaseNum < currentCasePhase) return "completed"
-      // Current active phase
-      if (phaseNum === currentCasePhase) return "in-progress"
+      // Use highestCompletedPhase to determine actual progress (not currentCasePhase which is just viewing)
+      // Check if this phase has been completed
+      if (phaseNum <= highestCompletedPhase) return "completed"
+      // Next phase after highest completed is in-progress
+      if (phaseNum === highestCompletedPhase + 1) return "in-progress"
       // Check dependencies for phases ahead
       const deps = phaseDependencies[phaseNum] || []
-      const depsCompleted = deps.every(dep => dep < currentCasePhase)
+      const depsCompleted = deps.every(dep => dep <= highestCompletedPhase)
       // If all dependencies are met, phase is available to work on
       if (depsCompleted) return "available"
       // Otherwise blocked
       return "blocked"
+    }
+    
+    // Check if current viewing phase has incomplete tools
+    const isCurrentPhaseComplete = () => {
+      const phase = casePhases.find(p => p.num === currentCasePhase)
+      if (!phase) return true
+      return phase.tools.every(tool => tool.status === "completed")
     }
     
     // Status colors for visual distinction
@@ -5702,14 +5713,23 @@ const tools = [
                     disabled={currentCasePhase === 1}
                     className="disabled:opacity-50"
                   >
-                    <ChevronLeft className="h-4 w-4 mr-1" /> Previous
+                    <ChevronLeft className="h-4 w-4 mr-1" /> Previous Phase
                   </Button>
                   <Button
-                    onClick={() => currentCasePhase < 8 && setCurrentCasePhase(currentCasePhase + 1)}
+                    onClick={() => {
+                      if (currentCasePhase >= 8) return
+                      if (!isCurrentPhaseComplete()) {
+                        setShowPhaseConfirmDialog(true)
+                      } else {
+                        setCurrentCasePhase(currentCasePhase + 1)
+                        setCurrentToolIndex(0)
+                        setSelectedToolId(null)
+                      }
+                    }}
                     disabled={currentCasePhase === 8}
                     className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] disabled:opacity-50"
                   >
-                    Next <ChevronRight className="h-4 w-4 ml-1" />
+                    Next Phase <ChevronRight className="h-4 w-4 ml-1" />
                   </Button>
                 </div>
               </div>
@@ -5916,23 +5936,54 @@ const tools = [
               ) : (
                 // Show tools grid
                 <>
+                  {/* Step indicator bar */}
+                  <div className={`flex items-center gap-2 mb-6 p-3 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                    <span className={`text-sm font-medium ${textSecondary}`}>Steps:</span>
+                    {currentPhase.tools.map((tool, idx) => (
+                      <button
+                        key={tool.id}
+                        onClick={() => { setCurrentToolIndex(idx); setSelectedToolId(tool.id); }}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                          idx === currentToolIndex 
+                            ? "bg-[#00e5ff] text-[#0a1628]" 
+                            : tool.status === "completed"
+                            ? "bg-[#4caf50]/20 text-[#4caf50]"
+                            : `${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"} ${textSecondary} hover:bg-[#00e5ff]/20`
+                        }`}
+                      >
+                        {tool.status === "completed" ? (
+                          <CheckCircle className="h-3 w-3" />
+                        ) : (
+                          <span>{idx + 1}</span>
+                        )}
+                        {tool.name}
+                      </button>
+                    ))}
+                  </div>
+
                   <h2 className={`text-lg font-semibold ${textPrimary} mb-4`}>Available Tools & Actions</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {currentPhase.tools.map((tool) => {
+                    {currentPhase.tools.map((tool, idx) => {
                       const ToolIcon = tool.icon
+                      const isCurrentStep = idx === currentToolIndex
                       return (
                         <Card
                           key={tool.id}
-                          className={`${bgCard} border ${borderColor} hover:shadow-lg transition-all cursor-pointer group`}
-                          onClick={() => setSelectedToolId(tool.id)}
+                          className={`${bgCard} border ${isCurrentStep ? "border-[#00e5ff] ring-2 ring-[#00e5ff]/20" : borderColor} hover:shadow-lg transition-all cursor-pointer group`}
+                          onClick={() => { setCurrentToolIndex(idx); setSelectedToolId(tool.id); }}
                         >
                           <div className="p-4">
                             <div className="flex items-start justify-between mb-3">
-                              <div
-                                className="w-10 h-10 rounded-lg flex items-center justify-center"
-                                style={{ backgroundColor: currentPhase.color + "20" }}
-                              >
-                                <ToolIcon className="h-5 w-5" style={{ color: currentPhase.color }} />
+                              <div className="flex items-center gap-2">
+                                <span className={`text-xs font-bold px-2 py-0.5 rounded ${isCurrentStep ? "bg-[#00e5ff] text-[#0a1628]" : `${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"} ${textSecondary}`}`}>
+                                  Step {idx + 1}
+                                </span>
+                                <div
+                                  className="w-8 h-8 rounded-lg flex items-center justify-center"
+                                  style={{ backgroundColor: currentPhase.color + "20" }}
+                                >
+                                  <ToolIcon className="h-4 w-4" style={{ color: currentPhase.color }} />
+                                </div>
                               </div>
                               {getToolStatusIcon(tool.status)}
                             </div>
@@ -5957,11 +6008,43 @@ const tools = [
                     })}
                   </div>
 
+                  {/* Step Navigation Footer */}
+                  <div className={`mt-6 flex items-center justify-between p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} border ${borderColor}`}>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        if (currentToolIndex > 0) {
+                          setCurrentToolIndex(currentToolIndex - 1)
+                          setSelectedToolId(currentPhase.tools[currentToolIndex - 1].id)
+                        }
+                      }}
+                      disabled={currentToolIndex === 0}
+                      className="disabled:opacity-50"
+                    >
+                      <ChevronLeft className="h-4 w-4 mr-1" /> Previous Step
+                    </Button>
+                    <div className={`text-sm ${textSecondary}`}>
+                      Step {currentToolIndex + 1} of {currentPhase.tools.length} in Phase {currentCasePhase}
+                    </div>
+                    <Button
+                      onClick={() => {
+                        if (currentToolIndex < currentPhase.tools.length - 1) {
+                          setCurrentToolIndex(currentToolIndex + 1)
+                          setSelectedToolId(currentPhase.tools[currentToolIndex + 1].id)
+                        }
+                      }}
+                      disabled={currentToolIndex === currentPhase.tools.length - 1}
+                      className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] disabled:opacity-50"
+                    >
+                      Next Step <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </div>
+
                   {/* Phase Completion Summary */}
                   <div className={`mt-8 ${bgSecondary} border ${borderColor} rounded-lg p-6`}>
                     <h3 className={`font-semibold ${textPrimary} mb-4`}>Phase Completion Requirements</h3>
                     <div className="space-y-3">
-                      {currentPhase.tools.map((tool) => (
+                      {currentPhase.tools.map((tool, idx) => (
                         <div key={tool.id} className="flex items-center gap-3">
                           {tool.status === "completed" ? (
                             <CheckCircle className="h-5 w-5 text-[#4caf50]" />
@@ -5971,14 +6054,14 @@ const tools = [
                             <Circle className="h-5 w-5" style={{ color: isDarkMode ? "#64748b" : "#94a3b8" }} />
                           )}
                           <span className={`text-sm ${tool.status === "completed" ? "line-through text-gray-500" : textPrimary}`}>
-                            {tool.name}
+                            Step {idx + 1}: {tool.name}
                           </span>
                         </div>
                       ))}
                     </div>
                     <div className="mt-4 pt-4 border-t border-[#1e4976]/30">
                       <p className={`text-sm ${textSecondary}`}>
-                        Complete all tools in this phase to unlock Phase {currentCasePhase < 8 ? currentCasePhase + 1 : "completion"}.
+                        Complete all steps in this phase to unlock Phase {currentCasePhase < 8 ? currentCasePhase + 1 : "completion"}.
                       </p>
                     </div>
                   </div>
@@ -5987,6 +6070,49 @@ const tools = [
             </div>
           </div>
         </div>
+        
+        {/* Confirmation Dialog for incomplete phase */}
+        {showPhaseConfirmDialog && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <Card className={`${bgCard} border ${borderColor} p-6 max-w-md mx-4`}>
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-full bg-[#ff9800]/20">
+                  <AlertTriangle className="h-6 w-6 text-[#ff9800]" />
+                </div>
+                <div className="flex-1">
+                  <h3 className={`text-lg font-bold ${textPrimary}`}>Incomplete Phase</h3>
+                  <p className={`text-sm ${textSecondary} mt-2`}>
+                    Phase {currentCasePhase} ({casePhases[currentCasePhase - 1]?.name}) has incomplete steps. 
+                    Are you sure you want to proceed to the next phase?
+                  </p>
+                  <p className={`text-xs ${textSecondary} mt-2`}>
+                    You can always return to complete the remaining steps later.
+                  </p>
+                  <div className="flex gap-3 mt-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowPhaseConfirmDialog(false)}
+                      className="flex-1"
+                    >
+                      Stay Here
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setShowPhaseConfirmDialog(false)
+                        setCurrentCasePhase(currentCasePhase + 1)
+                        setCurrentToolIndex(0)
+                        setSelectedToolId(null)
+                      }}
+                      className="flex-1 bg-[#ff9800] text-white hover:bg-[#f57c00]"
+                    >
+                      Continue Anyway
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
     )
   }
@@ -6019,17 +6145,68 @@ const tools = [
       setComparisonFlags(prev => ({ ...prev, [id]: { ...prev[id], note, status: prev[id]?.status || null } }))
     }
 
+    // Get phase context info for tool screens
+    const currentPhaseInfo = casePhases.find(p => p.num === currentCasePhase)
+    const currentToolInfo = currentPhaseInfo?.tools[currentToolIndex]
+    const nextToolInfo = currentPhaseInfo?.tools[currentToolIndex + 1]
+    const isLastToolInPhase = currentToolIndex >= (currentPhaseInfo?.tools.length || 1) - 1
+
     // Client-specific flow: When coming from Dashboard -> Client -> Compare
     if (!isAdHocMode && selectedClient && selectedAssetClass) {
       return (
         <div className={`min-h-screen ${bgPrimary} flex`}>
           <Sidebar />
           <div className="flex-1 overflow-auto">
+            {/* Phase Context Banner - shows when coming from case workflow */}
+            {selectedCaseId && currentPhaseInfo && (
+              <div className={`${isDarkMode ? "bg-[#0d2847]" : "bg-blue-50"} border-b ${borderColor} px-6 py-3`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs font-bold px-2 py-1 rounded bg-[#00e5ff]/20 text-[#00e5ff]`}>
+                        Phase {currentCasePhase}
+                      </span>
+                      <span className={`text-sm font-medium ${textPrimary}`}>{currentPhaseInfo.name}</span>
+                    </div>
+                    <ChevronRight className={`h-4 w-4 ${textSecondary}`} />
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs font-bold px-2 py-1 rounded bg-[#ff9800]/20 text-[#ff9800]`}>
+                        Step {currentToolIndex + 1}/{currentPhaseInfo.tools.length}
+                      </span>
+                      <span className={`text-sm font-medium ${textPrimary}`}>Spec Comparison</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {!isLastToolInPhase && nextToolInfo && (
+                      <span className={`text-xs ${textSecondary}`}>
+                        Next: {nextToolInfo.name}
+                      </span>
+                    )}
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        if (isLastToolInPhase) {
+                          setCurrentCasePhase(Math.min(currentCasePhase + 1, 8))
+                          setCurrentToolIndex(0)
+                        } else {
+                          setCurrentToolIndex(currentToolIndex + 1)
+                        }
+                        setCurrentScreen("case-workflow")
+                      }}
+                      className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
+                    >
+                      {isLastToolInPhase ? "Complete Phase" : "Next Step"} <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
               <div className="flex items-center gap-4 mb-2">
                 {selectedCaseId && (
                   <button onClick={() => setCurrentScreen("case-workflow")} className={`flex items-center gap-2 ${textSecondary} hover:text-[#00e5ff]`}>
-                    <ArrowLeft className="h-4 w-4" /> Back to Case
+                    <ArrowLeft className="h-4 w-4" /> Back to Case Workflow
                   </button>
                 )}
                 {!selectedCaseId && (
@@ -6904,13 +7081,63 @@ const tools = [
       setLogAnalysisFlags(prev => ({ ...prev, [id]: { ...prev[id], note, status: prev[id]?.status || null } }))
     }
     
+    // Get phase context info for log-analysis
+    const logPhaseInfo = casePhases.find(p => p.num === currentCasePhase)
+    const logNextToolInfo = logPhaseInfo?.tools[currentToolIndex + 1]
+    const logIsLastToolInPhase = currentToolIndex >= (logPhaseInfo?.tools.length || 1) - 1
+    
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
+          {/* Phase Context Banner */}
+          {selectedCaseId && logPhaseInfo && (
+            <div className={`${isDarkMode ? "bg-[#0d2847]" : "bg-blue-50"} border-b ${borderColor} px-6 py-3`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-bold px-2 py-1 rounded bg-[#00e5ff]/20 text-[#00e5ff]`}>
+                      Phase {currentCasePhase}
+                    </span>
+                    <span className={`text-sm font-medium ${textPrimary}`}>{logPhaseInfo.name}</span>
+                  </div>
+                  <ChevronRight className={`h-4 w-4 ${textSecondary}`} />
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-bold px-2 py-1 rounded bg-[#ff9800]/20 text-[#ff9800]`}>
+                      Step {currentToolIndex + 1}/{logPhaseInfo.tools.length}
+                    </span>
+                    <span className={`text-sm font-medium ${textPrimary}`}>Log Analysis</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {!logIsLastToolInPhase && logNextToolInfo && (
+                    <span className={`text-xs ${textSecondary}`}>
+                      Next: {logNextToolInfo.name}
+                    </span>
+                  )}
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      if (logIsLastToolInPhase) {
+                        setCurrentCasePhase(Math.min(currentCasePhase + 1, 8))
+                        setCurrentToolIndex(0)
+                      } else {
+                        setCurrentToolIndex(currentToolIndex + 1)
+                      }
+                      setCurrentScreen("case-workflow")
+                    }}
+                    className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
+                  >
+                    {logIsLastToolInPhase ? "Complete Phase" : "Next Step"} <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => selectedCaseId ? setCurrentScreen("case-workflow") : isAdHocMode ? setCurrentScreen("dashboard") : setCurrentScreen("client-detail")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
-              <ArrowLeft className="h-4 w-4" /> {selectedCaseId ? "Back to Case" : "Back"}
+              <ArrowLeft className="h-4 w-4" /> {selectedCaseId ? "Back to Case Workflow" : "Back"}
             </button>
             <h1 className={`text-2xl font-bold ${textPrimary}`}>Log Analysis</h1>
             {!isAdHocMode && selectedClient && (
@@ -12565,7 +12792,7 @@ const copyToClipboard = () => {
 
             {/* ══════════════════════���═════════���══════════��═══════════
                 STEP 2: CORRELATION RESULTS
-            ═════════════���═════════════════════════════════════════ */}
+            ═════════════���════════════════════════════════��════════ */}
             {certReportStep === "results" && (
               <div className="space-y-6">
                 {/* KPI Row 1 */}
