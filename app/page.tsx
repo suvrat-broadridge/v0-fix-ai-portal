@@ -2082,14 +2082,14 @@ export default function BCometPlatform() {
           // Max radius 42 keeps Launch just inside a square viewport
           const CX = 50, CY = 50
           const solarPlanets = [
-            { name: "Intake",  radius: 7,  color: "#2196f3", size: 1.0, tools: ["Intake Portal", "Doc Upload", "AI Gap Analysis"] },
+            { name: "Intake",  radius: 5,  color: "#2196f3", size: 1.0, tools: ["Intake Portal", "Doc Upload", "AI Gap Analysis"] },
             { name: "Design",  radius: 12, color: "#9c27b0", size: 1.1, tools: ["Spec Compare", "ATDL Config", "Field Mapping"] },
-            { name: "Connect", radius: 17, color: "#00bcd4", size: 1.2, tools: ["Network Setup", "Session Validation"] },
-            { name: "Plan",    radius: 22, color: "#ff9800", size: 1.3, tools: ["Test Case Gen", "Cert Test Plan"] },
-            { name: "Execute", radius: 27, color: "#e91e63", size: 1.4, tools: ["Log Analysis", "Test Runner", "Evidence"] },
-            { name: "Analyze", radius: 33, color: "#f44336", size: 1.5, tools: ["Root Cause AI", "Defect Tracking"] },
-            { name: "Decide",  radius: 38, color: "#4caf50", size: 1.6, tools: ["Cert Report", "Go/No-Go"] },
-            { name: "Launch",  radius: 43, color: "#00e5ff", size: 1.7, tools: ["Prod Config", "Go-Live", "Hypercare"] },
+            { name: "Connect", radius: 19, color: "#00bcd4", size: 1.2, tools: ["Network Setup", "Session Validation"] },
+            { name: "Plan",    radius: 26, color: "#ff9800", size: 1.3, tools: ["Test Case Gen", "Cert Test Plan"] },
+            { name: "Execute", radius: 33, color: "#e91e63", size: 1.4, tools: ["Log Analysis", "Test Runner", "Evidence"] },
+            { name: "Analyze", radius: 40, color: "#f44336", size: 1.5, tools: ["Root Cause AI", "Defect Tracking"] },
+            { name: "Decide",  radius: 47, color: "#4caf50", size: 1.6, tools: ["Cert Report", "Go/No-Go"] },
+            { name: "Launch",  radius: 54, color: "#00e5ff", size: 1.7, tools: ["Prod Config", "Go-Live", "Hypercare"] },
           ]
           const angleRad = (cometAngleDeg * Math.PI) / 180
           const cp = solarPlanets[cometPhase]
