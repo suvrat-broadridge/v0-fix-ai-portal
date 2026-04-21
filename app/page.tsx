@@ -172,6 +172,11 @@ export default function BCometPlatform() {
   const [certReportOptions, setCertReportOptions] = useState({ clientMessages: true, passFailResults: true, gatewayNotes: true, rawConductor: false, unmatchedCases: false })
   const [certClientName, setCertClientName] = useState("Goldman Sachs")
   const [certReportTitle, setCertReportTitle] = useState("FIX 4.2 Equities Certification Report")
+  // Solar System Animation state
+  const [cometPhase, setCometPhase] = useState(0) // 0-7 for each phase
+  const [visitedPlanets, setVisitedPlanets] = useState<number[]>([])
+  const [activePlanetTools, setActivePlanetTools] = useState<number | null>(null)
+  
   // Intake Portal state
   const [intakeStep, setIntakeStep] = useState(0)
   const [intakeData, setIntakeData] = useState<{
@@ -2115,87 +2120,176 @@ export default function BCometPlatform() {
             </div>
 
             <div className="lg:col-span-2">
-              {/* 8-Phase Orbital Animation - Comet visiting planets */}
-              <div className={`${bgCard}/80 backdrop-blur-md p-4 border ${borderColor} rounded-xl`}>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className={`font-semibold ${textPrimary}`}>8-Phase Journey</h3>
-                  <span className="flex h-2 w-2 rounded-full bg-[#4caf50] animate-pulse" />
-                </div>
+              {/* Solar System Animation - Comet visiting planets at different orbits */}
+              {(() => {
+                const solarPlanets = [
+                  { name: "Intake", radius: 35, color: "#2196f3", tools: ["Intake Portal", "Doc Upload", "AI Gap Analysis"] },
+                  { name: "Design", radius: 50, color: "#9c27b0", tools: ["Spec Compare", "ATDL Config", "Field Mapping"] },
+                  { name: "Connect", radius: 65, color: "#00bcd4", tools: ["Network Setup", "Session Validation"] },
+                  { name: "Plan", radius: 80, color: "#ff9800", tools: ["Test Case Gen", "Cert Test Plan"] },
+                  { name: "Execute", radius: 95, color: "#e91e63", tools: ["Log Analysis", "Test Runner", "Evidence"] },
+                  { name: "Analyze", radius: 110, color: "#f44336", tools: ["Root Cause AI", "Defect Tracking"] },
+                  { name: "Decide", radius: 125, color: "#4caf50", tools: ["Cert Report", "Go/No-Go"] },
+                  { name: "Launch", radius: 140, color: "#00e5ff", tools: ["Prod Config", "Go-Live", "Hypercare"] },
+                ]
+                const cometAngle = (cometPhase / 8) * 360
+                const cometRad = (cometAngle * Math.PI) / 180
+                const currentPlanet = solarPlanets[cometPhase % 8]
+                const cometX = 160 + currentPlanet.radius * Math.cos(cometRad - Math.PI / 2)
+                const cometY = 160 + currentPlanet.radius * Math.sin(cometRad - Math.PI / 2)
+                // Tail points away from sun (center)
+                const tailAngle = Math.atan2(cometY - 160, cometX - 160) * (180 / Math.PI)
                 
-                {/* Orbital System */}
-                <div className="relative h-72 w-full">
-                  {/* Orbit path */}
-                  <svg className="absolute inset-0 w-full h-full" viewBox="0 0 300 280">
-                    <ellipse cx="150" cy="140" rx="130" ry="120" fill="none" stroke={isDarkMode ? "#1e4976" : "#e2e8f0"} strokeWidth="1" strokeDasharray="4 4" />
-                  </svg>
-                  
-                  {/* 8 Planets positioned around the orbit */}
-                  {[
-                    { name: "Intake", angle: 0, color: "#2196f3", completed: true },
-                    { name: "Design", angle: 45, color: "#9c27b0", completed: true },
-                    { name: "Connect", angle: 90, color: "#00bcd4", completed: true },
-                    { name: "Plan", angle: 135, color: "#ff9800", completed: false },
-                    { name: "Execute", angle: 180, color: "#e91e63", completed: false },
-                    { name: "Analyze", angle: 225, color: "#f44336", completed: false },
-                    { name: "Decide", angle: 270, color: "#4caf50", completed: false },
-                    { name: "Launch", angle: 315, color: "#00e5ff", completed: false },
-                  ].map((planet, i) => {
-                    const rad = (planet.angle * Math.PI) / 180;
-                    const x = 150 + 130 * Math.cos(rad);
-                    const y = 140 + 120 * Math.sin(rad);
-                    return (
-                      <div
-                        key={planet.name}
-                        className="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
-                        style={{ left: `${(x / 300) * 100}%`, top: `${(y / 280) * 100}%` }}
-                      >
-                        <div 
-                          className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold transition-all duration-500 ${planet.completed ? "ring-2 ring-[#4caf50] ring-offset-2 ring-offset-[#0a1628]" : ""}`}
-                          style={{ 
-                            backgroundColor: planet.completed ? "#4caf50" : planet.color,
-                            boxShadow: `0 0 ${planet.completed ? "15px" : "10px"} ${planet.completed ? "#4caf50" : planet.color}40`
-                          }}
-                        >
-                          {i + 1}
+                return (
+                  <div className={`${bgCard}/80 backdrop-blur-md p-4 border ${borderColor} rounded-xl`}>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className={`font-semibold ${textPrimary}`}>8-Phase Solar System</h3>
+                      <span className="flex h-2 w-2 rounded-full bg-[#4caf50] animate-pulse" />
+                    </div>
+                    
+                    {/* Solar System */}
+                    <div className="relative h-80 w-full flex items-center justify-center">
+                      {/* Orbit rings */}
+                      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 320 320">
+                        {solarPlanets.map((planet, i) => (
+                          <circle 
+                            key={planet.name} 
+                            cx="160" 
+                            cy="160" 
+                            r={planet.radius} 
+                            fill="none" 
+                            stroke={visitedPlanets.includes(i) ? "#4caf5030" : isDarkMode ? "#1e4976" : "#e2e8f0"} 
+                            strokeWidth="1" 
+                            strokeDasharray="4 4" 
+                          />
+                        ))}
+                      </svg>
+                      
+                      {/* Sun - Active Cases (center) */}
+                      <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+                        <div className={`w-14 h-14 rounded-full bg-gradient-to-br from-[#ff9800] via-[#ff5722] to-[#f44336] flex items-center justify-center shadow-lg animate-pulse`} style={{ boxShadow: "0 0 30px #ff980080, 0 0 60px #ff572240" }}>
+                          <Briefcase className="h-6 w-6 text-white" />
                         </div>
-                        <span className={`text-[9px] mt-1 ${planet.completed ? "text-[#4caf50] font-medium" : textSecondary}`}>{planet.name}</span>
+                        <p className={`text-[10px] text-center mt-1 ${textPrimary} font-medium`}>Active Cases</p>
                       </div>
-                    );
-                  })}
-                  
-                  {/* Animated Comet traveling the orbit */}
-                  <div className="absolute animate-[orbitComet_16s_linear_infinite]" style={{ left: "50%", top: "50%", transformOrigin: "0 0" }}>
-                    <div className="relative" style={{ transform: "translate(-50%, -50%)" }}>
-                      <CometLogo size={28} />
-                      {/* Comet trail */}
-                      <div className="absolute -right-6 top-1/2 -translate-y-1/2 w-8 h-1 bg-gradient-to-r from-[#00e5ff] to-transparent rounded-full opacity-60" />
+                      
+                      {/* 8 Planets at different orbital distances */}
+                      {solarPlanets.map((planet, i) => {
+                        const angle = (i / 8) * 360 - 90 // Start from top
+                        const rad = (angle * Math.PI) / 180
+                        const x = 160 + planet.radius * Math.cos(rad)
+                        const y = 160 + planet.radius * Math.sin(rad)
+                        const isVisited = visitedPlanets.includes(i)
+                        const isActive = activePlanetTools === i
+                        const planetSize = 8 + (i * 1.5) // Larger planets further out
+                        
+                        return (
+                          <div key={planet.name}>
+                            <div
+                              className="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center cursor-pointer z-20"
+                              style={{ left: `${(x / 320) * 100}%`, top: `${(y / 320) * 100}%` }}
+                              onClick={() => setActivePlanetTools(isActive ? null : i)}
+                            >
+                              <div 
+                                className={`rounded-full flex items-center justify-center text-white font-bold transition-all duration-500 ${isVisited ? "ring-2 ring-[#4caf50]" : ""} ${isActive ? "scale-125" : ""}`}
+                                style={{ 
+                                  width: planetSize * 2.5,
+                                  height: planetSize * 2.5,
+                                  fontSize: planetSize > 12 ? "11px" : "9px",
+                                  backgroundColor: isVisited ? "#4caf50" : planet.color,
+                                  boxShadow: `0 0 ${isVisited ? "20px" : "12px"} ${isVisited ? "#4caf50" : planet.color}60`
+                                }}
+                              >
+                                {i + 1}
+                              </div>
+                              <span className={`text-[8px] mt-0.5 whitespace-nowrap ${isVisited ? "text-[#4caf50] font-medium" : textSecondary}`}>{planet.name}</span>
+                            </div>
+                            
+                            {/* Tools popup when active */}
+                            {isActive && (
+                              <div 
+                                className={`absolute z-30 ${bgCard} border ${borderColor} rounded-lg p-2 shadow-xl min-w-[120px]`}
+                                style={{ 
+                                  left: `${(x / 320) * 100}%`, 
+                                  top: `${((y + 30) / 320) * 100}%`,
+                                  transform: "translateX(-50%)"
+                                }}
+                              >
+                                <p className={`text-[9px] font-semibold ${textPrimary} mb-1 border-b ${borderColor} pb-1`}>{planet.name} Tools</p>
+                                {planet.tools.map((tool, ti) => (
+                                  <div key={ti} className="flex items-center gap-1 py-0.5">
+                                    <div className={`w-1.5 h-1.5 rounded-full ${isVisited ? "bg-[#4caf50]" : "bg-gray-400"}`} />
+                                    <span className={`text-[8px] ${textSecondary}`}>{tool}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                      
+                      {/* Animated Comet */}
+                      <div 
+                        className="absolute z-40 transition-all duration-1000 ease-in-out"
+                        style={{ 
+                          left: `${(cometX / 320) * 100}%`, 
+                          top: `${(cometY / 320) * 100}%`,
+                          transform: "translate(-50%, -50%)"
+                        }}
+                      >
+                        <div className="relative" style={{ transform: `rotate(${tailAngle + 180}deg)` }}>
+                          <CometLogo size={24} />
+                          {/* Comet tail pointing away from sun */}
+                          <div className="absolute left-full top-1/2 -translate-y-1/2 w-10 h-1.5 bg-gradient-to-r from-[#00e5ff] via-[#00e5ff80] to-transparent rounded-full" />
+                          <div className="absolute left-full top-1/2 -translate-y-1/2 mt-1 w-8 h-0.5 bg-gradient-to-r from-[#00e5ff60] to-transparent rounded-full" />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  
-                  {/* Center - Current Case */}
-                  <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                    <div className={`w-16 h-16 rounded-full ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-100"} flex items-center justify-center mx-auto mb-1 border ${borderColor}`}>
-                      <Briefcase className="h-6 w-6 text-[#00e5ff]" />
-                    </div>
-                    <p className={`text-xs font-medium ${textPrimary}`}>Active Case</p>
-                    <p className={`text-[10px] ${textSecondary}`}>Phase 4 of 8</p>
-                  </div>
-                </div>
 
-                {/* Bottom status */}
-                <div className={`mt-2 pt-3 border-t ${borderColor}`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-[#4caf50]" />
-                      <span className={`text-[10px] ${textSecondary}`}>3 phases complete</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-[#ff9800] animate-pulse" />
-                      <span className={`text-[10px] ${textSecondary}`}>Cert Planning in progress</span>
+                    {/* Animation controls */}
+                    <div className={`mt-2 pt-3 border-t ${borderColor}`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="h-6 text-[10px] px-2"
+                            onClick={() => {
+                              const newPhase = (cometPhase + 1) % 8
+                              setCometPhase(newPhase)
+                              if (!visitedPlanets.includes(newPhase)) {
+                                setVisitedPlanets([...visitedPlanets, newPhase])
+                              }
+                              setActivePlanetTools(newPhase)
+                              setTimeout(() => setActivePlanetTools(null), 2000)
+                            }}
+                          >
+                            <ChevronRight className="h-3 w-3 mr-1" /> Next Phase
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="h-6 text-[10px] px-2"
+                            onClick={() => { setVisitedPlanets([]); setCometPhase(0); setActivePlanetTools(null) }}
+                          >
+                            Reset
+                          </Button>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 rounded-full bg-[#4caf50]" />
+                            <span className={`text-[10px] ${textSecondary}`}>{visitedPlanets.length} visited</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 rounded-full bg-[#ff9800] animate-pulse" />
+                            <span className={`text-[10px] ${textSecondary}`}>Phase {cometPhase + 1}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                )
+              })()}
             </div>
           </div>
 
@@ -13139,7 +13233,7 @@ const copyToClipboard = () => {
 
             {/* ═════════════════════════════════════════════���═════════
                 STEP 4: GENERATE CLIENT REPORT
-            ═══════════════════════════════════════════════════════ */}
+            ═══════════════════��═══════════════════════════════════ */}
             {certReportStep === "generate" && (
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-6">
