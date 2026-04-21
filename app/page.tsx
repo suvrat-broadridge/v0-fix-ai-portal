@@ -5491,7 +5491,13 @@ const tools = [
 
   // Case Workflow Screen - 8-Phase Lifecycle View
   if (currentScreen === "case-workflow") {
+    console.log("[v0] case-workflow rendering", { currentCasePhase, casePhases: casePhases?.length, selectedCaseId, selectedToolId })
+    if (!casePhases || casePhases.length === 0) {
+      console.log("[v0] ERROR: casePhases is empty or undefined")
+      return <div>Error: No phases defined</div>
+    }
     const currentPhase = casePhases.find(p => p.num === currentCasePhase) || casePhases[0]
+    console.log("[v0] currentPhase", { name: currentPhase?.name, tools: currentPhase?.tools?.length })
     const getPhaseStatus = (phaseNum: number) => {
       if (phaseNum < currentCasePhase) return "completed"
       if (phaseNum === currentCasePhase) return "in-progress"
