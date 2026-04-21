@@ -2115,96 +2115,84 @@ export default function BCometPlatform() {
             </div>
 
             <div className="lg:col-span-2">
-              {/* Animated Process Grid */}
+              {/* 8-Phase Orbital Animation - Comet visiting planets */}
               <div className={`${bgCard}/80 backdrop-blur-md p-4 border ${borderColor} rounded-xl`}>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className={`font-semibold ${textPrimary}`}>Live Platform Processes</h3>
+                  <h3 className={`font-semibold ${textPrimary}`}>8-Phase Journey</h3>
                   <span className="flex h-2 w-2 rounded-full bg-[#4caf50] animate-pulse" />
                 </div>
                 
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Spec Compare Animation */}
-                  <div className={`p-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"} overflow-hidden relative`}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <GitCompare className="h-4 w-4 text-[#00e5ff]" />
-                      <span className={`text-xs font-medium ${textPrimary}`}>Spec Compare</span>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <div className="h-1.5 flex-1 rounded bg-[#1e4976]/30 overflow-hidden">
-                          <div className="h-full bg-[#4caf50] rounded animate-[progressBar_3s_ease-in-out_infinite]" style={{ width: '75%' }} />
+                {/* Orbital System */}
+                <div className="relative h-72 w-full">
+                  {/* Orbit path */}
+                  <svg className="absolute inset-0 w-full h-full" viewBox="0 0 300 280">
+                    <ellipse cx="150" cy="140" rx="130" ry="120" fill="none" stroke={isDarkMode ? "#1e4976" : "#e2e8f0"} strokeWidth="1" strokeDasharray="4 4" />
+                  </svg>
+                  
+                  {/* 8 Planets positioned around the orbit */}
+                  {[
+                    { name: "Intake", angle: 0, color: "#2196f3", completed: true },
+                    { name: "Design", angle: 45, color: "#9c27b0", completed: true },
+                    { name: "Connect", angle: 90, color: "#00bcd4", completed: true },
+                    { name: "Plan", angle: 135, color: "#ff9800", completed: false },
+                    { name: "Execute", angle: 180, color: "#e91e63", completed: false },
+                    { name: "Analyze", angle: 225, color: "#f44336", completed: false },
+                    { name: "Decide", angle: 270, color: "#4caf50", completed: false },
+                    { name: "Launch", angle: 315, color: "#00e5ff", completed: false },
+                  ].map((planet, i) => {
+                    const rad = (planet.angle * Math.PI) / 180;
+                    const x = 150 + 130 * Math.cos(rad);
+                    const y = 140 + 120 * Math.sin(rad);
+                    return (
+                      <div
+                        key={planet.name}
+                        className="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
+                        style={{ left: `${(x / 300) * 100}%`, top: `${(y / 280) * 100}%` }}
+                      >
+                        <div 
+                          className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold transition-all duration-500 ${planet.completed ? "ring-2 ring-[#4caf50] ring-offset-2 ring-offset-[#0a1628]" : ""}`}
+                          style={{ 
+                            backgroundColor: planet.completed ? "#4caf50" : planet.color,
+                            boxShadow: `0 0 ${planet.completed ? "15px" : "10px"} ${planet.completed ? "#4caf50" : planet.color}40`
+                          }}
+                        >
+                          {i + 1}
                         </div>
-                        <span className="text-[10px] text-[#4caf50]">75%</span>
+                        <span className={`text-[9px] mt-1 ${planet.completed ? "text-[#4caf50] font-medium" : textSecondary}`}>{planet.name}</span>
                       </div>
-                      <p className={`text-[10px] ${textSecondary}`}>Goldman Sachs - Equities</p>
+                    );
+                  })}
+                  
+                  {/* Animated Comet traveling the orbit */}
+                  <div className="absolute animate-[orbitComet_16s_linear_infinite]" style={{ left: "50%", top: "50%", transformOrigin: "0 0" }}>
+                    <div className="relative" style={{ transform: "translate(-50%, -50%)" }}>
+                      <CometLogo size={28} />
+                      {/* Comet trail */}
+                      <div className="absolute -right-6 top-1/2 -translate-y-1/2 w-8 h-1 bg-gradient-to-r from-[#00e5ff] to-transparent rounded-full opacity-60" />
                     </div>
                   </div>
-
-                  {/* Log Analysis Animation */}
-                  <div className={`p-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"} overflow-hidden relative`}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <FileSearch className="h-4 w-4 text-[#ff9800]" />
-                      <span className={`text-xs font-medium ${textPrimary}`}>Log Analysis</span>
+                  
+                  {/* Center - Current Case */}
+                  <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                    <div className={`w-16 h-16 rounded-full ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-100"} flex items-center justify-center mx-auto mb-1 border ${borderColor}`}>
+                      <Briefcase className="h-6 w-6 text-[#00e5ff]" />
                     </div>
-                    <div className="flex gap-1 mb-1">
-                      {[1,2,3,4,5].map(i => (
-                        <div key={i} className={`h-6 w-2 rounded-sm ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"} overflow-hidden`}>
-                          <div 
-                            className="w-full bg-[#ff9800] animate-[barGrow_1.5s_ease-in-out_infinite]" 
-                            style={{ animationDelay: `${i * 0.2}s`, height: `${20 + i * 15}%` }} 
-                          />
-                        </div>
-                      ))}
-                    </div>
-                    <p className={`text-[10px] ${textSecondary}`}>Morgan Stanley - Options</p>
-                  </div>
-
-                  {/* Test Case Generation */}
-                  <div className={`p-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"} overflow-hidden relative`}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <VerifixLogo size={16} />
-                      <span className={`text-xs font-medium ${textPrimary}`}>Reg Test Gen</span>
-                    </div>
-                    <div className="space-y-1">
-                      {["TC001", "TC002", "TC003"].map((tc, i) => (
-                        <div key={tc} className="flex items-center gap-2 animate-[slideIn_0.5s_ease-out_forwards]" style={{ animationDelay: `${i * 0.3}s`, opacity: 0 }}>
-                          <CheckCircle className="h-3 w-3 text-[#4caf50]" />
-                          <span className={`text-[10px] ${textSecondary}`}>{tc} Created</span>
-                        </div>
-                      ))}
-                    </div>
-                    <p className={`text-[10px] ${textSecondary} mt-1`}>JP Morgan - Futures</p>
-                  </div>
-
-                  {/* Status Changes */}
-                  <div className={`p-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"} overflow-hidden relative`}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <Activity className="h-4 w-4 text-[#2196f3]" />
-                      <span className={`text-xs font-medium ${textPrimary}`}>Status Updates</span>
-                    </div>
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-[#4caf50] animate-pulse" />
-                        <span className={`text-[10px] ${textSecondary}`}>Citadel certified</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-[#ff9800] animate-[blink_1s_ease-in-out_infinite]" />
-                        <span className={`text-[10px] ${textSecondary}`}>Two Sigma testing</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-[#2196f3] animate-pulse" />
-                        <span className={`text-[10px] ${textSecondary}`}>Bridgewater setup</span>
-                      </div>
-                    </div>
+                    <p className={`text-xs font-medium ${textPrimary}`}>Active Case</p>
+                    <p className={`text-[10px] ${textSecondary}`}>Phase 4 of 8</p>
                   </div>
                 </div>
 
-                {/* Bottom ticker */}
-                <div className={`mt-3 pt-3 border-t ${borderColor} overflow-hidden`}>
-                  <div className="flex animate-[ticker_20s_linear_infinite]">
-                    {["Spec uploaded - Blackrock", "Tests passed - Vanguard", "Certification complete - State Street", "Config exported - Fidelity", "Spec uploaded - Blackrock", "Tests passed - Vanguard"].map((msg, i) => (
-                      <span key={i} className={`text-[10px] ${textSecondary} whitespace-nowrap mr-8`}>{msg}</span>
-                    ))}
+                {/* Bottom status */}
+                <div className={`mt-2 pt-3 border-t ${borderColor}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-[#4caf50]" />
+                      <span className={`text-[10px] ${textSecondary}`}>3 phases complete</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-[#ff9800] animate-pulse" />
+                      <span className={`text-[10px] ${textSecondary}`}>Cert Planning in progress</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2244,7 +2232,7 @@ export default function BCometPlatform() {
               </button>
             </div>
             <div className="flex items-center gap-1">
-              {["Dashboard", "Add Client", "Add Case", "Spec Compare", "Log Analysis", "Test Suite", "Evidence", "Prod Config", "Certification"].map((step, i) => (
+              {["Dashboard", "Intake", "Solution Design", "Connectivity", "Cert Planning", "Test Execution", "Analysis", "Decisioning", "Production"].map((step, i) => (
                 <button 
                   key={step} 
                   onClick={() => setWalkthroughStep(i)}
@@ -2360,8 +2348,8 @@ export default function BCometPlatform() {
                       <Building2 className="h-6 w-6 text-[#4caf50]" />
                     </div>
                     <div>
-                      <h4 className={`font-bold text-xl ${textPrimary}`}>2. Add New Client</h4>
-                      <p className={`text-sm ${textSecondary}`}>Register a new client in the system</p>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>2. Intake & Discovery</h4>
+                      <p className={`text-sm ${textSecondary}`}>Gather requirements and identify gaps</p>
                     </div>
                   </div>
                   <div className={`space-y-4 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
@@ -2441,8 +2429,8 @@ export default function BCometPlatform() {
                       <Briefcase className="h-6 w-6 text-[#9c27b0]" />
                     </div>
                     <div>
-                      <h4 className={`font-bold text-xl ${textPrimary}`}>3. Create Onboarding Case</h4>
-                      <p className={`text-sm ${textSecondary}`}>Start a new certification workflow</p>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>3. Solution Design</h4>
+                      <p className={`text-sm ${textSecondary}`}>Configure FIX sessions and field mappings</p>
                     </div>
                   </div>
                   <div className={`space-y-4 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
@@ -2524,8 +2512,8 @@ export default function BCometPlatform() {
                       <GitCompare className="h-6 w-6 text-[#2196f3]" />
                     </div>
                     <div>
-                      <h4 className={`font-bold text-xl ${textPrimary}`}>4. Spec Compare</h4>
-                      <p className={`text-sm ${textSecondary}`}>AI-powered specification analysis</p>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>4. Connectivity Setup</h4>
+                      <p className={`text-sm ${textSecondary}`}>Network provisioning and session validation</p>
                     </div>
                   </div>
                   <div className={`space-y-3 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
@@ -2596,17 +2584,17 @@ export default function BCometPlatform() {
               </div>
             )}
 
-            {/* Step 4: Log Analysis */}
+            {/* Step 4: Certification Planning */}
             {walkthroughStep === 4 && (
               <div className="grid grid-cols-2 gap-8">
                 <div>
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#9c27b0]/20 to-[#9c27b0]/5 flex items-center justify-center border border-[#9c27b0]/30">
-                      <FileSearch className="h-6 w-6 text-[#9c27b0]" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#ff9800]/20 to-[#ff9800]/5 flex items-center justify-center border border-[#ff9800]/30">
+                      <ClipboardList className="h-6 w-6 text-[#ff9800]" />
                     </div>
                     <div>
-                      <h4 className={`font-bold text-xl ${textPrimary}`}>5. FIX Log Analysis</h4>
-                      <p className={`text-sm ${textSecondary}`}>Parse and analyze production FIX logs</p>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>5. Certification Planning</h4>
+                      <p className={`text-sm ${textSecondary}`}>Generate test cases and certification plan</p>
                     </div>
                   </div>
                   <div className={`space-y-3 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
@@ -2673,17 +2661,17 @@ export default function BCometPlatform() {
               </div>
             )}
 
-            {/* Step 5: Test Suite */}
+            {/* Step 5: Test Execution */}
             {walkthroughStep === 5 && (
               <div className="grid grid-cols-2 gap-8">
                 <div>
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#4caf50]/20 to-[#4caf50]/5 flex items-center justify-center border border-[#4caf50]/30">
-                      <TestTube className="h-6 w-6 text-[#4caf50]" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#e91e63]/20 to-[#e91e63]/5 flex items-center justify-center border border-[#e91e63]/30">
+                      <Play className="h-6 w-6 text-[#e91e63]" />
                     </div>
                     <div>
-                      <h4 className={`font-bold text-xl ${textPrimary}`}>6. Test Suite Generation</h4>
-                      <p className={`text-sm ${textSecondary}`}>AI-generated regression test cases</p>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>6. Test Execution</h4>
+                      <p className={`text-sm ${textSecondary}`}>Execute tests and capture evidence</p>
                     </div>
                   </div>
                   <div className={`space-y-3 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
@@ -2737,17 +2725,17 @@ export default function BCometPlatform() {
               </div>
             )}
 
-            {/* Step 6: Evidence Vault */}
+            {/* Step 6: Analysis & Remediation */}
             {walkthroughStep === 6 && (
               <div className="grid grid-cols-2 gap-8">
                 <div>
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#9c27b0]/20 to-[#9c27b0]/5 flex items-center justify-center border border-[#9c27b0]/30">
-                      <FolderArchive className="h-6 w-6 text-[#9c27b0]" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#f44336]/20 to-[#f44336]/5 flex items-center justify-center border border-[#f44336]/30">
+                      <FileSearch className="h-6 w-6 text-[#f44336]" />
                     </div>
                     <div>
-                      <h4 className={`font-bold text-xl ${textPrimary}`}>7. Evidence Collection</h4>
-                      <p className={`text-sm ${textSecondary}`}>Complete audit trail & artifacts</p>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>7. Analysis & Remediation</h4>
+                      <p className={`text-sm ${textSecondary}`}>Diagnose failures and track defects</p>
                     </div>
                   </div>
                   <div className={`space-y-3 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
@@ -2816,17 +2804,17 @@ export default function BCometPlatform() {
               </div>
             )}
 
-            {/* Step 7: Prod Config */}
+            {/* Step 7: Certification Decisioning */}
             {walkthroughStep === 7 && (
               <div className="grid grid-cols-2 gap-8">
                 <div>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#4caf50]/20 to-[#4caf50]/5 flex items-center justify-center border border-[#4caf50]/30">
-                      <Server className="h-6 w-6 text-[#4caf50]" />
+                      <Award className="h-6 w-6 text-[#4caf50]" />
                     </div>
                     <div>
-                      <h4 className={`font-bold text-xl ${textPrimary}`}>8. Production Config Export</h4>
-                      <p className={`text-sm ${textSecondary}`}>Generate deployment-ready configuration</p>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>8. Certification Decisioning</h4>
+                      <p className={`text-sm ${textSecondary}`}>Evaluate readiness and make go/no-go decisions</p>
                     </div>
                   </div>
                   <div className={`space-y-3 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
@@ -2895,17 +2883,17 @@ export default function BCometPlatform() {
               </div>
             )}
 
-            {/* Step 8: Certification */}
+            {/* Step 8: Production Enablement */}
             {walkthroughStep === 8 && (
               <div className="grid grid-cols-2 gap-8">
                 <div>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00e5ff]/20 to-[#00e5ff]/5 flex items-center justify-center border border-[#00e5ff]/30">
-                      <Award className="h-6 w-6 text-[#00e5ff]" />
+                      <Rocket className="h-6 w-6 text-[#00e5ff]" />
                     </div>
                     <div>
-                      <h4 className={`font-bold text-xl ${textPrimary}`}>9. Certification & Go-Live</h4>
-                      <p className={`text-sm ${textSecondary}`}>Final approval and production deployment</p>
+                      <h4 className={`font-bold text-xl ${textPrimary}`}>9. Production Enablement</h4>
+                      <p className={`text-sm ${textSecondary}`}>Go-live and hypercare monitoring</p>
                     </div>
                   </div>
                   <div className={`space-y-3 p-4 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>

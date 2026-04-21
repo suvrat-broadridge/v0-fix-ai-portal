@@ -303,3 +303,46 @@
     text-shadow: 0 0 15px #00e5ff, 0 0 30px #00e5ff;
   }
 }
+
+/* Comet orbiting around phases - elliptical path */
+@keyframes orbitComet {
+  0% {
+    transform: translate(130px, 0px) rotate(0deg);
+  }
+  12.5% {
+    transform: translate(92px, 85px) rotate(45deg);
+  }
+  25% {
+    transform: translate(0px, 120px) rotate(90deg);
+  }
+  37.5% {
+    transform: translate(-92px, 85px) rotate(135deg);
+  }
+  50% {
+    transform: translate(-130px, 0px) rotate(180deg);
+  }
+  62.5% {
+    transform: translate(-92px, -85px) rotate(225deg);
+  }
+  75% {
+    transform: translate(0px, -120px) rotate(270deg);
+  }
+  87.5% {
+    transform: translate(92px, -85px) rotate(315deg);
+  }
+  100% {
+    transform: translate(130px, 0px) rotate(360deg);
+  }
+}
+
+/* Planet pulse when comet approaches */
+@keyframes planetPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 10px currentColor;
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+  }
+}
