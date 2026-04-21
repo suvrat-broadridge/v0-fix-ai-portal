@@ -5796,9 +5796,11 @@ const tools = [
                   
                   {/* Inline Tool Content */}
                   {(() => {
-                    const tool = currentPhase.tools.find(t => t.id === selectedToolId)
+                    const toolIdx = currentPhase.tools.findIndex(t => t.id === selectedToolId)
+                    const tool = toolIdx >= 0 ? currentPhase.tools[toolIdx] : null
                     if (!tool) return null
                     const ToolIcon = tool.icon
+                    const actualToolIndex = toolIdx // Use this instead of currentToolIndex for accuracy
                     
                     return (
                       <Card className={`${bgCard} border ${borderColor}`}>
@@ -5806,7 +5808,7 @@ const tools = [
                           <div className="flex items-center gap-3">
                             <div className="flex items-center gap-2">
                               <span className={`text-xs font-bold px-2 py-1 rounded bg-[#00e5ff] text-[#0a1628]`}>
-                                Step {currentToolIndex + 1}
+                                Step {actualToolIndex + 1} of {currentPhase.tools.length}
                               </span>
                               <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: currentPhase.color + "20" }}>
                                 <ToolIcon className="h-5 w-5" style={{ color: currentPhase.color }} />
@@ -5925,9 +5927,20 @@ const tools = [
                           {!["intake", "docs", "gap"].includes(tool.id) && (
                             <div className="space-y-4">
                               <p className={textSecondary}>This tool is available for use. Click below to open the full interface.</p>
+                              <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} mb-4`}>
+                                <p className={`text-xs ${textSecondary}`}>
+                                  Next step after this: <span className="font-medium text-[#00e5ff]">
+                                    {actualToolIndex < currentPhase.tools.length - 1 
+                                      ? currentPhase.tools[actualToolIndex + 1].name 
+                                      : `Phase ${currentCasePhase + 1}`}
+                                  </span>
+                                </p>
+                              </div>
                               <Button 
                                 className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
                                 onClick={() => {
+                                  // Set correct tool index for navigation context
+                                  setCurrentToolIndex(actualToolIndex)
                                   // Set client context from case data for tools to show phase banner
                                   if (selectedOnboardingCase) {
                                     const caseClient = clients.find(c => c.name === selectedOnboardingCase.client)
@@ -12866,7 +12879,7 @@ const copyToClipboard = () => {
               </div>
             )}
 
-            {/* ══════════════════════���═════════���══════════��═══════════
+            {/* ═════════════════��════���═════════���══════════��═══════════
                 STEP 2: CORRELATION RESULTS
             ═════════════���════════════════════════════════��════════ */}
             {certReportStep === "results" && (
