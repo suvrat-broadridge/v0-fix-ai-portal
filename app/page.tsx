@@ -236,6 +236,109 @@ export default function BCometPlatform() {
     autoExtract: false,
     confirmAccurate: false,
   })
+  // Case Workflow state - 8-phase lifecycle tracking
+  const [currentCasePhase, setCurrentCasePhase] = useState(1)
+  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null)
+  const casePhases = [
+    {
+      num: 1,
+      name: "Intake & Discovery",
+      description: "Collect counterparty information, upload documents, and analyze requirements",
+      icon: ClipboardCheck,
+      color: "#00e5ff",
+      tools: [
+        { id: "intake", name: "Intake Portal", screen: "intake-portal", icon: FileText, status: "completed" as const },
+        { id: "docs", name: "Document Upload", screen: "intake-portal", icon: Upload, status: "completed" as const },
+        { id: "gap", name: "AI Gap Analysis", screen: "intake-portal", icon: Brain, status: "in-progress" as const },
+      ],
+    },
+    {
+      num: 2,
+      name: "Solution Design & Configuration",
+      description: "Configure FIX sessions, compare specs, and set up field mappings",
+      icon: Cog,
+      color: "#4caf50",
+      tools: [
+        { id: "spec-compare", name: "Spec Compare", screen: "spec-compare", icon: GitCompare, status: "pending" as const },
+        { id: "atdl", name: "ATDL Configuration", screen: "atdl-compare", icon: Code, status: "pending" as const },
+        { id: "session", name: "Session Config", screen: "session-config", icon: Server, status: "pending" as const },
+        { id: "field-map", name: "Field Mapping", screen: "field-mapping", icon: Link2, status: "pending" as const },
+      ],
+    },
+    {
+      num: 3,
+      name: "Connectivity Setup",
+      description: "Provision network, run smoke tests, and validate session readiness",
+      icon: Wifi,
+      color: "#2196f3",
+      tools: [
+        { id: "network", name: "Network Provisioning", screen: "session-config", icon: Globe, status: "pending" as const },
+        { id: "smoke", name: "Connectivity Test", screen: "test-results", icon: Zap, status: "pending" as const },
+        { id: "validate", name: "Session Validation", screen: "session-config", icon: CheckCircle, status: "pending" as const },
+      ],
+    },
+    {
+      num: 4,
+      name: "Certification Planning",
+      description: "Generate test plans, create test cases, and prepare certification checklist",
+      icon: Target,
+      color: "#ff9800",
+      tools: [
+        { id: "test-plan", name: "Test Plan Generator", screen: "test-case-gen", icon: FileText, status: "pending" as const },
+        { id: "test-cases", name: "Test Case Creator", screen: "test-case-gen", icon: TestTube, status: "pending" as const },
+        { id: "checklist", name: "Readiness Checklist", screen: "certification-gen", icon: ClipboardCheck, status: "pending" as const },
+      ],
+    },
+    {
+      num: 5,
+      name: "Test Execution",
+      description: "Run session and application tests, capture evidence, and record results",
+      icon: Play,
+      color: "#9c27b0",
+      tools: [
+        { id: "session-tests", name: "Session Tests", screen: "test-results", icon: Server, status: "pending" as const },
+        { id: "app-tests", name: "Application Tests", screen: "test-results", icon: Activity, status: "pending" as const },
+        { id: "evidence", name: "Evidence Capture", screen: "evidence-vault", icon: FolderArchive, status: "pending" as const },
+        { id: "log-analysis", name: "Log Analysis", screen: "log-analysis", icon: FileSearch, status: "pending" as const },
+      ],
+    },
+    {
+      num: 6,
+      name: "Analysis & Remediation",
+      description: "Analyze failures, diagnose root causes, and track defect resolution",
+      icon: Brain,
+      color: "#f44336",
+      tools: [
+        { id: "failure-analysis", name: "Failure Analysis", screen: "log-analysis", icon: AlertTriangle, status: "pending" as const },
+        { id: "root-cause", name: "AI Root Cause", screen: "log-analysis", icon: Brain, status: "pending" as const },
+        { id: "defects", name: "Defect Tracking", screen: "onboarding-case-detail", icon: AlertCircle, status: "pending" as const },
+      ],
+    },
+    {
+      num: 7,
+      name: "Certification Decisioning",
+      description: "Evaluate completion, generate certification report, and collect signoffs",
+      icon: Award,
+      color: "#2196f3",
+      tools: [
+        { id: "eval", name: "Completion Evaluation", screen: "certification-gen", icon: CheckSquare, status: "pending" as const },
+        { id: "cert-report", name: "Certification Report", screen: "client-cert-report", icon: Award, status: "pending" as const },
+        { id: "signoffs", name: "Signoff Collection", screen: "approvals", icon: Stamp, status: "pending" as const },
+      ],
+    },
+    {
+      num: 8,
+      name: "Production Enablement",
+      description: "Generate production configs, complete go-live checklist, and begin hypercare",
+      icon: Rocket,
+      color: "#4caf50",
+      tools: [
+        { id: "prod-config", name: "Production Config", screen: "prod-config", icon: Server, status: "pending" as const },
+        { id: "go-live", name: "Go-Live Checklist", screen: "go-live", icon: Rocket, status: "pending" as const },
+        { id: "hypercare", name: "Hypercare Monitor", screen: "dashboard", icon: Activity, status: "pending" as const },
+      ],
+    },
+  ]
   // AI Assistant state - GitHub Copilot style with actions (persisted to localStorage)
   const getDefaultAiWelcomeMessage = () => [
     { 
@@ -5684,6 +5787,237 @@ const tools = [
     )
   }
 
+  // Case Workflow Screen - 8-Phase Lifecycle View
+  if (currentScreen === "case-workflow") {
+    const currentPhase = casePhases.find(p => p.num === currentCasePhase) || casePhases[0]
+    const getPhaseStatus = (phaseNum: number) => {
+      if (phaseNum < currentCasePhase) return "completed"
+      if (phaseNum === currentCasePhase) return "in-progress"
+      return "locked"
+    }
+
+    const getToolStatusColor = (status: string) => {
+      switch (status) {
+        case "completed": return "#4caf50"
+        case "in-progress": return "#ff9800"
+        default: return isDarkMode ? "#64748b" : "#94a3b8"
+      }
+    }
+
+    const getToolStatusIcon = (status: string) => {
+      switch (status) {
+        case "completed": return <CheckCircle className="h-4 w-4" style={{ color: "#4caf50" }} />
+        case "in-progress": return <Clock className="h-4 w-4" style={{ color: "#ff9800" }} />
+        default: return <Circle className="h-4 w-4" style={{ color: isDarkMode ? "#64748b" : "#94a3b8" }} />
+      }
+    }
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <AIAssistant />
+        <div className="flex-1 flex overflow-hidden">
+          {/* Phase Navigation Sidebar */}
+          <div className={`w-72 ${bgSecondary} border-r ${borderColor} overflow-y-auto`}>
+            <div className="p-4 border-b border-[#1e4976]/30">
+              <button
+                onClick={() => setCurrentScreen("onboarding-cases")}
+                className={`flex items-center gap-2 text-sm ${textSecondary} hover:text-[#00e5ff] mb-3`}
+              >
+                <ArrowLeft className="h-4 w-4" /> Back to Cases
+              </button>
+              <h2 className={`text-lg font-bold ${textPrimary}`}>OB-2024-001234</h2>
+              <p className={`text-sm ${textSecondary}`}>Goldman Sachs - Equities</p>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-xs px-2 py-1 rounded-full bg-[#ff9800]/20 text-[#ff9800] font-medium">In Progress</span>
+                <span className={`text-xs ${textSecondary}`}>Phase {currentCasePhase}/8</span>
+              </div>
+            </div>
+
+            <nav className="p-2">
+              {casePhases.map((phase) => {
+                const PhaseIcon = phase.icon
+                const status = getPhaseStatus(phase.num)
+                const isActive = phase.num === currentCasePhase
+                const isCompleted = status === "completed"
+                const isLocked = status === "locked"
+
+                return (
+                  <div key={phase.num} className="mb-1">
+                    <button
+                      onClick={() => !isLocked && setCurrentCasePhase(phase.num)}
+                      disabled={isLocked}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all ${
+                        isActive
+                          ? "bg-[#00e5ff]/10 border border-[#00e5ff]/30"
+                          : isLocked
+                          ? "opacity-50 cursor-not-allowed"
+                          : `hover:${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"}`
+                      }`}
+                    >
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                          isCompleted ? "bg-[#4caf50]" : isActive ? "bg-[#00e5ff]" : isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"
+                        }`}
+                      >
+                        {isCompleted ? (
+                          <Check className="h-4 w-4 text-white" />
+                        ) : (
+                          <span className={`text-xs font-bold ${isActive ? "text-[#0a1628]" : textSecondary}`}>
+                            {phase.num}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm font-medium truncate ${isActive ? "text-[#00e5ff]" : textPrimary}`}>
+                          {phase.name}
+                        </p>
+                        <p className={`text-xs truncate ${textSecondary}`}>
+                          {phase.tools.length} tools
+                        </p>
+                      </div>
+                      {isLocked && <Lock className="h-4 w-4 text-gray-500" />}
+                    </button>
+                  </div>
+                )
+              })}
+            </nav>
+          </div>
+
+          {/* Main Content Area */}
+          <div className="flex-1 overflow-y-auto">
+            {/* Phase Header */}
+            <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+              <div className="flex items-center gap-4">
+                <div
+                  className="w-14 h-14 rounded-xl flex items-center justify-center"
+                  style={{ backgroundColor: currentPhase.color + "20" }}
+                >
+                  <currentPhase.icon className="h-7 w-7" style={{ color: currentPhase.color }} />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-bold px-2 py-1 rounded ${textSecondary} bg-[#1e4976]/30`}>
+                      Phase {currentPhase.num}
+                    </span>
+                    <h1 className={`text-xl font-bold ${textPrimary}`}>{currentPhase.name}</h1>
+                  </div>
+                  <p className={`text-sm ${textSecondary} mt-1`}>{currentPhase.description}</p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => currentCasePhase > 1 && setCurrentCasePhase(currentCasePhase - 1)}
+                    disabled={currentCasePhase === 1}
+                    className="disabled:opacity-50"
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" /> Previous
+                  </Button>
+                  <Button
+                    onClick={() => currentCasePhase < 8 && setCurrentCasePhase(currentCasePhase + 1)}
+                    disabled={currentCasePhase === 8}
+                    className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] disabled:opacity-50"
+                  >
+                    Next <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Phase Progress Bar */}
+              <div className="mt-4 flex items-center gap-1">
+                {casePhases.map((phase, idx) => (
+                  <div
+                    key={idx}
+                    className="flex-1 h-2 rounded-full overflow-hidden"
+                    style={{ backgroundColor: isDarkMode ? "#1e4976" : "#e2e8f0" }}
+                  >
+                    <div
+                      className="h-full transition-all duration-300"
+                      style={{
+                        width: getPhaseStatus(phase.num) === "completed" ? "100%" : getPhaseStatus(phase.num) === "in-progress" ? "50%" : "0%",
+                        backgroundColor: phase.color,
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </header>
+
+            {/* Tools Grid */}
+            <div className="p-6">
+              <h2 className={`text-lg font-semibold ${textPrimary} mb-4`}>Available Tools & Actions</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {currentPhase.tools.map((tool) => {
+                  const ToolIcon = tool.icon
+                  return (
+                    <Card
+                      key={tool.id}
+                      className={`${bgCard} border ${borderColor} hover:shadow-lg transition-all cursor-pointer group`}
+                      onClick={() => setCurrentScreen(tool.screen as typeof currentScreen)}
+                    >
+                      <div className="p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div
+                            className="w-10 h-10 rounded-lg flex items-center justify-center"
+                            style={{ backgroundColor: currentPhase.color + "20" }}
+                          >
+                            <ToolIcon className="h-5 w-5" style={{ color: currentPhase.color }} />
+                          </div>
+                          {getToolStatusIcon(tool.status)}
+                        </div>
+                        <h3 className={`font-semibold ${textPrimary} group-hover:text-[#00e5ff] transition-colors`}>
+                          {tool.name}
+                        </h3>
+                        <div className="flex items-center justify-between mt-3">
+                          <span
+                            className="text-xs px-2 py-1 rounded-full font-medium capitalize"
+                            style={{
+                              backgroundColor: getToolStatusColor(tool.status) + "20",
+                              color: getToolStatusColor(tool.status),
+                            }}
+                          >
+                            {tool.status.replace("-", " ")}
+                          </span>
+                          <ArrowRight className={`h-4 w-4 ${textSecondary} group-hover:text-[#00e5ff] transition-colors`} />
+                        </div>
+                      </div>
+                    </Card>
+                  )
+                })}
+              </div>
+
+              {/* Phase Completion Summary */}
+              <div className={`mt-8 ${bgSecondary} border ${borderColor} rounded-lg p-6`}>
+                <h3 className={`font-semibold ${textPrimary} mb-4`}>Phase Completion Requirements</h3>
+                <div className="space-y-3">
+                  {currentPhase.tools.map((tool) => (
+                    <div key={tool.id} className="flex items-center gap-3">
+                      {tool.status === "completed" ? (
+                        <CheckCircle className="h-5 w-5 text-[#4caf50]" />
+                      ) : tool.status === "in-progress" ? (
+                        <Clock className="h-5 w-5 text-[#ff9800]" />
+                      ) : (
+                        <Circle className="h-5 w-5" style={{ color: isDarkMode ? "#64748b" : "#94a3b8" }} />
+                      )}
+                      <span className={`text-sm ${tool.status === "completed" ? "line-through text-gray-500" : textPrimary}`}>
+                        {tool.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 pt-4 border-t border-[#1e4976]/30">
+                  <p className={`text-sm ${textSecondary}`}>
+                    Complete all tools in this phase to unlock Phase {currentCasePhase < 8 ? currentCasePhase + 1 : "completion"}.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // Spec Compare Screen
   if (currentScreen === "spec-compare") {
 const specCompareResults = [
@@ -5719,9 +6053,18 @@ const specCompareResults = [
           <Sidebar />
           <div className="flex-1 overflow-auto">
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-              <button onClick={() => { setShowSpecResults(false); setShowStandardizedSpecs(false); setSelectedAdminSpecForResults(null); setCurrentScreen("client-detail"); }} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
-                <ArrowLeft className="h-4 w-4" /> Back to {selectedClient.name}
-              </button>
+              <div className="flex items-center gap-4 mb-2">
+                {selectedCaseId && (
+                  <button onClick={() => setCurrentScreen("case-workflow")} className={`flex items-center gap-2 ${textSecondary} hover:text-[#00e5ff]`}>
+                    <ArrowLeft className="h-4 w-4" /> Back to Case
+                  </button>
+                )}
+                {!selectedCaseId && (
+                  <button onClick={() => { setShowSpecResults(false); setShowStandardizedSpecs(false); setSelectedAdminSpecForResults(null); setCurrentScreen("client-detail"); }} className={`flex items-center gap-2 ${textSecondary} hover:text-[#00e5ff]`}>
+                    <ArrowLeft className="h-4 w-4" /> Back to {selectedClient.name}
+                  </button>
+                )}
+              </div>
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className={`text-2xl font-bold ${textPrimary}`}>Spec Comparison</h1>
@@ -6593,8 +6936,8 @@ const specCompareResults = [
         <Sidebar />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-            <button onClick={() => isAdHocMode ? setCurrentScreen("dashboard") : setCurrentScreen("client-detail")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
-              <ArrowLeft className="h-4 w-4" /> Back
+            <button onClick={() => selectedCaseId ? setCurrentScreen("case-workflow") : isAdHocMode ? setCurrentScreen("dashboard") : setCurrentScreen("client-detail")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> {selectedCaseId ? "Back to Case" : "Back"}
             </button>
             <h1 className={`text-2xl font-bold ${textPrimary}`}>Log Analysis</h1>
             {!isAdHocMode && selectedClient && (
@@ -6999,12 +7342,12 @@ const specCompareResults = [
           <Sidebar />
           <div className="flex-1 overflow-auto">
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-              <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
-                <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+              <button onClick={() => selectedCaseId ? setCurrentScreen("case-workflow") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+                <ArrowLeft className="h-4 w-4" /> {selectedCaseId ? "Back to Case" : "Back to Dashboard"}
               </button>
               <div className="flex items-center gap-3">
                 <VerifixLogo size={32} />
-                <h1 className={`text-2xl font-bold ${textPrimary}`}>Testing (Ad-hoc)</h1>
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>Testing {isAdHocMode && "(Ad-hoc)"}</h1>
               </div>
               <p className={`text-sm ${textSecondary} mt-1`}>Generate regression test cases from specs, logs, or scenarios</p>
             </header>
@@ -7484,12 +7827,12 @@ const specCompareResults = [
           <Sidebar />
           <div className="flex-1 overflow-auto">
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-              <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
-                <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+              <button onClick={() => selectedCaseId ? setCurrentScreen("case-workflow") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+                <ArrowLeft className="h-4 w-4" /> {selectedCaseId ? "Back to Case" : "Back to Dashboard"}
               </button>
               <div className="flex items-center gap-3">
                 <ConductorLogo size={32} />
-                <h1 className={`text-2xl font-bold ${textPrimary}`}>Certification (Ad-hoc)</h1>
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>Certification {isAdHocMode && "(Ad-hoc)"}</h1>
               </div>
               <p className={`text-sm ${textSecondary} mt-1`}>Generate certification test cases from specs, logs, or scenarios</p>
             </header>
@@ -11798,8 +12141,8 @@ const copyToClipboard = () => {
         <Sidebar />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-            <button onClick={() => selectedClient ? setCurrentScreen("client-detail") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
-              <ArrowLeft className="h-4 w-4" /> Back
+            <button onClick={() => selectedCaseId ? setCurrentScreen("case-workflow") : selectedClient ? setCurrentScreen("client-detail") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> {selectedCaseId ? "Back to Case" : "Back"}
             </button>
             <div className="flex items-center gap-3">
               <Server className="h-8 w-8 text-[#00e5ff]" />
@@ -12654,8 +12997,8 @@ const copyToClipboard = () => {
         <Sidebar />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-            <button onClick={() => selectedClient ? setCurrentScreen("client-detail") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
-              <ArrowLeft className="h-4 w-4" /> Back
+            <button onClick={() => selectedCaseId ? setCurrentScreen("case-workflow") : selectedClient ? setCurrentScreen("client-detail") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> {selectedCaseId ? "Back to Case" : "Back"}
             </button>
             <div className="flex items-center gap-3">
               <Link2 className="h-8 w-8 text-[#00e5ff]" />
@@ -12818,8 +13161,8 @@ const copyToClipboard = () => {
         <Sidebar />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-            <button onClick={() => selectedClient ? setCurrentScreen("client-detail") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
-              <ArrowLeft className="h-4 w-4" /> Back
+            <button onClick={() => selectedCaseId ? setCurrentScreen("case-workflow") : selectedClient ? setCurrentScreen("client-detail") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> {selectedCaseId ? "Back to Case" : "Back"}
             </button>
             <div className="flex items-center gap-3">
               <BarChart3 className="h-8 w-8 text-[#00e5ff]" />
@@ -13364,9 +13707,10 @@ const copyToClipboard = () => {
                             onClick={(e) => {
                               e.preventDefault()
                               e.stopPropagation()
-                              console.log("[v0] Clicking case:", caseItem.id, caseItem)
                               setSelectedOnboardingCase(caseItem)
-                              setTimeout(() => setCurrentScreen("onboarding-case-detail"), 0)
+                              setSelectedCaseId(caseItem.id)
+                              setCurrentCasePhase(Math.min(caseItem.stage, 8))
+                              setTimeout(() => setCurrentScreen("case-workflow"), 0)
                             }}
                           >
                             <span className="font-mono font-medium text-[#00e5ff] group-hover/case:underline">{caseItem.id}</span>
