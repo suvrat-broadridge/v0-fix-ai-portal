@@ -5927,7 +5927,19 @@ const tools = [
                               <p className={textSecondary}>This tool is available for use. Click below to open the full interface.</p>
                               <Button 
                                 className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
-                                onClick={() => setCurrentScreen(tool.screen as typeof currentScreen)}
+                                onClick={() => {
+                                  // Set client context from case data for tools to show phase banner
+                                  if (selectedOnboardingCase) {
+                                    const caseClient = clients.find(c => c.name === selectedOnboardingCase.client)
+                                    if (caseClient) {
+                                      setSelectedClient(caseClient)
+                                      setSelectedAssetClass(selectedOnboardingCase.assetClass || "Equities")
+                                      setSelectedFixVersion("FIX.4.4")
+                                      setIsAdHocMode(false)
+                                    }
+                                  }
+                                  setCurrentScreen(tool.screen as typeof currentScreen)
+                                }}
                               >
                                 <Play className="h-4 w-4 mr-2" /> Open {tool.name}
                               </Button>
@@ -6643,17 +6655,76 @@ const tools = [
     }
 
     // Ad-hoc Mode: Tools -> Spec Compare (select any specs)
+    // Get phase context for tools opened from case workflow
+    const adHocPhaseInfo = casePhases.find(p => p.num === currentCasePhase)
+    const adHocNextToolInfo = adHocPhaseInfo?.tools[currentToolIndex + 1]
+    const adHocIsLastToolInPhase = currentToolIndex >= (adHocPhaseInfo?.tools.length || 1) - 1
+    
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
         <div className="flex-1 overflow-auto">
+          {/* Phase Context Banner - shows when coming from case workflow */}
+          {selectedCaseId && adHocPhaseInfo && (
+            <div className={`${isDarkMode ? "bg-[#0d2847]" : "bg-blue-50"} border-b ${borderColor} px-6 py-3`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-bold px-2 py-1 rounded bg-[#00e5ff]/20 text-[#00e5ff]`}>
+                      Phase {currentCasePhase}
+                    </span>
+                    <span className={`text-sm font-medium ${textPrimary}`}>{adHocPhaseInfo.name}</span>
+                  </div>
+                  <ChevronRight className={`h-4 w-4 ${textSecondary}`} />
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-bold px-2 py-1 rounded bg-[#ff9800]/20 text-[#ff9800]`}>
+                      Step {currentToolIndex + 1}/{adHocPhaseInfo.tools.length}
+                    </span>
+                    <span className={`text-sm font-medium ${textPrimary}`}>Spec Comparison</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {!adHocIsLastToolInPhase && adHocNextToolInfo && (
+                    <span className={`text-xs ${textSecondary}`}>
+                      Next: {adHocNextToolInfo.name}
+                    </span>
+                  )}
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      if (adHocIsLastToolInPhase) {
+                        setCurrentCasePhase(Math.min(currentCasePhase + 1, 8))
+                        setCurrentToolIndex(0)
+                      } else {
+                        setCurrentToolIndex(currentToolIndex + 1)
+                      }
+                      setCurrentScreen("case-workflow")
+                    }}
+                    className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
+                  >
+                    {adHocIsLastToolInPhase ? "Complete Phase" : "Next Step"} <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-<button onClick={() => { setShowSpecResults(false); setShowStandardizedSpecs(false); setSelectedAdminSpecForResults(null); setCurrentScreen("dashboard"); }} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
-  <ArrowLeft className="h-4 w-4" /> Back
-  </button>
-  <h1 className={`text-2xl font-bold ${textPrimary}`}>Spec Comparison</h1>
-  <p className={textSecondary}>Compare any admin spec with any client spec</p>
+            <button onClick={() => { 
+              setShowSpecResults(false); 
+              setShowStandardizedSpecs(false); 
+              setSelectedAdminSpecForResults(null); 
+              if (selectedCaseId) {
+                setCurrentScreen("case-workflow");
+              } else {
+                setCurrentScreen("dashboard"); 
+              }
+            }} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> {selectedCaseId ? "Back to Case Workflow" : "Back"}
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Spec Comparison</h1>
+            <p className={textSecondary}>{selectedCaseId ? `Case: ${selectedCaseId} | ${selectedOnboardingCase?.client || "Client"}` : "Compare any admin spec with any client spec"}</p>
           </header>
 
           <div className="p-6">
