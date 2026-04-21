@@ -239,6 +239,7 @@ export default function BCometPlatform() {
   // Case Workflow state - 8-phase lifecycle tracking
   const [currentCasePhase, setCurrentCasePhase] = useState(1)
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null)
+  const [selectedToolId, setSelectedToolId] = useState<string | null>(null)
   const casePhases = [
     {
       num: 1,
@@ -5522,25 +5523,34 @@ const tools = [
           <div className={`w-72 ${bgSecondary} border-r ${borderColor} overflow-y-auto`}>
             <div className="p-4 border-b border-[#1e4976]/30">
               <button
-                onClick={() => setCurrentScreen("onboarding-cases")}
+                onClick={() => { setSelectedToolId(null); setCurrentScreen("onboarding-cases"); }}
                 className={`flex items-center gap-2 text-sm ${textSecondary} hover:text-[#00e5ff] mb-3`}
               >
                 <ArrowLeft className="h-4 w-4" /> Back to Cases
               </button>
-              <h2 className={`text-lg font-bold ${textPrimary}`}>{selectedCaseId || selectedCase?.id || "OB-2024-001234"}</h2>
-              <p className={`text-sm ${textSecondary}`}>{selectedOnboardingCase?.client || selectedCase?.clientName || selectedClient?.name || "Client"} - {selectedOnboardingCase?.assetClass || selectedCase?.assetClass || "Equities"}</p>
-              <div className="flex items-center gap-2 mt-2">
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                  (selectedOnboardingCase?.status || selectedCase?.status) === "on-track" ? "bg-[#4caf50]/20 text-[#4caf50]" :
-                  (selectedOnboardingCase?.status || selectedCase?.status) === "blocked" ? "bg-[#f44336]/20 text-[#f44336]" :
-                  "bg-[#ff9800]/20 text-[#ff9800]"
-                }`}>
-                  {(() => {
-                    const status = selectedOnboardingCase?.status || selectedCase?.status || "in-progress"
-                    return status.replace("-", " ").replace(/\b\w/g, l => l.toUpperCase())
-                  })()}
-                </span>
-                <span className={`text-xs ${textSecondary}`}>Phase {currentCasePhase}/8</span>
+              <h2 className={`text-lg font-bold ${textPrimary}`}>{selectedCaseId || selectedCase?.id || selectedOnboardingCase?.id || "OB-2024-001234"}</h2>
+              <p className={`text-sm ${textSecondary}`}>{selectedOnboardingCase?.client || selectedClient?.name || "Client"} - {selectedOnboardingCase?.assetClass || selectedCase?.assetClass || "Equities"}</p>
+              
+              {/* Completion Pie Chart */}
+              <div className="mt-4 flex items-center gap-4">
+                <div className="relative w-16 h-16">
+                  <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90">
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke={isDarkMode ? "#1e4976" : "#e2e8f0"} strokeWidth="3" />
+                    <circle 
+                      cx="18" cy="18" r="15.9" fill="none" 
+                      stroke="#00e5ff" strokeWidth="3" 
+                      strokeDasharray={`${(currentCasePhase / 8) * 100} 100`}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className={`text-sm font-bold ${textPrimary}`}>{Math.round((currentCasePhase / 8) * 100)}%</span>
+                  </div>
+                </div>
+                <div>
+                  <p className={`text-xs ${textSecondary}`}>Overall Progress</p>
+                  <p className={`text-sm font-medium ${textPrimary}`}>Phase {currentCasePhase} of 8</p>
+                </div>
               </div>
             </div>
 
@@ -5658,74 +5668,228 @@ const tools = [
               </div>
             </header>
 
-            {/* Tools Grid */}
+            {/* Tools Grid or Selected Tool Content */}
             <div className="p-6">
-              <h2 className={`text-lg font-semibold ${textPrimary} mb-4`}>Available Tools & Actions</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {currentPhase.tools.map((tool) => {
-                  const ToolIcon = tool.icon
-                  return (
-                    <Card
-                      key={tool.id}
-                      className={`${bgCard} border ${borderColor} hover:shadow-lg transition-all cursor-pointer group`}
-                      onClick={() => setCurrentScreen(tool.screen as typeof currentScreen)}
-                    >
-                      <div className="p-4">
-                        <div className="flex items-start justify-between mb-3">
-                          <div
-                            className="w-10 h-10 rounded-lg flex items-center justify-center"
-                            style={{ backgroundColor: currentPhase.color + "20" }}
-                          >
-                            <ToolIcon className="h-5 w-5" style={{ color: currentPhase.color }} />
+              {selectedToolId ? (
+                // Show selected tool inline content
+                <div>
+                  <button 
+                    onClick={() => setSelectedToolId(null)}
+                    className={`flex items-center gap-2 text-sm ${textSecondary} hover:text-[#00e5ff] mb-4`}
+                  >
+                    <ArrowLeft className="h-4 w-4" /> Back to Phase Tools
+                  </button>
+                  
+                  {/* Inline Tool Content */}
+                  {(() => {
+                    const tool = currentPhase.tools.find(t => t.id === selectedToolId)
+                    if (!tool) return null
+                    const ToolIcon = tool.icon
+                    
+                    return (
+                      <Card className={`${bgCard} border ${borderColor}`}>
+                        <div className={`p-4 border-b ${borderColor} flex items-center justify-between`}>
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: currentPhase.color + "20" }}>
+                              <ToolIcon className="h-5 w-5" style={{ color: currentPhase.color }} />
+                            </div>
+                            <div>
+                              <h2 className={`text-lg font-bold ${textPrimary}`}>{tool.name}</h2>
+                              <p className={`text-sm ${textSecondary}`}>Phase {currentCasePhase}: {currentPhase.name}</p>
+                            </div>
                           </div>
-                          {getToolStatusIcon(tool.status)}
-                        </div>
-                        <h3 className={`font-semibold ${textPrimary} group-hover:text-[#00e5ff] transition-colors`}>
-                          {tool.name}
-                        </h3>
-                        <div className="flex items-center justify-between mt-3">
-                          <span
-                            className="text-xs px-2 py-1 rounded-full font-medium capitalize"
-                            style={{
-                              backgroundColor: getToolStatusColor(tool.status) + "20",
-                              color: getToolStatusColor(tool.status),
-                            }}
-                          >
+                          <span className="text-xs px-2 py-1 rounded-full font-medium capitalize" style={{ backgroundColor: getToolStatusColor(tool.status) + "20", color: getToolStatusColor(tool.status) }}>
                             {tool.status.replace("-", " ")}
                           </span>
-                          <ArrowRight className={`h-4 w-4 ${textSecondary} group-hover:text-[#00e5ff] transition-colors`} />
                         </div>
-                      </div>
-                    </Card>
-                  )
-                })}
-              </div>
+                        
+                        <div className="p-6">
+                          {/* Intake Portal Tool */}
+                          {tool.id === "intake" && (
+                            <div className="space-y-4">
+                              <p className={textSecondary}>Collect counterparty business information and contact details.</p>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <Label className={textSecondary}>Legal Entity Name</Label>
+                                  <Input placeholder="Enter legal entity name" className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
+                                </div>
+                                <div>
+                                  <Label className={textSecondary}>LEI Code</Label>
+                                  <Input placeholder="Enter LEI" className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
+                                </div>
+                                <div>
+                                  <Label className={textSecondary}>Primary Contact</Label>
+                                  <Input placeholder="Contact name" className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
+                                </div>
+                                <div>
+                                  <Label className={textSecondary}>Contact Email</Label>
+                                  <Input placeholder="email@company.com" className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
+                                </div>
+                              </div>
+                              <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">
+                                <CheckCircle className="h-4 w-4 mr-2" /> Mark Complete
+                              </Button>
+                            </div>
+                          )}
+                          
+                          {/* Document Upload Tool */}
+                          {tool.id === "docs" && (
+                            <div className="space-y-4">
+                              <p className={textSecondary}>Upload counterparty FIX specifications and supporting documents.</p>
+                              <div className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center`}>
+                                <Upload className={`h-12 w-12 mx-auto mb-4 ${textSecondary}`} />
+                                <p className={`${textPrimary} font-medium`}>Drop files here or click to upload</p>
+                                <p className={`text-sm ${textSecondary} mt-1`}>Supports XML, PDF, DOC up to 50MB</p>
+                                <Button variant="outline" className="mt-4">Select Files</Button>
+                              </div>
+                              <div className={`${bgSecondary} p-4 rounded-lg`}>
+                                <p className={`text-sm font-medium ${textPrimary} mb-2`}>Uploaded Documents</p>
+                                <div className="flex items-center gap-3 py-2">
+                                  <FileText className="h-5 w-5 text-[#00e5ff]" />
+                                  <span className={`text-sm ${textPrimary}`}>client_fix_spec_v1.2.xml</span>
+                                  <span className={`text-xs ${textSecondary}`}>2.4 MB</span>
+                                  <CheckCircle className="h-4 w-4 text-[#4caf50] ml-auto" />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* AI Gap Analysis Tool */}
+                          {tool.id === "gap" && (
+                            <div className="space-y-4">
+                              <p className={textSecondary}>AI-powered analysis of FIX spec gaps and compatibility issues.</p>
+                              <div className={`${bgSecondary} p-4 rounded-lg`}>
+                                <div className="flex items-center gap-3 mb-4">
+                                  <Brain className="h-6 w-6 text-[#9c27b0]" />
+                                  <span className={`font-medium ${textPrimary}`}>AI Analysis in Progress...</span>
+                                </div>
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <span className={`text-sm ${textSecondary}`}>Parsing FIX Spec</span>
+                                    <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                    <span className={`text-sm ${textSecondary}`}>Comparing with Admin Spec</span>
+                                    <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                    <span className={`text-sm ${textSecondary}`}>Identifying Gaps</span>
+                                    <Loader className="h-4 w-4 text-[#ff9800] animate-spin" />
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                    <span className={`text-sm ${textSecondary}`}>Generating Recommendations</span>
+                                    <Circle className="h-4 w-4 text-gray-500" />
+                                  </div>
+                                </div>
+                              </div>
+                              <div className={`border ${borderColor} rounded-lg p-4`}>
+                                <p className={`text-sm font-medium ${textPrimary} mb-2`}>Preliminary Findings</p>
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2">
+                                    <AlertTriangle className="h-4 w-4 text-[#ff9800]" />
+                                    <span className={`text-sm ${textSecondary}`}>3 message types undefined</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <AlertCircle className="h-4 w-4 text-[#f44336]" />
+                                    <span className={`text-sm ${textSecondary}`}>5 required tags missing</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                    <span className={`text-sm ${textSecondary}`}>142 tags compatible</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Generic fallback for other tools */}
+                          {!["intake", "docs", "gap"].includes(tool.id) && (
+                            <div className="space-y-4">
+                              <p className={textSecondary}>This tool is available for use. Click below to open the full interface.</p>
+                              <Button 
+                                className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
+                                onClick={() => setCurrentScreen(tool.screen as typeof currentScreen)}
+                              >
+                                <Play className="h-4 w-4 mr-2" /> Open {tool.name}
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </Card>
+                    )
+                  })()}
+                </div>
+              ) : (
+                // Show tools grid
+                <>
+                  <h2 className={`text-lg font-semibold ${textPrimary} mb-4`}>Available Tools & Actions</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {currentPhase.tools.map((tool) => {
+                      const ToolIcon = tool.icon
+                      return (
+                        <Card
+                          key={tool.id}
+                          className={`${bgCard} border ${borderColor} hover:shadow-lg transition-all cursor-pointer group`}
+                          onClick={() => setSelectedToolId(tool.id)}
+                        >
+                          <div className="p-4">
+                            <div className="flex items-start justify-between mb-3">
+                              <div
+                                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                                style={{ backgroundColor: currentPhase.color + "20" }}
+                              >
+                                <ToolIcon className="h-5 w-5" style={{ color: currentPhase.color }} />
+                              </div>
+                              {getToolStatusIcon(tool.status)}
+                            </div>
+                            <h3 className={`font-semibold ${textPrimary} group-hover:text-[#00e5ff] transition-colors`}>
+                              {tool.name}
+                            </h3>
+                            <div className="flex items-center justify-between mt-3">
+                              <span
+                                className="text-xs px-2 py-1 rounded-full font-medium capitalize"
+                                style={{
+                                  backgroundColor: getToolStatusColor(tool.status) + "20",
+                                  color: getToolStatusColor(tool.status),
+                                }}
+                              >
+                                {tool.status.replace("-", " ")}
+                              </span>
+                              <ArrowRight className={`h-4 w-4 ${textSecondary} group-hover:text-[#00e5ff] transition-colors`} />
+                            </div>
+                          </div>
+                        </Card>
+                      )
+                    })}
+                  </div>
 
-              {/* Phase Completion Summary */}
-              <div className={`mt-8 ${bgSecondary} border ${borderColor} rounded-lg p-6`}>
-                <h3 className={`font-semibold ${textPrimary} mb-4`}>Phase Completion Requirements</h3>
-                <div className="space-y-3">
-                  {currentPhase.tools.map((tool) => (
-                    <div key={tool.id} className="flex items-center gap-3">
-                      {tool.status === "completed" ? (
-                        <CheckCircle className="h-5 w-5 text-[#4caf50]" />
-                      ) : tool.status === "in-progress" ? (
-                        <Clock className="h-5 w-5 text-[#ff9800]" />
-                      ) : (
-                        <Circle className="h-5 w-5" style={{ color: isDarkMode ? "#64748b" : "#94a3b8" }} />
-                      )}
-                      <span className={`text-sm ${tool.status === "completed" ? "line-through text-gray-500" : textPrimary}`}>
-                        {tool.name}
-                      </span>
+                  {/* Phase Completion Summary */}
+                  <div className={`mt-8 ${bgSecondary} border ${borderColor} rounded-lg p-6`}>
+                    <h3 className={`font-semibold ${textPrimary} mb-4`}>Phase Completion Requirements</h3>
+                    <div className="space-y-3">
+                      {currentPhase.tools.map((tool) => (
+                        <div key={tool.id} className="flex items-center gap-3">
+                          {tool.status === "completed" ? (
+                            <CheckCircle className="h-5 w-5 text-[#4caf50]" />
+                          ) : tool.status === "in-progress" ? (
+                            <Clock className="h-5 w-5 text-[#ff9800]" />
+                          ) : (
+                            <Circle className="h-5 w-5" style={{ color: isDarkMode ? "#64748b" : "#94a3b8" }} />
+                          )}
+                          <span className={`text-sm ${tool.status === "completed" ? "line-through text-gray-500" : textPrimary}`}>
+                            {tool.name}
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-                <div className="mt-4 pt-4 border-t border-[#1e4976]/30">
-                  <p className={`text-sm ${textSecondary}`}>
-                    Complete all tools in this phase to unlock Phase {currentCasePhase < 8 ? currentCasePhase + 1 : "completion"}.
-                  </p>
-                </div>
-              </div>
+                    <div className="mt-4 pt-4 border-t border-[#1e4976]/30">
+                      <p className={`text-sm ${textSecondary}`}>
+                        Complete all tools in this phase to unlock Phase {currentCasePhase < 8 ? currentCasePhase + 1 : "completion"}.
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -12307,7 +12471,7 @@ const copyToClipboard = () => {
 
             {/* ══════════════════════���═════════���══════════��═══════════
                 STEP 2: CORRELATION RESULTS
-            ═══════════════════════════════════════════════════════ */}
+            ═════════════���═════════════════════════════════════════ */}
             {certReportStep === "results" && (
               <div className="space-y-6">
                 {/* KPI Row 1 */}
@@ -13425,6 +13589,9 @@ const copyToClipboard = () => {
                               setSelectedOnboardingCase(caseItem)
                               setSelectedCaseId(caseItem.id)
                               setCurrentCasePhase(Math.min(caseItem.stage, 8))
+                              // Also set selectedCase and selectedClient for compatibility
+                              setSelectedCase(workflowCase)
+                              if (matchingClient) setSelectedClient(matchingClient)
                               setTimeout(() => setCurrentScreen("case-workflow"), 0)
                             }}
                           >
