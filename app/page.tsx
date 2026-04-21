@@ -1058,6 +1058,8 @@ export default function BCometPlatform() {
   const openCaseWorkflow = (caseItem: any, client: any) => {
     setSelectedClient(client)
     setSelectedCase(caseItem)
+    setSelectedCaseId(caseItem.id)
+    setCurrentCasePhase(Math.min(caseItem.currentStage || caseItem.stage || 1, 8))
     setCurrentScreen("case-workflow")
   }
 
@@ -1354,7 +1356,7 @@ export default function BCometPlatform() {
   {[
   { icon: LayoutDashboard, label: "Dashboard", screen: "dashboard", roles: ["admin", "client"] },
   { icon: Navigation, label: "Workflow Overview", screen: "workflow-overview", roles: ["admin"] },
-  { icon: FileText, label: "Onboarding Portal", screen: "intake-portal", roles: ["admin", "client"] },
+
   { icon: Users, label: "Clients", screen: "clients", roles: ["admin"] },
   { icon: Briefcase, label: "Onboarding Cases", screen: "onboarding-cases", roles: ["admin"] },
   { icon: Scale, label: "Approvals", screen: "approvals", roles: ["admin"], badge: 3 },
@@ -5826,10 +5828,16 @@ const tools = [
               >
                 <ArrowLeft className="h-4 w-4" /> Back to Cases
               </button>
-              <h2 className={`text-lg font-bold ${textPrimary}`}>OB-2024-001234</h2>
-              <p className={`text-sm ${textSecondary}`}>Goldman Sachs - Equities</p>
+              <h2 className={`text-lg font-bold ${textPrimary}`}>{selectedCaseId || selectedCase?.id || "OB-2024-001234"}</h2>
+              <p className={`text-sm ${textSecondary}`}>{selectedOnboardingCase?.client || selectedCase?.clientName || selectedClient?.name || "Client"} - {selectedOnboardingCase?.assetClass || selectedCase?.assetClass || "Equities"}</p>
               <div className="flex items-center gap-2 mt-2">
-                <span className="text-xs px-2 py-1 rounded-full bg-[#ff9800]/20 text-[#ff9800] font-medium">In Progress</span>
+                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                  (selectedOnboardingCase?.status || selectedCase?.status) === "on-track" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                  (selectedOnboardingCase?.status || selectedCase?.status) === "blocked" ? "bg-[#f44336]/20 text-[#f44336]" :
+                  "bg-[#ff9800]/20 text-[#ff9800]"
+                }`}>
+                  {(selectedOnboardingCase?.status || selectedCase?.status || "in-progress").replace("-", " ").replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                </span>
                 <span className={`text-xs ${textSecondary}`}>Phase {currentCasePhase}/8</span>
               </div>
             </div>
