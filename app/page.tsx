@@ -2150,10 +2150,10 @@ export default function BCometPlatform() {
                         {/* Glow halo */}
                         {(isVisited || isActive) && (
                           <circle cx={px} cy={py} r={planet.size + 1.2}
-                            fill={isVisited ? "#4caf5025" : `${planet.color}20`} />
+                            fill={isVisited ? "#4caf5025" : "#9ca3af30"} />
                         )}
                         <circle cx={px} cy={py} r={planet.size}
-                          fill={isVisited ? "#4caf50" : planet.color}
+                          fill={isVisited ? "#4caf50" : isActive ? planet.color : "#9ca3af"}
                           filter={isActive || isVisited ? "url(#glow)" : undefined}
                         />
                         {/* Ring around active planet */}
