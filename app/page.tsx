@@ -5535,7 +5535,10 @@ const tools = [
                   (selectedOnboardingCase?.status || selectedCase?.status) === "blocked" ? "bg-[#f44336]/20 text-[#f44336]" :
                   "bg-[#ff9800]/20 text-[#ff9800]"
                 }`}>
-                  {(selectedOnboardingCase?.status || selectedCase?.status || "in-progress").replace("-", " ").replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                  {(() => {
+                    const status = selectedOnboardingCase?.status || selectedCase?.status || "in-progress"
+                    return status.replace("-", " ").replace(/\b\w/g, l => l.toUpperCase())
+                  })()}
                 </span>
                 <span className={`text-xs ${textSecondary}`}>Phase {currentCasePhase}/8</span>
               </div>
@@ -5596,12 +5599,17 @@ const tools = [
             {/* Phase Header */}
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
               <div className="flex items-center gap-4">
-                <div
-                  className="w-14 h-14 rounded-xl flex items-center justify-center"
-                  style={{ backgroundColor: currentPhase.color + "20" }}
-                >
-                  <currentPhase.icon className="h-7 w-7" style={{ color: currentPhase.color }} />
-                </div>
+                {(() => {
+                  const PhaseIcon = currentPhase.icon
+                  return (
+                    <div
+                      className="w-14 h-14 rounded-xl flex items-center justify-center"
+                      style={{ backgroundColor: currentPhase.color + "20" }}
+                    >
+                      <PhaseIcon className="h-7 w-7" style={{ color: currentPhase.color }} />
+                    </div>
+                  )
+                })()}
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <span className={`text-xs font-bold px-2 py-1 rounded ${textSecondary} bg-[#1e4976]/30`}>
