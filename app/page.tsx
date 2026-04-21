@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "workflow-overview" | "dashboard" | "clients" | "client-detail" | "case-workflow" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "onboarding-case-detail" | "approvals" | "evidence-vault" | "prod-config" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case" | "presentation" | "client-cert-report">("workflow-overview")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "workflow-overview" | "dashboard" | "clients" | "client-detail" | "case-workflow" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "onboarding-case-detail" | "approvals" | "evidence-vault" | "prod-config" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case" | "presentation" | "client-cert-report">("home")
   const [settingsTab, setSettingsTab] = useState<"profile" | "notifications" | "security" | "integrations" | "appearance" | "api-keys">("profile")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [isManager, setIsManager] = useState(false)
@@ -3389,199 +3389,6 @@ export default function BCometPlatform() {
       )
     }
     
-    // Workflow Overview Screen - 8-phase onboarding lifecycle
-    if (currentScreen === "workflow-overview") {
-      const phases = [
-        {
-          num: 1,
-          name: "Intake & Discovery",
-          icon: ClipboardCheck,
-          steps: ["Create onboarding request", "Collect data", "AI document analysis", "Gap analysis"],
-          color: "#00e5ff",
-          activeCount: 12,
-          progress: 45,
-        },
-        {
-          num: 2,
-          name: "Solution Design & Configuration",
-          icon: Cog,
-          steps: ["Build counterparty profile", "Generate FIX session config", "Generate FIX dictionary", "Internal review/approval"],
-          color: "#4caf50",
-          activeCount: 8,
-          progress: 60,
-        },
-        {
-          num: 3,
-          name: "Connectivity Setup",
-          icon: Wifi,
-          steps: ["Provision network", "Connectivity smoke test", "Session readiness validation"],
-          color: "#2196f3",
-          activeCount: 5,
-          progress: 75,
-        },
-        {
-          num: 4,
-          name: "Certification Planning",
-          icon: Target,
-          steps: ["Generate cert test plan", "Create test cases", "Share readiness checklist"],
-          color: "#ff9800",
-          activeCount: 6,
-          progress: 40,
-        },
-        {
-          num: 5,
-          name: "Test Execution",
-          icon: Play,
-          steps: ["Session-level tests", "Application-level tests", "Negative tests", "Recovery tests", "Capture evidence"],
-          color: "#9c27b0",
-          activeCount: 4,
-          progress: 55,
-        },
-        {
-          num: 6,
-          name: "Analysis & Remediation",
-          icon: Brain,
-          steps: ["Auto-evaluate results", "AI root cause analysis", "Defect creation", "Retest cycle"],
-          color: "#f44336",
-          activeCount: 3,
-          progress: 30,
-        },
-        {
-          num: 7,
-          name: "Certification Decisioning",
-          icon: Award,
-          steps: ["Evaluate completion", "Generate cert report", "Collect formal signoffs"],
-          color: "#2196f3",
-          activeCount: 2,
-          progress: 20,
-        },
-        {
-          num: 8,
-          name: "Production Enablement",
-          icon: Rocket,
-          steps: ["Generate prod config pack", "Readiness checklist", "Prod smoke test", "Go-live & hypercare"],
-          color: "#4caf50",
-          activeCount: 1,
-          progress: 10,
-        },
-      ]
-
-      const capabilities = [
-        { name: "Document Extraction", phases: [1, 2] },
-        { name: "Gap Detection", phases: [1, 4] },
-        { name: "Config Recommendation", phases: [2, 3] },
-        { name: "Test Generation", phases: [4, 5] },
-        { name: "Failure Diagnosis", phases: [6] },
-        { name: "Conversational Assistant", phases: [1, 2, 3, 4, 5, 6, 7, 8] },
-      ]
-
-      return (
-        <div className={`min-h-screen ${bgPrimary} flex`}>
-          <Sidebar />
-          <AIAssistant />
-          <div className="flex-1 overflow-auto">
-            <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
-              <h1 className={`text-2xl font-bold ${textPrimary}`}>Onboarding Lifecycle</h1>
-              <p className={textSecondary}>End-to-end FIX protocol onboarding workflow</p>
-            </header>
-
-            <div className="p-6 space-y-8">
-              {/* 8-Phase Timeline */}
-              <div className="space-y-4">
-                <h2 className={`text-lg font-semibold ${textPrimary}`}>The 8 Phases of Onboarding</h2>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {phases.map((phase, idx) => {
-                    const PhaseIcon = phase.icon
-                    return (
-                      <div
-                        key={idx}
-                        className={`${bgSecondary} border ${borderColor} rounded-lg p-4 hover:shadow-lg transition-shadow`}
-                      >
-                        <div className="flex items-start gap-4">
-                          <div
-                            className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center"
-                            style={{ backgroundColor: phase.color + "20" }}
-                          >
-                            <PhaseIcon className="h-6 w-6" style={{ color: phase.color }} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className={`text-xs font-bold px-2 py-1 rounded ${textSecondary} bg-[#1e4976]/30`}>
-                                Phase {phase.num}
-                              </span>
-                              <h3 className={`text-sm font-semibold ${textPrimary} truncate`}>{phase.name}</h3>
-                            </div>
-
-                            {/* Progress bar */}
-                            <div className="mb-3">
-                              <div className="h-1.5 bg-[#1e4976]/30 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full transition-all duration-300"
-                                  style={{
-                                    width: `${phase.progress}%`,
-                                    backgroundColor: phase.color,
-                                  }}
-                                />
-                              </div>
-                              <p className={`text-xs ${textSecondary} mt-1`}>{phase.progress}% complete</p>
-                            </div>
-
-                            {/* Steps */}
-                            <div className="space-y-1 mb-3">
-                              {phase.steps.map((step, i) => (
-                                <p key={i} className={`text-xs ${textSecondary} flex items-start gap-2`}>
-                                  <span className="text-[#00e5ff] mt-0.5">•</span>
-                                  <span>{step}</span>
-                                </p>
-                              ))}
-                            </div>
-
-                            {/* Active cases count */}
-                            <div className="flex items-center gap-2 pt-2 border-t border-[#1e4976]/30">
-                              <span className="text-xs font-bold" style={{ color: phase.color }}>
-                                {phase.activeCount}
-                              </span>
-                              <span className={`text-xs ${textSecondary}`}>active cases in this phase</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* Platform Capabilities */}
-              <div className="space-y-4">
-                <h2 className={`text-lg font-semibold ${textPrimary}`}>AI-Powered Platform Capabilities</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {capabilities.map((cap, idx) => (
-                    <div key={idx} className={`${bgSecondary} border ${borderColor} rounded-lg p-4`}>
-                      <h3 className={`font-semibold text-sm ${textPrimary} mb-2`}>{cap.name}</h3>
-                      <div className="flex gap-2 flex-wrap">
-                        {cap.phases.map((phaseNum) => {
-                          const phase = phases.find(p => p.num === phaseNum)
-                          return (
-                            <span
-                              key={phaseNum}
-                              className="text-xs px-2 py-1 rounded-full text-white"
-                              style={{ backgroundColor: phase?.color }}
-                            >
-                              Phase {phaseNum}
-                            </span>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )
-    }
-    
     // Admin dashboard - overview with metrics
     if (currentScreen === "dashboard") {
       const totalClients = clients.length
@@ -5160,6 +4967,199 @@ const tools = [
                   </div>
                 </Card>
               ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Workflow Overview Screen - 8-phase onboarding lifecycle
+  if (currentScreen === "workflow-overview") {
+    const phases = [
+      {
+        num: 1,
+        name: "Intake & Discovery",
+        icon: ClipboardCheck,
+        steps: ["Create onboarding request", "Collect data", "AI document analysis", "Gap analysis"],
+        color: "#00e5ff",
+        activeCount: 12,
+        progress: 45,
+      },
+      {
+        num: 2,
+        name: "Solution Design & Configuration",
+        icon: Cog,
+        steps: ["Build counterparty profile", "Generate FIX session config", "Generate FIX dictionary", "Internal review/approval"],
+        color: "#4caf50",
+        activeCount: 8,
+        progress: 60,
+      },
+      {
+        num: 3,
+        name: "Connectivity Setup",
+        icon: Wifi,
+        steps: ["Provision network", "Connectivity smoke test", "Session readiness validation"],
+        color: "#2196f3",
+        activeCount: 5,
+        progress: 75,
+      },
+      {
+        num: 4,
+        name: "Certification Planning",
+        icon: Target,
+        steps: ["Generate cert test plan", "Create test cases", "Share readiness checklist"],
+        color: "#ff9800",
+        activeCount: 6,
+        progress: 40,
+      },
+      {
+        num: 5,
+        name: "Test Execution",
+        icon: Play,
+        steps: ["Session-level tests", "Application-level tests", "Negative tests", "Recovery tests", "Capture evidence"],
+        color: "#9c27b0",
+        activeCount: 4,
+        progress: 55,
+      },
+      {
+        num: 6,
+        name: "Analysis & Remediation",
+        icon: Brain,
+        steps: ["Auto-evaluate results", "AI root cause analysis", "Defect creation", "Retest cycle"],
+        color: "#f44336",
+        activeCount: 3,
+        progress: 30,
+      },
+      {
+        num: 7,
+        name: "Certification Decisioning",
+        icon: Award,
+        steps: ["Evaluate completion", "Generate cert report", "Collect formal signoffs"],
+        color: "#2196f3",
+        activeCount: 2,
+        progress: 20,
+      },
+      {
+        num: 8,
+        name: "Production Enablement",
+        icon: Rocket,
+        steps: ["Generate prod config pack", "Readiness checklist", "Prod smoke test", "Go-live & hypercare"],
+        color: "#4caf50",
+        activeCount: 1,
+        progress: 10,
+      },
+    ]
+
+    const capabilities = [
+      { name: "Document Extraction", phases: [1, 2] },
+      { name: "Gap Detection", phases: [1, 4] },
+      { name: "Config Recommendation", phases: [2, 3] },
+      { name: "Test Generation", phases: [4, 5] },
+      { name: "Failure Diagnosis", phases: [6] },
+      { name: "Conversational Assistant", phases: [1, 2, 3, 4, 5, 6, 7, 8] },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <AIAssistant />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Onboarding Lifecycle</h1>
+            <p className={textSecondary}>End-to-end FIX protocol onboarding workflow</p>
+          </header>
+
+          <div className="p-6 space-y-8">
+            {/* 8-Phase Timeline */}
+            <div className="space-y-4">
+              <h2 className={`text-lg font-semibold ${textPrimary}`}>The 8 Phases of Onboarding</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {phases.map((phase, idx) => {
+                  const PhaseIcon = phase.icon
+                  return (
+                    <div
+                      key={idx}
+                      className={`${bgSecondary} border ${borderColor} rounded-lg p-4 hover:shadow-lg transition-shadow`}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div
+                          className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center"
+                          style={{ backgroundColor: phase.color + "20" }}
+                        >
+                          <PhaseIcon className="h-6 w-6" style={{ color: phase.color }} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className={`text-xs font-bold px-2 py-1 rounded ${textSecondary} bg-[#1e4976]/30`}>
+                              Phase {phase.num}
+                            </span>
+                            <h3 className={`text-sm font-semibold ${textPrimary} truncate`}>{phase.name}</h3>
+                          </div>
+
+                          {/* Progress bar */}
+                          <div className="mb-3">
+                            <div className="h-1.5 bg-[#1e4976]/30 rounded-full overflow-hidden">
+                              <div
+                                className="h-full transition-all duration-300"
+                                style={{
+                                  width: `${phase.progress}%`,
+                                  backgroundColor: phase.color,
+                                }}
+                              />
+                            </div>
+                            <p className={`text-xs ${textSecondary} mt-1`}>{phase.progress}% complete</p>
+                          </div>
+
+                          {/* Steps */}
+                          <div className="space-y-1 mb-3">
+                            {phase.steps.map((step, i) => (
+                              <p key={i} className={`text-xs ${textSecondary} flex items-start gap-2`}>
+                                <span className="text-[#00e5ff] mt-0.5">•</span>
+                                <span>{step}</span>
+                              </p>
+                            ))}
+                          </div>
+
+                          {/* Active cases count */}
+                          <div className="flex items-center gap-2 pt-2 border-t border-[#1e4976]/30">
+                            <span className="text-xs font-bold" style={{ color: phase.color }}>
+                              {phase.activeCount}
+                            </span>
+                            <span className={`text-xs ${textSecondary}`}>active cases in this phase</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Platform Capabilities */}
+            <div className="space-y-4">
+              <h2 className={`text-lg font-semibold ${textPrimary}`}>AI-Powered Platform Capabilities</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {capabilities.map((cap, idx) => (
+                  <div key={idx} className={`${bgSecondary} border ${borderColor} rounded-lg p-4`}>
+                    <h3 className={`font-semibold text-sm ${textPrimary} mb-2`}>{cap.name}</h3>
+                    <div className="flex gap-2 flex-wrap">
+                      {cap.phases.map((phaseNum) => {
+                        const phase = phases.find(p => p.num === phaseNum)
+                        return (
+                          <span
+                            key={phaseNum}
+                            className="text-xs px-2 py-1 rounded-full text-white"
+                            style={{ backgroundColor: phase?.color }}
+                          >
+                            Phase {phaseNum}
+                          </span>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
