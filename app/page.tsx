@@ -5507,10 +5507,50 @@ const tools = [
         </div>
       )
     }
-    const getPhaseStatus = (phaseNum: number) => {
+    // Smart dependency logic - phases can run in parallel if dependencies are met
+    // Dependencies:
+    // Phase 1 (Intake): No dependencies - always available
+    // Phase 2 (Solution Design): Requires Phase 1 to be at least started (need specs uploaded)
+    // Phase 3 (Connectivity): Can run in parallel with Phase 2 (only needs basic client info)
+    // Phase 4 (Cert Planning): Requires Phase 2 (need config to plan tests)
+    // Phase 5 (Test Execution): Requires Phase 3 (connectivity) and Phase 4 (test plans)
+    // Phase 6 (Analysis): Requires some Phase 5 tests to be run
+    // Phase 7 (Decisioning): Requires Phase 6 analysis
+    // Phase 8 (Production): Requires Phase 7 approval
+    const phaseDependencies: Record<number, number[]> = {
+      1: [],           // No dependencies
+      2: [1],          // Needs Phase 1
+      3: [1],          // Can start with just Phase 1 (parallel with Phase 2)
+      4: [2],          // Needs Phase 2 config
+      5: [3, 4],       // Needs connectivity and test plans
+      6: [5],          // Needs test execution
+      7: [6],          // Needs analysis
+      8: [7],          // Needs certification decision
+    }
+    
+    const getPhaseStatus = (phaseNum: number): "completed" | "in-progress" | "available" | "blocked" => {
+      // Check if this phase has been passed (completed)
       if (phaseNum < currentCasePhase) return "completed"
+      // Current active phase
       if (phaseNum === currentCasePhase) return "in-progress"
-      return "locked"
+      // Check dependencies for phases ahead
+      const deps = phaseDependencies[phaseNum] || []
+      const depsCompleted = deps.every(dep => dep < currentCasePhase)
+      // If all dependencies are met, phase is available to work on
+      if (depsCompleted) return "available"
+      // Otherwise blocked
+      return "blocked"
+    }
+    
+    // Status colors for visual distinction
+    const getPhaseStatusColor = (status: string) => {
+      switch (status) {
+        case "completed": return "#4caf50"    // Green
+        case "in-progress": return "#00e5ff"  // Cyan
+        case "available": return "#ff9800"    // Orange/Amber - can be started
+        case "blocked": return "#64748b"      // Gray - waiting on dependencies
+        default: return "#64748b"
+      }
     }
 
     const getToolStatusColor = (status: string) => {
@@ -5575,28 +5615,33 @@ const tools = [
                 const status = getPhaseStatus(phase.num)
                 const isActive = phase.num === currentCasePhase
                 const isCompleted = status === "completed"
-                const isLocked = status === "locked"
+                const isAvailable = status === "available"
+                const isBlocked = status === "blocked"
+                const statusColor = getPhaseStatusColor(status)
 
                 return (
                   <div key={phase.num} className="mb-1">
                     <button
-                      onClick={() => !isLocked && setCurrentCasePhase(phase.num)}
-                      disabled={isLocked}
+                      onClick={() => !isBlocked && setCurrentCasePhase(phase.num)}
+                      disabled={isBlocked}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all ${
                         isActive
                           ? "bg-[#00e5ff]/10 border border-[#00e5ff]/30"
-                          : isLocked
+                          : isBlocked
                           ? "opacity-50 cursor-not-allowed"
+                          : isAvailable
+                          ? `hover:bg-[#ff9800]/10 border border-transparent hover:border-[#ff9800]/30`
                           : `hover:${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"}`
                       }`}
                     >
                       <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          isCompleted ? "bg-[#4caf50]" : isActive ? "bg-[#00e5ff]" : isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"
-                        }`}
+                        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: statusColor + (isCompleted || isActive ? "" : "30") }}
                       >
                         {isCompleted ? (
                           <Check className="h-4 w-4 text-white" />
+                        ) : isAvailable ? (
+                          <span className="text-xs font-bold text-[#ff9800]">{phase.num}</span>
                         ) : (
                           <span className={`text-xs font-bold ${isActive ? "text-[#0a1628]" : textSecondary}`}>
                             {phase.num}
@@ -5604,14 +5649,20 @@ const tools = [
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-medium truncate ${isActive ? "text-[#00e5ff]" : textPrimary}`}>
+                        <p className={`text-sm font-medium truncate ${
+                          isActive ? "text-[#00e5ff]" : 
+                          isAvailable ? "text-[#ff9800]" : 
+                          isCompleted ? "text-[#4caf50]" :
+                          textPrimary
+                        }`}>
                           {phase.name}
                         </p>
                         <p className={`text-xs truncate ${textSecondary}`}>
                           {phase.tools.length} tools
                         </p>
                       </div>
-                      {isLocked && <Lock className="h-4 w-4 text-gray-500" />}
+                      {isBlocked && <Lock className="h-4 w-4 text-gray-500" />}
+                      {isAvailable && <Unlock className="h-4 w-4 text-[#ff9800]" />}
                     </button>
                   </div>
                 )
@@ -5663,23 +5714,51 @@ const tools = [
                 </div>
               </div>
 
-              {/* Phase Progress Bar */}
+              {/* Phase Progress Bar - shows status of each phase */}
               <div className="mt-4 flex items-center gap-1">
-                {casePhases.map((phase, idx) => (
-                  <div
-                    key={idx}
-                    className="flex-1 h-2 rounded-full overflow-hidden"
-                    style={{ backgroundColor: isDarkMode ? "#1e4976" : "#e2e8f0" }}
-                  >
+                {casePhases.map((phase, idx) => {
+                  const status = getPhaseStatus(phase.num)
+                  const statusColor = getPhaseStatusColor(status)
+                  return (
                     <div
-                      className="h-full transition-all duration-300"
-                      style={{
-                        width: getPhaseStatus(phase.num) === "completed" ? "100%" : getPhaseStatus(phase.num) === "in-progress" ? "50%" : "0%",
-                        backgroundColor: phase.color,
-                      }}
-                    />
-                  </div>
-                ))}
+                      key={idx}
+                      className="flex-1 h-2 rounded-full overflow-hidden cursor-pointer hover:scale-y-150 transition-transform"
+                      style={{ backgroundColor: isDarkMode ? "#1e4976" : "#e2e8f0" }}
+                      onClick={() => status !== "blocked" && setCurrentCasePhase(phase.num)}
+                      title={`${phase.name} - ${status}`}
+                    >
+                      <div
+                        className="h-full transition-all duration-300"
+                        style={{
+                          width: status === "completed" ? "100%" : 
+                                 status === "in-progress" ? "50%" : 
+                                 status === "available" ? "25%" : "0%",
+                          backgroundColor: statusColor,
+                        }}
+                      />
+                    </div>
+                  )
+                })}
+              </div>
+              
+              {/* Phase Status Legend */}
+              <div className="mt-2 flex items-center gap-4 text-xs">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-full bg-[#4caf50]" />
+                  <span className={textSecondary}>Completed</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-full bg-[#00e5ff]" />
+                  <span className={textSecondary}>In Progress</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-full bg-[#ff9800]" />
+                  <span className={textSecondary}>Available</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-full bg-[#64748b]" />
+                  <span className={textSecondary}>Blocked</span>
+                </div>
               </div>
             </header>
 
