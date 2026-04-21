@@ -5804,8 +5804,13 @@ const tools = [
                       <Card className={`${bgCard} border ${borderColor}`}>
                         <div className={`p-4 border-b ${borderColor} flex items-center justify-between`}>
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: currentPhase.color + "20" }}>
-                              <ToolIcon className="h-5 w-5" style={{ color: currentPhase.color }} />
+                            <div className="flex items-center gap-2">
+                              <span className={`text-xs font-bold px-2 py-1 rounded bg-[#00e5ff] text-[#0a1628]`}>
+                                Step {currentToolIndex + 1}
+                              </span>
+                              <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: currentPhase.color + "20" }}>
+                                <ToolIcon className="h-5 w-5" style={{ color: currentPhase.color }} />
+                              </div>
                             </div>
                             <div>
                               <h2 className={`text-lg font-bold ${textPrimary}`}>{tool.name}</h2>
