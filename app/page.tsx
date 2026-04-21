@@ -2076,10 +2076,103 @@ export default function BCometPlatform() {
   if (currentScreen === "home") {
     return (
       <div className={`min-h-screen ${bgPrimary} transition-colors overflow-hidden`}>
-        <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className={`absolute top-20 left-10 w-72 h-72 ${isDarkMode ? "bg-[#00e5ff]/5" : "bg-[#00e5ff]/10"} rounded-full blur-3xl animate-pulse`} />
-          <div className={`absolute bottom-20 right-10 w-96 h-96 ${isDarkMode ? "bg-[#0091ea]/5" : "bg-[#0091ea]/10"} rounded-full blur-3xl animate-pulse`} style={{ animationDelay: "1s" }} />
-        </div>
+        {/* Full-page solar system background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none" style={{ opacity: isDarkMode ? 0.22 : 0.13 }}>
+        {(() => {
+          const CX = 50, CY = 50 // percent-based center (left-center of screen)
+          const solarPlanets = [
+            { name: "Intake",  radius: 8,   color: "#2196f3", size: 1.1 },
+            { name: "Design",  radius: 14,  color: "#9c27b0", size: 1.3 },
+            { name: "Connect", radius: 20,  color: "#00bcd4", size: 1.4 },
+            { name: "Plan",    radius: 27,  color: "#ff9800", size: 1.5 },
+            { name: "Execute", radius: 34,  color: "#e91e63", size: 1.6 },
+            { name: "Analyze", radius: 41,  color: "#f44336", size: 1.7 },
+            { name: "Decide",  radius: 48,  color: "#4caf50", size: 1.8 },
+            { name: "Launch",  radius: 56,  color: "#00e5ff", size: 1.9 },
+          ]
+          // Use percentage-based viewBox so it fills any screen
+          const VB = 100
+          const angleRad = (cometAngleDeg * Math.PI) / 180
+          const cp = solarPlanets[cometPhase]
+          const cometX = CX + cp.radius * Math.cos(angleRad - Math.PI / 2)
+          const cometY = CY + cp.radius * Math.sin(angleRad - Math.PI / 2)
+          const tailRad = Math.atan2(cometY - CY, cometX - CX)
+
+          return (
+            <svg
+              viewBox={`0 0 ${VB} ${VB}`}
+              preserveAspectRatio="xMidYMid slice"
+              className="w-full h-full"
+            >
+              <defs>
+                <radialGradient id="sunGradBg" cx="40%" cy="40%">
+                  <stop offset="0%" stopColor="#ffcc80" />
+                  <stop offset="50%" stopColor="#ff9800" />
+                  <stop offset="100%" stopColor="#f44336" />
+                </radialGradient>
+              </defs>
+
+              {/* Orbit rings */}
+              {solarPlanets.map((planet, i) => (
+                <circle
+                  key={planet.name}
+                  cx={CX} cy={CY} r={planet.radius}
+                  fill="none"
+                  stroke={visitedPlanets.includes(i) ? "#4caf50" : isDarkMode ? "#4fc3f7" : "#0091ea"}
+                  strokeWidth={visitedPlanets.includes(i) ? 0.15 : 0.08}
+                  strokeDasharray="1.2 1.2"
+                />
+              ))}
+
+              {/* Planets */}
+              {solarPlanets.map((planet, i) => {
+                const pAngle = ((i / 8) * 360 - 90) * Math.PI / 180
+                const px = CX + planet.radius * Math.cos(pAngle)
+                const py = CY + planet.radius * Math.sin(pAngle)
+                const isVisited = visitedPlanets.includes(i)
+                const isActive = activePlanetTools === i
+                return (
+                  <g key={planet.name}>
+                    {isVisited && <circle cx={px} cy={py} r={planet.size + 0.8} fill="#4caf5030" />}
+                    <circle
+                      cx={px} cy={py} r={planet.size}
+                      fill={isVisited ? "#4caf50" : planet.color}
+                    />
+                    {isActive && (
+                      <circle cx={px} cy={py} r={planet.size + 1.5} fill="none" stroke={planet.color} strokeWidth="0.3" />
+                    )}
+                    <text x={px} y={py + planet.size + 1.8} textAnchor="middle" fontSize="1.4"
+                      fill={isVisited ? "#4caf50" : isDarkMode ? "#94a3b8" : "#475569"} fontWeight={isVisited ? "700" : "400"}>
+                      {planet.name}
+                    </text>
+                  </g>
+                )
+              })}
+
+              {/* Sun */}
+              <circle cx={CX} cy={CY} r={3.2} fill="url(#sunGradBg)" />
+              <circle cx={CX} cy={CY} r={3.2} fill="none" stroke="#ff9800" strokeWidth="0.5" opacity="0.5" />
+              <text x={CX} y={CY + 0.5} textAnchor="middle" dominantBaseline="middle" fontSize="1.3" fill="white" fontWeight="700">Cases</text>
+
+              {/* Comet tail - away from sun */}
+              <line x1={cometX} y1={cometY}
+                x2={cometX + Math.cos(tailRad) * 3.5} y2={cometY + Math.sin(tailRad) * 3.5}
+                stroke="#00e5ff" strokeWidth="0.6" strokeLinecap="round" opacity="0.9" />
+              <line x1={cometX} y1={cometY}
+                x2={cometX + Math.cos(tailRad) * 5.5} y2={cometY + Math.sin(tailRad) * 5.5}
+                stroke="#00e5ff" strokeWidth="0.25" strokeLinecap="round" opacity="0.5" />
+              <line
+                x1={cometX + Math.cos(tailRad - 0.15) * 0.5} y1={cometY + Math.sin(tailRad - 0.15) * 0.5}
+                x2={cometX + Math.cos(tailRad - 0.15) * 4.5} y2={cometY + Math.sin(tailRad - 0.15) * 4.5}
+                stroke="#00e5ff" strokeWidth="0.15" strokeLinecap="round" opacity="0.4" />
+
+              {/* Comet head */}
+              <circle cx={cometX} cy={cometY} r={0.8} fill="#00e5ff" />
+              <circle cx={cometX} cy={cometY} r={0.4} fill="white" />
+            </svg>
+          )
+        })()}
+      </div>
 
         <header className={`${bgSecondary}/80 backdrop-blur-md border-b ${borderColor} sticky top-0 z-50`}>
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -2106,8 +2199,8 @@ export default function BCometPlatform() {
         </header>
 
         <section className="relative max-w-7xl mx-auto px-6 py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
-            <div className="lg:col-span-3">
+          <div className="grid grid-cols-1 gap-12 items-center">
+            <div>
               <div className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm mb-6 ${isDarkMode ? "bg-[#00e5ff]/10 border border-[#00e5ff]/20" : "bg-[#0a1628]/5 border border-[#0a1628]/10"}`}>
                 <span className="flex h-2 w-2 rounded-full bg-[#4caf50] animate-pulse" />
                 <span className={`font-medium ${isDarkMode ? "text-[#00e5ff]" : "text-[#0a1628]"}`}>B- COMET FIX AI Platform</span>
@@ -2144,176 +2237,6 @@ export default function BCometPlatform() {
               </div>
             </div>
 
-            <div className="lg:col-span-2">
-              {/* Solar System Animation - comet auto-orbits, planets at increasing distances */}
-              {(() => {
-                const CX = 200, CY = 200 // sun center in SVG coords
-                const solarPlanets = [
-                  { name: "Intake",   radius: 42,  color: "#2196f3", size: 10, tools: ["Intake Portal", "Doc Upload", "AI Gap Analysis"] },
-                  { name: "Design",   radius: 65,  color: "#9c27b0", size: 12, tools: ["Spec Compare", "ATDL Config", "Field Mapping"] },
-                  { name: "Connect",  radius: 88,  color: "#00bcd4", size: 13, tools: ["Network Setup", "Session Validation"] },
-                  { name: "Plan",     radius: 110, color: "#ff9800", size: 14, tools: ["Test Case Gen", "Cert Test Plan"] },
-                  { name: "Execute",  radius: 132, color: "#e91e63", size: 15, tools: ["Log Analysis", "Test Runner", "Evidence"] },
-                  { name: "Analyze",  radius: 152, color: "#f44336", size: 16, tools: ["Root Cause AI", "Defect Tracking"] },
-                  { name: "Decide",   radius: 170, color: "#4caf50", size: 17, tools: ["Cert Report", "Go/No-Go"] },
-                  { name: "Launch",   radius: 188, color: "#00e5ff", size: 18, tools: ["Prod Config", "Go-Live", "Hypercare"] },
-                ]
-                const SVG = (CX + 188 + 30) * 2 // viewBox size = 836? simplify:
-                const VB = 420 // viewBox square side
-
-                // Comet travels on the orbit of the current planet (spiral effect: each full loop moves to next planet)
-                // Simpler: comet sweeps 360deg, each 45deg = next planet
-                const angleRad = (cometAngleDeg * Math.PI) / 180
-                const currentPlanet = solarPlanets[cometPhase]
-                const cometX = CX + currentPlanet.radius * Math.cos(angleRad - Math.PI / 2)
-                const cometY = CY + currentPlanet.radius * Math.sin(angleRad - Math.PI / 2)
-                // Tail direction: from comet away from sun
-                const tailRad = Math.atan2(cometY - CY, cometX - CX)
-                const tailDeg = tailRad * (180 / Math.PI) + 90 // rotate so tail points outward
-
-                return (
-                  <div className={`${bgCard}/80 backdrop-blur-md p-4 border ${borderColor} rounded-xl`}>
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className={`font-semibold ${textPrimary}`}>8-Phase Journey</h3>
-                      <div className="flex items-center gap-2">
-                        <span className="flex h-2 w-2 rounded-full bg-[#4caf50] animate-pulse" />
-                        <span className={`text-[10px] ${textSecondary}`}>Phase {cometPhase + 1} — {currentPlanet.name}</span>
-                      </div>
-                    </div>
-
-                    {/* SVG Solar System */}
-                    <div className="relative w-full" style={{ aspectRatio: "1/1" }}>
-                      <svg viewBox={`0 0 ${VB} ${VB}`} className="w-full h-full" style={{ maxHeight: 340 }}>
-                        {/* Orbit rings */}
-                        {solarPlanets.map((planet, i) => (
-                          <circle
-                            key={planet.name}
-                            cx={CX} cy={CY} r={planet.radius}
-                            fill="none"
-                            stroke={visitedPlanets.includes(i) ? "#4caf5025" : isDarkMode ? "#1e497660" : "#cbd5e1"}
-                            strokeWidth={visitedPlanets.includes(i) ? 1.5 : 0.8}
-                            strokeDasharray="5 4"
-                          />
-                        ))}
-
-                        {/* Planets */}
-                        {solarPlanets.map((planet, i) => {
-                          // Each planet sits at a fixed angle spaced evenly (not rotating)
-                          const pAngle = ((i / 8) * 360 - 90) * Math.PI / 180
-                          const px = CX + planet.radius * Math.cos(pAngle)
-                          const py = CY + planet.radius * Math.sin(pAngle)
-                          const isVisited = visitedPlanets.includes(i)
-                          const isActive = activePlanetTools === i
-                          return (
-                            <g key={planet.name} style={{ cursor: "pointer" }} onClick={() => setActivePlanetTools(isActive ? null : i)}>
-                              {/* Glow when visited */}
-                              {isVisited && (
-                                <circle cx={px} cy={py} r={planet.size + 5} fill="#4caf5020" />
-                              )}
-                              {/* Planet body */}
-                              <circle
-                                cx={px} cy={py} r={planet.size}
-                                fill={isVisited ? "#4caf50" : planet.color}
-                                style={{ filter: `drop-shadow(0 0 ${isActive ? 10 : 6}px ${isVisited ? "#4caf50" : planet.color}90)` }}
-                              />
-                              {/* Planet number */}
-                              <text x={px} y={py + 1} textAnchor="middle" dominantBaseline="middle" fontSize={planet.size > 13 ? 7 : 6} fill="white" fontWeight="bold">
-                                {i + 1}
-                              </text>
-                              {/* Planet label */}
-                              <text
-                                x={px}
-                                y={py + planet.size + 9}
-                                textAnchor="middle"
-                                fontSize="7"
-                                fill={isVisited ? "#4caf50" : isDarkMode ? "#94a3b8" : "#64748b"}
-                                fontWeight={isVisited ? "600" : "400"}
-                              >
-                                {planet.name}
-                              </text>
-
-                              {/* Tools popup when comet is here */}
-                              {isActive && (() => {
-                                // Decide popup direction (keep inside viewBox)
-                                const popupX = px > CX ? px - 80 : px + 5
-                                const popupY = Math.max(10, Math.min(py - 10, VB - 70))
-                                return (
-                                  <g>
-                                    <rect x={popupX} y={popupY} width={75} height={10 + planet.tools.length * 11} rx="4"
-                                      fill={isDarkMode ? "#0d2137" : "#f8fafc"} stroke={planet.color} strokeWidth="0.8" />
-                                    <text x={popupX + 4} y={popupY + 8} fontSize="6" fill={planet.color} fontWeight="700">{planet.name}</text>
-                                    {planet.tools.map((tool, ti) => (
-                                      <g key={ti}>
-                                        <circle cx={popupX + 6} cy={popupY + 15 + ti * 11} r="2" fill={isVisited ? "#4caf50" : "#94a3b8"} />
-                                        <text x={popupX + 11} y={popupY + 18 + ti * 11} fontSize="5.5" fill={isDarkMode ? "#94a3b8" : "#475569"}>{tool}</text>
-                                      </g>
-                                    ))}
-                                  </g>
-                                )
-                              })()}
-                            </g>
-                          )
-                        })}
-
-                        {/* Sun (center) */}
-                        <circle cx={CX} cy={CY} r={26} fill="url(#sunGrad)" style={{ filter: "drop-shadow(0 0 12px #ff980070)" }} />
-                        <circle cx={CX} cy={CY} r={26} fill="none" stroke="#ff980040" strokeWidth="4" className="animate-pulse" />
-                        <text x={CX} y={CY + 1} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill="white" fontWeight="700">Cases</text>
-                        <defs>
-                          <radialGradient id="sunGrad" cx="40%" cy="40%">
-                            <stop offset="0%" stopColor="#ffcc80" />
-                            <stop offset="50%" stopColor="#ff9800" />
-                            <stop offset="100%" stopColor="#f44336" />
-                          </radialGradient>
-                        </defs>
-
-                        {/* Comet tail (behind comet, points away from sun) */}
-                        <line
-                          x1={cometX} y1={cometY}
-                          x2={cometX + Math.cos(tailRad) * 22}
-                          y2={cometY + Math.sin(tailRad) * 22}
-                          stroke="#00e5ff" strokeWidth="3" strokeLinecap="round"
-                          style={{ filter: "blur(1px)", opacity: 0.85 }}
-                        />
-                        <line
-                          x1={cometX} y1={cometY}
-                          x2={cometX + Math.cos(tailRad) * 34}
-                          y2={cometY + Math.sin(tailRad) * 34}
-                          stroke="#00e5ff" strokeWidth="1.5" strokeLinecap="round"
-                          style={{ opacity: 0.45 }}
-                        />
-                        <line
-                          x1={cometX + Math.cos(tailRad - 0.15) * 4}
-                          y1={cometY + Math.sin(tailRad - 0.15) * 4}
-                          x2={cometX + Math.cos(tailRad - 0.15) * 28}
-                          y2={cometY + Math.sin(tailRad - 0.15) * 28}
-                          stroke="#00e5ff80" strokeWidth="1" strokeLinecap="round"
-                        />
-
-                        {/* Comet head */}
-                        <circle cx={cometX} cy={cometY} r={5} fill="#00e5ff" style={{ filter: "drop-shadow(0 0 6px #00e5ff)" }} />
-                        <circle cx={cometX} cy={cometY} r={2.5} fill="white" />
-                      </svg>
-                    </div>
-
-                    {/* Status bar */}
-                    <div className={`pt-2 border-t ${borderColor} flex items-center justify-between`}>
-                      <div className="flex gap-3">
-                        <div className="flex items-center gap-1">
-                          <div className="w-2 h-2 rounded-full bg-[#4caf50]" />
-                          <span className={`text-[10px] ${textSecondary}`}>{visitedPlanets.length} of 8 phases reached</span>
-                        </div>
-                      </div>
-                      <div className="flex gap-1">
-                        {solarPlanets.map((_, i) => (
-                          <div key={i} className={`w-1.5 h-1.5 rounded-full transition-colors duration-500 ${visitedPlanets.includes(i) ? "bg-[#4caf50]" : isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`} />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })()}
-            </div>
           </div>
 
         </section>
