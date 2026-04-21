@@ -5735,24 +5735,24 @@ const tools = [
 
   // Spec Compare Screen
   if (currentScreen === "spec-compare") {
-const specCompareResults = [
-  { id: "diff-1", title: "Undefined Message Types", left: "35=K, 35=H Undefined In Counterparty Spec", right: "35=DF, 35=L Undefined In Counterparty Spec" },
-  { id: "diff-2", title: "Unsupported Tags", left: "35=D: tags 375, 943\n35=G: tags 524, 133", right: "35=D: tags 111, 6454\n35=8: tags 5124, 1331" },
-  { id: "diff-3", title: "Unsupported Tag Values", left: "123=4, 7, 9\n56=24, 56, gh", right: "123=12, 55, 78\n76=5, 8, 0" },
-  { id: "diff-4", title: "Datatype Mismatch", left: "Tag 46 is String", right: "Tag 98 is Char" },
-  ]
+    const specCompareResults = [
+      { id: "diff-1", title: "Undefined Message Types", left: "35=K, 35=H Undefined In Counterparty Spec", right: "35=DF, 35=L Undefined In Counterparty Spec" },
+      { id: "diff-2", title: "Unsupported Tags", left: "35=D: tags 375, 943\n35=G: tags 524, 133", right: "35=D: tags 111, 6454\n35=8: tags 5124, 1331" },
+      { id: "diff-3", title: "Unsupported Tag Values", left: "123=4, 7, 9\n56=24, 56, gh", right: "123=12, 55, 78\n76=5, 8, 0" },
+      { id: "diff-4", title: "Datatype Mismatch", left: "Tag 46 is String", right: "Tag 98 is Char" },
+    ]
 
-  // All specs for this client when "Show All Specs" is clicked
-  const allClientSpecs = [
-    { asset: "Equities", protocol: "FIX 4.2", adminSpec: "EQ_FIX42_v1.2.xml", adminVersion: "v1.2", clientSpec: "client_eq_42_v1.1.xml", clientVersion: "v1.1", status: "complete", differences: 3 },
-    { asset: "Equities", protocol: "FIX 4.4", adminSpec: "EQ_FIX44_v2.1.xml", adminVersion: "v2.1", clientSpec: "client_eq_44_v1.2.xml", clientVersion: "v1.2", status: "in-progress", differences: 7 },
-    { asset: "Options", protocol: "FIX 4.4", adminSpec: "OPT_FIX44_v2.0.xml", adminVersion: "v2.0", clientSpec: "client_opt_44_v1.0.xml", clientVersion: "v1.0", status: "complete", differences: 2 },
-    { asset: "Futures", protocol: "FIX 4.2", adminSpec: "FUT_FIX42_v1.0.xml", adminVersion: "v1.0", clientSpec: null, clientVersion: null, status: "pending", differences: 0 },
-    { asset: "Futures", protocol: "FIX 5.0 SP2", adminSpec: "FUT_FIX50SP2_v2.0.xml", adminVersion: "v2.0", clientSpec: "client_fut_50sp2_v1.0.xml", clientVersion: "v1.0", status: "in-progress", differences: 5 },
-  ]
-  
-  const allActionsSelected = specCompareResults.every(section => comparisonFlags[section.id]?.status !== null && comparisonFlags[section.id]?.status !== undefined)
+    // All specs for this client when "Show All Specs" is clicked
+    const allClientSpecs = [
+      { asset: "Equities", protocol: "FIX 4.2", adminSpec: "EQ_FIX42_v1.2.xml", adminVersion: "v1.2", clientSpec: "client_eq_42_v1.1.xml", clientVersion: "v1.1", status: "complete", differences: 3 },
+      { asset: "Equities", protocol: "FIX 4.4", adminSpec: "EQ_FIX44_v2.1.xml", adminVersion: "v2.1", clientSpec: "client_eq_44_v1.2.xml", clientVersion: "v1.2", status: "in-progress", differences: 7 },
+      { asset: "Options", protocol: "FIX 4.4", adminSpec: "OPT_FIX44_v2.0.xml", adminVersion: "v2.0", clientSpec: "client_opt_44_v1.0.xml", clientVersion: "v1.0", status: "complete", differences: 2 },
+      { asset: "Futures", protocol: "FIX 4.2", adminSpec: "FUT_FIX42_v1.0.xml", adminVersion: "v1.0", clientSpec: null, clientVersion: null, status: "pending", differences: 0 },
+      { asset: "Futures", protocol: "FIX 5.0 SP2", adminSpec: "FUT_FIX50SP2_v2.0.xml", adminVersion: "v2.0", clientSpec: "client_fut_50sp2_v1.0.xml", clientVersion: "v1.0", status: "in-progress", differences: 5 },
+    ]
     
+    const allActionsSelected = specCompareResults.every(section => comparisonFlags[section.id]?.status !== null && comparisonFlags[section.id]?.status !== undefined)
+      
     const updateFlag = (id: string, status: "ignore" | "customization" | "flag" | null) => {
       setComparisonFlags(prev => ({ ...prev, [id]: { ...prev[id], status, note: prev[id]?.note || "" } }))
     }
