@@ -2067,10 +2067,10 @@ export default function BCometPlatform() {
               </div>
             </div>
   <div className="flex items-center gap-4">
-  <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 rounded-lg transition-colors ${isDarkMode ? "text-[#00e5ff] hover:bg-[#00e5ff]/20" : "text-[#0a1628] hover:bg-[#0a1628]/10"}`}>
+  <button onClick={() => {console.log("[v0] Theme toggle clicked"); setIsDarkMode(!isDarkMode)}} className={`p-2 rounded-lg transition-colors ${isDarkMode ? "text-[#00e5ff] hover:bg-[#00e5ff]/20" : "text-[#0a1628] hover:bg-[#0a1628]/10"}`}>
   {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
   </button>
-  <Button onClick={() => setCurrentScreen("role-select")} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-semibold">Login / Register</Button>
+  <Button onClick={() => {console.log("[v0] Login/Register clicked"); setCurrentScreen("role-select")}} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-semibold">Login / Register</Button>
   </div>
           </div>
         </header>
@@ -2098,11 +2098,11 @@ export default function BCometPlatform() {
               </p>
 
   <div className="flex gap-4 mb-8">
-  <Button size="lg" onClick={() => setShowContactPanel(true)} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-semibold">Start Here</Button>
-  <Button size="lg" variant="outline" onClick={() => setCurrentScreen("fix-msg-creator")} className={`font-semibold ${isDarkMode ? "border-[#00e5ff] text-[#00e5ff] hover:bg-[#00e5ff]/10" : "border-[#0091ea] text-[#0091ea] hover:bg-[#0091ea]/10"}`}>
+  <Button size="lg" onClick={() => {console.log("[v0] Start Here clicked"); setShowContactPanel(true)}} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 font-semibold">Start Here</Button>
+  <Button size="lg" variant="outline" onClick={() => {console.log("[v0] Try Message Creator clicked"); setCurrentScreen("fix-msg-creator")}} className={`font-semibold ${isDarkMode ? "border-[#00e5ff] text-[#00e5ff] hover:bg-[#00e5ff]/10" : "border-[#0091ea] text-[#0091ea] hover:bg-[#0091ea]/10"}`}>
     <MessageSquare className="h-5 w-5 mr-2" /> Try Message Creator Free
   </Button>
-  <Button size="lg" variant="outline" onClick={() => { setCurrentSlide(0); setCurrentScreen("presentation") }} className={`font-semibold ${isDarkMode ? "border-[#4caf50] text-[#4caf50] hover:bg-[#4caf50]/10" : "border-[#4caf50] text-[#4caf50] hover:bg-[#4caf50]/10"}`}>
+  <Button size="lg" variant="outline" onClick={() => {console.log("[v0] View Demo clicked"); setCurrentSlide(0); setCurrentScreen("presentation")}} className={`font-semibold ${isDarkMode ? "border-[#4caf50] text-[#4caf50] hover:bg-[#4caf50]/10" : "border-[#4caf50] text-[#4caf50] hover:bg-[#4caf50]/10"}`}>
     <BookOpen className="h-5 w-5 mr-2" /> View Demo
   </Button>
   </div>
@@ -13148,7 +13148,7 @@ const copyToClipboard = () => {
               </div>
             )}
 
-            {/* ═══════════════════════════════════════════════════════
+            {/* ═════════════════════════════════════════════���═════════
                 STEP 4: GENERATE CLIENT REPORT
             ═══════════════════════════════════════════════════════ */}
             {certReportStep === "generate" && (
