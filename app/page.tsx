@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "workflow-overview" | "dashboard" | "clients" | "client-detail" | "case-workflow" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "onboarding-case-detail" | "approvals" | "evidence-vault" | "prod-config" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case" | "presentation" | "client-cert-report">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "workflow-overview" | "intake-portal" | "dashboard" | "clients" | "client-detail" | "case-workflow" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "onboarding-case-detail" | "approvals" | "evidence-vault" | "prod-config" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case" | "presentation" | "client-cert-report">("home")
   const [settingsTab, setSettingsTab] = useState<"profile" | "notifications" | "security" | "integrations" | "appearance" | "api-keys">("profile")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [isManager, setIsManager] = useState(false)
@@ -171,6 +171,40 @@ export default function BCometPlatform() {
   const [certReportOptions, setCertReportOptions] = useState({ clientMessages: true, passFailResults: true, gatewayNotes: true, rawConductor: false, unmatchedCases: false })
   const [certClientName, setCertClientName] = useState("Goldman Sachs")
   const [certReportTitle, setCertReportTitle] = useState("FIX 4.2 Equities Certification Report")
+  // Intake Portal state
+  const [intakeStep, setIntakeStep] = useState(0)
+  const [intakeData, setIntakeData] = useState({
+    legalEntityName: "",
+    lei: "",
+    contactName: "",
+    contactEmail: "",
+    contactPhone: "",
+    businessSponsor: "",
+    jiraTicket: "",
+    environments: [] as string[],
+    businessLines: [] as string[],
+    useCases: [] as string[],
+    fixVersion: "5.0",
+    sessionRole: "initiator",
+    senderCompId: "",
+    targetCompId: "",
+    targetSubId: "",
+    heartbeat: 30,
+    resetSeqPolicy: "Always",
+    primaryHost: "",
+    primaryPort: "",
+    drHost: "",
+    drPort: "",
+    connectivity: "Internet",
+    sourceIps: "",
+    tlsRequired: false,
+    certMethod: "Manual",
+    authentication: "None",
+    encryptionNotes: "",
+    uploadedFiles: [] as {name: string, size: string, type: string}[],
+    autoExtract: false,
+    confirmAccurate: false,
+  })
   // AI Assistant state - GitHub Copilot style with actions (persisted to localStorage)
   const getDefaultAiWelcomeMessage = () => [
     { 
@@ -1186,6 +1220,7 @@ export default function BCometPlatform() {
   {[
   { icon: LayoutDashboard, label: "Dashboard", screen: "dashboard", roles: ["admin", "client"] },
   { icon: Navigation, label: "Workflow Overview", screen: "workflow-overview", roles: ["admin"] },
+  { icon: FileText, label: "Onboarding Portal", screen: "intake-portal", roles: ["client"] },
   { icon: Users, label: "Clients", screen: "clients", roles: ["admin"] },
   { icon: Briefcase, label: "Onboarding Cases", screen: "onboarding-cases", roles: ["admin"] },
   { icon: Scale, label: "Approvals", screen: "approvals", roles: ["admin"], badge: 3 },
@@ -5161,6 +5196,457 @@ const tools = [
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Intake Portal - Client Onboarding Request Wizard
+  if (currentScreen === "intake-portal") {
+    const steps = [
+      { num: 1, title: "Business Information", icon: Building2 },
+      { num: 2, title: "Service Selection", icon: ShoppingCart },
+      { num: 3, title: "Session Details", icon: Network },
+      { num: 4, title: "Connectivity & Security", icon: Lock },
+      { num: 5, title: "Document Upload", icon: Upload },
+      { num: 6, title: "Review & Submit", icon: CheckCircle },
+    ]
+
+    const environments = ["UAT", "Certification", "Production"]
+    const businessLines = ["Equities", "Options", "Futures", "FX", "Fixed Income", "Commodities", "Credit", "ETF", "Rates"]
+    const useCases = ["Order Entry", "Market Data", "Drop Copy", "Post-Trade", "Algo/DMA", "Care Order"]
+    const fixVersions = ["4.2", "4.4", "5.0", "5.0 SP2", "Custom"]
+
+    const handleNextStep = () => {
+      if (intakeStep < steps.length - 1) setIntakeStep(intakeStep + 1)
+    }
+
+    const handlePrevStep = () => {
+      if (intakeStep > 0) setIntakeStep(intakeStep - 1)
+    }
+
+    const handleInputChange = (field: string, value: any) => {
+      setIntakeData(prev => ({ ...prev, [field]: value }))
+    }
+
+    const toggleCheckbox = (field: string, value: string) => {
+      setIntakeData(prev => {
+        const array = prev[field as keyof typeof prev] as string[]
+        return { ...prev, [field]: array.includes(value) ? array.filter(v => v !== value) : [...array, value] }
+      })
+    }
+
+    const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault()
+      const files = Array.from(e.dataTransfer.files)
+      const newFiles = files.map(f => ({
+        name: f.name,
+        size: `${(f.size / 1024).toFixed(2)} KB`,
+        type: f.type.includes("pdf") ? "PDF" : f.type.includes("sheet") ? "XLSX" : "DOC"
+      }))
+      setIntakeData(prev => ({
+        ...prev,
+        uploadedFiles: [...prev.uploadedFiles, ...newFiles]
+      }))
+    }
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <div className="flex items-center gap-3">
+              <FileText className="h-8 w-8 text-[#00e5ff]" />
+              <div>
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>Onboarding Portal</h1>
+                <p className={`text-sm ${textSecondary}`}>Complete your counterparty onboarding request</p>
+              </div>
+            </div>
+          </header>
+
+          <div className="p-6">
+            {/* Progress Indicator */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                {steps.map((step, idx) => {
+                  const Icon = step.icon
+                  const isCompleted = idx < intakeStep
+                  const isActive = idx === intakeStep
+                  return (
+                    <div key={idx} className="flex flex-col items-center flex-1">
+                      <div className="flex items-center w-full">
+                        <div
+                          className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
+                            isActive
+                              ? "bg-[#00e5ff] text-[#0a1628]"
+                              : isCompleted
+                              ? "bg-[#4caf50] text-white"
+                              : `${isDarkMode ? "bg-[#1e4976]" : "bg-gray-300"} ${textSecondary}`
+                          }`}
+                        >
+                          {isCompleted ? <Check className="h-5 w-5" /> : step.num}
+                        </div>
+                        {idx < steps.length - 1 && (
+                          <div
+                            className={`flex-1 h-1 mx-2 ${
+                              isCompleted ? "bg-[#4caf50]" : isDarkMode ? "bg-[#1e4976]" : "bg-gray-300"
+                            }`}
+                          />
+                        )}
+                      </div>
+                      <p className={`text-xs font-medium mt-2 text-center ${isActive ? "text-[#00e5ff]" : textSecondary}`}>
+                        {step.title}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Step Content */}
+            <Card className={`${bgCard} border ${borderColor}`}>
+              <div className="p-6">
+                {intakeStep === 0 && (
+                  <div className="space-y-5">
+                    <h2 className={`text-xl font-bold ${textPrimary}`}>Business Information</h2>
+                    <Input
+                      placeholder="Legal entity name"
+                      value={intakeData.legalEntityName}
+                      onChange={e => handleInputChange("legalEntityName", e.target.value)}
+                      className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                    />
+                    <Input
+                      placeholder="LEI / Regulatory Identifier"
+                      value={intakeData.lei}
+                      onChange={e => handleInputChange("lei", e.target.value)}
+                      className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                    />
+                    <Input
+                      placeholder="Contact name"
+                      value={intakeData.contactName}
+                      onChange={e => handleInputChange("contactName", e.target.value)}
+                      className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                    />
+                    <Input
+                      type="email"
+                      placeholder="Contact email"
+                      value={intakeData.contactEmail}
+                      onChange={e => handleInputChange("contactEmail", e.target.value)}
+                      className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                    />
+                    <Input
+                      placeholder="Contact phone"
+                      value={intakeData.contactPhone}
+                      onChange={e => handleInputChange("contactPhone", e.target.value)}
+                      className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                    />
+                    <Input
+                      placeholder="Business sponsor name"
+                      value={intakeData.businessSponsor}
+                      onChange={e => handleInputChange("businessSponsor", e.target.value)}
+                      className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                    />
+                    <Input
+                      placeholder="JIRA / ServiceNow ticket reference"
+                      value={intakeData.jiraTicket}
+                      onChange={e => handleInputChange("jiraTicket", e.target.value)}
+                      className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                    />
+                  </div>
+                )}
+
+                {intakeStep === 1 && (
+                  <div className="space-y-6">
+                    <h2 className={`text-xl font-bold ${textPrimary}`}>Service Selection</h2>
+                    
+                    <div>
+                      <p className={`text-sm font-semibold ${textPrimary} mb-3`}>Environment</p>
+                      <div className="flex flex-wrap gap-2">
+                        {environments.map(env => (
+                          <button
+                            key={env}
+                            onClick={() => toggleCheckbox("environments", env)}
+                            className={`px-3 py-2 rounded-lg border transition-all text-sm font-medium ${
+                              intakeData.environments.includes(env)
+                                ? "bg-[#00e5ff] text-[#0a1628] border-[#00e5ff]"
+                                : `border ${borderColor} ${textSecondary}`
+                            }`}
+                          >
+                            {env}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className={`text-sm font-semibold ${textPrimary} mb-3`}>Business Lines</p>
+                      <div className="flex flex-wrap gap-2">
+                        {businessLines.map(line => (
+                          <button
+                            key={line}
+                            onClick={() => toggleCheckbox("businessLines", line)}
+                            className={`px-3 py-2 rounded-lg border transition-all text-sm font-medium ${
+                              intakeData.businessLines.includes(line)
+                                ? "bg-[#4caf50] text-white border-[#4caf50]"
+                                : `border ${borderColor} ${textSecondary}`
+                            }`}
+                          >
+                            {line}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className={`text-sm font-semibold ${textPrimary} mb-3`}>Use Cases</p>
+                      <div className="flex flex-wrap gap-2">
+                        {useCases.map(useCase => (
+                          <button
+                            key={useCase}
+                            onClick={() => toggleCheckbox("useCases", useCase)}
+                            className={`px-3 py-2 rounded-lg border transition-all text-sm font-medium ${
+                              intakeData.useCases.includes(useCase)
+                                ? "bg-[#2196f3] text-white border-[#2196f3]"
+                                : `border ${borderColor} ${textSecondary}`
+                            }`}
+                          >
+                            {useCase}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className={`text-sm font-semibold ${textPrimary} mb-3`}>FIX Version</p>
+                      <div className="flex flex-wrap gap-3">
+                        {fixVersions.map(version => (
+                          <label key={version} className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="fixVersion"
+                              checked={intakeData.fixVersion === version}
+                              onChange={() => handleInputChange("fixVersion", version)}
+                              className="w-4 h-4"
+                            />
+                            <span className={`text-sm ${textSecondary}`}>{version}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {intakeStep === 2 && (
+                  <div className="space-y-5">
+                    <h2 className={`text-xl font-bold ${textPrimary}`}>Session Details</h2>
+                    
+                    <div>
+                      <p className={`text-sm font-semibold ${textPrimary} mb-3`}>Session Role</p>
+                      <div className="flex gap-4">
+                        {["initiator", "acceptor"].map(role => (
+                          <label key={role} className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="sessionRole"
+                              checked={intakeData.sessionRole === role}
+                              onChange={() => handleInputChange("sessionRole", role)}
+                              className="w-4 h-4"
+                            />
+                            <span className={`text-sm capitalize ${textSecondary}`}>{role}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    <Input placeholder="SenderCompID" value={intakeData.senderCompId} onChange={e => handleInputChange("senderCompId", e.target.value)} className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
+                    <Input placeholder="TargetCompID" value={intakeData.targetCompId} onChange={e => handleInputChange("targetCompId", e.target.value)} className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
+                    <Input placeholder="TargetSubID (optional)" value={intakeData.targetSubId} onChange={e => handleInputChange("targetSubId", e.target.value)} className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className={`text-xs font-semibold ${textSecondary}`}>HeartBtInt (seconds)</label>
+                        <Input type="number" value={intakeData.heartbeat} onChange={e => handleInputChange("heartbeat", parseInt(e.target.value))} className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
+                      </div>
+                      <div>
+                        <label className={`text-xs font-semibold ${textSecondary}`}>ResetSeqNumFlag Policy</label>
+                        <select value={intakeData.resetSeqPolicy} onChange={e => handleInputChange("resetSeqPolicy", e.target.value)} className={`w-full px-3 py-2 rounded border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}>
+                          <option>Always</option>
+                          <option>Never</option>
+                          <option>On Logon</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input placeholder="Primary Host" value={intakeData.primaryHost} onChange={e => handleInputChange("primaryHost", e.target.value)} className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
+                      <Input placeholder="Primary Port" value={intakeData.primaryPort} onChange={e => handleInputChange("primaryPort", e.target.value)} className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input placeholder="DR/Backup Host (optional)" value={intakeData.drHost} onChange={e => handleInputChange("drHost", e.target.value)} className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
+                      <Input placeholder="DR/Backup Port (optional)" value={intakeData.drPort} onChange={e => handleInputChange("drPort", e.target.value)} className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
+                    </div>
+                  </div>
+                )}
+
+                {intakeStep === 3 && (
+                  <div className="space-y-5">
+                    <h2 className={`text-xl font-bold ${textPrimary}`}>Connectivity & Security</h2>
+                    
+                    <div>
+                      <p className={`text-sm font-semibold ${textPrimary} mb-3`}>Connectivity Type</p>
+                      <div className="space-y-2">
+                        {["Internet", "VPN", "Leased Line", "Cross-Connect"].map(type => (
+                          <label key={type} className="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="connectivity" checked={intakeData.connectivity === type} onChange={() => handleInputChange("connectivity", type)} className="w-4 h-4" />
+                            <span className={`text-sm ${textSecondary}`}>{type}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className={`text-sm font-semibold ${textSecondary}`}>Source IP Addresses (one per line)</label>
+                      <textarea value={intakeData.sourceIps} onChange={e => handleInputChange("sourceIps", e.target.value)} rows={3} placeholder="192.168.1.1&#10;192.168.1.2" className={`w-full px-3 py-2 rounded border mt-2 text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`} />
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <input type="checkbox" checked={intakeData.tlsRequired} onChange={e => handleInputChange("tlsRequired", e.target.checked)} className="w-4 h-4 rounded" />
+                      <label className={`text-sm font-semibold ${textPrimary}`}>TLS/SSL Required</label>
+                    </div>
+
+                    <div>
+                      <label className={`text-sm font-semibold ${textSecondary}`}>Certificate Exchange Method</label>
+                      <select value={intakeData.certMethod} onChange={e => handleInputChange("certMethod", e.target.value)} className={`w-full px-3 py-2 rounded border text-sm mt-2 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}>
+                        <option>Manual</option>
+                        <option>Automated</option>
+                        <option>Self-signed</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className={`text-sm font-semibold ${textSecondary}`}>Authentication</label>
+                      <select value={intakeData.authentication} onChange={e => handleInputChange("authentication", e.target.value)} className={`w-full px-3 py-2 rounded border text-sm mt-2 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}>
+                        <option>None</option>
+                        <option>Username/Password</option>
+                        <option>Certificate-based</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className={`text-sm font-semibold ${textSecondary}`}>Encryption Requirements Notes</label>
+                      <textarea value={intakeData.encryptionNotes} onChange={e => handleInputChange("encryptionNotes", e.target.value)} rows={3} placeholder="Any additional security requirements..." className={`w-full px-3 py-2 rounded border mt-2 text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`} />
+                    </div>
+                  </div>
+                )}
+
+                {intakeStep === 4 && (
+                  <div className="space-y-5">
+                    <h2 className={`text-xl font-bold ${textPrimary}`}>Document Upload</h2>
+                    
+                    <div
+                      onDrop={handleFileDrop}
+                      onDragOver={(e) => e.preventDefault()}
+                      className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+                        isDarkMode ? "border-[#1e4976] hover:border-[#00e5ff] hover:bg-[#1e4976]/20" : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+                      }`}
+                    >
+                      <Upload className="h-8 w-8 mx-auto mb-2 text-[#00e5ff]" />
+                      <p className={`text-sm font-semibold ${textPrimary}`}>Drag and drop files or click to upload</p>
+                      <p className={`text-xs ${textSecondary} mt-1`}>PDF, XLSX, DOCX, XML, CSV, TXT supported</p>
+                    </div>
+
+                    {intakeData.uploadedFiles.length > 0 && (
+                      <div className={`border ${borderColor} rounded-lg p-4`}>
+                        <p className={`text-sm font-semibold ${textPrimary} mb-3`}>Uploaded Files ({intakeData.uploadedFiles.length})</p>
+                        <div className="space-y-2">
+                          {intakeData.uploadedFiles.map((file, idx) => (
+                            <div key={idx} className={`flex items-center justify-between p-2 rounded ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                              <div className="flex items-center gap-3">
+                                <FileText className="h-5 w-5 text-[#00e5ff]" />
+                                <div>
+                                  <p className={`text-sm font-medium ${textPrimary}`}>{file.name}</p>
+                                  <p className={`text-xs ${textSecondary}`}>{file.size}</p>
+                                </div>
+                              </div>
+                              <span className="text-xs px-2 py-1 rounded bg-[#2196f3]/20 text-[#2196f3] font-medium">{file.type}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-3">
+                      <input type="checkbox" checked={intakeData.autoExtract} onChange={e => handleInputChange("autoExtract", e.target.checked)} className="w-4 h-4 rounded" />
+                      <label className={`text-sm font-semibold ${textPrimary}`}>Auto-extract requirements from documents (AI analysis)</label>
+                    </div>
+                  </div>
+                )}
+
+                {intakeStep === 5 && (
+                  <div className="space-y-5">
+                    <h2 className={`text-xl font-bold ${textPrimary}`}>Review & Submit</h2>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <Card className={`${bgCard} border ${borderColor} p-4`}>
+                        <p className={`text-xs font-semibold ${textSecondary} mb-2`}>Legal Entity</p>
+                        <p className={`text-sm ${textPrimary} font-medium`}>{intakeData.legalEntityName || "Not provided"}</p>
+                      </Card>
+                      <Card className={`${bgCard} border ${borderColor} p-4`}>
+                        <p className={`text-xs font-semibold ${textSecondary} mb-2`}>FIX Version</p>
+                        <p className={`text-sm ${textPrimary} font-medium`}>{intakeData.fixVersion}</p>
+                      </Card>
+                      <Card className={`${bgCard} border ${borderColor} p-4`}>
+                        <p className={`text-xs font-semibold ${textSecondary} mb-2`}>Environments</p>
+                        <p className={`text-sm ${textPrimary} font-medium`}>{intakeData.environments.join(", ") || "None selected"}</p>
+                      </Card>
+                      <Card className={`${bgCard} border ${borderColor} p-4`}>
+                        <p className={`text-xs font-semibold ${textSecondary} mb-2`}>Business Lines</p>
+                        <p className={`text-sm ${textPrimary} font-medium`}>{intakeData.businessLines.slice(0, 2).join(", ")} {intakeData.businessLines.length > 2 ? `+${intakeData.businessLines.length - 2}` : ""}</p>
+                      </Card>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <input type="checkbox" checked={intakeData.confirmAccurate} onChange={e => handleInputChange("confirmAccurate", e.target.checked)} className="w-4 h-4 rounded" />
+                      <label className={`text-sm font-semibold ${textPrimary}`}>I confirm all details are accurate</label>
+                    </div>
+                  </div>
+                )}
+
+                {/* Navigation Buttons */}
+                <div className="flex items-center justify-between mt-8 pt-6 border-t border-[#1e4976]/30">
+                  <Button
+                    onClick={handlePrevStep}
+                    disabled={intakeStep === 0}
+                    variant="outline"
+                    className={intakeStep === 0 ? "opacity-50 cursor-not-allowed" : ""}
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-2" /> Previous
+                  </Button>
+
+                  {intakeStep === steps.length - 1 ? (
+                    <Button
+                      onClick={() => {
+                        alert("Onboarding request submitted! Case ID: OB-2024-001234")
+                        setCurrentScreen("dashboard")
+                      }}
+                      disabled={!intakeData.confirmAccurate}
+                      className="bg-[#4caf50] hover:bg-[#4caf50]/80 disabled:opacity-50"
+                    >
+                      Submit Request <CheckCircle className="h-4 w-4 ml-2" />
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleNextStep}
+                      className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
+                    >
+                      Next <ChevronRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </Card>
           </div>
         </div>
       </div>
@@ -11890,7 +12376,7 @@ const copyToClipboard = () => {
               </div>
             )}
 
-            {/* ═══════════════════════════════════════════════════════
+            {/* ══════════════════════════════════════��════════════════
                 STEP 3: GATEWAY DELTA ANALYSIS
             ═══════════════════════════════════════════════════════ */}
             {certReportStep === "delta" && (
