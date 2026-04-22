@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Walkthrough Recording</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .player-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .player-header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .player-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .frame-display {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+
+        .frame-display img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .frame-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .section-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px 40px;
+            border-radius: 12px;
+            font-size: 24px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .section-label.show {
+            opacity: 1;
+        }
+
+        .playback-controls {
+            background: rgba(50, 50, 70, 0.8);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.secondary {
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(102, 126, 234, 0.5);
+        }
+
+        .progress-container {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.1s linear;
+            border-radius: 3px;
+        }
+
+        .progress-bar:hover::before {
+            opacity: 1;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .frame-counter {
+            font-size: 13px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            min-width: 80px;
+            text-align: center;
+            color: #aaa;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .speed-control label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+        }
+
+        .speed-control select {
+            background: rgba(102, 126, 234, 0.3);
+            border: 1px solid rgba(102, 126, 234, 0.5);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .stats {
+            background: rgba(50, 50, 70, 0.5);
+            padding: 15px 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.6;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        .timeline-preview {
+            display: flex;
+            gap: 2px;
+            margin-top: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        .timeline-segment {
+            height: 30px;
+            flex: 1;
+            min-width: 4px;
+            background: rgba(102, 126, 234, 0.4);
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .timeline-segment:hover {
+            background: rgba(102, 126, 234, 0.6);
+            height: 40px;
+        }
+
+        .timeline-segment.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
+        }
+
+        .fullscreen-btn {
+            background: rgba(102, 126, 234, 0.3);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.5);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 12px;
+            }
+
+            .player-header h1 {
+                font-size: 20px;
+            }
+
+            .playback-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .progress-container {
+                width: 100%;
+            }
+
+            .speed-control {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .keyboard-hints {
+            background: rgba(50, 50, 70, 0.3);
+            padding: 15px 20px;
+            font-size: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .keyboard-hints h3 {
+            margin-bottom: 10px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+        }
+
+        .keyboard-shortcuts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+        }
+
+        .shortcut {
+            display: flex;
+            gap: 8px;
+            font-size: 11px;
+        }
+
+        .key {
+            background: rgba(102, 126, 234, 0.3);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            border: 1px solid rgba(102, 126, 234, 0.5);
+            min-width: 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="player-header">
+            <h1>Application Walkthrough Recording</h1>
+            <p>Landing Page → Admin Dashboard → Client Dashboard (38 frames)</p>
+        </div>
+
+        <div class="video-container">
+            <div class="frame-display">
+                <img id="frameImage" src="frames/frame_0001_landing_hero_1.png" alt="Frame">
+            </div>
+            <div class="frame-info">
+                <span id="frameLabel">Loading...</span>
+            </div>
+            <div class="section-label" id="sectionLabel"></div>
+        </div>
+
+        <div class="playback-controls">
+            <button class="btn" id="playBtn" onclick="togglePlay()">
+                <span id="playIcon">▶</span>
+                <span id="playText">Play</span>
+            </button>
+            <button class="btn secondary" id="prevBtn" onclick="previousFrame()">← Previous</button>
+            <button class="btn secondary" id="nextBtn" onclick="nextFrame()">Next →</button>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar" onclick="seek(event)">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="frame-counter">
+                    <span id="currentFrame">1</span> / <span id="totalFrames">38</span>
+                </div>
+            </div>
+
+            <div class="speed-control">
+                <label>Speed:</label>
+                <select id="speedSelect" onchange="changeSpeed()">
+                    <option value="500">0.5x</option>
+                    <option value="300" selected>1x</option>
+                    <option value="200">1.5x</option>
+                    <option value="100">2x</option>
+                </select>
+            </div>
+
+            <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-label">Total Frames</div>
+                <div class="stat-value">38</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Current Position</div>
+                <div class="stat-value"><span id="statFrame">1</span>/<span>38</span></div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Duration</div>
+                <div class="stat-value"><span id="duration">00:19</span>s</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Status</div>
+                <div class="stat-value" id="statusText">Ready</div>
+            </div>
+        </div>
+
+        <div class="timeline-preview" id="timeline"></div>
+
+        <div class="keyboard-hints">
+            <h3>Keyboard Shortcuts</h3>
+            <div class="keyboard-shortcuts">
+                <div class="shortcut"><span class="key">SPACE</span><span>Play/Pause</span></div>
+                <div class="shortcut"><span class="key">→</span><span>Next Frame</span></div>
+                <div class="shortcut"><span class="key">←</span><span>Previous Frame</span></div>
+                <div class="shortcut"><span class="key">F</span><span>Fullscreen</span></div>
+                <div class="shortcut"><span class="key">0-9</span><span>Jump to %</span></div>
+                <div class="shortcut"><span class="key">+</span><span>Faster</span></div>
+                <div class="shortcut"><span class="key">-</span><span>Slower</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const frameCount = 38;
+        let currentFrameNum = 1;
+        let isPlaying = false;
+        let frameDelay = 300; // milliseconds
+        let playInterval = null;
+
+        const sections = {
+            landing: { start: 1, end: 14, label: 'Landing Page Tour' },
+            admin: { start: 15, end: 25, label: 'Admin Dashboard' },
+            client: { start: 26, end: 35, label: 'Client Dashboard' },
+            final: { start: 36, end: 38, label: 'Final Overview' }
+        };
+
+        function pad(num) {
+            return String(num).padStart(4, '0');
+        }
+
+        function getFrameFilename(num) {
+            const names = [
+                '', // placeholder for index 0
+                'landing_hero_1', 'landing_hero_2', 'landing_hero_3', 'landing_hero_4', 'landing_hero_5',
+                'landing_scroll_1', 'landing_scroll_2', 'landing_scroll_3', 'landing_scroll_4', 'landing_scroll_5',
+                'landing_scroll_6', 'landing_scroll_7', 'landing_scroll_8', 'landing_top',
+                'admin_dashboard_1', 'admin_dashboard_2', 'admin_dashboard_3', 'admin_dashboard_4', 'admin_dashboard_5',
+                'admin_dashboard_scroll_1', 'admin_dashboard_scroll_2', 'admin_dashboard_scroll_3', 'admin_dashboard_scroll_4', 'admin_dashboard_scroll_5',
+                'admin_dashboard_scroll_6',
+                'client_dashboard_1', 'client_dashboard_2', 'client_dashboard_3', 'client_dashboard_4', 'client_dashboard_5',
+                'client_dashboard_scroll_1', 'client_dashboard_scroll_2', 'client_dashboard_scroll_3', 'client_dashboard_scroll_4', 'client_dashboard_scroll_5',
+                'final_home_1', 'final_home_2', 'final_home_3'
+            ];
+            return `frame_${pad(num)}_${names[num]}.png`;
+        }
+
+        function displayFrame(frameNum) {
+            currentFrameNum = Math.max(1, Math.min(frameNum, frameCount));
+            const filename = getFrameFilename(currentFrameNum);
+            document.getElementById('frameImage').src = `frames/${filename}`;
+            document.getElementById('frameLabel').textContent = `Frame ${currentFrameNum}/${frameCount}`;
+            document.getElementById('currentFrame').textContent = currentFrameNum;
+            document.getElementById('statFrame').textContent = currentFrameNum;
+
+            // Update progress
+            const progress = (currentFrameNum / frameCount) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            // Update timeline
+            updateTimeline();
+
+            // Update section label
+            updateSectionLabel();
+
+            // Update duration
+            updateDuration();
+        }
+
+        function updateSectionLabel() {
+            const label = document.getElementById('sectionLabel');
+            label.classList.remove('show');
+
+            for (const [key, section] of Object.entries(sections)) {
+                if (currentFrameNum === section.start) {
+                    label.textContent = section.label;
+                    setTimeout(() => label.classList.add('show'), 50);
+                    setTimeout(() => label.classList.remove('show'), 2000);
+                }
+            }
+        }
+
+        function updateTimeline() {
+            const timeline = document.getElementById('timeline');
+            timeline.innerHTML = '';
+            
+            for (let i = 1; i <= frameCount; i++) {
+                const segment = document.createElement('div');
+                segment.className = 'timeline-segment';
+                if (i === currentFrameNum) segment.classList.add('active');
+                segment.onclick = () => displayFrame(i);
+                timeline.appendChild(segment);
+            }
+        }
+
+        function updateDuration() {
+            const fps = 1000 / frameDelay;
+            const totalSeconds = frameCount / fps;
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = Math.floor(totalSeconds % 60);
+            document.getElementById('duration').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function togglePlay() {
+            isPlaying ? pause() : play();
+        }
+
+        function play() {
+            isPlaying = true;
+            document.getElementById('playIcon').textContent = '⏸';
+            document.getElementById('playText').textContent = 'Pause';
+            document.getElementById('statusText').textContent = 'Playing';
+
+            playInterval = setInterval(() => {
+                if (currentFrameNum >= frameCount) {
+                    pause();
+                } else {
+                    displayFrame(currentFrameNum + 1);
+                }
+            }, frameDelay);
+        }
+
+        function pause() {
+            isPlaying = false;
+            clearInterval(playInterval);
+            document.getElementById('playIcon').textContent = '▶';
+            document.getElementById('playText').textContent = 'Play';
+            document.getElementById('statusText').textContent = 'Paused';
+        }
+
+        function nextFrame() {
+            pause();
+            displayFrame(currentFrameNum + 1);
+        }
+
+        function previousFrame() {
+            pause();
+            displayFrame(currentFrameNum - 1);
+        }
+
+        function seek(event) {
+            const progressBar = document.getElementById('progressBar');
+            const rect = progressBar.getBoundingClientRect();
+            const percent = (event.clientX - rect.left) / rect.width;
+            const frameNum = Math.ceil(percent * frameCount);
+            pause();
+            displayFrame(frameNum);
+        }
+
+        function changeSpeed() {
+            frameDelay = parseInt(document.getElementById('speedSelect').value);
+            if (isPlaying) {
+                pause();
+                play();
+            }
+        }
+
+        function toggleFullscreen() {
+            const container = document.querySelector('.video-container');
+            if (!document.fullscreenElement) {
+                container.requestFullscreen().catch(() => {
+                    alert('Fullscreen not supported');
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                togglePlay();
+            } else if (e.code === 'ArrowRight') {
+                nextFrame();
+            } else if (e.code === 'ArrowLeft') {
+                previousFrame();
+            } else if (e.code === 'KeyF') {
+                toggleFullscreen();
+            } else if (e.code === 'Minus') {
+                const select = document.getElementById('speedSelect');
+                const currentIndex = Array.from(select.options).findIndex(o => o.selected);
+                if (currentIndex > 0) select.options[currentIndex - 1].selected = true;
+                changeSpeed();
+            } else if (e.code === 'Equal' || e.code === 'Plus') {
+                const select = document.getElementById('speedSelect');
+                const currentIndex = Array.from(select.options).findIndex(o => o.selected);
+                if (currentIndex < select.options.length - 1) select.options[currentIndex + 1].selected = true;
+                changeSpeed();
+            } else if (e.key >= '0' && e.key <= '9') {
+                const percent = parseInt(e.key) * 10;
+                displayFrame(Math.ceil((percent / 100) * frameCount));
+            }
+        });
+
+        // Initialize
+        window.addEventListener('load', () => {
+            displayFrame(1);
+            updateTimeline();
+        });
+    </script>
+</body>
+</html>
