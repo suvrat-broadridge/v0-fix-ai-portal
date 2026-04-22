@@ -1,0 +1,309 @@
+{
+  "platform": "B-COMET Platform",
+  "generatedAt": "2026-04-22T16:59:07.697Z",
+  "totalScreens": 60,
+  "capturedScreens": 60,
+  "failedScreens": [],
+  "screens": [
+    {
+      "name": "home",
+      "path": "screenshots/home.png",
+      "captured": true
+    },
+    {
+      "name": "role-select",
+      "path": "screenshots/role-select.png",
+      "captured": true
+    },
+    {
+      "name": "login",
+      "path": "screenshots/login.png",
+      "captured": true
+    },
+    {
+      "name": "dashboard",
+      "path": "screenshots/dashboard.png",
+      "captured": true
+    },
+    {
+      "name": "clients",
+      "path": "screenshots/clients.png",
+      "captured": true
+    },
+    {
+      "name": "client-detail",
+      "path": "screenshots/client-detail.png",
+      "captured": true
+    },
+    {
+      "name": "asset-tools",
+      "path": "screenshots/asset-tools.png",
+      "captured": true
+    },
+    {
+      "name": "workflow-overview",
+      "path": "screenshots/workflow-overview.png",
+      "captured": true
+    },
+    {
+      "name": "intake-portal",
+      "path": "screenshots/intake-portal.png",
+      "captured": true
+    },
+    {
+      "name": "case-workflow",
+      "path": "screenshots/case-workflow.png",
+      "captured": true
+    },
+    {
+      "name": "spec-compare",
+      "path": "screenshots/spec-compare.png",
+      "captured": true
+    },
+    {
+      "name": "spec-compare-overview",
+      "path": "screenshots/spec-compare-overview.png",
+      "captured": true
+    },
+    {
+      "name": "log-analysis",
+      "path": "screenshots/log-analysis.png",
+      "captured": true
+    },
+    {
+      "name": "scenario-creation",
+      "path": "screenshots/scenario-creation.png",
+      "captured": true
+    },
+    {
+      "name": "test-case-gen",
+      "path": "screenshots/test-case-gen.png",
+      "captured": true
+    },
+    {
+      "name": "certification-gen",
+      "path": "screenshots/certification-gen.png",
+      "captured": true
+    },
+    {
+      "name": "atdl-workbench",
+      "path": "screenshots/atdl-workbench.png",
+      "captured": true
+    },
+    {
+      "name": "atdl-guided-choices",
+      "path": "screenshots/atdl-guided-choices.png",
+      "captured": true
+    },
+    {
+      "name": "atdl-flow-select",
+      "path": "screenshots/atdl-flow-select.png",
+      "captured": true
+    },
+    {
+      "name": "atdl-wizard",
+      "path": "screenshots/atdl-wizard.png",
+      "captured": true
+    },
+    {
+      "name": "atdl-validate",
+      "path": "screenshots/atdl-validate.png",
+      "captured": true
+    },
+    {
+      "name": "atdl-ui-repr",
+      "path": "screenshots/atdl-ui-repr.png",
+      "captured": true
+    },
+    {
+      "name": "atdl-compare",
+      "path": "screenshots/atdl-compare.png",
+      "captured": true
+    },
+    {
+      "name": "fix-atdl-compare",
+      "path": "screenshots/fix-atdl-compare.png",
+      "captured": true
+    },
+    {
+      "name": "fix-to-atdl",
+      "path": "screenshots/fix-to-atdl.png",
+      "captured": true
+    },
+    {
+      "name": "atdl-remediation",
+      "path": "screenshots/atdl-remediation.png",
+      "captured": true
+    },
+    {
+      "name": "admin-specs",
+      "path": "screenshots/admin-specs.png",
+      "captured": true
+    },
+    {
+      "name": "client-specs",
+      "path": "screenshots/client-specs.png",
+      "captured": true
+    },
+    {
+      "name": "client-log-files",
+      "path": "screenshots/client-log-files.png",
+      "captured": true
+    },
+    {
+      "name": "client-cert-report",
+      "path": "screenshots/client-cert-report.png",
+      "captured": true
+    },
+    {
+      "name": "settings",
+      "path": "screenshots/settings.png",
+      "captured": true
+    },
+    {
+      "name": "fix-msg-creator",
+      "path": "screenshots/fix-msg-creator.png",
+      "captured": true
+    },
+    {
+      "name": "session-config",
+      "path": "screenshots/session-config.png",
+      "captured": true
+    },
+    {
+      "name": "field-mapping",
+      "path": "screenshots/field-mapping.png",
+      "captured": true
+    },
+    {
+      "name": "test-results",
+      "path": "screenshots/test-results.png",
+      "captured": true
+    },
+    {
+      "name": "go-live",
+      "path": "screenshots/go-live.png",
+      "captured": true
+    },
+    {
+      "name": "reports",
+      "path": "screenshots/reports.png",
+      "captured": true
+    },
+    {
+      "name": "onboarding-cases",
+      "path": "screenshots/onboarding-cases.png",
+      "captured": true
+    },
+    {
+      "name": "create-case",
+      "path": "screenshots/create-case.png",
+      "captured": true
+    },
+    {
+      "name": "onboarding-case-detail",
+      "path": "screenshots/onboarding-case-detail.png",
+      "captured": true
+    },
+    {
+      "name": "presentation",
+      "path": "screenshots/presentation.png",
+      "captured": true
+    },
+    {
+      "name": "approvals",
+      "path": "screenshots/approvals.png",
+      "captured": true
+    },
+    {
+      "name": "evidence-vault",
+      "path": "screenshots/evidence-vault.png",
+      "captured": true
+    },
+    {
+      "name": "prod-config",
+      "path": "screenshots/prod-config.png",
+      "captured": true
+    },
+    {
+      "name": "rule-library",
+      "path": "screenshots/rule-library.png",
+      "captured": true
+    },
+    {
+      "name": "ai-review-queue",
+      "path": "screenshots/ai-review-queue.png",
+      "captured": true
+    },
+    {
+      "name": "sla-analytics",
+      "path": "screenshots/sla-analytics.png",
+      "captured": true
+    },
+    {
+      "name": "document-ingestion",
+      "path": "screenshots/document-ingestion.png",
+      "captured": true
+    },
+    {
+      "name": "gap-analysis",
+      "path": "screenshots/gap-analysis.png",
+      "captured": true
+    },
+    {
+      "name": "counterparty-profile",
+      "path": "screenshots/counterparty-profile.png",
+      "captured": true
+    },
+    {
+      "name": "fix-dictionary",
+      "path": "screenshots/fix-dictionary.png",
+      "captured": true
+    },
+    {
+      "name": "connectivity-setup",
+      "path": "screenshots/connectivity-setup.png",
+      "captured": true
+    },
+    {
+      "name": "connectivity-test",
+      "path": "screenshots/connectivity-test.png",
+      "captured": true
+    },
+    {
+      "name": "cert-planning",
+      "path": "screenshots/cert-planning.png",
+      "captured": true
+    },
+    {
+      "name": "test-execution",
+      "path": "screenshots/test-execution.png",
+      "captured": true
+    },
+    {
+      "name": "analysis-remediation",
+      "path": "screenshots/analysis-remediation.png",
+      "captured": true
+    },
+    {
+      "name": "cert-decisioning",
+      "path": "screenshots/cert-decisioning.png",
+      "captured": true
+    },
+    {
+      "name": "signoff-module",
+      "path": "screenshots/signoff-module.png",
+      "captured": true
+    },
+    {
+      "name": "go-live-manager",
+      "path": "screenshots/go-live-manager.png",
+      "captured": true
+    },
+    {
+      "name": "post-go-live",
+      "path": "screenshots/post-go-live.png",
+      "captured": true
+    }
+  ]
+}

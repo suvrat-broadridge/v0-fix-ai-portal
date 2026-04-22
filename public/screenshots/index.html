@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B-COMET Platform - Screen Capture Index</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      background: linear-gradient(135deg, #0a1628 0%, #1a2a3a 100%);
+      color: #e0e0e0;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 50px;
+      border-bottom: 2px solid #00e5ff;
+      padding-bottom: 30px;
+    }
+    
+    header h1 {
+      font-size: 3em;
+      background: linear-gradient(135deg, #00e5ff, #2196f3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+    
+    header p {
+      font-size: 1.1em;
+      color: #b0b0b0;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid #00e5ff;
+      border-radius: 8px;
+    }
+    
+    .stat {
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-size: 2em;
+      color: #00e5ff;
+      font-weight: bold;
+    }
+    
+    .stat-label {
+      color: #b0b0b0;
+      margin-top: 5px;
+    }
+    
+    .screen-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+    
+    .screen-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .screen-card:hover {
+      border-color: #00e5ff;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 229, 255, 0.2);
+    }
+    
+    .screen-name {
+      padding: 15px;
+      background: rgba(0, 229, 255, 0.1);
+      border-bottom: 1px solid rgba(0, 229, 255, 0.3);
+      font-weight: 600;
+      font-size: 0.95em;
+      color: #00e5ff;
+    }
+    
+    .screen-image {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #0a1628;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9em;
+      color: #666;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .screen-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .screen-image.placeholder {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.1) 0%, rgba(33, 150, 243, 0.1) 100%);
+    }
+    
+    .screen-info {
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex-grow: 1;
+    }
+    
+    .screen-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      font-weight: 500;
+    }
+    
+    .screen-status.captured {
+      background: rgba(76, 175, 80, 0.2);
+      color: #4caf50;
+    }
+    
+    .screen-status.pending {
+      background: rgba(255, 152, 0, 0.2);
+      color: #ff9800;
+    }
+    
+    .footer {
+      text-align: center;
+      padding: 30px;
+      border-top: 1px solid rgba(0, 229, 255, 0.3);
+      color: #888;
+      margin-top: 50px;
+    }
+    
+    .transition-section {
+      margin-top: 50px;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: 12px;
+    }
+    
+    .transition-section h2 {
+      color: #00e5ff;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+    }
+    
+    .transition-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    
+    .transition-item {
+      padding: 15px;
+      background: rgba(0, 229, 255, 0.05);
+      border: 1px solid rgba(0, 229, 255, 0.2);
+      border-radius: 8px;
+    }
+    
+    .transition-item strong {
+      color: #00e5ff;
+    }
+    
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 1.8em;
+      }
+      
+      .screen-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>B-COMET Platform</h1>
+      <p>Complete Screen Capture & Transition Guide</p>
+    </header>
+    
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-number">60</div>
+        <div class="stat-label">Total Screens</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">2</div>
+        <div class="stat-label">Roles (Admin/Client)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">5</div>
+        <div class="stat-label">Asset Classes</div>
+      </div>
+    </div>
+    
+    <h2 style="color: #00e5ff; margin-bottom: 30px; font-size: 1.5em;">Screen Captures</h2>
+    <div class="screen-grid">
+
+      <div class="screen-card">
+        <div class="screen-name">home</div>
+        <div class="screen-image">
+          <img src="screenshots/home.png" alt="home screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">role-select</div>
+        <div class="screen-image">
+          <img src="screenshots/role-select.png" alt="role-select screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">login</div>
+        <div class="screen-image">
+          <img src="screenshots/login.png" alt="login screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">dashboard</div>
+        <div class="screen-image">
+          <img src="screenshots/dashboard.png" alt="dashboard screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">clients</div>
+        <div class="screen-image">
+          <img src="screenshots/clients.png" alt="clients screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">client-detail</div>
+        <div class="screen-image">
+          <img src="screenshots/client-detail.png" alt="client-detail screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">asset-tools</div>
+        <div class="screen-image">
+          <img src="screenshots/asset-tools.png" alt="asset-tools screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">workflow-overview</div>
+        <div class="screen-image">
+          <img src="screenshots/workflow-overview.png" alt="workflow-overview screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">intake-portal</div>
+        <div class="screen-image">
+          <img src="screenshots/intake-portal.png" alt="intake-portal screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">case-workflow</div>
+        <div class="screen-image">
+          <img src="screenshots/case-workflow.png" alt="case-workflow screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">spec-compare</div>
+        <div class="screen-image">
+          <img src="screenshots/spec-compare.png" alt="spec-compare screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">spec-compare-overview</div>
+        <div class="screen-image">
+          <img src="screenshots/spec-compare-overview.png" alt="spec-compare-overview screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">log-analysis</div>
+        <div class="screen-image">
+          <img src="screenshots/log-analysis.png" alt="log-analysis screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">scenario-creation</div>
+        <div class="screen-image">
+          <img src="screenshots/scenario-creation.png" alt="scenario-creation screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">test-case-gen</div>
+        <div class="screen-image">
+          <img src="screenshots/test-case-gen.png" alt="test-case-gen screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">certification-gen</div>
+        <div class="screen-image">
+          <img src="screenshots/certification-gen.png" alt="certification-gen screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">atdl-workbench</div>
+        <div class="screen-image">
+          <img src="screenshots/atdl-workbench.png" alt="atdl-workbench screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">atdl-guided-choices</div>
+        <div class="screen-image">
+          <img src="screenshots/atdl-guided-choices.png" alt="atdl-guided-choices screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">atdl-flow-select</div>
+        <div class="screen-image">
+          <img src="screenshots/atdl-flow-select.png" alt="atdl-flow-select screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">atdl-wizard</div>
+        <div class="screen-image">
+          <img src="screenshots/atdl-wizard.png" alt="atdl-wizard screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">atdl-validate</div>
+        <div class="screen-image">
+          <img src="screenshots/atdl-validate.png" alt="atdl-validate screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">atdl-ui-repr</div>
+        <div class="screen-image">
+          <img src="screenshots/atdl-ui-repr.png" alt="atdl-ui-repr screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">atdl-compare</div>
+        <div class="screen-image">
+          <img src="screenshots/atdl-compare.png" alt="atdl-compare screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">fix-atdl-compare</div>
+        <div class="screen-image">
+          <img src="screenshots/fix-atdl-compare.png" alt="fix-atdl-compare screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">fix-to-atdl</div>
+        <div class="screen-image">
+          <img src="screenshots/fix-to-atdl.png" alt="fix-to-atdl screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">atdl-remediation</div>
+        <div class="screen-image">
+          <img src="screenshots/atdl-remediation.png" alt="atdl-remediation screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">admin-specs</div>
+        <div class="screen-image">
+          <img src="screenshots/admin-specs.png" alt="admin-specs screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">client-specs</div>
+        <div class="screen-image">
+          <img src="screenshots/client-specs.png" alt="client-specs screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">client-log-files</div>
+        <div class="screen-image">
+          <img src="screenshots/client-log-files.png" alt="client-log-files screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">client-cert-report</div>
+        <div class="screen-image">
+          <img src="screenshots/client-cert-report.png" alt="client-cert-report screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">settings</div>
+        <div class="screen-image">
+          <img src="screenshots/settings.png" alt="settings screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">fix-msg-creator</div>
+        <div class="screen-image">
+          <img src="screenshots/fix-msg-creator.png" alt="fix-msg-creator screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">session-config</div>
+        <div class="screen-image">
+          <img src="screenshots/session-config.png" alt="session-config screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">field-mapping</div>
+        <div class="screen-image">
+          <img src="screenshots/field-mapping.png" alt="field-mapping screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">test-results</div>
+        <div class="screen-image">
+          <img src="screenshots/test-results.png" alt="test-results screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">go-live</div>
+        <div class="screen-image">
+          <img src="screenshots/go-live.png" alt="go-live screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">reports</div>
+        <div class="screen-image">
+          <img src="screenshots/reports.png" alt="reports screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">onboarding-cases</div>
+        <div class="screen-image">
+          <img src="screenshots/onboarding-cases.png" alt="onboarding-cases screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">create-case</div>
+        <div class="screen-image">
+          <img src="screenshots/create-case.png" alt="create-case screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">onboarding-case-detail</div>
+        <div class="screen-image">
+          <img src="screenshots/onboarding-case-detail.png" alt="onboarding-case-detail screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">presentation</div>
+        <div class="screen-image">
+          <img src="screenshots/presentation.png" alt="presentation screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">approvals</div>
+        <div class="screen-image">
+          <img src="screenshots/approvals.png" alt="approvals screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">evidence-vault</div>
+        <div class="screen-image">
+          <img src="screenshots/evidence-vault.png" alt="evidence-vault screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">prod-config</div>
+        <div class="screen-image">
+          <img src="screenshots/prod-config.png" alt="prod-config screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">rule-library</div>
+        <div class="screen-image">
+          <img src="screenshots/rule-library.png" alt="rule-library screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">ai-review-queue</div>
+        <div class="screen-image">
+          <img src="screenshots/ai-review-queue.png" alt="ai-review-queue screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">sla-analytics</div>
+        <div class="screen-image">
+          <img src="screenshots/sla-analytics.png" alt="sla-analytics screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">document-ingestion</div>
+        <div class="screen-image">
+          <img src="screenshots/document-ingestion.png" alt="document-ingestion screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">gap-analysis</div>
+        <div class="screen-image">
+          <img src="screenshots/gap-analysis.png" alt="gap-analysis screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">counterparty-profile</div>
+        <div class="screen-image">
+          <img src="screenshots/counterparty-profile.png" alt="counterparty-profile screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">fix-dictionary</div>
+        <div class="screen-image">
+          <img src="screenshots/fix-dictionary.png" alt="fix-dictionary screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">connectivity-setup</div>
+        <div class="screen-image">
+          <img src="screenshots/connectivity-setup.png" alt="connectivity-setup screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">connectivity-test</div>
+        <div class="screen-image">
+          <img src="screenshots/connectivity-test.png" alt="connectivity-test screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">cert-planning</div>
+        <div class="screen-image">
+          <img src="screenshots/cert-planning.png" alt="cert-planning screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">test-execution</div>
+        <div class="screen-image">
+          <img src="screenshots/test-execution.png" alt="test-execution screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">analysis-remediation</div>
+        <div class="screen-image">
+          <img src="screenshots/analysis-remediation.png" alt="analysis-remediation screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">cert-decisioning</div>
+        <div class="screen-image">
+          <img src="screenshots/cert-decisioning.png" alt="cert-decisioning screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">signoff-module</div>
+        <div class="screen-image">
+          <img src="screenshots/signoff-module.png" alt="signoff-module screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">go-live-manager</div>
+        <div class="screen-image">
+          <img src="screenshots/go-live-manager.png" alt="go-live-manager screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-name">post-go-live</div>
+        <div class="screen-image">
+          <img src="screenshots/post-go-live.png" alt="post-go-live screenshot" loading="lazy">
+        </div>
+        <div class="screen-info">
+          <span class="screen-status captured">✓ Captured</span>
+        </div>
+      </div>
+
+    </div>
+    
+    <div class="transition-section">
+      <h2>📍 Screen Transitions & Navigation Flow</h2>
+      <div class="transition-grid">
+        <div class="transition-item">
+          <strong>Role Selection:</strong> role-select → login (Admin/Client)
+        </div>
+        <div class="transition-item">
+          <strong>Login Flow:</strong> login → dashboard (for admins) or clients (for clients)
+        </div>
+        <div class="transition-item">
+          <strong>Dashboard:</strong> dashboard → client-detail, workflow-overview, case-workflow
+        </div>
+        <div class="transition-item">
+          <strong>Asset Tools:</strong> client-detail → asset-tools (per asset class)
+        </div>
+        <div class="transition-item">
+          <strong>Workflow:</strong> workflow-overview → case-workflow, intake-portal, spec-compare
+        </div>
+        <div class="transition-item">
+          <strong>ATDL Tools:</strong> Multiple screens (atdl-workbench, atdl-wizard, atdl-validate, etc.)
+        </div>
+        <div class="transition-item">
+          <strong>Testing:</strong> test-case-gen → test-results → certification-gen
+        </div>
+        <div class="transition-item">
+          <strong>Onboarding:</strong> onboarding-cases → onboarding-case-detail → create-case
+        </div>
+        <div class="transition-item">
+          <strong>Go-Live:</strong> approvals → go-live → go-live-manager → post-go-live
+        </div>
+        <div class="transition-item">
+          <strong>Comparison Tools:</strong> spec-compare, log-analysis, atdl-compare, fix-atdl-compare
+        </div>
+        <div class="transition-item">
+          <strong>Configuration:</strong> session-config, fix-msg-creator, field-mapping, prod-config
+        </div>
+        <div class="transition-item">
+          <strong>Analytics:</strong> sla-analytics, reports, ai-review-queue, gap-analysis
+        </div>
+      </div>
+    </div>
+    
+    <footer>
+      <p>Generated on 4/22/2026, 4:59:07 PM</p>
+      <p>Screens captured: <strong>60/60</strong></p>
+      
+    </footer>
+  </div>
+</body>
+</html>
