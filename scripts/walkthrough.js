@@ -65,16 +65,39 @@ function screenshot(name, desc) {
 
 function findButton(text) {
   try {
-    const snapshot = browser('snapshot -q');
+    const snapshot = browser('snapshot');
     const lines = snapshot.split('\n');
+    
+    // First try exact text match
     for (const line of lines) {
-      if (line.toLowerCase().includes(text.toLowerCase()) && line.includes('@e')) {
+      if (line.includes(text) && line.match(/@e\d+/)) {
         const match = line.match(/@e\d+/);
         if (match) return match[0];
       }
     }
-  } catch (e) {}
+    
+    // Then try case-insensitive partial match
+    const lowerText = text.toLowerCase();
+    for (const line of lines) {
+      if (line.toLowerCase().includes(lowerText) && line.match(/@e\d+/)) {
+        const match = line.match(/@e\d+/);
+        if (match) return match[0];
+      }
+    }
+  } catch (e) {
+    // Continue silently
+  }
   return null;
+}
+
+function clickElement(selector) {
+  try {
+    browser(`click ${selector}`);
+    wait(1000);
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 function runWalkthrough() {
@@ -96,335 +119,277 @@ function runWalkthrough() {
     section('2. EXPLORING HOME PAGE');
     log('Scrolling through home page content...');
     
-    browser('scroll down 500');
+    browser('scroll down 3');
     wait(1000);
     screenshot('02_hero_section', 'Hero section - Platform overview');
     
-    browser('scroll down 500');
+    browser('scroll down 3');
     wait(1000);
     screenshot('03_features_overview', 'Features section - Core capabilities');
     
-    browser('scroll down 500');
+    browser('scroll down 3');
     wait(1000);
     screenshot('04_benefits_section', 'Benefits section - Value proposition');
     
-    browser('scroll down 500');
+    browser('scroll down 3');
     wait(1000);
-    screenshot('05_footer_section', 'Footer - Contact information');
+    screenshot('05_dashboard_features', 'Dashboard features - Advanced tools');
     
-    // NAVIGATION TO LOGIN
-    section('3. NAVIGATION & AUTHENTICATION');
-    log('Returning to top and accessing login...');
+    browser('scroll down 3');
+    wait(1000);
+    screenshot('06_workflow_features', 'Workflow capabilities - Process automation');
+    
+    browser('scroll down 3');
+    wait(1000);
+    screenshot('07_footer_section', 'Footer - Contact information');
+    
+    // NAVIGATION TO MAIN APP
+    section('3. ACCESSING APPLICATION FEATURES');
+    log('Looking for navigation to app...');
     browser('scroll to top');
     wait(1000);
     
-    // Look for login button or link
-    let snapshot = browser('snapshot -q');
-    let loginBtn = findButton('login') || findButton('sign in') || findButton('get started');
+    // LOOK FOR BUTTONS TO ENTER MAIN APP
+    let snapshot = browser('snapshot');
     
-    if (loginBtn) {
-      log(`Found login button: ${loginBtn}`);
-      browser(`click ${loginBtn}`);
-      browser('wait --load networkidle');
-      wait(1500);
-      screenshot('06_role_selection', 'Role selection screen');
-    }
+    // Try to find and click various entry points
+    const entryPoints = ['Dashboard', 'Admin', 'Get Started', 'Start', 'Login', 'Enter', 'Access'];
+    let foundEntry = false;
     
-    // ADMIN JOURNEY
-    section('4. ADMIN USER JOURNEY');
-    snapshot = browser('snapshot -q');
-    let adminBtn = findButton('admin');
-    
-    if (adminBtn) {
-      log('Selecting Admin role...');
-      browser(`click ${adminBtn}`);
-      browser('wait --load networkidle');
-      wait(1500);
-      screenshot('07_admin_dashboard', 'Admin Dashboard - Main view');
-      
-      // Explore dashboard sections
-      log('Exploring dashboard sections...');
-      
-      browser('scroll down 400');
-      wait(1000);
-      screenshot('08_dashboard_metrics', 'Dashboard - Key metrics');
-      
-      browser('scroll down 400');
-      wait(1000);
-      screenshot('09_dashboard_pipeline', 'Dashboard - Onboarding pipeline');
-      
-      browser('scroll down 400');
-      wait(1000);
-      screenshot('10_dashboard_activities', 'Dashboard - Recent activities');
-      
-      browser('scroll to top');
-      wait(1000);
-      
-      // Navigation menu exploration
-      section('5. ADMIN MENU NAVIGATION');
-      log('Navigating through admin menu options...');
-      
-      snapshot = browser('snapshot -q');
-      let clientsBtn = findButton('clients') || findButton('client management');
-      if (clientsBtn) {
-        browser(`click ${clientsBtn}`);
+    for (const entry of entryPoints) {
+      const btn = findButton(entry);
+      if (btn) {
+        log(`Found entry point: ${entry}`);
+        clickElement(btn);
         browser('wait --load networkidle');
         wait(1500);
-        screenshot('11_clients_list', 'Admin - Clients management');
-        
-        browser('scroll down 400');
-        wait(1000);
-        screenshot('12_clients_table', 'Admin - Clients table view');
-      }
-      
-      snapshot = browser('snapshot -q');
-      let casesBtn = findButton('cases') || findButton('case management');
-      if (casesBtn) {
-        browser(`click ${casesBtn}`);
-        browser('wait --load networkidle');
-        wait(1500);
-        screenshot('13_cases_list', 'Admin - Cases overview');
-        
-        browser('scroll down 400');
-        wait(1000);
-        screenshot('14_cases_details', 'Admin - Case details');
-      }
-      
-      // ATDL Tools section
-      section('6. ATDL TOOLS & CONFIGURATION');
-      snapshot = browser('snapshot -q');
-      let atdlBtn = findButton('atdl') || findButton('algorithmic');
-      if (atdlBtn) {
-        browser(`click ${atdlBtn}`);
-        browser('wait --load networkidle');
-        wait(1500);
-        screenshot('15_atdl_workbench', 'ATDL Workbench - Main interface');
-        
-        browser('scroll down 400');
-        wait(1000);
-        screenshot('16_atdl_strategies', 'ATDL - Strategy configurations');
-        
-        browser('scroll down 400');
-        wait(1000);
-        screenshot('17_atdl_parameters', 'ATDL - Algorithm parameters');
-      }
-      
-      // Testing & Certification
-      section('7. TESTING & CERTIFICATION');
-      snapshot = browser('snapshot -q');
-      let testBtn = findButton('test') || findButton('certification') || findButton('testing');
-      if (testBtn) {
-        browser(`click ${testBtn}`);
-        browser('wait --load networkidle');
-        wait(1500);
-        screenshot('18_testing_dashboard', 'Testing Suite - Dashboard');
-        
-        browser('scroll down 400');
-        wait(1000);
-        screenshot('19_test_scenarios', 'Testing - Test scenarios');
-        
-        browser('scroll down 400');
-        wait(1000);
-        screenshot('20_test_results', 'Testing - Results analysis');
-      }
-      
-      // Go-Live & Deployment
-      section('8. GO-LIVE & DEPLOYMENT');
-      snapshot = browser('snapshot -q');
-      let goLiveBtn = findButton('go-live') || findButton('deployment') || findButton('launch');
-      if (goLiveBtn) {
-        browser(`click ${goLiveBtn}`);
-        browser('wait --load networkidle');
-        wait(1500);
-        screenshot('21_golive_planning', 'Go-Live - Planning phase');
-        
-        browser('scroll down 400');
-        wait(1000);
-        screenshot('22_golive_readiness', 'Go-Live - Readiness checklist');
-        
-        browser('scroll down 400');
-        wait(1000);
-        screenshot('23_golive_execution', 'Go-Live - Execution timeline');
-      }
-      
-      // Analytics & Reporting
-      section('9. ANALYTICS & REPORTING');
-      snapshot = browser('snapshot -q');
-      let analyticsBtn = findButton('analytics') || findButton('reports') || findButton('reporting');
-      if (analyticsBtn) {
-        browser(`click ${analyticsBtn}`);
-        browser('wait --load networkidle');
-        wait(1500);
-        screenshot('24_analytics_dashboard', 'Analytics - Dashboard view');
-        
-        browser('scroll down 400');
-        wait(1000);
-        screenshot('25_analytics_charts', 'Analytics - Performance charts');
-        
-        browser('scroll down 400');
-        wait(1000);
-        screenshot('26_analytics_reports', 'Analytics - Generated reports');
-      }
-      
-      // Settings & Configuration
-      section('10. SETTINGS & CONFIGURATION');
-      snapshot = browser('snapshot -q');
-      let settingsBtn = findButton('settings') || findButton('configuration');
-      if (settingsBtn) {
-        browser(`click ${settingsBtn}`);
-        browser('wait --load networkidle');
-        wait(1500);
-        screenshot('27_settings_general', 'Settings - General configuration');
-        
-        browser('scroll down 400');
-        wait(1000);
-        screenshot('28_settings_security', 'Settings - Security options');
-        
-        browser('scroll down 400');
-        wait(1000);
-        screenshot('29_settings_advanced', 'Settings - Advanced options');
+        screenshot(`08_app_${entry.toLowerCase()}`, `Entering - ${entry}`);
+        foundEntry = true;
+        break;
       }
     }
     
-    // CLIENT JOURNEY
-    section('11. CLIENT USER JOURNEY');
-    log('Navigating to client dashboard...');
+    // If no entry point, try scrolling to find interactive elements
+    if (!foundEntry) {
+      log('Exploring page for navigation elements...');
+      browser('scroll down 5');
+      wait(1000);
+      screenshot('08_additional_content', 'Additional content section');
+    }
+    
+    // DASHBOARD TOUR
+    section('4. DASHBOARD & OVERVIEW');
+    log('Exploring dashboard sections...');
+    
     browser('scroll to top');
     wait(1000);
+    screenshot('09_dashboard_main', 'Dashboard - Main view');
     
-    snapshot = browser('snapshot -q');
-    let backBtn = findButton('back') || findButton('home');
-    if (backBtn) {
-      browser(`click ${backBtn}`);
-      browser('wait --load networkidle');
-      wait(1500);
-    }
-    
-    snapshot = browser('snapshot -q');
-    let clientBtn = findButton('client');
-    if (clientBtn) {
-      browser(`click ${clientBtn}`);
-      browser('wait --load networkidle');
-      wait(1500);
-      screenshot('30_client_dashboard', 'Client Dashboard - Overview');
-      
-      browser('scroll down 400');
-      wait(1000);
-      screenshot('31_client_onboarding', 'Client - Onboarding status');
-      
-      browser('scroll down 400');
-      wait(1000);
-      screenshot('32_client_cases', 'Client - Active cases');
-      
-      browser('scroll down 400');
-      wait(1000);
-      screenshot('33_client_submissions', 'Client - Case submissions');
-    }
-    
-    // WORKFLOWS & PROCESSES
-    section('12. WORKFLOWS & PROCESSES');
-    snapshot = browser('snapshot -q');
-    let workflowBtn = findButton('workflow') || findButton('process');
-    if (workflowBtn) {
-      browser(`click ${workflowBtn}`);
-      browser('wait --load networkidle');
-      wait(1500);
-      screenshot('34_workflow_builder', 'Workflow Builder - Canvas');
-      
-      browser('scroll down 400');
-      wait(1000);
-      screenshot('35_workflow_stages', 'Workflow - Process stages');
-      
-      browser('scroll down 400');
-      wait(1000);
-      screenshot('36_workflow_automation', 'Workflow - Automation rules');
-    }
-    
-    // MONITORING & COMPLIANCE
-    section('13. MONITORING & COMPLIANCE');
-    snapshot = browser('snapshot -q');
-    let monitorBtn = findButton('monitor') || findButton('compliance') || findButton('audit');
-    if (monitorBtn) {
-      browser(`click ${monitorBtn}`);
-      browser('wait --load networkidle');
-      wait(1500);
-      screenshot('37_monitoring_console', 'Monitoring - Live console');
-      
-      browser('scroll down 400');
-      wait(1000);
-      screenshot('38_compliance_audit', 'Compliance - Audit logs');
-      
-      browser('scroll down 400');
-      wait(1000);
-      screenshot('39_compliance_reports', 'Compliance - Compliance reports');
-    }
-    
-    // USER MANAGEMENT
-    section('14. USER MANAGEMENT');
-    snapshot = browser('snapshot -q');
-    let usersBtn = findButton('users') || findButton('user management') || findButton('team');
-    if (usersBtn) {
-      browser(`click ${usersBtn}`);
-      browser('wait --load networkidle');
-      wait(1500);
-      screenshot('40_users_list', 'User Management - Users list');
-      
-      browser('scroll down 400');
-      wait(1000);
-      screenshot('41_users_roles', 'User Management - Roles configuration');
-      
-      browser('scroll down 400');
-      wait(1000);
-      screenshot('42_users_permissions', 'User Management - Permissions matrix');
-    }
-    
-    // DOCUMENTATION & HELP
-    section('15. DOCUMENTATION & HELP');
-    snapshot = browser('snapshot -q');
-    let helpBtn = findButton('help') || findButton('documentation') || findButton('support');
-    if (helpBtn) {
-      browser(`click ${helpBtn}`);
-      browser('wait --load networkidle');
-      wait(1500);
-      screenshot('43_help_center', 'Help Center - Documentation');
-      
-      browser('scroll down 400');
-      wait(1000);
-      screenshot('44_help_faq', 'Help Center - FAQ section');
-      
-      browser('scroll down 400');
-      wait(1000);
-      screenshot('45_help_support', 'Help Center - Support contact');
-    }
-    
-    // PROFILE & PREFERENCES
-    section('16. PROFILE & ACCOUNT');
-    snapshot = browser('snapshot -q');
-    let profileBtn = findButton('profile') || findButton('account') || findButton('preferences');
-    if (profileBtn) {
-      browser(`click ${profileBtn}`);
-      browser('wait --load networkidle');
-      wait(1500);
-      screenshot('46_profile_settings', 'Profile - Account settings');
-      
-      browser('scroll down 300');
-      wait(1000);
-      screenshot('47_profile_preferences', 'Profile - User preferences');
-      
-      browser('scroll down 300');
-      wait(1000);
-      screenshot('48_profile_notifications', 'Profile - Notification settings');
-    }
-    
-    // FINAL TOUR
-    section('17. COMPLETE TOUR SUMMARY');
-    browser('scroll to top');
+    browser('scroll down 3');
     wait(1000);
-    screenshot('49_final_home', 'Final view - Application home');
+    screenshot('10_dashboard_metrics', 'Dashboard - Key metrics & statistics');
     
+    browser('scroll down 3');
+    wait(1000);
+    screenshot('11_dashboard_pipeline', 'Dashboard - Onboarding pipeline');
+    
+    browser('scroll down 3');
+    wait(1000);
+    screenshot('12_dashboard_activities', 'Dashboard - Recent activities & events');
+    
+    // NAVIGATION & MENU EXPLORATION
+    section('5. NAVIGATION MENU');
+    log('Exploring navigation menu items...');
+    
+    snapshot = browser('snapshot');
+    
+    const menuItems = [
+      'Dashboard', 'Workflow', 'Clients', 'Cases', 'Onboarding', 'Approvals', 
+      'Evidence', 'Config', 'Library', 'Review', 'Analytics'
+    ];
+    
+    let itemNum = 13;
+    for (const item of menuItems) {
+      const menuBtn = findButton(item);
+      if (menuBtn) {
+        log(`Clicking: ${item}`);
+        clickElement(menuBtn);
+        browser('wait --load networkidle');
+        wait(1000);
+        screenshot(`${String(itemNum).padStart(2, '0')}_menu_${item.toLowerCase().replace(/\s+/g, '_')}`, 
+                   `Menu - ${item}`);
+        itemNum++;
+      }
+    }
+    
+    // TOOLS SECTION
+    section('6. TOOLS & UTILITIES');
+    log('Exploring tools section...');
+    
+    const tools = [
+      'Spec Compare', 'Log Analysis', 'Scenario', 'FIX Creator',
+      'ATDL', 'Workbench', 'Validation', 'Compare'
+    ];
+    
+    for (const tool of tools) {
+      const toolBtn = findButton(tool);
+      if (toolBtn) {
+        log(`Opening tool: ${tool}`);
+        clickElement(toolBtn);
+        browser('wait --load networkidle');
+        wait(1000);
+        screenshot(`${String(itemNum).padStart(2, '0')}_tool_${tool.toLowerCase().replace(/\s+/g, '_')}`, 
+                   `Tool - ${tool}`);
+        itemNum++;
+      }
+    }
+    
+    // WORKFLOW STAGES
+    section('7. WORKFLOW STAGES');
+    log('Navigating through workflow stages...');
+    
+    const stages = [
+      'Design', 'Compliance', 'Testing', 'UAT', 'Certification', 'Go-Live', 'Production'
+    ];
+    
+    for (const stage of stages) {
+      const stageBtn = findButton(stage);
+      if (stageBtn) {
+        log(`Viewing stage: ${stage}`);
+        clickElement(stageBtn);
+        browser('wait --load networkidle');
+        wait(1000);
+        screenshot(`${String(itemNum).padStart(2, '0')}_stage_${stage.toLowerCase().replace(/\s+/g, '_')}`, 
+                   `Workflow Stage - ${stage}`);
+        itemNum++;
+      }
+    }
+    
+    // ASSET CLASSES
+    section('8. ASSET CLASS CONFIGURATIONS');
+    log('Viewing asset class specific content...');
+    
+    const assetClasses = ['Equities', 'Options', 'Futures', 'Fixed Income', 'Commodities'];
+    
+    for (const assetClass of assetClasses) {
+      const assetBtn = findButton(assetClass);
+      if (assetBtn) {
+        log(`Viewing asset class: ${assetClass}`);
+        clickElement(assetBtn);
+        browser('wait --load networkidle');
+        wait(1000);
+        screenshot(`${String(itemNum).padStart(2, '0')}_asset_${assetClass.toLowerCase().replace(/\s+/g, '_')}`, 
+                   `Asset Class - ${assetClass}`);
+        itemNum++;
+      }
+    }
+    
+    // USER ROLES
+    section('9. USER ROLES & VIEWS');
+    log('Exploring different user role perspectives...');
+    
+    const roles = ['Admin', 'Client', 'Analyst', 'Manager', 'Reviewer'];
+    
+    for (const role of roles) {
+      const roleBtn = findButton(role);
+      if (roleBtn) {
+        log(`Switching to role: ${role}`);
+        clickElement(roleBtn);
+        browser('wait --load networkidle');
+        wait(1000);
+        screenshot(`${String(itemNum).padStart(2, '0')}_role_${role.toLowerCase()}`, 
+                   `User Role - ${role} perspective`);
+        itemNum++;
+      }
+    }
+    
+    // SETTINGS & CONFIGURATION
+    section('10. SETTINGS & CONFIGURATION');
+    log('Exploring settings and configuration options...');
+    
+    const settingsItems = [
+      'Settings', 'Configuration', 'Security', 'Preferences', 'Advanced', 'API', 'Integrations'
+    ];
+    
+    for (const setting of settingsItems) {
+      const settingBtn = findButton(setting);
+      if (settingBtn) {
+        log(`Opening: ${setting}`);
+        clickElement(settingBtn);
+        browser('wait --load networkidle');
+        wait(1000);
+        screenshot(`${String(itemNum).padStart(2, '0')}_settings_${setting.toLowerCase().replace(/\s+/g, '_')}`, 
+                   `Settings - ${setting}`);
+        itemNum++;
+      }
+    }
+    
+    // ANALYTICS & REPORTING
+    section('11. ANALYTICS & REPORTING');
+    log('Viewing analytics and reports...');
+    
+    const analytics = ['Analytics', 'Reports', 'Performance', 'Metrics', 'SLA', 'Insights'];
+    
+    for (const item of analytics) {
+      const btn = findButton(item);
+      if (btn) {
+        log(`Viewing: ${item}`);
+        clickElement(btn);
+        browser('wait --load networkidle');
+        wait(1000);
+        screenshot(`${String(itemNum).padStart(2, '0')}_analytics_${item.toLowerCase().replace(/\s+/g, '_')}`, 
+                   `Analytics - ${item}`);
+        itemNum++;
+      }
+    }
+    
+    // HELP & SUPPORT
+    section('12. HELP & SUPPORT');
+    log('Exploring help and support resources...');
+    
+    const help = ['Help', 'Documentation', 'FAQ', 'Support', 'Contact', 'About'];
+    
+    for (const item of help) {
+      const btn = findButton(item);
+      if (btn) {
+        log(`Accessing: ${item}`);
+        clickElement(btn);
+        browser('wait --load networkidle');
+        wait(1000);
+        screenshot(`${String(itemNum).padStart(2, '0')}_help_${item.toLowerCase().replace(/\s+/g, '_')}`, 
+                   `Help - ${item}`);
+        itemNum++;
+      }
+    }
+    
+    // USER ACCOUNT
+    section('13. USER ACCOUNT & PROFILE');
+    log('Viewing user account options...');
+    
+    const account = ['Profile', 'Account', 'Preferences', 'Notifications', 'Logout'];
+    
+    for (const item of account) {
+      const btn = findButton(item);
+      if (btn) {
+        log(`Accessing: ${item}`);
+        if (item !== 'Logout') { // Don't actually logout
+          clickElement(btn);
+          browser('wait --load networkidle');
+          wait(1000);
+        }
+        screenshot(`${String(itemNum).padStart(2, '0')}_account_${item.toLowerCase().replace(/\s+/g, '_')}`, 
+                   `Account - ${item}`);
+        itemNum++;
+      }
+    }
+    
+    // FINAL SUMMARY
+    section('14. COMPLETE WALKTHROUGH SUMMARY');
     log('\n✅ Walkthrough completed successfully!');
     log(`Total screenshots captured: ${stepCounter}`);
     log(`Timestamp: ${new Date().toLocaleString()}`);
+    log(`Coverage: ${itemNum - 1} unique screens/sections documented`);
+    
     
   } catch (error) {
     log(`\n❌ Error during walkthrough: ${error.message}`);
