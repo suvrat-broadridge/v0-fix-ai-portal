@@ -409,39 +409,41 @@ export default function BCometPlatform() {
   }, [aiChatHistory])
 
   // Comet follows circular orbit, visiting each planet sequentially
-  // cometAngleDeg goes 0 to 360*8 (one full orbit per planet)
-  // Each planet is at angle (i/8)*360 degrees, comet visits them in order
+  // After visiting last planet, continues outward off-screen, then re-emerges from sun
+  // cometAngleDeg: 0-315 visits planets, 315-360 exits off-screen, then resets to 0
   useEffect(() => {
     if (currentScreen !== "home") return
     const STEP = 0.5 // degrees per tick
     const TICK = 40  // ms per tick
-    const TOTAL_DEGREES = 360 // one full circle
+    const EXIT_ANGLE = 400 // continue past 360 to exit off-screen
     
     const id = setInterval(() => {
       setCometAngleDeg(prev => {
         const next = prev + STEP
         
-        // Check if we completed a full cycle
-        if (next >= TOTAL_DEGREES) {
+        // After exiting off-screen, reset to emerge from sun
+        if (next >= EXIT_ANGLE) {
           // Reset all planets to grey for next cycle
           setVisitedPlanets([])
           setActivePlanetTools(null)
           return 0
         }
         
-        // Each planet is at angle (i/8)*360, comet visits when passing that angle
-        // Check which planet we're closest to
-        for (let i = 0; i < 8; i++) {
-          const planetAngle = (i / 8) * 360
-          const diff = Math.abs(next - planetAngle)
-          if (diff < 3 || diff > 357) { // within 3 degrees of planet
-            // Mark visited and show tools
-            setVisitedPlanets(vp => vp.includes(i) ? vp : [...vp, i])
-            if (activePlanetTools !== i) {
-              setActivePlanetTools(i)
-              setTimeout(() => setActivePlanetTools(ap => ap === i ? null : ap), 2500)
+        // Only check planet visits during the main orbit (0-315 degrees)
+        if (next <= 315) {
+          // Each planet is at angle (i/8)*360, comet visits when passing that angle
+          for (let i = 0; i < 8; i++) {
+            const planetAngle = (i / 8) * 360
+            const diff = Math.abs(next - planetAngle)
+            if (diff < 3) { // within 3 degrees of planet
+              // Mark visited and show tools
+              setVisitedPlanets(vp => vp.includes(i) ? vp : [...vp, i])
+              if (activePlanetTools !== i) {
+                setActivePlanetTools(i)
+                setTimeout(() => setActivePlanetTools(ap => ap === i ? null : ap), 2500)
+              }
+              break
             }
-            break
           }
         }
         
@@ -2112,28 +2114,36 @@ export default function BCometPlatform() {
           ]
           
           // Comet follows expanding spiral, passing through each planet's position
+          // After last planet (315 deg), continues outward off-screen
           // Each planet is at a fixed angle: (i/8)*360 degrees from top
-          // Comet radius interpolates to match each planet's orbit as it passes
           
           const cometAngleRad = (cometAngleDeg - 90) * Math.PI / 180 // -90 to start from top
+          const maxRadius = solarPlanets[7].radius
           
-          // Find which two planets we're between based on angle
-          const normalizedAngle = ((cometAngleDeg % 360) + 360) % 360
-          const planetIdx = Math.floor(normalizedAngle / 45) // 0-7
-          const nextPlanetIdx = (planetIdx + 1) % 8
-          const progressBetween = (normalizedAngle % 45) / 45 // 0-1 between planets
+          let cometRadius: number
           
-          // Smoothly interpolate radius between current and next planet
-          const currentRadius = solarPlanets[planetIdx].radius
-          const nextRadius = solarPlanets[nextPlanetIdx].radius
-          const cometRadius = currentRadius + (nextRadius - currentRadius) * progressBetween
+          if (cometAngleDeg <= 315) {
+            // Normal orbit - interpolate between planets
+            const normalizedAngle = cometAngleDeg % 360
+            const planetIdx = Math.floor(normalizedAngle / 45) // 0-7
+            const nextPlanetIdx = Math.min(planetIdx + 1, 7)
+            const progressBetween = (normalizedAngle % 45) / 45
+            
+            const currentPlanetRadius = solarPlanets[planetIdx].radius
+            const nextPlanetRadius = solarPlanets[nextPlanetIdx].radius
+            cometRadius = currentPlanetRadius + (nextPlanetRadius - currentPlanetRadius) * progressBetween
+          } else {
+            // Exit phase - continue outward beyond last planet
+            const exitProgress = (cometAngleDeg - 315) / 85 // 0 to 1 over exit
+            cometRadius = maxRadius + exitProgress * 40 // expand off-screen
+          }
           
           // Comet position
           const cometX = CX + cometRadius * Math.cos(cometAngleRad)
           const cometY = CY + cometRadius * Math.sin(cometAngleRad)
           
-          // Tail points opposite to direction of travel (tangent to orbit, trailing)
-          const tailRad = cometAngleRad + Math.PI + 0.15 // trail behind with slight outward angle
+          // Tail ALWAYS points away from sun (radially outward from center)
+          const tailRad = Math.atan2(cometY - CY, cometX - CX)
 
           // Compute screen-space position for each planet for the HTML popup
           // We expose active planet screen coords via CSS vars — simpler: just render popup via fixed HTML
@@ -2226,42 +2236,19 @@ export default function BCometPlatform() {
                   <text x={CX} y={CY + 0.6} textAnchor="middle" dominantBaseline="middle"
                     fontSize="1.4" fill="white" fontWeight="700" opacity="0.9">Cases</text>
 
-                  {/* Realistic comet - simple bright head with long smooth gradient tail */}
-                  {/* Like reference images: bright cyan/white nucleus, soft glow, long fading tail */}
-                  
-                  {/* Long main tail - smooth gradient fade */}
-                  <line 
-                    x1={cometX} y1={cometY}
-                    x2={cometX + Math.cos(tailRad) * 20} y2={cometY + Math.sin(tailRad) * 20}
-                    stroke="url(#mainTailGrad)" strokeWidth="2" strokeLinecap="round"
+                  {/* Comet using actual image - rotated so tail points away from sun */}
+                  <image
+                    href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-xIT5YytKFZ4xUB9WJpnK0cDWe6gb4e.png"
+                    x={cometX - 8}
+                    y={cometY - 3}
+                    width="16"
+                    height="6"
+                    style={{
+                      transformOrigin: `${cometX}px ${cometY}px`,
+                      transform: `rotate(${tailRad * 180 / Math.PI}deg)`,
+                    }}
+                    preserveAspectRatio="xMidYMid slice"
                   />
-                  
-                  {/* Secondary wider tail - more diffuse */}
-                  <line 
-                    x1={cometX} y1={cometY}
-                    x2={cometX + Math.cos(tailRad + 0.08) * 16} y2={cometY + Math.sin(tailRad + 0.08) * 16}
-                    stroke="url(#mainTailGrad)" strokeWidth="3.5" strokeLinecap="round" opacity="0.4"
-                  />
-                  <line 
-                    x1={cometX} y1={cometY}
-                    x2={cometX + Math.cos(tailRad - 0.06) * 14} y2={cometY + Math.sin(tailRad - 0.06) * 14}
-                    stroke="url(#mainTailGrad)" strokeWidth="2.5" strokeLinecap="round" opacity="0.3"
-                  />
-                  
-                  {/* Bright inner core of tail */}
-                  <line 
-                    x1={cometX} y1={cometY}
-                    x2={cometX + Math.cos(tailRad) * 6} y2={cometY + Math.sin(tailRad) * 6}
-                    stroke="white" strokeWidth="1" strokeLinecap="round" opacity="0.7"
-                  />
-
-                  {/* Coma - soft outer glow */}
-                  <circle cx={cometX} cy={cometY} r={3} fill="#06b6d4" opacity="0.2" filter="url(#cometGlow)" />
-                  <circle cx={cometX} cy={cometY} r={2} fill="#22d3ee" opacity="0.4" filter="url(#glow)" />
-                  
-                  {/* Bright nucleus */}
-                  <circle cx={cometX} cy={cometY} r={1.2} fill="#67e8f9" opacity="0.9" />
-                  <circle cx={cometX} cy={cometY} r={0.6} fill="white" opacity="1" />
                 </svg>
               </div>
 
