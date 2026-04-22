@@ -2099,18 +2099,18 @@ export default function BCometPlatform() {
       <div className={`min-h-screen ${bgPrimary} transition-colors overflow-hidden`}>
         {/* Full-page solar system background — SVG decorative layer */}
         {(() => {
-          // All radii in % units (viewBox 0 0 100 100), center at 50,50
-          // Max radius ~38 keeps all planets visible on screen
-          const CX = 50, CY = 50
+          // All radii in % units (viewBox 0 0 100 100)
+          // Center shifted to lower-left so planets spread into north/northeast
+          const CX = 35, CY = 55
           const solarPlanets = [
-            { name: "Intake",  radius: 3,  color: "#2196f3", size: 1.0, tools: ["Create onboarding request", "Collect data", "AI document analysis", "Gap analysis"] },
-            { name: "Design",  radius: 12, color: "#9c27b0", size: 1.1, tools: ["Build counterparty profile", "Generate FIX session config", "Generate FIX dictionary", "Internal review/approval"] },
+            { name: "Intake",  radius: 6,  color: "#2196f3", size: 1.0, tools: ["Create onboarding request", "Collect data", "AI document analysis", "Gap analysis"] },
+            { name: "Design",  radius: 14, color: "#9c27b0", size: 1.1, tools: ["Build counterparty profile", "Generate FIX session config", "Generate FIX dictionary", "Internal review/approval"] },
             { name: "Connect", radius: 22, color: "#00bcd4", size: 1.2, tools: ["Provision network", "Connectivity smoke test", "Session readiness validation"] },
-            { name: "Plan",    radius: 32, color: "#ff9800", size: 1.3, tools: ["Generate cert test plan", "Create test cases", "Share readiness checklist"] },
-            { name: "Execute", radius: 42, color: "#e91e63", size: 1.4, tools: ["Session-level tests", "Application-level tests", "Negative tests", "Recovery tests", "Capture evidence"] },
-            { name: "Analyze", radius: 51, color: "#f44336", size: 1.5, tools: ["Auto-evaluate results", "AI root cause analysis", "Defect creation", "Retest cycle"] },
-            { name: "Decide",  radius: 59, color: "#4caf50", size: 1.6, tools: ["Evaluate completion", "Generate cert report", "Collect formal signoffs"] },
-            { name: "Launch",  radius: 67, color: "#00e5ff", size: 1.7, tools: ["Generate prod config pack", "Readiness checklist", "Prod smoke test", "Go-live & hypercare"] },
+            { name: "Plan",    radius: 30, color: "#ff9800", size: 1.3, tools: ["Generate cert test plan", "Create test cases", "Share readiness checklist"] },
+            { name: "Execute", radius: 38, color: "#e91e63", size: 1.4, tools: ["Session-level tests", "Application-level tests", "Negative tests", "Recovery tests", "Capture evidence"] },
+            { name: "Analyze", radius: 46, color: "#f44336", size: 1.5, tools: ["Auto-evaluate results", "AI root cause analysis", "Defect creation", "Retest cycle"] },
+            { name: "Decide",  radius: 54, color: "#4caf50", size: 1.6, tools: ["Evaluate completion", "Generate cert report", "Collect formal signoffs"] },
+            { name: "Launch",  radius: 62, color: "#00e5ff", size: 1.7, tools: ["Generate prod config pack", "Readiness checklist", "Prod smoke test", "Go-live & hypercare"] },
           ]
           
           // Comet follows expanding spiral, passing through each planet's position
@@ -2236,18 +2236,18 @@ export default function BCometPlatform() {
                   <text x={CX} y={CY + 0.6} textAnchor="middle" dominantBaseline="middle"
                     fontSize="1.4" fill="white" fontWeight="700" opacity="0.9">Cases</text>
 
-                  {/* Comet using clean cropped image - rotated so tail points away from sun */}
+                  {/* Comet using generated realistic comet image - rotated so tail points away from sun */}
                   <image
-                    href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-iq7CviFlwDHSYSsuCSh2L5XWVR28kU.png"
-                    x={cometX - 6}
-                    y={cometY - 2}
-                    width="12"
-                    height="4"
+                    href="/images/comet.png"
+                    x={cometX - 1}
+                    y={cometY - 5}
+                    width="18"
+                    height="10"
                     style={{
                       transformOrigin: `${cometX}px ${cometY}px`,
-                      transform: `rotate(${tailRad * 180 / Math.PI}deg)`,
+                      transform: `rotate(${(tailRad * 180 / Math.PI) + 180}deg)`,
                     }}
-                    preserveAspectRatio="xMidYMid slice"
+                    preserveAspectRatio="xMidYMid meet"
                   />
                 </svg>
               </div>
