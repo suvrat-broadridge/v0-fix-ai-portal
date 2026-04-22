@@ -2168,19 +2168,39 @@ export default function BCometPlatform() {
                       <stop offset="100%" stopColor="#f44336" />
                     </radialGradient>
                     {/* Main tail gradient - smooth cyan to transparent fade like real comet */}
-                    <linearGradient id="mainTailGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#a5f3fc" stopOpacity="0.9" />
-                      <stop offset="15%" stopColor="#67e8f9" stopOpacity="0.7" />
-                      <stop offset="35%" stopColor="#22d3ee" stopOpacity="0.5" />
-                      <stop offset="60%" stopColor="#06b6d4" stopOpacity="0.25" />
-                      <stop offset="100%" stopColor="#0891b2" stopOpacity="0" />
+                    {/* Ion tail gradient - blue/cyan, straighter */}
+                    <linearGradient id="ionTailGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#67e8f9" stopOpacity="0.95" />
+                      <stop offset="20%" stopColor="#22d3ee" stopOpacity="0.7" />
+                      <stop offset="45%" stopColor="#06b6d4" stopOpacity="0.4" />
+                      <stop offset="70%" stopColor="#0891b2" stopOpacity="0.15" />
+                      <stop offset="100%" stopColor="#164e63" stopOpacity="0" />
                     </linearGradient>
+                    {/* Dust tail gradient - warmer white/cream tones */}
+                    <linearGradient id="dustTailGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#fefce8" stopOpacity="0.8" />
+                      <stop offset="15%" stopColor="#fef9c3" stopOpacity="0.5" />
+                      <stop offset="35%" stopColor="#e0f2fe" stopOpacity="0.3" />
+                      <stop offset="60%" stopColor="#bae6fd" stopOpacity="0.15" />
+                      <stop offset="100%" stopColor="#7dd3fc" stopOpacity="0" />
+                    </linearGradient>
+                    {/* Core glow gradient */}
+                    <radialGradient id="cometCoreGrad" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="white" stopOpacity="1" />
+                      <stop offset="30%" stopColor="#a5f3fc" stopOpacity="0.9" />
+                      <stop offset="60%" stopColor="#22d3ee" stopOpacity="0.5" />
+                      <stop offset="100%" stopColor="#06b6d4" stopOpacity="0" />
+                    </radialGradient>
                     <filter id="glow">
                       <feGaussianBlur stdDeviation="0.5" result="blur" />
                       <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
                     </filter>
                     <filter id="cometGlow">
-                      <feGaussianBlur stdDeviation="1" result="blur" />
+                      <feGaussianBlur stdDeviation="1.5" result="blur" />
+                      <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                    </filter>
+                    <filter id="softGlow">
+                      <feGaussianBlur stdDeviation="2" result="blur" />
                       <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
                     </filter>
                   </defs>
@@ -2236,39 +2256,49 @@ export default function BCometPlatform() {
                   <text x={CX} y={CY + 0.6} textAnchor="middle" dominantBaseline="middle"
                     fontSize="1.4" fill="white" fontWeight="700" opacity="0.9">Cases</text>
 
-                  {/* Comet with SVG - realistic tail pointing away from sun */}
+                  {/* Realistic comet with dust tail and ion tail */}
                   
-                  {/* Long main tail - smooth gradient fade */}
-                  <line 
-                    x1={cometX} y1={cometY}
-                    x2={cometX + Math.cos(tailRad) * 25} y2={cometY + Math.sin(tailRad) * 25}
-                    stroke="url(#mainTailGrad)" strokeWidth="2.5" strokeLinecap="round"
-                  />
-                  
-                  {/* Secondary wider diffuse tail */}
+                  {/* DUST TAIL - broader, curved, warmer colors */}
                   <path
-                    d={`M ${cometX} ${cometY} Q ${cometX + Math.cos(tailRad + 0.1) * 8} ${cometY + Math.sin(tailRad + 0.1) * 8}, ${cometX + Math.cos(tailRad + 0.15) * 20} ${cometY + Math.sin(tailRad + 0.15) * 20}`}
-                    stroke="url(#mainTailGrad)" strokeWidth="4" fill="none" opacity="0.35" strokeLinecap="round"
+                    d={`M ${cometX} ${cometY} 
+                        Q ${cometX + Math.cos(tailRad + 0.25) * 10} ${cometY + Math.sin(tailRad + 0.25) * 10},
+                          ${cometX + Math.cos(tailRad + 0.35) * 22} ${cometY + Math.sin(tailRad + 0.35) * 22}`}
+                    stroke="url(#dustTailGrad)" strokeWidth="5" fill="none" opacity="0.5" strokeLinecap="round" filter="url(#softGlow)"
                   />
                   <path
-                    d={`M ${cometX} ${cometY} Q ${cometX + Math.cos(tailRad - 0.08) * 7} ${cometY + Math.sin(tailRad - 0.08) * 7}, ${cometX + Math.cos(tailRad - 0.12) * 18} ${cometY + Math.sin(tailRad - 0.12) * 18}`}
-                    stroke="url(#mainTailGrad)" strokeWidth="3" fill="none" opacity="0.25" strokeLinecap="round"
+                    d={`M ${cometX} ${cometY} 
+                        Q ${cometX + Math.cos(tailRad + 0.15) * 8} ${cometY + Math.sin(tailRad + 0.15) * 8},
+                          ${cometX + Math.cos(tailRad + 0.22) * 18} ${cometY + Math.sin(tailRad + 0.22) * 18}`}
+                    stroke="url(#dustTailGrad)" strokeWidth="3.5" fill="none" opacity="0.4" strokeLinecap="round"
                   />
                   
-                  {/* Bright inner core */}
+                  {/* ION TAIL - straighter, bluer, longer */}
                   <line 
                     x1={cometX} y1={cometY}
-                    x2={cometX + Math.cos(tailRad) * 8} y2={cometY + Math.sin(tailRad) * 8}
-                    stroke="white" strokeWidth="1.2" strokeLinecap="round" opacity="0.8"
+                    x2={cometX + Math.cos(tailRad) * 28} y2={cometY + Math.sin(tailRad) * 28}
+                    stroke="url(#ionTailGrad)" strokeWidth="1.8" strokeLinecap="round"
+                  />
+                  <line 
+                    x1={cometX} y1={cometY}
+                    x2={cometX + Math.cos(tailRad - 0.05) * 24} y2={cometY + Math.sin(tailRad - 0.05) * 24}
+                    stroke="url(#ionTailGrad)" strokeWidth="1.2" strokeLinecap="round" opacity="0.6"
+                  />
+                  
+                  {/* Inner bright ion stream */}
+                  <line 
+                    x1={cometX} y1={cometY}
+                    x2={cometX + Math.cos(tailRad) * 12} y2={cometY + Math.sin(tailRad) * 12}
+                    stroke="white" strokeWidth="0.8" strokeLinecap="round" opacity="0.7"
                   />
 
-                  {/* Coma - soft fuzzy glow around nucleus */}
-                  <circle cx={cometX} cy={cometY} r={3.5} fill="#06b6d4" opacity="0.15" filter="url(#cometGlow)" />
-                  <circle cx={cometX} cy={cometY} r={2.5} fill="#22d3ee" opacity="0.35" filter="url(#glow)" />
+                  {/* COMA - layered fuzzy glow around nucleus */}
+                  <circle cx={cometX} cy={cometY} r={4} fill="url(#cometCoreGrad)" opacity="0.2" filter="url(#softGlow)" />
+                  <circle cx={cometX} cy={cometY} r={2.8} fill="#22d3ee" opacity="0.25" filter="url(#cometGlow)" />
+                  <circle cx={cometX} cy={cometY} r={2} fill="#67e8f9" opacity="0.45" filter="url(#glow)" />
                   
-                  {/* Nucleus - bright center */}
-                  <circle cx={cometX} cy={cometY} r={1.3} fill="#67e8f9" opacity="0.95" />
-                  <circle cx={cometX} cy={cometY} r={0.7} fill="white" opacity="1" />
+                  {/* NUCLEUS - intense bright center */}
+                  <circle cx={cometX} cy={cometY} r={1.2} fill="#a5f3fc" opacity="1" />
+                  <circle cx={cometX} cy={cometY} r={0.6} fill="white" opacity="1" />
                 </svg>
               </div>
 
