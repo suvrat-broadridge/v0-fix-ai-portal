@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B-COMET Platform - Application Walkthrough</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0a1628 0%, #1a2744 100%);
+      min-height: 100vh;
+      color: #e0e0e0;
+      padding: 2rem;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .header h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(90deg, #00e5ff, #4caf50);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+    .header p { color: #a0a0a0; }
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+    .stat {
+      background: rgba(30, 73, 118, 0.3);
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #00e5ff;
+    }
+    .stat-label { color: #a0a0a0; font-size: 0.9rem; }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: 1.5rem;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    .card {
+      background: rgba(30, 73, 118, 0.2);
+      border: 1px solid rgba(0, 229, 255, 0.2);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: #00e5ff;
+      box-shadow: 0 8px 32px rgba(0, 229, 255, 0.2);
+    }
+    .card img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      object-position: top;
+      border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+      cursor: pointer;
+    }
+    .card-content {
+      padding: 1rem;
+    }
+    .card-number {
+      display: inline-block;
+      background: #00e5ff;
+      color: #0a1628;
+      font-weight: bold;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      margin-right: 0.5rem;
+    }
+    .card-title {
+      color: #fff;
+      font-weight: 500;
+    }
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+    .lightbox.active { display: flex; }
+    .lightbox img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      color: #fff;
+      font-size: 2rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 229, 255, 0.2);
+      border: none;
+      color: #fff;
+      font-size: 2rem;
+      padding: 1rem;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    .lightbox-nav:hover { background: rgba(0, 229, 255, 0.4); }
+    .lightbox-prev { left: 1rem; }
+    .lightbox-next { right: 1rem; }
+    .lightbox-info {
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(30, 73, 118, 0.8);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>B-COMET Platform Walkthrough</h1>
+    <p>Complete Application Functionality Demonstration</p>
+  </div>
+  
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value">77</div>
+      <div class="stat-label">Screenshots</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">28</div>
+      <div class="stat-label">Sections</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">2</div>
+      <div class="stat-label">User Roles</div>
+    </div>
+  </div>
+  
+  <div class="gallery">
+    
+    <div class="card" onclick="openLightbox(0)">
+      <img src="001_01_home_page.png" alt="01 home page" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">1</span>
+        <span class="card-title">01 home page</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(1)">
+      <img src="002_02_fix_message_creator_demo.png" alt="02 fix message creator demo" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">2</span>
+        <span class="card-title">02 fix message creator demo</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(2)">
+      <img src="003_03_presentation_slide1.png" alt="03 presentation slide1" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">3</span>
+        <span class="card-title">03 presentation slide1</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(3)">
+      <img src="004_04_presentation_slides.png" alt="04 presentation slides" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">4</span>
+        <span class="card-title">04 presentation slides</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(4)">
+      <img src="005_05_role_selection.png" alt="05 role selection" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">5</span>
+        <span class="card-title">05 role selection</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(5)">
+      <img src="006_06_admin_login.png" alt="06 admin login" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">6</span>
+        <span class="card-title">06 admin login</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(6)">
+      <img src="007_07_admin_login_filled.png" alt="07 admin login filled" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">7</span>
+        <span class="card-title">07 admin login filled</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(7)">
+      <img src="008_08_admin_dashboard.png" alt="08 admin dashboard" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">8</span>
+        <span class="card-title">08 admin dashboard</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(8)">
+      <img src="009_09_dashboard_pipeline.png" alt="09 dashboard pipeline" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">9</span>
+        <span class="card-title">09 dashboard pipeline</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(9)">
+      <img src="010_10_dashboard_clients.png" alt="10 dashboard clients" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">10</span>
+        <span class="card-title">10 dashboard clients</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(10)">
+      <img src="011_11_clients_list.png" alt="11 clients list" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">11</span>
+        <span class="card-title">11 clients list</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(11)">
+      <img src="012_12_client_detail.png" alt="12 client detail" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">12</span>
+        <span class="card-title">12 client detail</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(12)">
+      <img src="013_13_client_assets.png" alt="13 client assets" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">13</span>
+        <span class="card-title">13 client assets</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(13)">
+      <img src="014_14_onboarding_cases.png" alt="14 onboarding cases" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">14</span>
+        <span class="card-title">14 onboarding cases</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(14)">
+      <img src="015_15_case_detail.png" alt="15 case detail" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">15</span>
+        <span class="card-title">15 case detail</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(15)">
+      <img src="016_16_case_phases.png" alt="16 case phases" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">16</span>
+        <span class="card-title">16 case phases</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(16)">
+      <img src="017_17_case_workflow.png" alt="17 case workflow" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">17</span>
+        <span class="card-title">17 case workflow</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(17)">
+      <img src="018_18_phase1_intake.png" alt="18 phase1 intake" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">18</span>
+        <span class="card-title">18 phase1 intake</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(18)">
+      <img src="019_19_phase2_design.png" alt="19 phase2 design" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">19</span>
+        <span class="card-title">19 phase2 design</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(19)">
+      <img src="020_20_phase3_connectivity.png" alt="20 phase3 connectivity" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">20</span>
+        <span class="card-title">20 phase3 connectivity</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(20)">
+      <img src="021_21_phase4_cert_planning.png" alt="21 phase4 cert planning" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">21</span>
+        <span class="card-title">21 phase4 cert planning</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(21)">
+      <img src="022_22_phase5_test_execution.png" alt="22 phase5 test execution" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">22</span>
+        <span class="card-title">22 phase5 test execution</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(22)">
+      <img src="023_23_phase6_remediation.png" alt="23 phase6 remediation" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">23</span>
+        <span class="card-title">23 phase6 remediation</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(23)">
+      <img src="024_24_phase7_certification.png" alt="24 phase7 certification" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">24</span>
+        <span class="card-title">24 phase7 certification</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(24)">
+      <img src="025_25_phase8_production.png" alt="25 phase8 production" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">25</span>
+        <span class="card-title">25 phase8 production</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(25)">
+      <img src="026_26_atdl_workbench.png" alt="26 atdl workbench" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">26</span>
+        <span class="card-title">26 atdl workbench</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(26)">
+      <img src="027_27_atdl_compare.png" alt="27 atdl compare" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">27</span>
+        <span class="card-title">27 atdl compare</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(27)">
+      <img src="028_28_atdl_validate.png" alt="28 atdl validate" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">28</span>
+        <span class="card-title">28 atdl validate</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(28)">
+      <img src="029_29_fix_to_atdl.png" alt="29 fix to atdl" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">29</span>
+        <span class="card-title">29 fix to atdl</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(29)">
+      <img src="030_30_atdl_ui_preview.png" alt="30 atdl ui preview" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">30</span>
+        <span class="card-title">30 atdl ui preview</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(30)">
+      <img src="031_31_spec_compare.png" alt="31 spec compare" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">31</span>
+        <span class="card-title">31 spec compare</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(31)">
+      <img src="032_32_spec_compare_equities.png" alt="32 spec compare equities" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">32</span>
+        <span class="card-title">32 spec compare equities</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(32)">
+      <img src="033_33_spec_compare_results.png" alt="33 spec compare results" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">33</span>
+        <span class="card-title">33 spec compare results</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(33)">
+      <img src="034_34_log_analysis.png" alt="34 log analysis" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">34</span>
+        <span class="card-title">34 log analysis</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(34)">
+      <img src="035_35_log_analysis_options.png" alt="35 log analysis options" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">35</span>
+        <span class="card-title">35 log analysis options</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(35)">
+      <img src="036_36_verifix_testing.png" alt="36 verifix testing" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">36</span>
+        <span class="card-title">36 verifix testing</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(36)">
+      <img src="037_37_test_scenarios.png" alt="37 test scenarios" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">37</span>
+        <span class="card-title">37 test scenarios</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(37)">
+      <img src="038_38_test_case_gen.png" alt="38 test case gen" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">38</span>
+        <span class="card-title">38 test case gen</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(38)">
+      <img src="039_39_conductor_certification.png" alt="39 conductor certification" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">39</span>
+        <span class="card-title">39 conductor certification</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(39)">
+      <img src="040_40_certification_workflow.png" alt="40 certification workflow" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">40</span>
+        <span class="card-title">40 certification workflow</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(40)">
+      <img src="041_41_client_cert_report.png" alt="41 client cert report" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">41</span>
+        <span class="card-title">41 client cert report</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(41)">
+      <img src="042_42_cert_report_details.png" alt="42 cert report details" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">42</span>
+        <span class="card-title">42 cert report details</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(42)">
+      <img src="043_43_fix_message_creator.png" alt="43 fix message creator" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">43</span>
+        <span class="card-title">43 fix message creator</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(43)">
+      <img src="044_44_fix_message_form.png" alt="44 fix message form" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">44</span>
+        <span class="card-title">44 fix message form</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(44)">
+      <img src="045_45_admin_specs.png" alt="45 admin specs" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">45</span>
+        <span class="card-title">45 admin specs</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(45)">
+      <img src="046_46_specs_library.png" alt="46 specs library" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">46</span>
+        <span class="card-title">46 specs library</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(46)">
+      <img src="047_47_approvals.png" alt="47 approvals" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">47</span>
+        <span class="card-title">47 approvals</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(47)">
+      <img src="048_48_approvals_pending.png" alt="48 approvals pending" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">48</span>
+        <span class="card-title">48 approvals pending</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(48)">
+      <img src="049_49_evidence_vault.png" alt="49 evidence vault" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">49</span>
+        <span class="card-title">49 evidence vault</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(49)">
+      <img src="050_50_evidence_categories.png" alt="50 evidence categories" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">50</span>
+        <span class="card-title">50 evidence categories</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(50)">
+      <img src="051_51_go_live.png" alt="51 go live" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">51</span>
+        <span class="card-title">51 go live</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(51)">
+      <img src="052_52_go_live_checklist.png" alt="52 go live checklist" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">52</span>
+        <span class="card-title">52 go live checklist</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(52)">
+      <img src="053_53_reports.png" alt="53 reports" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">53</span>
+        <span class="card-title">53 reports</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(53)">
+      <img src="054_54_analytics.png" alt="54 analytics" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">54</span>
+        <span class="card-title">54 analytics</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(54)">
+      <img src="055_55_settings_profile.png" alt="55 settings profile" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">55</span>
+        <span class="card-title">55 settings profile</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(55)">
+      <img src="056_56_settings_profile_form.png" alt="56 settings profile form" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">56</span>
+        <span class="card-title">56 settings profile form</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(56)">
+      <img src="057_57_settings_notifications.png" alt="57 settings notifications" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">57</span>
+        <span class="card-title">57 settings notifications</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(57)">
+      <img src="058_58_settings_security.png" alt="58 settings security" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">58</span>
+        <span class="card-title">58 settings security</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(58)">
+      <img src="059_59_settings_integrations.png" alt="59 settings integrations" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">59</span>
+        <span class="card-title">59 settings integrations</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(59)">
+      <img src="060_60_settings_appearance.png" alt="60 settings appearance" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">60</span>
+        <span class="card-title">60 settings appearance</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(60)">
+      <img src="061_61_settings_api_keys.png" alt="61 settings api keys" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">61</span>
+        <span class="card-title">61 settings api keys</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(61)">
+      <img src="062_62_light_mode.png" alt="62 light mode" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">62</span>
+        <span class="card-title">62 light mode</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(62)">
+      <img src="063_63_dark_mode.png" alt="63 dark mode" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">63</span>
+        <span class="card-title">63 dark mode</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(63)">
+      <img src="064_64_ai_assistant.png" alt="64 ai assistant" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">64</span>
+        <span class="card-title">64 ai assistant</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(64)">
+      <img src="065_65_ai_assistant_response.png" alt="65 ai assistant response" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">65</span>
+        <span class="card-title">65 ai assistant response</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(65)">
+      <img src="066_66_sidebar_collapsed.png" alt="66 sidebar collapsed" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">66</span>
+        <span class="card-title">66 sidebar collapsed</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(66)">
+      <img src="067_67_sidebar_expanded.png" alt="67 sidebar expanded" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">67</span>
+        <span class="card-title">67 sidebar expanded</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(67)">
+      <img src="068_68_logged_out.png" alt="68 logged out" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">68</span>
+        <span class="card-title">68 logged out</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(68)">
+      <img src="069_69_role_select_client.png" alt="69 role select client" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">69</span>
+        <span class="card-title">69 role select client</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(69)">
+      <img src="070_70_client_login.png" alt="70 client login" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">70</span>
+        <span class="card-title">70 client login</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(70)">
+      <img src="071_71_client_login_filled.png" alt="71 client login filled" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">71</span>
+        <span class="card-title">71 client login filled</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(71)">
+      <img src="072_72_client_dashboard.png" alt="72 client dashboard" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">72</span>
+        <span class="card-title">72 client dashboard</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(72)">
+      <img src="073_73_client_specs.png" alt="73 client specs" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">73</span>
+        <span class="card-title">73 client specs</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(73)">
+      <img src="074_74_client_log_files.png" alt="74 client log files" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">74</span>
+        <span class="card-title">74 client log files</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(74)">
+      <img src="075_75_create_case.png" alt="75 create case" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">75</span>
+        <span class="card-title">75 create case</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(75)">
+      <img src="076_76_create_case_form.png" alt="76 create case form" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">76</span>
+        <span class="card-title">76 create case form</span>
+      </div>
+    </div>
+    <div class="card" onclick="openLightbox(76)">
+      <img src="077_77_final_home.png" alt="77 final home" loading="lazy">
+      <div class="card-content">
+        <span class="card-number">77</span>
+        <span class="card-title">77 final home</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+    <button class="lightbox-nav lightbox-prev" onclick="navLightbox(-1)">&#10094;</button>
+    <img src="" alt="" id="lightbox-img">
+    <button class="lightbox-nav lightbox-next" onclick="navLightbox(1)">&#10095;</button>
+    <div class="lightbox-info" id="lightbox-info"></div>
+  </div>
+  
+  <script>
+    const files = ["001_01_home_page.png","002_02_fix_message_creator_demo.png","003_03_presentation_slide1.png","004_04_presentation_slides.png","005_05_role_selection.png","006_06_admin_login.png","007_07_admin_login_filled.png","008_08_admin_dashboard.png","009_09_dashboard_pipeline.png","010_10_dashboard_clients.png","011_11_clients_list.png","012_12_client_detail.png","013_13_client_assets.png","014_14_onboarding_cases.png","015_15_case_detail.png","016_16_case_phases.png","017_17_case_workflow.png","018_18_phase1_intake.png","019_19_phase2_design.png","020_20_phase3_connectivity.png","021_21_phase4_cert_planning.png","022_22_phase5_test_execution.png","023_23_phase6_remediation.png","024_24_phase7_certification.png","025_25_phase8_production.png","026_26_atdl_workbench.png","027_27_atdl_compare.png","028_28_atdl_validate.png","029_29_fix_to_atdl.png","030_30_atdl_ui_preview.png","031_31_spec_compare.png","032_32_spec_compare_equities.png","033_33_spec_compare_results.png","034_34_log_analysis.png","035_35_log_analysis_options.png","036_36_verifix_testing.png","037_37_test_scenarios.png","038_38_test_case_gen.png","039_39_conductor_certification.png","040_40_certification_workflow.png","041_41_client_cert_report.png","042_42_cert_report_details.png","043_43_fix_message_creator.png","044_44_fix_message_form.png","045_45_admin_specs.png","046_46_specs_library.png","047_47_approvals.png","048_48_approvals_pending.png","049_49_evidence_vault.png","050_50_evidence_categories.png","051_51_go_live.png","052_52_go_live_checklist.png","053_53_reports.png","054_54_analytics.png","055_55_settings_profile.png","056_56_settings_profile_form.png","057_57_settings_notifications.png","058_58_settings_security.png","059_59_settings_integrations.png","060_60_settings_appearance.png","061_61_settings_api_keys.png","062_62_light_mode.png","063_63_dark_mode.png","064_64_ai_assistant.png","065_65_ai_assistant_response.png","066_66_sidebar_collapsed.png","067_67_sidebar_expanded.png","068_68_logged_out.png","069_69_role_select_client.png","070_70_client_login.png","071_71_client_login_filled.png","072_72_client_dashboard.png","073_73_client_specs.png","074_74_client_log_files.png","075_75_create_case.png","076_76_create_case_form.png","077_77_final_home.png"];
+    let currentIndex = 0;
+    
+    function openLightbox(index) {
+      currentIndex = index;
+      updateLightbox();
+      document.getElementById('lightbox').classList.add('active');
+    }
+    
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('active');
+    }
+    
+    function navLightbox(dir) {
+      currentIndex = (currentIndex + dir + files.length) % files.length;
+      updateLightbox();
+    }
+    
+    function updateLightbox() {
+      document.getElementById('lightbox-img').src = files[currentIndex];
+      document.getElementById('lightbox-info').textContent = 
+        `${currentIndex + 1} / ${files.length}: ${files[currentIndex].replace(/^\d+_/, '').replace(/_/g, ' ').replace('.png', '')}`;
+    }
+    
+    document.addEventListener('keydown', (e) => {
+      if (!document.getElementById('lightbox').classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') navLightbox(-1);
+      if (e.key === 'ArrowRight') navLightbox(1);
+    });
+  </script>
+</body>
+</html>
