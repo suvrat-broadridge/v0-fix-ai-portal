@@ -408,38 +408,48 @@ export default function BCometPlatform() {
     }
   }, [aiChatHistory])
 
-  // Auto-animate comet traveling directly between planets (not following orbits)
-  // cometAngleDeg goes 0-360, each 45deg = one planet visit
-  // When completes full cycle (returns to sun), reset all planets to grey
+  // Comet follows circular orbit, visiting each planet sequentially
+  // cometAngleDeg goes 0 to 360*8 (one full orbit per planet)
+  // Each planet is at angle (i/8)*360 degrees, comet visits them in order
   useEffect(() => {
     if (currentScreen !== "home") return
-    const STEP = 0.35 // degrees per tick - controls speed
-    const TICK = 50   // ms per tick
+    const STEP = 0.5 // degrees per tick
+    const TICK = 40  // ms per tick
+    const TOTAL_DEGREES = 360 // one full circle
+    
     const id = setInterval(() => {
       setCometAngleDeg(prev => {
         const next = prev + STEP
-        // Check if we completed a full cycle (360 degrees)
-        if (next >= 360) {
+        
+        // Check if we completed a full cycle
+        if (next >= TOTAL_DEGREES) {
           // Reset all planets to grey for next cycle
           setVisitedPlanets([])
           setActivePlanetTools(null)
           return 0
         }
-        // Which planet are we nearest to? Each planet is 45deg apart
-        const nearestIdx = Math.floor(next / 45) % 8
-        const nearestAngle = nearestIdx * 45 + 22.5 // midpoint of each segment
-        const dist = Math.abs(next - nearestAngle)
-        if (dist < STEP * 3) {
-          // Arrived at a planet — mark visited and show tools briefly
-          setVisitedPlanets(vp => vp.includes(nearestIdx) ? vp : [...vp, nearestIdx])
-          setActivePlanetTools(nearestIdx)
-          setTimeout(() => setActivePlanetTools(null), 2200)
+        
+        // Each planet is at angle (i/8)*360, comet visits when passing that angle
+        // Check which planet we're closest to
+        for (let i = 0; i < 8; i++) {
+          const planetAngle = (i / 8) * 360
+          const diff = Math.abs(next - planetAngle)
+          if (diff < 3 || diff > 357) { // within 3 degrees of planet
+            // Mark visited and show tools
+            setVisitedPlanets(vp => vp.includes(i) ? vp : [...vp, i])
+            if (activePlanetTools !== i) {
+              setActivePlanetTools(i)
+              setTimeout(() => setActivePlanetTools(ap => ap === i ? null : ap), 2500)
+            }
+            break
+          }
         }
+        
         return next
       })
     }, TICK)
     return () => clearInterval(id)
-  }, [currentScreen])
+  }, [currentScreen, activePlanetTools])
   const [showContactPanel, setShowContactPanel] = useState(false)
   const [showDemoForm, setShowDemoForm] = useState(false)
   const [showWalkthrough, setShowWalkthrough] = useState(false)
@@ -2101,23 +2111,29 @@ export default function BCometPlatform() {
             { name: "Launch",  radius: 67, color: "#00e5ff", size: 1.7, tools: ["Generate prod config pack", "Readiness checklist", "Prod smoke test", "Go-live & hypercare"] },
           ]
           
-          // Comet follows a smooth expanding spiral through planets
-          // As cometAngleDeg goes 0-360, radius expands from innermost to outermost planet
-          const minRadius = solarPlanets[0].radius
-          const maxRadius = solarPlanets[7].radius
+          // Comet follows expanding spiral, passing through each planet's position
+          // Each planet is at a fixed angle: (i/8)*360 degrees from top
+          // Comet radius interpolates to match each planet's orbit as it passes
           
-          // Spiral: angle increases continuously, radius expands proportionally
-          const spiralAngle = (cometAngleDeg - 90) * Math.PI / 180 // start from top
-          const spiralProgress = cometAngleDeg / 360 // 0 to 1 over full cycle
-          const spiralRadius = minRadius + (maxRadius - minRadius) * spiralProgress
+          const cometAngleRad = (cometAngleDeg - 90) * Math.PI / 180 // -90 to start from top
           
-          // Comet position on spiral
-          const cometX = CX + spiralRadius * Math.cos(spiralAngle)
-          const cometY = CY + spiralRadius * Math.sin(spiralAngle)
+          // Find which two planets we're between based on angle
+          const normalizedAngle = ((cometAngleDeg % 360) + 360) % 360
+          const planetIdx = Math.floor(normalizedAngle / 45) // 0-7
+          const nextPlanetIdx = (planetIdx + 1) % 8
+          const progressBetween = (normalizedAngle % 45) / 45 // 0-1 between planets
           
-          // Tail points tangent to spiral (perpendicular to radius, trailing behind)
-          // For expanding spiral, tail trails behind the direction of travel
-          const tailRad = spiralAngle + Math.PI + 0.3 // slightly angled outward like real comet
+          // Smoothly interpolate radius between current and next planet
+          const currentRadius = solarPlanets[planetIdx].radius
+          const nextRadius = solarPlanets[nextPlanetIdx].radius
+          const cometRadius = currentRadius + (nextRadius - currentRadius) * progressBetween
+          
+          // Comet position
+          const cometX = CX + cometRadius * Math.cos(cometAngleRad)
+          const cometY = CY + cometRadius * Math.sin(cometAngleRad)
+          
+          // Tail points opposite to direction of travel (tangent to orbit, trailing)
+          const tailRad = cometAngleRad + Math.PI + 0.15 // trail behind with slight outward angle
 
           // Compute screen-space position for each planet for the HTML popup
           // We expose active planet screen coords via CSS vars — simpler: just render popup via fixed HTML
@@ -2141,19 +2157,13 @@ export default function BCometPlatform() {
                       <stop offset="50%" stopColor="#ff9800" />
                       <stop offset="100%" stopColor="#f44336" />
                     </radialGradient>
-                    {/* Dust tail gradient - wider, more diffuse, pinkish-white fade */}
-                    <linearGradient id="dustTailGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#e0f2fe" stopOpacity="0.8" />
-                      <stop offset="30%" stopColor="#bae6fd" stopOpacity="0.5" />
-                      <stop offset="60%" stopColor="#7dd3fc" stopOpacity="0.25" />
-                      <stop offset="100%" stopColor="#38bdf8" stopOpacity="0" />
-                    </linearGradient>
-                    {/* Ion tail gradient - brighter cyan, straighter */}
-                    <linearGradient id="ionTailGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#22d3ee" stopOpacity="1" />
-                      <stop offset="25%" stopColor="#06b6d4" stopOpacity="0.7" />
-                      <stop offset="50%" stopColor="#0891b2" stopOpacity="0.4" />
-                      <stop offset="100%" stopColor="#0e7490" stopOpacity="0" />
+                    {/* Main tail gradient - smooth cyan to transparent fade like real comet */}
+                    <linearGradient id="mainTailGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#a5f3fc" stopOpacity="0.9" />
+                      <stop offset="15%" stopColor="#67e8f9" stopOpacity="0.7" />
+                      <stop offset="35%" stopColor="#22d3ee" stopOpacity="0.5" />
+                      <stop offset="60%" stopColor="#06b6d4" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#0891b2" stopOpacity="0" />
                     </linearGradient>
                     <filter id="glow">
                       <feGaussianBlur stdDeviation="0.5" result="blur" />
@@ -2216,65 +2226,42 @@ export default function BCometPlatform() {
                   <text x={CX} y={CY + 0.6} textAnchor="middle" dominantBaseline="middle"
                     fontSize="1.4" fill="white" fontWeight="700" opacity="0.9">Cases</text>
 
-                  {/* Realistic comet with long diffuse tail like reference images */}
+                  {/* Realistic comet - simple bright head with long smooth gradient tail */}
+                  {/* Like reference images: bright cyan/white nucleus, soft glow, long fading tail */}
                   
-                  {/* Outer wide dust tail - very long, fan-shaped, gradient fade */}
-                  <path 
-                    d={`M ${cometX} ${cometY} 
-                        Q ${cometX + Math.cos(tailRad + 0.2) * 8} ${cometY + Math.sin(tailRad + 0.2) * 8}
-                          ${cometX + Math.cos(tailRad + 0.35) * 18} ${cometY + Math.sin(tailRad + 0.35) * 18}`}
-                    stroke="url(#dustTailGrad)" strokeWidth="3" fill="none" opacity="0.35" strokeLinecap="round"
-                  />
-                  <path 
-                    d={`M ${cometX} ${cometY} 
-                        Q ${cometX + Math.cos(tailRad - 0.15) * 7} ${cometY + Math.sin(tailRad - 0.15) * 7}
-                          ${cometX + Math.cos(tailRad - 0.25) * 16} ${cometY + Math.sin(tailRad - 0.25) * 16}`}
-                    stroke="url(#dustTailGrad)" strokeWidth="2.5" fill="none" opacity="0.3" strokeLinecap="round"
+                  {/* Long main tail - smooth gradient fade */}
+                  <line 
+                    x1={cometX} y1={cometY}
+                    x2={cometX + Math.cos(tailRad) * 20} y2={cometY + Math.sin(tailRad) * 20}
+                    stroke="url(#mainTailGrad)" strokeWidth="2" strokeLinecap="round"
                   />
                   
-                  {/* Main ion tail - straighter, brighter cyan, very long */}
-                  <path 
-                    d={`M ${cometX} ${cometY} 
-                        Q ${cometX + Math.cos(tailRad) * 6} ${cometY + Math.sin(tailRad) * 6}
-                          ${cometX + Math.cos(tailRad + 0.05) * 14} ${cometY + Math.sin(tailRad + 0.05) * 14}`}
-                    stroke="url(#ionTailGrad)" strokeWidth="1.2" fill="none" opacity="0.7" strokeLinecap="round"
+                  {/* Secondary wider tail - more diffuse */}
+                  <line 
+                    x1={cometX} y1={cometY}
+                    x2={cometX + Math.cos(tailRad + 0.08) * 16} y2={cometY + Math.sin(tailRad + 0.08) * 16}
+                    stroke="url(#mainTailGrad)" strokeWidth="3.5" strokeLinecap="round" opacity="0.4"
                   />
-                  <path 
-                    d={`M ${cometX} ${cometY} 
-                        Q ${cometX + Math.cos(tailRad - 0.03) * 5} ${cometY + Math.sin(tailRad - 0.03) * 5}
-                          ${cometX + Math.cos(tailRad - 0.06) * 12} ${cometY + Math.sin(tailRad - 0.06) * 12}`}
-                    stroke="url(#ionTailGrad)" strokeWidth="0.8" fill="none" opacity="0.5" strokeLinecap="round"
+                  <line 
+                    x1={cometX} y1={cometY}
+                    x2={cometX + Math.cos(tailRad - 0.06) * 14} y2={cometY + Math.sin(tailRad - 0.06) * 14}
+                    stroke="url(#mainTailGrad)" strokeWidth="2.5" strokeLinecap="round" opacity="0.3"
                   />
                   
-                  {/* Inner bright core stream */}
-                  <path 
-                    d={`M ${cometX} ${cometY} 
-                        L ${cometX + Math.cos(tailRad) * 4} ${cometY + Math.sin(tailRad) * 4}`}
-                    stroke="white" strokeWidth="0.6" fill="none" opacity="0.8" strokeLinecap="round"
-                  />
-                  
-                  {/* Additional wispy streams for realism */}
-                  <path 
-                    d={`M ${cometX} ${cometY} 
-                        Q ${cometX + Math.cos(tailRad + 0.4) * 4} ${cometY + Math.sin(tailRad + 0.4) * 4}
-                          ${cometX + Math.cos(tailRad + 0.5) * 10} ${cometY + Math.sin(tailRad + 0.5) * 10}`}
-                    stroke="#67e8f9" strokeWidth="0.4" fill="none" opacity="0.25" strokeLinecap="round"
-                  />
-                  <path 
-                    d={`M ${cometX} ${cometY} 
-                        Q ${cometX + Math.cos(tailRad - 0.35) * 3.5} ${cometY + Math.sin(tailRad - 0.35) * 3.5}
-                          ${cometX + Math.cos(tailRad - 0.45) * 9} ${cometY + Math.sin(tailRad - 0.45) * 9}`}
-                    stroke="#a5f3fc" strokeWidth="0.3" fill="none" opacity="0.2" strokeLinecap="round"
+                  {/* Bright inner core of tail */}
+                  <line 
+                    x1={cometX} y1={cometY}
+                    x2={cometX + Math.cos(tailRad) * 6} y2={cometY + Math.sin(tailRad) * 6}
+                    stroke="white" strokeWidth="1" strokeLinecap="round" opacity="0.7"
                   />
 
-                  {/* Coma - fuzzy glow around nucleus */}
-                  <circle cx={cometX} cy={cometY} r={2.5} fill="#22d3ee" opacity="0.15" />
-                  <circle cx={cometX} cy={cometY} r={1.8} fill="#06b6d4" opacity="0.3" filter="url(#glow)" />
-                  <circle cx={cometX} cy={cometY} r={1.2} fill="#22d3ee" opacity="0.5" filter="url(#glow)" />
+                  {/* Coma - soft outer glow */}
+                  <circle cx={cometX} cy={cometY} r={3} fill="#06b6d4" opacity="0.2" filter="url(#cometGlow)" />
+                  <circle cx={cometX} cy={cometY} r={2} fill="#22d3ee" opacity="0.4" filter="url(#glow)" />
                   
-                  {/* Nucleus - bright white/cyan center */}
-                  <circle cx={cometX} cy={cometY} r={0.8} fill="#67e8f9" opacity="1" />
-                  <circle cx={cometX} cy={cometY} r={0.4} fill="white" opacity="1" />
+                  {/* Bright nucleus */}
+                  <circle cx={cometX} cy={cometY} r={1.2} fill="#67e8f9" opacity="0.9" />
+                  <circle cx={cometX} cy={cometY} r={0.6} fill="white" opacity="1" />
                 </svg>
               </div>
 
