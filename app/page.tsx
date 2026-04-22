@@ -2236,13 +2236,13 @@ export default function BCometPlatform() {
                   <text x={CX} y={CY + 0.6} textAnchor="middle" dominantBaseline="middle"
                     fontSize="1.4" fill="white" fontWeight="700" opacity="0.9">Cases</text>
 
-                  {/* Comet using actual image - rotated so tail points away from sun */}
+                  {/* Comet using clean cropped image - rotated so tail points away from sun */}
                   <image
-                    href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-xIT5YytKFZ4xUB9WJpnK0cDWe6gb4e.png"
-                    x={cometX - 8}
-                    y={cometY - 3}
-                    width="16"
-                    height="6"
+                    href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-iq7CviFlwDHSYSsuCSh2L5XWVR28kU.png"
+                    x={cometX - 6}
+                    y={cometY - 2}
+                    width="12"
+                    height="4"
                     style={{
                       transformOrigin: `${cometX}px ${cometY}px`,
                       transform: `rotate(${tailRad * 180 / Math.PI}deg)`,
