@@ -2091,14 +2091,14 @@ export default function BCometPlatform() {
           // Max radius ~38 keeps all planets visible on screen
           const CX = 50, CY = 50
           const solarPlanets = [
-            { name: "Intake",  radius: 6,  color: "#2196f3", size: 1.0, tools: ["Create onboarding request", "Collect data", "AI document analysis", "Gap analysis"] },
-            { name: "Design",  radius: 11, color: "#9c27b0", size: 1.1, tools: ["Build counterparty profile", "Generate FIX session config", "Generate FIX dictionary", "Internal review/approval"] },
-            { name: "Connect", radius: 16, color: "#00bcd4", size: 1.2, tools: ["Provision network", "Connectivity smoke test", "Session readiness validation"] },
-            { name: "Plan",    radius: 21, color: "#ff9800", size: 1.3, tools: ["Generate cert test plan", "Create test cases", "Share readiness checklist"] },
-            { name: "Execute", radius: 26, color: "#e91e63", size: 1.4, tools: ["Session-level tests", "Application-level tests", "Negative tests", "Recovery tests", "Capture evidence"] },
-            { name: "Analyze", radius: 31, color: "#f44336", size: 1.5, tools: ["Auto-evaluate results", "AI root cause analysis", "Defect creation", "Retest cycle"] },
-            { name: "Decide",  radius: 36, color: "#4caf50", size: 1.6, tools: ["Evaluate completion", "Generate cert report", "Collect formal signoffs"] },
-            { name: "Launch",  radius: 41, color: "#00e5ff", size: 1.7, tools: ["Generate prod config pack", "Readiness checklist", "Prod smoke test", "Go-live & hypercare"] },
+            { name: "Intake",  radius: 3,  color: "#2196f3", size: 1.0, tools: ["Create onboarding request", "Collect data", "AI document analysis", "Gap analysis"] },
+            { name: "Design",  radius: 12, color: "#9c27b0", size: 1.1, tools: ["Build counterparty profile", "Generate FIX session config", "Generate FIX dictionary", "Internal review/approval"] },
+            { name: "Connect", radius: 22, color: "#00bcd4", size: 1.2, tools: ["Provision network", "Connectivity smoke test", "Session readiness validation"] },
+            { name: "Plan",    radius: 32, color: "#ff9800", size: 1.3, tools: ["Generate cert test plan", "Create test cases", "Share readiness checklist"] },
+            { name: "Execute", radius: 42, color: "#e91e63", size: 1.4, tools: ["Session-level tests", "Application-level tests", "Negative tests", "Recovery tests", "Capture evidence"] },
+            { name: "Analyze", radius: 51, color: "#f44336", size: 1.5, tools: ["Auto-evaluate results", "AI root cause analysis", "Defect creation", "Retest cycle"] },
+            { name: "Decide",  radius: 59, color: "#4caf50", size: 1.6, tools: ["Evaluate completion", "Generate cert report", "Collect formal signoffs"] },
+            { name: "Launch",  radius: 67, color: "#00e5ff", size: 1.7, tools: ["Generate prod config pack", "Readiness checklist", "Prod smoke test", "Go-live & hypercare"] },
           ]
           
           // Comet travels in smooth curves between planets
