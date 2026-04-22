@@ -408,23 +408,32 @@ export default function BCometPlatform() {
     }
   }, [aiChatHistory])
 
-  // Auto-animate comet continuously around the solar system
+  // Auto-animate comet traveling directly between planets (not following orbits)
+  // cometAngleDeg goes 0-360, each 45deg = one planet visit
+  // When completes full cycle (returns to sun), reset all planets to grey
   useEffect(() => {
     if (currentScreen !== "home") return
-    const STEP = 0.4 // degrees per tick - controls speed
-    const TICK = 50  // ms per tick
+    const STEP = 0.35 // degrees per tick - controls speed
+    const TICK = 50   // ms per tick
     const id = setInterval(() => {
       setCometAngleDeg(prev => {
-        const next = (prev + STEP) % 360
+        const next = prev + STEP
+        // Check if we completed a full cycle (360 degrees)
+        if (next >= 360) {
+          // Reset all planets to grey for next cycle
+          setVisitedPlanets([])
+          setActivePlanetTools(null)
+          return 0
+        }
         // Which planet are we nearest to? Each planet is 45deg apart
-        const nearestIdx = Math.round(next / 45) % 8
-        const nearestAngle = nearestIdx * 45
+        const nearestIdx = Math.floor(next / 45) % 8
+        const nearestAngle = nearestIdx * 45 + 22.5 // midpoint of each segment
         const dist = Math.abs(next - nearestAngle)
-        if (dist < STEP * 2 || dist > 360 - STEP * 2) {
+        if (dist < STEP * 3) {
           // Arrived at a planet — mark visited and show tools briefly
           setVisitedPlanets(vp => vp.includes(nearestIdx) ? vp : [...vp, nearestIdx])
           setActivePlanetTools(nearestIdx)
-          setTimeout(() => setActivePlanetTools(null), 1800)
+          setTimeout(() => setActivePlanetTools(null), 2200)
         }
         return next
       })
@@ -2079,23 +2088,43 @@ export default function BCometPlatform() {
         {/* Full-page solar system background — SVG decorative layer */}
         {(() => {
           // All radii in % units (viewBox 0 0 100 100), center at 50,50
-          // Max radius 42 keeps Launch just inside a square viewport
+          // Max radius ~38 keeps all planets visible on screen
           const CX = 50, CY = 50
           const solarPlanets = [
-            { name: "Intake",  radius: 5,  color: "#2196f3", size: 1.0, tools: ["Intake Portal", "Doc Upload", "AI Gap Analysis"] },
-            { name: "Design",  radius: 12, color: "#9c27b0", size: 1.1, tools: ["Spec Compare", "ATDL Config", "Field Mapping"] },
-            { name: "Connect", radius: 19, color: "#00bcd4", size: 1.2, tools: ["Network Setup", "Session Validation"] },
-            { name: "Plan",    radius: 26, color: "#ff9800", size: 1.3, tools: ["Test Case Gen", "Cert Test Plan"] },
-            { name: "Execute", radius: 33, color: "#e91e63", size: 1.4, tools: ["Log Analysis", "Test Runner", "Evidence"] },
-            { name: "Analyze", radius: 40, color: "#f44336", size: 1.5, tools: ["Root Cause AI", "Defect Tracking"] },
-            { name: "Decide",  radius: 47, color: "#4caf50", size: 1.6, tools: ["Cert Report", "Go/No-Go"] },
-            { name: "Launch",  radius: 54, color: "#00e5ff", size: 1.7, tools: ["Prod Config", "Go-Live", "Hypercare"] },
+            { name: "Intake",  radius: 6,  color: "#2196f3", size: 1.0, tools: ["Create onboarding request", "Collect data", "AI document analysis", "Gap analysis"] },
+            { name: "Design",  radius: 11, color: "#9c27b0", size: 1.1, tools: ["Build counterparty profile", "Generate FIX session config", "Generate FIX dictionary", "Internal review/approval"] },
+            { name: "Connect", radius: 16, color: "#00bcd4", size: 1.2, tools: ["Provision network", "Connectivity smoke test", "Session readiness validation"] },
+            { name: "Plan",    radius: 21, color: "#ff9800", size: 1.3, tools: ["Generate cert test plan", "Create test cases", "Share readiness checklist"] },
+            { name: "Execute", radius: 26, color: "#e91e63", size: 1.4, tools: ["Session-level tests", "Application-level tests", "Negative tests", "Recovery tests", "Capture evidence"] },
+            { name: "Analyze", radius: 31, color: "#f44336", size: 1.5, tools: ["Auto-evaluate results", "AI root cause analysis", "Defect creation", "Retest cycle"] },
+            { name: "Decide",  radius: 36, color: "#4caf50", size: 1.6, tools: ["Evaluate completion", "Generate cert report", "Collect formal signoffs"] },
+            { name: "Launch",  radius: 41, color: "#00e5ff", size: 1.7, tools: ["Generate prod config pack", "Readiness checklist", "Prod smoke test", "Go-live & hypercare"] },
           ]
-          const angleRad = (cometAngleDeg * Math.PI) / 180
-          const cp = solarPlanets[cometPhase]
-          const cometX = CX + cp.radius * Math.cos(angleRad - Math.PI / 2)
-          const cometY = CY + cp.radius * Math.sin(angleRad - Math.PI / 2)
-          const tailRad = Math.atan2(cometY - CY, cometX - CX)
+          
+          // Comet travels directly from planet to planet (not following orbits)
+          // Calculate comet position by interpolating between planets
+          const currentPlanetIdx = Math.floor(cometAngleDeg / 45) % 8
+          const nextPlanetIdx = (currentPlanetIdx + 1) % 8
+          const progress = (cometAngleDeg % 45) / 45 // 0-1 progress between planets
+          
+          const currentPlanet = solarPlanets[currentPlanetIdx]
+          const nextPlanet = solarPlanets[nextPlanetIdx]
+          const cpAngle = ((currentPlanetIdx / 8) * 360 - 90) * Math.PI / 180
+          const npAngle = ((nextPlanetIdx / 8) * 360 - 90) * Math.PI / 180
+          
+          // Start and end positions
+          const startX = CX + currentPlanet.radius * Math.cos(cpAngle)
+          const startY = CY + currentPlanet.radius * Math.sin(cpAngle)
+          const endX = CX + nextPlanet.radius * Math.cos(npAngle)
+          const endY = CY + nextPlanet.radius * Math.sin(npAngle)
+          
+          // Interpolate comet position (direct line between planets)
+          const cometX = startX + (endX - startX) * progress
+          const cometY = startY + (endY - startY) * progress
+          
+          // Tail points away from direction of travel
+          const travelAngle = Math.atan2(endY - startY, endX - startX)
+          const tailRad = travelAngle + Math.PI // opposite of travel direction
 
           // Compute screen-space position for each planet for the HTML popup
           // We expose active planet screen coords via CSS vars — simpler: just render popup via fixed HTML
