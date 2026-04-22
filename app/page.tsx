@@ -3984,13 +3984,14 @@ export default function BCometPlatform() {
                 <div className="overflow-x-auto pb-4">
                   <div className="flex gap-4 min-w-max">
                     {[
-                      { stage: 1, name: "Setup", color: "#2196f3", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 1) },
-                      { stage: 2, name: "Spec Analysis", color: "#9c27b0", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 2) },
+                      { stage: 1, name: "Intake", color: "#2196f3", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 1) },
+                      { stage: 2, name: "Configuration", color: "#9c27b0", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 2) },
                       { stage: 3, name: "Connectivity", color: "#00bcd4", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 3) },
-                      { stage: 4, name: "Log Analysis", color: "#ff9800", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 4) },
-                      { stage: 5, name: "Testing", color: "#e91e63", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 5) },
-                      { stage: 6, name: "Certification", color: "#4caf50", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 6) },
-                      { stage: 7, name: "Live", color: "#00e5ff", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 7) },
+                      { stage: 4, name: "Cert Planning", color: "#ff9800", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 4) },
+                      { stage: 5, name: "Test Execution", color: "#e91e63", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 5) },
+                      { stage: 6, name: "Analysis", color: "#ff5722", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 6) },
+                      { stage: 7, name: "Decisioning", color: "#4caf50", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 7) },
+                      { stage: 8, name: "Production", color: "#00e5ff", clients: clients.filter(c => (clientStages[c.name]?.stage || 1) === 8) },
                     ].map((column) => (
                       <div key={column.stage} className="w-72 flex-shrink-0">
                         <div className={`rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-100"} p-3`}>
@@ -4180,6 +4181,38 @@ export default function BCometPlatform() {
                     </div>
                   </div>
                 </Card>
+
+                {/* Onboarding Lifecycle Metrics */}
+                <Card className={`${bgCard} border ${borderColor}`}>
+                  <div className={`px-4 py-3 border-b ${borderColor}`}>
+                    <h2 className={`font-semibold ${textPrimary}`}>Onboarding Lifecycle Metrics</h2>
+                  </div>
+                  <div className="p-4 grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <p className={`text-xs ${textSecondary} mb-1`}>Avg. Cycle Time</p>
+                      <p className="text-2xl font-bold text-[#2196f3]">18 days</p>
+                      <p className={`text-xs ${textSecondary}`}>Target: 15 days</p>
+                    </div>
+                    <div className="text-center">
+                      <p className={`text-xs ${textSecondary} mb-1`}>First-Time Cert Pass</p>
+                      <p className="text-2xl font-bold text-[#4caf50]">72%</p>
+                      <p className={`text-xs ${textSecondary}`}>Up from 68%</p>
+                    </div>
+                    <div className="text-center">
+                      <p className={`text-xs ${textSecondary} mb-1`}>Active Cases by Phase</p>
+                      <div className="flex gap-1 mt-2 h-2">
+                        {[12, 8, 6, 4, 5, 3, 2, 1].map((count, i) => (
+                          <div key={i} className="flex-1 rounded-sm bg-opacity-60" style={{backgroundColor: ["#2196f3", "#9c27b0", "#00bcd4", "#ff9800", "#e91e63", "#ff5722", "#4caf50", "#00e5ff"][i]}} />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <p className={`text-xs ${textSecondary} mb-1`}>Go-Live Readiness</p>
+                      <p className="text-2xl font-bold text-[#4caf50]">4 of 12</p>
+                      <p className={`text-xs ${textSecondary}`}>clients ready</p>
+                    </div>
+                  </div>
+                </Card>
               </div>
 
               {/* Case Health Grid - Enhanced per design brief */}
@@ -4192,10 +4225,14 @@ export default function BCometPlatform() {
                   <div className="flex items-center gap-2">
                     <select className={`px-2 py-1 rounded text-xs border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"}`}>
                       <option>All Stages</option>
-                      <option>Setup</option>
-                      <option>Spec Analysis</option>
-                      <option>Testing</option>
-                      <option>Certification</option>
+                      <option>Intake</option>
+                      <option>Configuration</option>
+                      <option>Connectivity</option>
+                      <option>Cert Planning</option>
+                      <option>Test Execution</option>
+                      <option>Analysis</option>
+                      <option>Decisioning</option>
+                      <option>Production</option>
                     </select>
                     <Button variant="outline" size="sm" onClick={() => setCurrentScreen("onboarding-cases")}>View All</Button>
                   </div>
@@ -17187,6 +17224,778 @@ ValidateFieldsHaveValues=Y`}
                     })}
                   </tbody>
                 </table>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // CHANGE 3: Document Ingestion Screen
+  if (currentScreen === "document-ingestion") {
+    const documents = [
+      { id: 1, name: "FIX_Spec_4.4.pdf", type: "FIX Specification", status: "completed", size: "2.4 MB" },
+      { id: 2, name: "Onboarding_Form.docx", type: "Onboarding Form", status: "processing", size: "1.1 MB" },
+      { id: 3, name: "Connectivity_Guide.pdf", type: "Connectivity Guide", status: "queued", size: "892 KB" },
+    ]
+
+    const extractedTags = [
+      { number: 49, name: "SenderCompID", required: true, values: "Client-provided string", source: "Session Details tab" },
+      { number: 56, name: "TargetCompID", required: true, values: "Venue-assigned ID", source: "Session Details tab" },
+      { number: 35, name: "MsgType", required: true, values: "A, D, 0, 1, 2, 3, etc.", source: "Message Schema table" },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        {selectedRole && <Sidebar />}
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Document Ingestion</h1>
+            <p className={textSecondary}>AI-powered document extraction and analysis</p>
+          </header>
+
+          <div className="p-6 grid grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <Card className={`${bgCard} border ${borderColor} p-6`}>
+                <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload Documents</h3>
+                <div className={`border-2 border-dashed ${borderColor} rounded p-8 text-center cursor-pointer hover:bg-opacity-50 transition`}>
+                  <Upload className="h-8 w-8 mx-auto mb-2 text-[#00e5ff]" />
+                  <p className={textPrimary}>Drop files here or click to upload</p>
+                  <p className={`text-xs ${textSecondary}`}>PDF, XLSX, DOCX, XML, CSV, TXT supported</p>
+                </div>
+              </Card>
+
+              <Card className={`${bgCard} border ${borderColor} p-6`}>
+                <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Document Queue</h3>
+                <div className="space-y-2">
+                  {documents.map(doc => (
+                    <div key={doc.id} className={`${bgPrimary} p-3 rounded flex justify-between items-center`}>
+                      <div>
+                        <p className={`font-medium ${textPrimary}`}>{doc.name}</p>
+                        <p className={`text-xs ${textSecondary}`}>{doc.type} • {doc.size}</p>
+                      </div>
+                      <span className={`px-2 py-1 rounded text-xs ${
+                        doc.status === 'completed' ? 'bg-[#4caf50]/20 text-[#4caf50]' :
+                        doc.status === 'processing' ? 'bg-[#ff9800]/20 text-[#ff9800]' :
+                        'bg-blue-500/20 text-blue-400'
+                      }`}>
+                        {doc.status === 'processing' ? <Loader className="h-3 w-3 inline animate-spin" /> : ''} {doc.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </div>
+
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Extracted Tags</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className={`border-b ${borderColor}`}>
+                      <th className={`text-left p-2 font-semibold ${textPrimary}`}>Tag #</th>
+                      <th className={`text-left p-2 font-semibold ${textPrimary}`}>Name</th>
+                      <th className={`text-left p-2 font-semibold ${textPrimary}`}>Required</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {extractedTags.map(tag => (
+                      <tr key={tag.number} className={`border-b ${borderColor} hover:${bgPrimary}`}>
+                        <td className="p-2 font-mono text-[#00e5ff]">{tag.number}</td>
+                        <td className={`p-2 ${textPrimary}`}>{tag.name}</td>
+                        <td className="p-2">{tag.required ? <Check className="h-4 w-4 text-[#4caf50]" /> : '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // CHANGE 4: Gap Analysis Screen
+  if (currentScreen === "gap-analysis") {
+    const gaps = [
+      { id: 1, category: "Session", requirement: "Tag 49 SenderCompID required", status: "missing", severity: "critical", recommendation: "Collect from client" },
+      { id: 2, category: "Message", requirement: "NewOrderSingle message support", status: "provided", severity: "low", recommendation: "Auto-fill confirmed" },
+      { id: 3, category: "Connectivity", requirement: "TLS 1.3 support", status: "incompatible", severity: "high", recommendation: "Upgrade client cert" },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        {selectedRole && <Sidebar />}
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Gap Analysis</h1>
+            <p className={textSecondary}>Compare requirements vs. client capabilities</p>
+          </header>
+
+          <div className="p-6 space-y-6">
+            <div className="grid grid-cols-4 gap-4">
+              {[
+                { label: "Total Requirements", value: "156", color: "text-[#00e5ff]" },
+                { label: "Matched", value: "128", color: "text-[#4caf50]" },
+                { label: "Gaps Found", value: "22", color: "text-[#f44336]" },
+                { label: "Warnings", value: "6", color: "text-[#ff9800]" },
+              ].map((stat, i) => (
+                <Card key={i} className={`${bgCard} border ${borderColor} p-4 text-center`}>
+                  <p className={textSecondary}>{stat.label}</p>
+                  <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+                </Card>
+              ))}
+            </div>
+
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Gap Details</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className={`border-b ${borderColor}`}>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>Category</th>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>Requirement</th>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>Status</th>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>Severity</th>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>Recommendation</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {gaps.map(gap => (
+                      <tr key={gap.id} className={`border-b ${borderColor}`}>
+                        <td className={`p-3 ${textPrimary}`}>{gap.category}</td>
+                        <td className={`p-3 ${textPrimary}`}>{gap.requirement}</td>
+                        <td className="p-3">
+                          <span className={`text-xs px-2 py-1 rounded ${gap.status === 'missing' ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+                            {gap.status}
+                          </span>
+                        </td>
+                        <td className="p-3">
+                          <span className={`text-xs px-2 py-1 rounded ${gap.severity === 'critical' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                            {gap.severity}
+                          </span>
+                        </td>
+                        <td className={`p-3 ${textSecondary}`}>{gap.recommendation}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // CHANGE 5: Counterparty Profile Screen
+  if (currentScreen === "counterparty-profile") {
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        {selectedRole && <Sidebar />}
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Counterparty Profile</h1>
+            <p className={textSecondary}>Manage client profile and details</p>
+          </header>
+
+          <div className="p-6 space-y-6">
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Entity Details</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Legal Name</label>
+                  <Input placeholder="Acme Trading Ltd." />
+                </div>
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>LEI</label>
+                  <Input placeholder="549300ABCD1234567890" />
+                </div>
+              </div>
+            </Card>
+
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Environment Status</h3>
+              <div className="flex gap-4">
+                {['UAT', 'Cert', 'Prod'].map(env => (
+                  <div key={env} className="flex items-center gap-2">
+                    <div className={`w-4 h-4 rounded-full ${env === 'UAT' ? 'bg-[#4caf50]' : env === 'Cert' ? 'bg-[#ff9800]' : 'bg-[#f44336]'}`}></div>
+                    <span className={textPrimary}>{env}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // CHANGE 6: FIX Dictionary Screen
+  if (currentScreen === "fix-dictionary") {
+    const messageTypes = [
+      { type: "A", name: "Logon", tagCount: 15 },
+      { type: "B", name: "News", tagCount: 8 },
+      { type: "D", name: "NewOrderSingle", tagCount: 32 },
+      { type: "8", name: "ExecutionReport", tagCount: 28 },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        {selectedRole && <Sidebar />}
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>FIX Dictionary</h1>
+            <p className={textSecondary}>Schema and message definitions</p>
+          </header>
+
+          <div className="p-6 space-y-6">
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Message Types</h3>
+              <div className="space-y-2">
+                {messageTypes.map(msg => (
+                  <div key={msg.type} className={`${bgPrimary} p-3 rounded cursor-pointer hover:bg-opacity-70 flex justify-between`}>
+                    <div>
+                      <p className={`font-medium ${textPrimary}`}>{msg.type} - {msg.name}</p>
+                    </div>
+                    <span className={`text-xs px-2 py-1 rounded ${borderColor} bg-opacity-50`}>{msg.tagCount} tags</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // CHANGE 7: Connectivity Setup Screen
+  if (currentScreen === "connectivity-setup") {
+    const ips = [
+      { ip: "192.168.1.100", direction: "Inbound", env: "Prod", status: "active", verified: "2024-02-15" },
+      { ip: "10.0.0.50", direction: "Outbound", env: "UAT", status: "pending", verified: "2024-02-10" },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        {selectedRole && <Sidebar />}
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Connectivity Setup</h1>
+            <p className={textSecondary}>Network provisioning and management</p>
+          </header>
+
+          <div className="p-6 space-y-6">
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>IP Allowlist</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className={`border-b ${borderColor}`}>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>IP Address</th>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>Direction</th>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>Environment</th>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ips.map((ip, i) => (
+                      <tr key={i} className={`border-b ${borderColor}`}>
+                        <td className="p-3 font-mono text-[#00e5ff]">{ip.ip}</td>
+                        <td className={`p-3 ${textPrimary}`}>{ip.direction}</td>
+                        <td className={`p-3 ${textPrimary}`}>{ip.env}</td>
+                        <td className="p-3">
+                          <span className={`text-xs px-2 py-1 rounded ${ip.status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                            {ip.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // CHANGE 8: Connectivity Test Screen
+  if (currentScreen === "connectivity-test") {
+    const tests = [
+      { id: 1, name: "Socket Connectivity Test", status: "pass", duration: "234ms", latency: "12ms" },
+      { id: 2, name: "TLS Handshake Test", status: "pass", duration: "156ms", latency: "8ms" },
+      { id: 3, name: "FIX Logon Test", status: "pass", duration: "345ms", latency: "15ms" },
+      { id: 4, name: "Heartbeat Validation", status: "fail", duration: "5000ms", latency: "N/A" },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        {selectedRole && <Sidebar />}
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Connectivity Test</h1>
+            <p className={textSecondary}>Validate connectivity and perform smoke testing</p>
+          </header>
+
+          <div className="p-6 space-y-6">
+            <div className="grid grid-cols-1 gap-4">
+              {tests.map(test => (
+                <Card key={test.id} className={`${bgCard} border ${borderColor} p-4`}>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className={`font-medium ${textPrimary}`}>{test.name}</p>
+                      <p className={`text-xs ${textSecondary}`}>Duration: {test.duration}</p>
+                    </div>
+                    <span className={`px-3 py-1 rounded text-sm font-medium ${
+                      test.status === 'pass' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                    }`}>
+                      {test.status === 'pass' ? '✓ Pass' : '✗ Fail'}
+                    </span>
+                  </div>
+                </Card>
+              ))}
+            </div>
+            <Card className={`${bgCard} border ${borderColor} p-4`}>
+              <p className={`text-sm ${textPrimary}`}>Overall Readiness: <span className="font-bold text-[#ff9800]">3/4 tests passed — 75% ready</span></p>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // CHANGE 9: Cert Planning Screen
+  if (currentScreen === "cert-planning") {
+    const tests = [
+      { id: "ST-001", name: "Logon", category: "Session", priority: "P1", auto: true },
+      { id: "ST-002", name: "Logout", category: "Session", priority: "P1", auto: true },
+      { id: "OF-001", name: "NewOrderSingle", category: "Order Flow", priority: "P1", auto: true },
+      { id: "NT-001", name: "Missing Required Tag", category: "Negative", priority: "P2", auto: true },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        {selectedRole && <Sidebar />}
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Certification Planning</h1>
+            <p className={textSecondary}>Generate and manage test plans</p>
+          </header>
+
+          <div className="p-6 space-y-6">
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Test Matrix</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className={`border-b ${borderColor}`}>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>Test ID</th>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>Name</th>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>Category</th>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>Priority</th>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>Generated</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tests.map(test => (
+                      <tr key={test.id} className={`border-b ${borderColor}`}>
+                        <td className="p-3 font-mono text-[#00e5ff]">{test.id}</td>
+                        <td className={`p-3 ${textPrimary}`}>{test.name}</td>
+                        <td className={`p-3 ${textSecondary}`}>{test.category}</td>
+                        <td className="p-3">
+                          <span className={`text-xs px-2 py-1 rounded ${test.priority === 'P1' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                            {test.priority}
+                          </span>
+                        </td>
+                        <td className="p-3">{test.auto ? <Check className="h-4 w-4 text-[#4caf50]" /> : '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // CHANGE 10: Test Execution Screen
+  if (currentScreen === "test-execution") {
+    const results = [
+      { id: "ST-001", name: "Logon", category: "Session", status: "passed", duration: "234ms" },
+      { id: "ST-002", name: "Logout", category: "Session", status: "passed", duration: "156ms" },
+      { id: "OF-001", name: "NewOrderSingle", category: "Order Flow", status: "failed", duration: "5000ms" },
+      { id: "NT-001", name: "Missing Required Tag", category: "Negative", status: "passed", duration: "234ms" },
+    ]
+
+    const passed = results.filter(r => r.status === 'passed').length
+    const total = results.length
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        {selectedRole && <Sidebar />}
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Test Execution</h1>
+            <p className={textSecondary}>Run and monitor certification tests</p>
+          </header>
+
+          <div className="p-6 space-y-6">
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className={`text-lg font-bold ${textPrimary}`}>Test Results</h3>
+                <Button>Run All</Button>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className={`border-b ${borderColor}`}>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>Test ID</th>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>Name</th>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>Category</th>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>Status</th>
+                      <th className={`text-left p-3 font-semibold ${textPrimary}`}>Duration</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {results.map(result => (
+                      <tr key={result.id} className={`border-b ${borderColor}`}>
+                        <td className="p-3 font-mono text-[#00e5ff]">{result.id}</td>
+                        <td className={`p-3 ${textPrimary}`}>{result.name}</td>
+                        <td className={`p-3 ${textSecondary}`}>{result.category}</td>
+                        <td className="p-3">
+                          <span className={`text-xs px-2 py-1 rounded ${result.status === 'passed' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                            {result.status === 'passed' ? '✓ Passed' : '✗ Failed'}
+                          </span>
+                        </td>
+                        <td className={`p-3 ${textSecondary}`}>{result.duration}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+
+            <Card className={`${bgCard} border ${borderColor} p-4`}>
+              <p className={`${textPrimary}`}>Pass Rate: <span className="font-bold text-[#4caf50]">{passed}/{total} tests passed ({Math.round(passed/total*100)}%)</span></p>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // CHANGE 11: Analysis & Remediation Screen
+  if (currentScreen === "analysis-remediation") {
+    const failures = [
+      { id: 1, test: "NewOrderSingle", category: "Order Flow", failType: "Tag Error", severity: "high" },
+      { id: 2, test: "ExecutionReport", category: "Order Flow", failType: "State Error", severity: "critical" },
+    ]
+
+    const defects = [
+      { id: "DEF-001", title: "Missing ClOrdID validation", severity: "critical", status: "open" },
+      { id: "DEF-002", title: "Incorrect OrdStatus transition", severity: "high", status: "open" },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        {selectedRole && <Sidebar />}
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Analysis & Remediation</h1>
+            <p className={textSecondary}>AI-powered failure analysis</p>
+          </header>
+
+          <div className="p-6 grid grid-cols-2 gap-6">
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Failed Tests</h3>
+              <div className="space-y-2">
+                {failures.map(f => (
+                  <div key={f.id} className={`${bgPrimary} p-3 rounded cursor-pointer hover:bg-opacity-70`}>
+                    <p className={`font-medium ${textPrimary}`}>{f.test}</p>
+                    <p className={`text-xs ${textSecondary}`}>{f.failType}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Defects</h3>
+              <div className="space-y-2">
+                {defects.map(d => (
+                  <div key={d.id} className={`${bgPrimary} p-3 rounded`}>
+                    <p className={`font-mono text-sm text-[#00e5ff]`}>{d.id}</p>
+                    <p className={`text-sm ${textPrimary}`}>{d.title}</p>
+                    <span className={`text-xs px-2 py-1 rounded mt-2 inline-block ${d.severity === 'critical' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                      {d.severity}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // CHANGE 12: Cert Decisioning Screen
+  if (currentScreen === "cert-decisioning") {
+    const criteria = [
+      { item: "All mandatory tests passed", status: true, count: "35/35" },
+      { item: "No critical defects open", status: true, count: "0 critical" },
+      { item: "Connectivity stable 48+ hours", status: true, count: "48h+" },
+      { item: "All required approvals", status: false, count: "4/6" },
+    ]
+
+    const signoffs = [
+      { role: "FIX Onboarding Team", status: "signed", name: "John Smith", date: "2024-02-10" },
+      { role: "Network Team", status: "signed", name: "Jane Doe", date: "2024-02-11" },
+      { role: "Compliance", status: "pending", name: "", date: "" },
+      { role: "Operations", status: "pending", name: "", date: "" },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        {selectedRole && <Sidebar />}
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Certification Decisioning</h1>
+            <p className={textSecondary}>Go/No-Go evaluation and signoff</p>
+          </header>
+
+          <div className="p-6 space-y-6">
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Go/No-Go Criteria</h3>
+              <div className="space-y-2">
+                {criteria.map((c, i) => (
+                  <div key={i} className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      {c.status ? <Check className="h-4 w-4 text-[#4caf50]" /> : <AlertCircle className="h-4 w-4 text-[#f44336]" />}
+                      <span className={textPrimary}>{c.item}</span>
+                    </div>
+                    <span className={textSecondary}>{c.count}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Signoff Collection</h3>
+              <div className="space-y-3">
+                {signoffs.map((s, i) => (
+                  <div key={i} className={`${bgPrimary} p-3 rounded flex justify-between items-center`}>
+                    <div>
+                      <p className={`font-medium ${textPrimary}`}>{s.role}</p>
+                      {s.status === 'signed' && <p className={`text-xs ${textSecondary}`}>{s.name} - {s.date}</p>}
+                    </div>
+                    {s.status === 'signed' ? (
+                      <Check className="h-4 w-4 text-[#4caf50]" />
+                    ) : (
+                      <Button size="sm">Request Signoff</Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <p className={`text-lg font-bold text-[#4caf50]`}>✓ APPROVED - Ready for Go-Live</p>
+            </Card>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // CHANGE 13: Signoff Module Screen
+  if (currentScreen === "signoff-module") {
+    const pendingSignoffs = [
+      { caseId: "C-2024-001", client: "Acme Trading", phase: "Connectivity", requestedBy: "Admin", requestedDate: "2024-02-15" },
+      { caseId: "C-2024-002", client: "Beta Corp", phase: "Test Execution", requestedBy: "Admin", requestedDate: "2024-02-14" },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        {selectedRole && <Sidebar />}
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Signoff Module</h1>
+            <p className={textSecondary}>Manage approvals and digital signoffs</p>
+          </header>
+
+          <div className="p-6 space-y-6">
+            <h3 className={`text-lg font-bold ${textPrimary}`}>Pending Signoffs</h3>
+            <div className="grid grid-cols-1 gap-4">
+              {pendingSignoffs.map((s, i) => (
+                <Card key={i} className={`${bgCard} border ${borderColor} p-6`}>
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <p className={`font-mono text-sm text-[#00e5ff]`}>{s.caseId}</p>
+                      <p className={`font-medium ${textPrimary}`}>{s.client}</p>
+                      <p className={`text-sm ${textSecondary}`}>{s.phase} - Requested {s.requestedDate}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button className="bg-[#4caf50] hover:bg-[#45a049]">Approve</Button>
+                    <Button className="bg-[#f44336] hover:bg-[#da190b]">Reject</Button>
+                    <Button variant="outline">Delegate</Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // CHANGE 14: Go-Live Manager Screen
+  if (currentScreen === "go-live-manager") {
+    const checks = [
+      { item: "Production SenderCompID verified", status: true },
+      { item: "Prod hosts/ports confirmed", status: true },
+      { item: "Production certificates exchanged", status: true },
+      { item: "Session schedule activated", status: false },
+      { item: "Runbook documented", status: true },
+    ]
+
+    const smokeTests = [
+      { name: "Logon/Logoff", status: "not-run" },
+      { name: "Basic order flow", status: "not-run" },
+      { name: "Drop copy verification", status: "not-run" },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        {selectedRole && <Sidebar />}
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Go-Live Manager</h1>
+            <p className={textSecondary}>Production cutover management</p>
+          </header>
+
+          <div className="p-6 space-y-6">
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Production Config Validation</h3>
+              <div className="space-y-2">
+                {checks.map((c, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    {c.status ? <Check className="h-4 w-4 text-[#4caf50]" /> : <AlertCircle className="h-4 w-4 text-[#f44336]" />}
+                    <span className={textPrimary}>{c.item}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Production Smoke Tests</h3>
+              <div className="space-y-2">
+                {smokeTests.map((t, i) => (
+                  <div key={i} className="flex justify-between items-center">
+                    <span className={textPrimary}>{t.name}</span>
+                    <Button size="sm">Run Test</Button>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <Button className="w-full bg-[#4caf50] hover:bg-[#45a049] text-white font-bold py-3">Schedule Go-Live</Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // CHANGE 15: Post Go-Live Monitoring Screen
+  if (currentScreen === "post-go-live") {
+    const kpis = [
+      { label: "Session Uptime", value: "99.97%", color: "text-[#4caf50]" },
+      { label: "Avg Latency", value: "2.3ms", color: "text-[#00e5ff]" },
+      { label: "Reject Rate", value: "0.4%", color: "text-[#4caf50]" },
+      { label: "Throughput", value: "12,450/day", color: "text-[#4caf50]" },
+    ]
+
+    const anomalies = [
+      { issue: "Unusual spike in reject rate at 14:30 UTC — 3x normal", severity: "amber" },
+      { issue: "Sequence gap detected between msg 45021-45023", severity: "red" },
+    ]
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        {selectedRole && <Sidebar />}
+        <div className="flex-1 overflow-auto">
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <h1 className={`text-2xl font-bold ${textPrimary}`}>Post Go-Live Monitoring</h1>
+            <p className={textSecondary}>Monitor production session and hypercare</p>
+          </header>
+
+          <div className="p-6 space-y-6">
+            <div className="grid grid-cols-4 gap-4">
+              {kpis.map((kpi, i) => (
+                <Card key={i} className={`${bgCard} border ${borderColor} p-4 text-center`}>
+                  <p className={textSecondary}>{kpi.label}</p>
+                  <p className={`text-2xl font-bold ${kpi.color}`}>{kpi.value}</p>
+                </Card>
+              ))}
+            </div>
+
+            <Card className={`${bgCard} border ${borderColor} p-6`}>
+              <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>AI-Detected Anomalies</h3>
+              <div className="space-y-3">
+                {anomalies.map((a, i) => (
+                  <div key={i} className={`${bgPrimary} p-3 rounded flex justify-between items-start`}>
+                    <div className="flex items-start gap-2">
+                      <AlertCircle className={`h-4 w-4 mt-1 ${a.severity === 'red' ? 'text-[#f44336]' : 'text-[#ff9800]'}`} />
+                      <p className={textSecondary}>{a.issue}</p>
+                    </div>
+                    <Button size="sm">Investigate</Button>
+                  </div>
+                ))}
               </div>
             </Card>
           </div>
