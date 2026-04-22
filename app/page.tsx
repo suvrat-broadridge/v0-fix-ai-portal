@@ -2236,19 +2236,39 @@ export default function BCometPlatform() {
                   <text x={CX} y={CY + 0.6} textAnchor="middle" dominantBaseline="middle"
                     fontSize="1.4" fill="white" fontWeight="700" opacity="0.9">Cases</text>
 
-                  {/* Comet using generated realistic comet image - rotated so tail points away from sun */}
-                  <image
-                    href="/images/comet.png"
-                    x={cometX - 1}
-                    y={cometY - 5}
-                    width="18"
-                    height="10"
-                    style={{
-                      transformOrigin: `${cometX}px ${cometY}px`,
-                      transform: `rotate(${(tailRad * 180 / Math.PI) + 180}deg)`,
-                    }}
-                    preserveAspectRatio="xMidYMid meet"
+                  {/* Comet with SVG - realistic tail pointing away from sun */}
+                  
+                  {/* Long main tail - smooth gradient fade */}
+                  <line 
+                    x1={cometX} y1={cometY}
+                    x2={cometX + Math.cos(tailRad) * 25} y2={cometY + Math.sin(tailRad) * 25}
+                    stroke="url(#mainTailGrad)" strokeWidth="2.5" strokeLinecap="round"
                   />
+                  
+                  {/* Secondary wider diffuse tail */}
+                  <path
+                    d={`M ${cometX} ${cometY} Q ${cometX + Math.cos(tailRad + 0.1) * 8} ${cometY + Math.sin(tailRad + 0.1) * 8}, ${cometX + Math.cos(tailRad + 0.15) * 20} ${cometY + Math.sin(tailRad + 0.15) * 20}`}
+                    stroke="url(#mainTailGrad)" strokeWidth="4" fill="none" opacity="0.35" strokeLinecap="round"
+                  />
+                  <path
+                    d={`M ${cometX} ${cometY} Q ${cometX + Math.cos(tailRad - 0.08) * 7} ${cometY + Math.sin(tailRad - 0.08) * 7}, ${cometX + Math.cos(tailRad - 0.12) * 18} ${cometY + Math.sin(tailRad - 0.12) * 18}`}
+                    stroke="url(#mainTailGrad)" strokeWidth="3" fill="none" opacity="0.25" strokeLinecap="round"
+                  />
+                  
+                  {/* Bright inner core */}
+                  <line 
+                    x1={cometX} y1={cometY}
+                    x2={cometX + Math.cos(tailRad) * 8} y2={cometY + Math.sin(tailRad) * 8}
+                    stroke="white" strokeWidth="1.2" strokeLinecap="round" opacity="0.8"
+                  />
+
+                  {/* Coma - soft fuzzy glow around nucleus */}
+                  <circle cx={cometX} cy={cometY} r={3.5} fill="#06b6d4" opacity="0.15" filter="url(#cometGlow)" />
+                  <circle cx={cometX} cy={cometY} r={2.5} fill="#22d3ee" opacity="0.35" filter="url(#glow)" />
+                  
+                  {/* Nucleus - bright center */}
+                  <circle cx={cometX} cy={cometY} r={1.3} fill="#67e8f9" opacity="0.95" />
+                  <circle cx={cometX} cy={cometY} r={0.7} fill="white" opacity="1" />
                 </svg>
               </div>
 
