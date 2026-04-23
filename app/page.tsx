@@ -2102,15 +2102,16 @@ export default function BCometPlatform() {
           // All radii in % units (viewBox 0 0 100 100)
           // Center shifted to lower-left so planets spread into north/northeast
           const CX = 35, CY = 55
+          // Radii reduced by 10% from original
           const solarPlanets = [
-            { name: "Intake",  radius: 6,  color: "#2196f3", size: 1.0, tools: ["Create onboarding request", "Collect data", "AI document analysis", "Gap analysis"] },
-            { name: "Design",  radius: 14, color: "#9c27b0", size: 1.1, tools: ["Build counterparty profile", "Generate FIX session config", "Generate FIX dictionary", "Internal review/approval"] },
-            { name: "Connect", radius: 22, color: "#00bcd4", size: 1.2, tools: ["Provision network", "Connectivity smoke test", "Session readiness validation"] },
-            { name: "Plan",    radius: 30, color: "#ff9800", size: 1.3, tools: ["Generate cert test plan", "Create test cases", "Share readiness checklist"] },
-            { name: "Execute", radius: 38, color: "#e91e63", size: 1.4, tools: ["Session-level tests", "Application-level tests", "Negative tests", "Recovery tests", "Capture evidence"] },
-            { name: "Analyze", radius: 46, color: "#f44336", size: 1.5, tools: ["Auto-evaluate results", "AI root cause analysis", "Defect creation", "Retest cycle"] },
-            { name: "Decide",  radius: 54, color: "#4caf50", size: 1.6, tools: ["Evaluate completion", "Generate cert report", "Collect formal signoffs"] },
-            { name: "Launch",  radius: 62, color: "#00e5ff", size: 1.7, tools: ["Generate prod config pack", "Readiness checklist", "Prod smoke test", "Go-live & hypercare"] },
+            { name: "Intake",  radius: 5.4,  color: "#2196f3", size: 1.0, tools: ["Create onboarding request", "Collect data", "AI document analysis", "Gap analysis"] },
+            { name: "Design",  radius: 12.6, color: "#9c27b0", size: 1.1, tools: ["Build counterparty profile", "Generate FIX session config", "Generate FIX dictionary", "Internal review/approval"] },
+            { name: "Connect", radius: 19.8, color: "#00bcd4", size: 1.2, tools: ["Provision network", "Connectivity smoke test", "Session readiness validation"] },
+            { name: "Plan",    radius: 27,   color: "#ff9800", size: 1.3, tools: ["Generate cert test plan", "Create test cases", "Share readiness checklist"] },
+            { name: "Execute", radius: 34.2, color: "#e91e63", size: 1.4, tools: ["Session-level tests", "Application-level tests", "Negative tests", "Recovery tests", "Capture evidence"] },
+            { name: "Analyze", radius: 41.4, color: "#f44336", size: 1.5, tools: ["Auto-evaluate results", "AI root cause analysis", "Defect creation", "Retest cycle"] },
+            { name: "Decide",  radius: 48.6, color: "#4caf50", size: 1.6, tools: ["Evaluate completion", "Generate cert report", "Collect formal signoffs"] },
+            { name: "Launch",  radius: 55.8, color: "#00e5ff", size: 1.7, tools: ["Generate prod config pack", "Readiness checklist", "Prod smoke test", "Go-live & hypercare"] },
           ]
           
           // Comet follows expanding spiral, passing through each planet's position
@@ -2305,7 +2306,18 @@ export default function BCometPlatform() {
                   style={{
                     left: `${apPx}%`,
                     top: `${apPy}%`,
-                    transform: apPx > 65 ? "translate(-110%, -50%)" : apPx < 35 ? "translate(10%, -50%)" : "translate(-50%, -120%)",
+                    // Clamp popup toward center depending on planet screen position
+                    // Right edge: flip left. Bottom edge: flip above. Corners: flip both.
+                    transform: (() => {
+                      const tooFarRight = apPx > 60
+                      const tooFarDown  = apPy > 65
+                      const tooFarLeft  = apPx < 20
+                      if (tooFarRight && tooFarDown)  return "translate(-105%, -105%)"
+                      if (tooFarRight)                return "translate(-105%, -50%)"
+                      if (tooFarDown)                 return "translate(-50%, -110%)"
+                      if (tooFarLeft)                 return "translate(5%, -50%)"
+                      return "translate(-50%, -120%)"
+                    })(),
                   }}
                 >
                   <div className={`${isDarkMode ? "bg-[#0a1628]/95" : "bg-white/95"} backdrop-blur-md border rounded-xl p-4 shadow-2xl min-w-[180px]`}
