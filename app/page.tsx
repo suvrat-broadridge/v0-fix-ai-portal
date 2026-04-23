@@ -6624,6 +6624,21 @@ const tools = [
                                   ))}
                                 </div>
                               </div>
+
+                              {/* Next Step Button */}
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex gap-3 pt-4 border-t border-[#1e4976]/30">
+                                  <Button
+                                    onClick={() => {
+                                      setCurrentToolIndex(actualToolIndex + 1)
+                                      setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id)
+                                    }}
+                                    className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto"
+                                  >
+                                    Next Step <ChevronRight className="h-4 w-4 ml-1" />
+                                  </Button>
+                                </div>
+                              )}
                             </div>
                           )}
                           
@@ -6672,6 +6687,21 @@ const tools = [
                                   </div>
                                 </div>
                               </div>
+
+                              {/* Next Step Button */}
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex gap-3 pt-4 border-t border-[#1e4976]/30">
+                                  <Button
+                                    onClick={() => {
+                                      setCurrentToolIndex(actualToolIndex + 1)
+                                      setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id)
+                                    }}
+                                    className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto"
+                                  >
+                                    Next Step <ChevronRight className="h-4 w-4 ml-1" />
+                                  </Button>
+                                </div>
+                              )}
                             </div>
                           )}
                           
