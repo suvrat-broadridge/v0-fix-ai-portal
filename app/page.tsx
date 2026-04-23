@@ -2314,32 +2314,25 @@ export default function BCometPlatform() {
                 </svg>
               </div>
 
-              {/* Tools popup — HTML overlay at full opacity, outside SVG dim layer */}
-              {activePlanet && (
-                <div
-                  className="fixed z-40 pointer-events-none"
-                  style={{
-                    left: `${apPx}%`,
-                    top: `${apPy}%`,
-                    // Popup opens closer to planet, leaning toward sun
-                    transform: (() => {
-                      const tooFarRight = apPx > 50
-                      const tooFarDown  = apPy > 55
-                      const tooFarLeft  = apPx < 15
-                      const tooFarUp    = apPy < 15
-                      if (tooFarRight && tooFarDown)  return "translate(-90%, -90%)"
-                      if (tooFarRight && tooFarUp)    return "translate(-90%, 10%)"
-                      if (tooFarRight)                return "translate(-90%, -50%)"
-                      if (tooFarDown)                 return "translate(-50%, -100%)"
-                      if (tooFarLeft && tooFarDown)   return "translate(10%, -90%)"
-                      if (tooFarLeft)                 return "translate(10%, -50%)"
-                      if (tooFarUp)                   return "translate(-50%, 10%)"
-                      return "translate(-50%, -100%)"
-                    })(),
-                  }}
-                >
-                  <div className={`${isDarkMode ? "bg-[#0a1628]/95" : "bg-white/95"} backdrop-blur-md border rounded-xl p-4 shadow-2xl min-w-[180px]`}
-                    style={{ borderColor: activePlanet.color }}>
+              {/* Tools popup — HTML overlay at full opacity, positioned between planet and sun */}
+              {activePlanet && (() => {
+                // Calculate position 35% of the way from planet toward sun center
+                const sunX = 50, sunY = 50
+                const fracTowardSun = 0.35
+                const popupX = apPx + (sunX - apPx) * fracTowardSun
+                const popupY = apPy + (sunY - apPy) * fracTowardSun
+                return (
+                  <div
+                    className="fixed z-40 pointer-events-none"
+                    style={{
+                      left: `${popupX}%`,
+                      top: `${popupY}%`,
+                      // Minimal transform to center the popup on its anchor point
+                      transform: "translate(-50%, -50%)",
+                    }}
+                  >
+                    <div className={`${isDarkMode ? "bg-[#0a1628]/95" : "bg-white/95"} backdrop-blur-md border rounded-xl p-4 shadow-2xl min-w-[180px]`}
+                      style={{ borderColor: activePlanet.color }}>
                     <div className="flex items-center gap-2 mb-3 pb-2" style={{ borderBottom: `1px solid ${activePlanet.color}40` }}>
                       <div className="w-3 h-3 rounded-full" style={{ backgroundColor: activePlanet.color }} />
                       <p className="text-sm font-bold" style={{ color: activePlanet.color }}>
@@ -2354,7 +2347,8 @@ export default function BCometPlatform() {
                     ))}
                   </div>
                 </div>
-              )}
+              )
+              })()}
             </>
           )
         })()}
