@@ -5196,6 +5196,179 @@ const tools = [
     )
   }
 
+  // Phase Cases Screen - shows all cases in a specific phase with cards view
+  if (currentScreen === "phase-cases" && phaseFilter !== null) {
+    const phaseNames = ["", "Intake & Discovery", "Solution Design & Configuration", "Connectivity Setup", "Certification Planning", "Test Execution", "Analysis & Remediation", "Certification Decisioning", "Production Enablement", "Production"]
+    const phaseColors = ["", "#00e5ff", "#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#f44336", "#2196f3", "#4caf50", "#00e5ff"]
+    const phaseIcons = [null, ClipboardCheck, Cog, Wifi, Target, Play, Brain, Award, Rocket, CheckCircle]
+    const PhaseIcon = phaseIcons[phaseFilter] || ClipboardCheck
+    
+    // Filter cases by the selected phase
+    const phaseCases = allCases.filter(c => c.stage === phaseFilter)
+    
+    // Group cases by status for better organization
+    const casesByStatus = {
+      critical: phaseCases.filter(c => c.status === "blocked" || c.priority === "Critical"),
+      atRisk: phaseCases.filter(c => c.status === "at-risk" && c.priority !== "Critical"),
+      onTrack: phaseCases.filter(c => c.status === "on-track"),
+      completed: phaseCases.filter(c => c.status === "completed"),
+    }
+    
+    const getStatusColor = (status: string) => {
+      switch (status) {
+        case "blocked": return "#f44336"
+        case "at-risk": return "#ff9800"
+        case "on-track": return "#4caf50"
+        case "completed": return "#00e5ff"
+        default: return "#6b7280"
+      }
+    }
+    
+    const getPriorityBadge = (priority: string) => {
+      const colors: Record<string, string> = { Critical: "#f44336", High: "#ff9800", Medium: "#2196f3", Low: "#4caf50" }
+      return (
+        <span className="px-2 py-0.5 rounded text-xs font-medium" style={{ backgroundColor: colors[priority] + "20", color: colors[priority] }}>
+          {priority}
+        </span>
+      )
+    }
+
+    return (
+      <div className={`min-h-screen ${bgPrimary} flex`}>
+        <Sidebar />
+        <AIAssistant />
+        <div className="flex-1 overflow-auto">
+          {/* Header */}
+          <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <button 
+              onClick={() => { setCurrentScreen("workflow-overview"); setPhaseFilter(null) }} 
+              className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}
+            >
+              <ArrowLeft className="h-4 w-4" /> Back to Workflow Overview
+            </button>
+            <div className="flex items-center gap-4">
+              <div 
+                className="w-12 h-12 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: phaseColors[phaseFilter] + "20" }}
+              >
+                <PhaseIcon className="h-6 w-6" style={{ color: phaseColors[phaseFilter] }} />
+              </div>
+              <div>
+                <h1 className={`text-2xl font-bold ${textPrimary}`}>Phase {phaseFilter}: {phaseNames[phaseFilter]}</h1>
+                <p className={textSecondary}>{phaseCases.length} active cases in this phase</p>
+              </div>
+            </div>
+          </header>
+
+          <div className="p-6 space-y-6">
+            {/* Summary Stats */}
+            <div className="grid grid-cols-4 gap-4">
+              {[
+                { label: "Critical / Blocked", count: casesByStatus.critical.length, color: "#f44336" },
+                { label: "At Risk", count: casesByStatus.atRisk.length, color: "#ff9800" },
+                { label: "On Track", count: casesByStatus.onTrack.length, color: "#4caf50" },
+                { label: "Completed", count: casesByStatus.completed.length, color: "#00e5ff" },
+              ].map(stat => (
+                <div key={stat.label} className={`${bgCard} border ${borderColor} rounded-lg p-4`}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: stat.color }} />
+                    <span className={`text-sm ${textSecondary}`}>{stat.label}</span>
+                  </div>
+                  <p className="text-3xl font-bold mt-2" style={{ color: stat.color }}>{stat.count}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Cases Grid */}
+            {phaseCases.length === 0 ? (
+              <div className={`${bgCard} border ${borderColor} rounded-lg p-12 text-center`}>
+                <div className="w-16 h-16 rounded-full bg-[#1e4976]/30 flex items-center justify-center mx-auto mb-4">
+                  <Briefcase className="h-8 w-8 text-[#00e5ff]" />
+                </div>
+                <h3 className={`text-lg font-semibold ${textPrimary} mb-2`}>No cases in this phase</h3>
+                <p className={textSecondary}>Cases will appear here when they reach this phase of the workflow.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {phaseCases.map(caseItem => (
+                  <div 
+                    key={caseItem.id}
+                    className={`${bgCard} border ${borderColor} rounded-lg p-4 hover:border-[#00e5ff] transition-all cursor-pointer group`}
+                    onClick={() => {
+                      setSelectedCase(caseItem)
+                      setCurrentScreen("case-workflow")
+                    }}
+                  >
+                    {/* Case Header */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <p className={`text-sm font-mono ${textSecondary}`}>{caseItem.id}</p>
+                        <h3 className={`text-lg font-semibold ${textPrimary} group-hover:text-[#00e5ff] transition-colors`}>
+                          {caseItem.client}
+                        </h3>
+                      </div>
+                      {getPriorityBadge(caseItem.priority)}
+                    </div>
+
+                    {/* Asset Class & Protocol */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className={`text-xs px-2 py-1 rounded ${bgSecondary} ${textSecondary}`}>
+                        {caseItem.assetClass}
+                      </span>
+                      <span className={`text-xs px-2 py-1 rounded ${bgSecondary} ${textSecondary}`}>
+                        {caseItem.protocol}
+                      </span>
+                    </div>
+
+                    {/* Status & Progress */}
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: getStatusColor(caseItem.status) }} />
+                        <span className={`text-sm capitalize ${textSecondary}`}>{caseItem.status.replace("-", " ")}</span>
+                      </div>
+                      <span className={`text-sm font-medium`} style={{ color: phaseColors[phaseFilter] }}>
+                        {caseItem.readinessScore}% ready
+                      </span>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="h-1.5 bg-[#1e4976]/30 rounded-full overflow-hidden mb-3">
+                      <div 
+                        className="h-full transition-all duration-300" 
+                        style={{ width: `${caseItem.readinessScore}%`, backgroundColor: phaseColors[phaseFilter] }}
+                      />
+                    </div>
+
+                    {/* Owner & SLA */}
+                    <div className="flex items-center justify-between pt-3 border-t border-[#1e4976]/30">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-[#00e5ff]/20 flex items-center justify-center text-xs text-[#00e5ff] font-medium">
+                          {caseItem.owner.split(" ").map(n => n[0]).join("")}
+                        </div>
+                        <span className={`text-xs ${textSecondary}`}>{caseItem.owner}</span>
+                      </div>
+                      <span className={`text-xs ${textSecondary}`}>SLA: {caseItem.slaDate}</span>
+                    </div>
+
+                    {/* Blockers if any */}
+                    {caseItem.blockers > 0 && (
+                      <div className="mt-3 pt-3 border-t border-[#1e4976]/30">
+                        <div className="flex items-center gap-2 text-[#f44336]">
+                          <AlertTriangle className="h-4 w-4" />
+                          <span className="text-xs font-medium">{caseItem.blockers} blocker{caseItem.blockers > 1 ? "s" : ""}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // Workflow Overview Screen - 8-phase onboarding lifecycle
   if (currentScreen === "workflow-overview") {
     const phases = [
@@ -5306,7 +5479,7 @@ const tools = [
                       style={{ borderColor: undefined }}
                       onMouseEnter={e => (e.currentTarget.style.borderColor = phase.color)}
                       onMouseLeave={e => (e.currentTarget.style.borderColor = "")}
-                      onClick={() => { setPhaseFilter(phase.num); setCurrentScreen("dashboard") }}
+                      onClick={() => { setPhaseFilter(phase.num); setCurrentScreen("phase-cases") }}
                     >
                       <div className="flex items-start gap-4">
                         <div
