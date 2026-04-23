@@ -408,11 +408,19 @@ export default function BCometPlatform() {
     }
   }, [aiChatHistory])
 
+  // Welcome screen panel states — declared before animation useEffect to avoid init ordering issues
+  const [showContactPanel, setShowContactPanel] = useState(false)
+  const [showDemoForm, setShowDemoForm] = useState(false)
+  const [showWalkthrough, setShowWalkthrough] = useState(false)
+  const [walkthroughStep, setWalkthroughStep] = useState(0)
+
   // Comet follows circular orbit, visiting each planet sequentially
   // After visiting last planet, continues outward off-screen, then re-emerges from sun
   // cometAngleDeg: 0-315 visits planets, 315-360 exits off-screen, then resets to 0
   useEffect(() => {
     if (currentScreen !== "home") return
+    // Pause animation when any welcome-screen panel is open
+    if (showContactPanel || showDemoForm || showWalkthrough) return
     const STEP = 0.5 // degrees per tick
     const TICK = 40  // ms per tick
     const EXIT_ANGLE = 400 // continue past 360 to exit off-screen
@@ -451,11 +459,7 @@ export default function BCometPlatform() {
       })
     }, TICK)
     return () => clearInterval(id)
-  }, [currentScreen, activePlanetTools])
-  const [showContactPanel, setShowContactPanel] = useState(false)
-  const [showDemoForm, setShowDemoForm] = useState(false)
-  const [showWalkthrough, setShowWalkthrough] = useState(false)
-  const [walkthroughStep, setWalkthroughStep] = useState(0)
+  }, [currentScreen, activePlanetTools, showContactPanel, showDemoForm, showWalkthrough])
   const [isLoading, setIsLoading] = useState(false)
   // Session configuration state
   const [sessionConfigs, setSessionConfigs] = useState<Record<string, {host: string, port: string, senderCompId: string, targetCompId: string, protocol: string, ssl: boolean, heartbeat: number, connected: boolean, lastTested: string | null}>>({
@@ -2107,6 +2111,8 @@ export default function BCometPlatform() {
     return (
       <div className={`min-h-screen ${bgPrimary} transition-colors overflow-hidden`}>
         {/* Full-page solar system background — SVG decorative layer */}
+        {/* Dims and freezes when any panel is open */}
+        <div className={`transition-opacity duration-700 ${showContactPanel || showDemoForm || showWalkthrough ? "opacity-15 pointer-events-none" : "opacity-100"}`}>
         {(() => {
           // All radii in % units (viewBox 0 0 100 100)
           // Sun position centered, planets spread via angle offset to fill north/northeast
@@ -2361,6 +2367,7 @@ export default function BCometPlatform() {
             </>
           )
         })()}
+        </div>{/* end solar system dim wrapper */}
 
         <header className={`${bgSecondary}/80 backdrop-blur-md border-b ${borderColor} sticky top-0 z-50`}>
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
