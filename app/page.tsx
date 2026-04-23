@@ -3768,6 +3768,55 @@ export default function BCometPlatform() {
                       </div>
                     </div>
 
+                    {/* Pending Requests from Admin */}
+                    {clientNotifications.filter(n => !n.read).length > 0 && (
+                      <div className={`${bgCard} border-2 border-[#ff9800] rounded-lg overflow-hidden`}>
+                        <div className="px-4 py-3 bg-[#ff9800]/10 border-b border-[#ff9800]/30 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <AlertTriangle className="h-5 w-5 text-[#ff9800]" />
+                            <h3 className={`font-semibold ${textPrimary}`}>Pending Requests</h3>
+                            <span className="px-2 py-0.5 rounded-full bg-[#ff9800] text-white text-xs font-bold">
+                              {clientNotifications.filter(n => !n.read).length}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="divide-y divide-[#1e4976]/30">
+                          {clientNotifications.filter(n => !n.read).map(notif => (
+                            <div key={notif.id} className="px-4 py-4 flex items-center justify-between hover:bg-[#1e4976]/10">
+                              <div className="flex items-center gap-4">
+                                <div className={`p-2 rounded-lg ${notif.type === "document-request" ? "bg-[#ff9800]/20" : "bg-[#00e5ff]/20"}`}>
+                                  {notif.type === "document-request" ? (
+                                    <Upload className="h-5 w-5 text-[#ff9800]" />
+                                  ) : (
+                                    <Bell className="h-5 w-5 text-[#00e5ff]" />
+                                  )}
+                                </div>
+                                <div>
+                                  <p className={`font-medium ${textPrimary}`}>{notif.title}</p>
+                                  <p className={`text-sm ${textSecondary}`}>{notif.message}</p>
+                                  <p className={`text-xs ${textSecondary} mt-1`}>
+                                    Requested {new Date(notif.timestamp).toLocaleDateString()} at {new Date(notif.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                  </p>
+                                </div>
+                              </div>
+                              <Button 
+                                onClick={() => {
+                                  setClientNotifications(prev => prev.map(n => n.id === notif.id ? {...n, read: true} : n))
+                                  if (notif.type === "document-request") {
+                                    setCurrentScreen("intake-portal")
+                                    setIntakeStep(4)
+                                  }
+                                }}
+                                className="bg-[#ff9800] hover:bg-[#f57c00] text-white"
+                              >
+                                {notif.type === "document-request" ? "Upload Now" : "View"}
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Active Cases with Phase Progress */}
                     <div className="grid gap-6">
                       {clientCases.map((caseItem) => {
