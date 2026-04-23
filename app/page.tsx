@@ -5203,8 +5203,8 @@ const tools = [
     const phaseIcons = [null, ClipboardCheck, Cog, Wifi, Target, Play, Brain, Award, Rocket, CheckCircle]
     const PhaseIcon = phaseIcons[phaseFilter] || ClipboardCheck
     
-    // Filter cases by the selected phase
-    const phaseCases = allCases.filter(c => c.stage === phaseFilter)
+    // Filter cases by the selected phase (onboardingCases uses 'stage' property)
+    const phaseCases = onboardingCases.filter(c => c.stage === phaseFilter)
     
     // Group cases by status for better organization
     const casesByStatus = {
@@ -5371,6 +5371,14 @@ const tools = [
 
   // Workflow Overview Screen - 8-phase onboarding lifecycle
   if (currentScreen === "workflow-overview") {
+    // Calculate active counts dynamically from onboardingCases
+    const getPhaseCount = (phaseNum: number) => onboardingCases.filter(c => c.stage === phaseNum).length
+    const getPhaseProgress = (phaseNum: number) => {
+      const casesInPhase = onboardingCases.filter(c => c.stage === phaseNum)
+      if (casesInPhase.length === 0) return 0
+      return Math.round(casesInPhase.reduce((sum, c) => sum + (c.readinessScore || 0), 0) / casesInPhase.length)
+    }
+    
     const phases = [
       {
         num: 1,
@@ -5378,8 +5386,8 @@ const tools = [
         icon: ClipboardCheck,
         steps: ["Create onboarding request", "Collect data", "AI document analysis", "Gap analysis"],
         color: "#00e5ff",
-        activeCount: 12,
-        progress: 45,
+        activeCount: getPhaseCount(1),
+        progress: getPhaseProgress(1),
       },
       {
         num: 2,
@@ -5387,8 +5395,8 @@ const tools = [
         icon: Cog,
         steps: ["Build counterparty profile", "Generate FIX session config", "Generate FIX dictionary", "Internal review/approval"],
         color: "#4caf50",
-        activeCount: 8,
-        progress: 60,
+        activeCount: getPhaseCount(2),
+        progress: getPhaseProgress(2),
       },
       {
         num: 3,
@@ -5396,8 +5404,8 @@ const tools = [
         icon: Wifi,
         steps: ["Provision network", "Connectivity smoke test", "Session readiness validation"],
         color: "#2196f3",
-        activeCount: 5,
-        progress: 75,
+        activeCount: getPhaseCount(3),
+        progress: getPhaseProgress(3),
       },
       {
         num: 4,
@@ -5405,8 +5413,8 @@ const tools = [
         icon: Target,
         steps: ["Generate cert test plan", "Create test cases", "Share readiness checklist"],
         color: "#ff9800",
-        activeCount: 6,
-        progress: 40,
+        activeCount: getPhaseCount(4),
+        progress: getPhaseProgress(4),
       },
       {
         num: 5,
@@ -5414,8 +5422,8 @@ const tools = [
         icon: Play,
         steps: ["Session-level tests", "Application-level tests", "Negative tests", "Recovery tests", "Capture evidence"],
         color: "#9c27b0",
-        activeCount: 4,
-        progress: 55,
+        activeCount: getPhaseCount(5),
+        progress: getPhaseProgress(5),
       },
       {
         num: 6,
@@ -5423,8 +5431,8 @@ const tools = [
         icon: Brain,
         steps: ["Auto-evaluate results", "AI root cause analysis", "Defect creation", "Retest cycle"],
         color: "#f44336",
-        activeCount: 3,
-        progress: 30,
+        activeCount: getPhaseCount(6),
+        progress: getPhaseProgress(6),
       },
       {
         num: 7,
@@ -5432,8 +5440,8 @@ const tools = [
         icon: Award,
         steps: ["Evaluate completion", "Generate cert report", "Collect formal signoffs"],
         color: "#2196f3",
-        activeCount: 2,
-        progress: 20,
+        activeCount: getPhaseCount(7),
+        progress: getPhaseProgress(7),
       },
       {
         num: 8,
@@ -5441,8 +5449,8 @@ const tools = [
         icon: Rocket,
         steps: ["Generate prod config pack", "Readiness checklist", "Prod smoke test", "Go-live & hypercare"],
         color: "#4caf50",
-        activeCount: 1,
-        progress: 10,
+        activeCount: getPhaseCount(8),
+        progress: getPhaseProgress(8),
       },
     ]
 
