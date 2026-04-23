@@ -3209,10 +3209,25 @@ export default function BCometPlatform() {
                   Try It Now <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
               )}
-            </div>
-          </div>
-        </div>
-      )}
+                                </div>
+                              </div>
+
+                              {/* Next Step Button */}
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex gap-3 pt-4 border-t border-[#1e4976]/30">
+                                  <Button
+                                    onClick={() => {
+                                      setCurrentToolIndex(actualToolIndex + 1)
+                                      setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id)
+                                    }}
+                                    className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto"
+                                  >
+                                    Next Step <ChevronRight className="h-4 w-4 ml-1" />
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
     </div>
   </section>
 
@@ -5927,10 +5942,25 @@ const tools = [
                             <span className={`text-sm ${textSecondary}`}>{version}</span>
                           </label>
                         ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
+                                </div>
+                              </div>
+
+                              {/* Next Step Button */}
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex gap-3 pt-4 border-t border-[#1e4976]/30">
+                                  <Button
+                                    onClick={() => {
+                                      setCurrentToolIndex(actualToolIndex + 1)
+                                      setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id)
+                                    }}
+                                    className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto"
+                                  >
+                                    Next Step <ChevronRight className="h-4 w-4 ml-1" />
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
 
                 {intakeStep === 2 && (
                   <div className="space-y-5">
@@ -6678,6 +6708,20 @@ const tools = [
                               >
                                 <Play className="h-4 w-4 mr-2" /> Open {tool.name}
                               </Button>
+
+                              {/* Next Step Button */}
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <Button
+                                  variant="outline"
+                                  onClick={() => {
+                                    setCurrentToolIndex(actualToolIndex + 1)
+                                    setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id)
+                                  }}
+                                  className="w-full mt-2"
+                                >
+                                  Next Step <ChevronRight className="h-4 w-4 ml-1" />
+                                </Button>
+                              )}
                             </div>
                           )}
                         </div>
