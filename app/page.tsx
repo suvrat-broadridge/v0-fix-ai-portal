@@ -2100,18 +2100,18 @@ export default function BCometPlatform() {
         {/* Full-page solar system background — SVG decorative layer */}
         {(() => {
           // All radii in % units (viewBox 0 0 100 100)
-          // Center shifted to lower-left so planets spread into north/northeast
-          const CX = 35, CY = 55
-          // Radii reduced by 10% from original
+          // Center shifted further to lower-left so planets spread into north/northeast
+          const CX = 25, CY = 65
+          // Radii adjusted for better spread
           const solarPlanets = [
-            { name: "Intake",  radius: 5.4,  color: "#2196f3", size: 1.0, tools: ["Create onboarding request", "Collect data", "AI document analysis", "Gap analysis"] },
-            { name: "Design",  radius: 12.6, color: "#9c27b0", size: 1.1, tools: ["Build counterparty profile", "Generate FIX session config", "Generate FIX dictionary", "Internal review/approval"] },
-            { name: "Connect", radius: 19.8, color: "#00bcd4", size: 1.2, tools: ["Provision network", "Connectivity smoke test", "Session readiness validation"] },
-            { name: "Plan",    radius: 27,   color: "#ff9800", size: 1.3, tools: ["Generate cert test plan", "Create test cases", "Share readiness checklist"] },
-            { name: "Execute", radius: 34.2, color: "#e91e63", size: 1.4, tools: ["Session-level tests", "Application-level tests", "Negative tests", "Recovery tests", "Capture evidence"] },
-            { name: "Analyze", radius: 41.4, color: "#f44336", size: 1.5, tools: ["Auto-evaluate results", "AI root cause analysis", "Defect creation", "Retest cycle"] },
-            { name: "Decide",  radius: 48.6, color: "#4caf50", size: 1.6, tools: ["Evaluate completion", "Generate cert report", "Collect formal signoffs"] },
-            { name: "Launch",  radius: 55.8, color: "#00e5ff", size: 1.7, tools: ["Generate prod config pack", "Readiness checklist", "Prod smoke test", "Go-live & hypercare"] },
+            { name: "Intake",  radius: 6,  color: "#2196f3", size: 1.0, tools: ["Create onboarding request", "Collect data", "AI document analysis", "Gap analysis"] },
+            { name: "Design",  radius: 14, color: "#9c27b0", size: 1.1, tools: ["Build counterparty profile", "Generate FIX session config", "Generate FIX dictionary", "Internal review/approval"] },
+            { name: "Connect", radius: 22, color: "#00bcd4", size: 1.2, tools: ["Provision network", "Connectivity smoke test", "Session readiness validation"] },
+            { name: "Plan",    radius: 30, color: "#ff9800", size: 1.3, tools: ["Generate cert test plan", "Create test cases", "Share readiness checklist"] },
+            { name: "Execute", radius: 38, color: "#e91e63", size: 1.4, tools: ["Session-level tests", "Application-level tests", "Negative tests", "Recovery tests", "Capture evidence"] },
+            { name: "Analyze", radius: 46, color: "#f44336", size: 1.5, tools: ["Auto-evaluate results", "AI root cause analysis", "Defect creation", "Retest cycle"] },
+            { name: "Decide",  radius: 54, color: "#4caf50", size: 1.6, tools: ["Evaluate completion", "Generate cert report", "Collect formal signoffs"] },
+            { name: "Launch",  radius: 62, color: "#00e5ff", size: 1.7, tools: ["Generate prod config pack", "Readiness checklist", "Prod smoke test", "Go-live & hypercare"] },
           ]
           
           // Comet follows expanding spiral, passing through each planet's position
@@ -2257,29 +2257,45 @@ export default function BCometPlatform() {
                   <text x={CX} y={CY + 0.6} textAnchor="middle" dominantBaseline="middle"
                     fontSize="1.4" fill="white" fontWeight="700" opacity="0.9">Cases</text>
 
-                  {/* Single cone tail — narrow at head, wide and faint at tip */}
+                  {/* Single cone tail — narrow at head, wide and faint/blurry at tip */}
                   {(() => {
                     const tailLen = 15
                     // Perpendicular axis to spread the cone width at the tip
                     const perpRad = tailRad + Math.PI / 2
                     const tipX = cometX + Math.cos(tailRad) * tailLen
                     const tipY = cometY + Math.sin(tailRad) * tailLen
-                    const halfWidth = 6 // half-width of cone at the far end
-                    const leftX  = tipX + Math.cos(perpRad) * halfWidth
-                    const leftY  = tipY + Math.sin(perpRad) * halfWidth
-                    const rightX = tipX - Math.cos(perpRad) * halfWidth
-                    const rightY = tipY - Math.sin(perpRad) * halfWidth
+                    const halfWidth = 5 // half-width of cone at the far end
+                    // Create uneven edge points with slight offsets
+                    const leftX  = tipX + Math.cos(perpRad) * halfWidth + Math.cos(tailRad) * 1.5
+                    const leftY  = tipY + Math.sin(perpRad) * halfWidth + Math.sin(tailRad) * 1.5
+                    const rightX = tipX - Math.cos(perpRad) * halfWidth - Math.cos(tailRad) * 0.8
+                    const rightY = tipY - Math.sin(perpRad) * halfWidth - Math.sin(tailRad) * 0.8
+                    // Middle point for curved edge
+                    const midX = tipX + Math.cos(tailRad) * 2
+                    const midY = tipY + Math.sin(tailRad) * 2
                     return (
                       <>
-                        {/* Outer glow — slightly wider, very faint */}
+                        {/* Outer soft blur layer */}
                         <path
-                          d={`M ${cometX} ${cometY} L ${leftX + Math.cos(perpRad) * 2} ${leftY + Math.sin(perpRad) * 2} L ${rightX - Math.cos(perpRad) * 2} ${rightY - Math.sin(perpRad) * 2} Z`}
-                          fill="url(#ionTailGrad)" opacity="0.18" filter="url(#softGlow)"
+                          d={`M ${cometX} ${cometY} 
+                              Q ${cometX + Math.cos(tailRad) * tailLen * 0.6 + Math.cos(perpRad) * halfWidth * 1.3} ${cometY + Math.sin(tailRad) * tailLen * 0.6 + Math.sin(perpRad) * halfWidth * 1.3},
+                                ${leftX + Math.cos(perpRad) * 3} ${leftY + Math.sin(perpRad) * 3}
+                              Q ${midX + Math.cos(tailRad) * 2} ${midY + Math.sin(tailRad) * 2},
+                                ${rightX - Math.cos(perpRad) * 3} ${rightY - Math.sin(perpRad) * 3}
+                              Q ${cometX + Math.cos(tailRad) * tailLen * 0.6 - Math.cos(perpRad) * halfWidth * 1.3} ${cometY + Math.sin(tailRad) * tailLen * 0.6 - Math.sin(perpRad) * halfWidth * 1.3},
+                                ${cometX} ${cometY} Z`}
+                          fill="url(#ionTailGrad)" opacity="0.12" filter="url(#softGlow)"
                         />
-                        {/* Main cone tail */}
+                        {/* Main tail with curved uneven edge */}
                         <path
-                          d={`M ${cometX} ${cometY} L ${leftX} ${leftY} L ${rightX} ${rightY} Z`}
-                          fill="url(#ionTailGrad)" opacity="0.75"
+                          d={`M ${cometX} ${cometY} 
+                              Q ${cometX + Math.cos(tailRad) * tailLen * 0.5 + Math.cos(perpRad) * halfWidth * 0.8} ${cometY + Math.sin(tailRad) * tailLen * 0.5 + Math.sin(perpRad) * halfWidth * 0.8},
+                                ${leftX} ${leftY}
+                              Q ${midX} ${midY},
+                                ${rightX} ${rightY}
+                              Q ${cometX + Math.cos(tailRad) * tailLen * 0.5 - Math.cos(perpRad) * halfWidth * 0.8} ${cometY + Math.sin(tailRad) * tailLen * 0.5 - Math.sin(perpRad) * halfWidth * 0.8},
+                                ${cometX} ${cometY} Z`}
+                          fill="url(#ionTailGrad)" opacity="0.7" filter="url(#glow)"
                         />
                       </>
                     )
@@ -2303,16 +2319,20 @@ export default function BCometPlatform() {
                   style={{
                     left: `${apPx}%`,
                     top: `${apPy}%`,
-                    // Clamp popup toward center depending on planet screen position
-                    // Right edge: flip left. Bottom edge: flip above. Corners: flip both.
+                    // Clamp popup toward sun depending on planet screen position
+                    // Aggressive thresholds ensure Decide/Launch stay on screen
                     transform: (() => {
-                      const tooFarRight = apPx > 60
-                      const tooFarDown  = apPy > 65
-                      const tooFarLeft  = apPx < 20
-                      if (tooFarRight && tooFarDown)  return "translate(-105%, -105%)"
-                      if (tooFarRight)                return "translate(-105%, -50%)"
-                      if (tooFarDown)                 return "translate(-50%, -110%)"
-                      if (tooFarLeft)                 return "translate(5%, -50%)"
+                      const tooFarRight = apPx > 50
+                      const tooFarDown  = apPy > 55
+                      const tooFarLeft  = apPx < 15
+                      const tooFarUp    = apPy < 15
+                      if (tooFarRight && tooFarDown)  return "translate(-110%, -110%)"
+                      if (tooFarRight && tooFarUp)    return "translate(-110%, 10%)"
+                      if (tooFarRight)                return "translate(-110%, -50%)"
+                      if (tooFarDown)                 return "translate(-50%, -115%)"
+                      if (tooFarLeft && tooFarDown)   return "translate(10%, -110%)"
+                      if (tooFarLeft)                 return "translate(10%, -50%)"
+                      if (tooFarUp)                   return "translate(-50%, 10%)"
                       return "translate(-50%, -120%)"
                     })(),
                   }}
