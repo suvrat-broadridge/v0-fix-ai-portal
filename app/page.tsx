@@ -250,6 +250,9 @@ export default function BCometPlatform() {
   const [selectedToolId, setSelectedToolId] = useState<string | null>(null)
   const [currentToolIndex, setCurrentToolIndex] = useState(0) // Track current tool within a phase
   const [showPhaseConfirmDialog, setShowPhaseConfirmDialog] = useState(false)
+  const [showForceCompleteDialog, setShowForceCompleteDialog] = useState<"step" | "phase" | null>(null)
+  const [forceCompleteReason, setForceCompleteReason] = useState("")
+  const [forceCompleteTargetToolIndex, setForceCompleteTargetToolIndex] = useState(0)
   const casePhases = [
     {
       num: 1,
@@ -6400,6 +6403,18 @@ const tools = [
                   >
                     <ChevronLeft className="h-4 w-4 mr-1" /> Previous Phase
                   </Button>
+                  {!isCurrentPhaseComplete() && currentCasePhase < 8 && (
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setForceCompleteReason("")
+                        setShowForceCompleteDialog("phase")
+                      }}
+                      className="border-[#f44336] text-[#f44336] hover:bg-[#f44336]/10"
+                    >
+                      Force Complete Phase
+                    </Button>
+                  )}
                   <Button
                     onClick={() => {
                       if (currentCasePhase >= 8) return
@@ -6504,9 +6519,25 @@ const tools = [
                               <p className={`text-sm ${textSecondary}`}>Phase {currentCasePhase}: {currentPhase.name}</p>
                             </div>
                           </div>
-                          <span className="text-xs px-2 py-1 rounded-full font-medium capitalize" style={{ backgroundColor: getToolStatusColor(tool.status) + "20", color: getToolStatusColor(tool.status) }}>
-                            {tool.status.replace("-", " ")}
-                          </span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs px-2 py-1 rounded-full font-medium capitalize" style={{ backgroundColor: getToolStatusColor(tool.status) + "20", color: getToolStatusColor(tool.status) }}>
+                              {tool.status.replace("-", " ")}
+                            </span>
+                            {tool.status !== "completed" && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setForceCompleteReason("")
+                                  setForceCompleteTargetToolIndex(actualToolIndex)
+                                  setShowForceCompleteDialog("step")
+                                }}
+                                className="text-xs border-[#ff9800] text-[#ff9800] hover:bg-[#ff9800]/10"
+                              >
+                                Force Complete Step
+                              </Button>
+                            )}
+                          </div>
                         </div>
                         
                         <div className="p-6">
@@ -6897,6 +6928,98 @@ const tools = [
           </div>
         </div>
         
+        {/* Force Complete Dialog — Step or Phase */}
+        {showForceCompleteDialog && (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+            <Card className={`${bgCard} border-2 border-[#f44336] w-full max-w-md`}>
+              <div className={`px-5 py-4 border-b ${borderColor} flex items-center gap-3`}>
+                <div className="p-2 rounded-full bg-[#f44336]/20">
+                  <AlertTriangle className="h-5 w-5 text-[#f44336]" />
+                </div>
+                <div>
+                  <h3 className={`font-bold ${textPrimary}`}>
+                    Force Complete {showForceCompleteDialog === "step" ? `Step ${forceCompleteTargetToolIndex + 1}` : `Phase ${currentCasePhase}`}
+                  </h3>
+                  <p className={`text-xs ${textSecondary} mt-0.5`}>
+                    {showForceCompleteDialog === "step"
+                      ? `Marking "${currentPhase?.tools[forceCompleteTargetToolIndex]?.name}" as complete without finishing all requirements.`
+                      : `Forcing Phase ${currentCasePhase} (${currentPhase?.name}) to complete and advancing to Phase ${currentCasePhase + 1}.`}
+                  </p>
+                </div>
+              </div>
+              <div className="p-5 space-y-4">
+                <div>
+                  <label className={`text-sm font-medium ${textPrimary} block mb-1`}>
+                    Reason for force completion <span className="text-[#f44336]">*</span>
+                  </label>
+                  <textarea
+                    value={forceCompleteReason}
+                    onChange={e => setForceCompleteReason(e.target.value)}
+                    placeholder="Describe why this step/phase is being force completed (minimum 50 characters)..."
+                    rows={4}
+                    className={`w-full rounded-lg border px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#f44336] ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder:text-slate-500" : "bg-white border-gray-200 text-gray-900 placeholder:text-gray-400"}`}
+                  />
+                  <div className="flex items-center justify-between mt-1">
+                    <p className={`text-xs ${forceCompleteReason.length < 50 ? "text-[#f44336]" : "text-[#4caf50]"}`}>
+                      {forceCompleteReason.length < 50
+                        ? `${50 - forceCompleteReason.length} more characters required`
+                        : "Minimum length reached"}
+                    </p>
+                    <span className={`text-xs ${textSecondary}`}>{forceCompleteReason.length} / 50 min</span>
+                  </div>
+                </div>
+
+                {/* Progress bar for character count */}
+                <div className="h-1.5 bg-[#1e4976]/30 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-200"
+                    style={{
+                      width: `${Math.min((forceCompleteReason.length / 50) * 100, 100)}%`,
+                      backgroundColor: forceCompleteReason.length >= 50 ? "#4caf50" : "#f44336",
+                    }}
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => {
+                      setShowForceCompleteDialog(null)
+                      setForceCompleteReason("")
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    disabled={forceCompleteReason.length < 50}
+                    onClick={() => {
+                      if (showForceCompleteDialog === "step") {
+                        // Mark the step complete and advance to next step
+                        const nextIndex = forceCompleteTargetToolIndex + 1
+                        if (nextIndex < currentPhase.tools.length) {
+                          setCurrentToolIndex(nextIndex)
+                          setSelectedToolId(currentPhase.tools[nextIndex].id)
+                        }
+                      } else {
+                        // Force complete the whole phase — advance to next phase
+                        setCurrentCasePhase(currentCasePhase + 1)
+                        setCurrentToolIndex(0)
+                        setSelectedToolId(null)
+                      }
+                      setShowForceCompleteDialog(null)
+                      setForceCompleteReason("")
+                    }}
+                    className="flex-1 bg-[#f44336] hover:bg-[#d32f2f] text-white disabled:opacity-40"
+                  >
+                    Confirm Force Complete
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
+
         {/* Confirmation Dialog for incomplete phase */}
         {showPhaseConfirmDialog && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
