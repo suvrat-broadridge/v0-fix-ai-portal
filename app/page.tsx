@@ -481,6 +481,13 @@ export default function BCometPlatform() {
   const [dashboardView, setDashboardView] = useState<"cards" | "kanban">("cards")
   // Phase filter — set from Workflow Overview to show cases in a specific phase
   const [phaseFilter, setPhaseFilter] = useState<number | null>(null)
+  // Files uploaded in case workflow
+  const [caseWorkflowFiles, setCaseWorkflowFiles] = useState<{name: string, size: string, type: string}[]>([])
+  // Client notifications for document requests etc
+  const [clientNotifications, setClientNotifications] = useState<{id: string, type: string, title: string, message: string, timestamp: string, read: boolean}[]>([
+    { id: "1", type: "document-request", title: "Document Upload Required", message: "Please upload your FIX specification document for Equities - FIX 4.4.", timestamp: new Date(Date.now() - 3600000).toISOString(), read: false },
+  ])
+  const [showClientNotifications, setShowClientNotifications] = useState(false)
   // Go-live checklist
   const [goLiveChecklist, setGoLiveChecklist] = useState<Record<string, boolean>>({
     "spec-approved": true,
@@ -3628,15 +3635,86 @@ export default function BCometPlatform() {
           <AIAssistant />
           <div className="flex-1 overflow-auto">
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
-              <div>
-                <h1 className={`text-xl font-bold ${textPrimary}`}>My Progress</h1>
-                <p className={textSecondary}>Track your certification progress across asset classes</p>
+              <div className="flex items-center gap-4">
+                <div>
+                  <h1 className={`text-xl font-bold ${textPrimary}`}>My Progress</h1>
+                  <p className={textSecondary}>Track your certification progress across asset classes</p>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setCurrentScreen("workflow-overview")}
+                  className="ml-4"
+                >
+                  <Navigation className="h-4 w-4 mr-1" /> View Workflow
+                </Button>
               </div>
               <div className="flex items-center gap-4">
-                <button className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 relative`}>
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#f44336] rounded-full text-[10px] text-white flex items-center justify-center">3</span>
-                </button>
+                {/* Notification Bell with Dropdown */}
+                <div className="relative">
+                  <button 
+                    className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 relative`}
+                    onClick={() => setShowClientNotifications(!showClientNotifications)}
+                  >
+                    <Bell className="h-5 w-5" />
+                    {clientNotifications.filter(n => !n.read).length > 0 && (
+                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#f44336] rounded-full text-[10px] text-white flex items-center justify-center">
+                        {clientNotifications.filter(n => !n.read).length}
+                      </span>
+                    )}
+                  </button>
+                  {showClientNotifications && (
+                    <div className={`absolute right-0 top-12 w-80 ${bgCard} border ${borderColor} rounded-lg shadow-xl z-50`}>
+                      <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                        <h4 className={`font-semibold ${textPrimary}`}>Notifications</h4>
+                        <button 
+                          onClick={() => setClientNotifications(prev => prev.map(n => ({...n, read: true})))}
+                          className={`text-xs ${textSecondary} hover:text-[#00e5ff]`}
+                        >
+                          Mark all read
+                        </button>
+                      </div>
+                      <div className="max-h-64 overflow-auto">
+                        {clientNotifications.length === 0 ? (
+                          <p className={`p-4 text-sm ${textSecondary} text-center`}>No notifications</p>
+                        ) : (
+                          clientNotifications.map(notif => (
+                            <div 
+                              key={notif.id} 
+                              className={`px-4 py-3 border-b ${borderColor} hover:bg-[#1e4976]/20 cursor-pointer ${!notif.read ? "bg-[#00e5ff]/5" : ""}`}
+                              onClick={() => {
+                                setClientNotifications(prev => prev.map(n => n.id === notif.id ? {...n, read: true} : n))
+                                if (notif.type === "document-request") {
+                                  setCurrentScreen("intake-portal")
+                                  setIntakeStep(4) // Go to document upload step
+                                }
+                                setShowClientNotifications(false)
+                              }}
+                            >
+                              <div className="flex items-start gap-3">
+                                <div className={`p-1.5 rounded-full ${notif.type === "document-request" ? "bg-[#ff9800]/20" : "bg-[#00e5ff]/20"}`}>
+                                  {notif.type === "document-request" ? (
+                                    <Upload className="h-4 w-4 text-[#ff9800]" />
+                                  ) : (
+                                    <Bell className="h-4 w-4 text-[#00e5ff]" />
+                                  )}
+                                </div>
+                                <div className="flex-1">
+                                  <p className={`text-sm font-medium ${textPrimary}`}>{notif.title}</p>
+                                  <p className={`text-xs ${textSecondary} mt-0.5`}>{notif.message}</p>
+                                  <p className={`text-xs ${textSecondary} mt-1`}>
+                                    {new Date(notif.timestamp).toLocaleString()}
+                                  </p>
+                                </div>
+                                {!notif.read && <div className="w-2 h-2 rounded-full bg-[#00e5ff]" />}
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
                 {/* User Profile */}
                 <div className="flex items-center gap-3">
                   <div className="text-right">
@@ -6122,7 +6200,14 @@ const tools = [
                                   <Input placeholder="email@company.com" className={`mt-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
                                 </div>
                               </div>
-                              <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">
+                              <Button 
+                                className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
+                                onClick={() => {
+                                  // Mark this tool as completed and advance to next step
+                                  setCurrentToolIndex(1) // Move to Document Upload (index 1)
+                                  setSelectedToolId("docs")
+                                }}
+                              >
                                 <CheckCircle className="h-4 w-4 mr-2" /> Mark Complete
                               </Button>
                             </div>
@@ -6131,20 +6216,80 @@ const tools = [
                           {/* Document Upload Tool */}
                           {tool.id === "docs" && (
                             <div className="space-y-4">
-                              <p className={textSecondary}>Upload counterparty FIX specifications and supporting documents.</p>
-                              <div className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center`}>
+                              <div className="flex items-center justify-between">
+                                <p className={textSecondary}>Upload counterparty FIX specifications and supporting documents.</p>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => {
+                                    setClientNotifications(prev => [...prev, {
+                                      id: Date.now().toString(),
+                                      type: "document-request",
+                                      title: "Document Upload Required",
+                                      message: "Please upload your FIX specification document for review.",
+                                      timestamp: new Date().toISOString(),
+                                      read: false,
+                                    }])
+                                    alert("Document request sent to client. They will see a notification on their next login.")
+                                  }}
+                                  className="text-[#ff9800] border-[#ff9800] hover:bg-[#ff9800]/10"
+                                >
+                                  <Send className="h-3 w-3 mr-1" /> Request from Client
+                                </Button>
+                              </div>
+                              <div 
+                                className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center cursor-pointer hover:border-[#00e5ff] hover:bg-[#00e5ff]/5 transition-all`}
+                                onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-[#00e5ff]", "bg-[#00e5ff]/10") }}
+                                onDragLeave={(e) => { e.currentTarget.classList.remove("border-[#00e5ff]", "bg-[#00e5ff]/10") }}
+                                onDrop={(e) => {
+                                  e.preventDefault()
+                                  e.currentTarget.classList.remove("border-[#00e5ff]", "bg-[#00e5ff]/10")
+                                  const files = Array.from(e.dataTransfer.files)
+                                  const newFiles = files.map(f => ({
+                                    name: f.name,
+                                    size: `${(f.size / (1024*1024)).toFixed(2)} MB`,
+                                    type: f.type.includes("pdf") ? "PDF" : f.type.includes("xml") ? "XML" : "DOC"
+                                  }))
+                                  setCaseWorkflowFiles(prev => [...prev, ...newFiles])
+                                }}
+                                onClick={() => {
+                                  const input = document.createElement("input")
+                                  input.type = "file"
+                                  input.multiple = true
+                                  input.accept = ".xml,.pdf,.doc,.docx"
+                                  input.onchange = (e) => {
+                                    const files = Array.from((e.target as HTMLInputElement).files || [])
+                                    const newFiles = files.map(f => ({
+                                      name: f.name,
+                                      size: `${(f.size / (1024*1024)).toFixed(2)} MB`,
+                                      type: f.type.includes("pdf") ? "PDF" : f.type.includes("xml") ? "XML" : "DOC"
+                                    }))
+                                    setCaseWorkflowFiles(prev => [...prev, ...newFiles])
+                                  }
+                                  input.click()
+                                }}
+                              >
                                 <Upload className={`h-12 w-12 mx-auto mb-4 ${textSecondary}`} />
                                 <p className={`${textPrimary} font-medium`}>Drop files here or click to upload</p>
                                 <p className={`text-sm ${textSecondary} mt-1`}>Supports XML, PDF, DOC up to 50MB</p>
-                                <Button variant="outline" className="mt-4">Select Files</Button>
                               </div>
                               <div className={`${bgSecondary} p-4 rounded-lg`}>
-                                <p className={`text-sm font-medium ${textPrimary} mb-2`}>Uploaded Documents</p>
-                                <div className="flex items-center gap-3 py-2">
-                                  <FileText className="h-5 w-5 text-[#00e5ff]" />
-                                  <span className={`text-sm ${textPrimary}`}>client_fix_spec_v1.2.xml</span>
-                                  <span className={`text-xs ${textSecondary}`}>2.4 MB</span>
-                                  <CheckCircle className="h-4 w-4 text-[#4caf50] ml-auto" />
+                                <p className={`text-sm font-medium ${textPrimary} mb-2`}>Uploaded Documents ({caseWorkflowFiles.length + 1})</p>
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-3 py-2">
+                                    <FileText className="h-5 w-5 text-[#00e5ff]" />
+                                    <span className={`text-sm ${textPrimary}`}>client_fix_spec_v1.2.xml</span>
+                                    <span className={`text-xs ${textSecondary}`}>2.4 MB</span>
+                                    <CheckCircle className="h-4 w-4 text-[#4caf50] ml-auto" />
+                                  </div>
+                                  {caseWorkflowFiles.map((file, idx) => (
+                                    <div key={idx} className="flex items-center gap-3 py-2">
+                                      <FileText className="h-5 w-5 text-[#00e5ff]" />
+                                      <span className={`text-sm ${textPrimary}`}>{file.name}</span>
+                                      <span className={`text-xs ${textSecondary}`}>{file.size}</span>
+                                      <CheckCircle className="h-4 w-4 text-[#4caf50] ml-auto" />
+                                    </div>
+                                  ))}
                                 </div>
                               </div>
                             </div>
