@@ -6997,8 +6997,182 @@ const tools = [
                             )
                           })()}
 
+                          {/* ATDL Configuration — inline guided run */}
+                          {tool.id === "atdl" && (() => {
+                            const conversionSteps = [
+                              { id: 0, label: "Upload FIX Spec", icon: Upload,      desc: "Upload your FIX specification" },
+                              { id: 1, label: "Convert",         icon: RefreshCw,   desc: "Convert FIX spec to ATDL format" },
+                              { id: 2, label: "Validate",        icon: CheckCircle, desc: "Validate ATDL schema" },
+                              { id: 3, label: "Preview",         icon: Eye,         desc: "Render strategy UI preview" },
+                              { id: 4, label: "Export",          icon: Download,    desc: "Export and use the ATDL" },
+                            ]
+                            const versionUpgradeSteps = [
+                              { id: 0, label: "Upload Specs",  icon: Upload,       desc: "Upload old & new FIX spec versions" },
+                              { id: 1, label: "Upload ATDLs",  icon: FileText,     desc: "Upload old & new ATDL versions" },
+                              { id: 2, label: "Compare FIX",   icon: GitCompare,   desc: "Compare FIX spec differences" },
+                              { id: 3, label: "Compare ATDL",  icon: GitCompare,   desc: "Compare ATDL differences" },
+                              { id: 4, label: "Validate",      icon: CheckCircle,  desc: "Validate ATDLs" },
+                              { id: 5, label: "Preview",       icon: Eye,          desc: "Preview and export" },
+                            ]
+                            const remediationSteps = [
+                              { id: 0, label: "Upload ATDL",   icon: Upload,        desc: "Upload existing ATDL file" },
+                              { id: 1, label: "Validate",      icon: CheckCircle,   desc: "Run validation checks" },
+                              { id: 2, label: "Review Issues", icon: AlertTriangle, desc: "Review identified issues" },
+                              { id: 3, label: "Remediate",     icon: Wrench,        desc: "Apply fixes" },
+                              { id: 4, label: "Re-validate",   icon: RefreshCw,     desc: "Re-validate and export" },
+                            ]
+                            const steps = atdlWorkflowType === "conversion" ? conversionSteps
+                                        : atdlWorkflowType === "version-upgrade" ? versionUpgradeSteps
+                                        : remediationSteps
+                            const workflowOpts = [
+                              { id: "conversion"      as const, icon: RefreshCw,  label: "FIX to ATDL",        sub: "Convert & Create",   color: "#00e5ff" },
+                              { id: "version-upgrade" as const, icon: GitCompare, label: "Version Upgrade",     sub: "Compare & Validate", color: "#9c27b0" },
+                              { id: "remediation"     as const, icon: Wrench,     label: "Validate & Remediate",sub: "Fix Existing ATDL",  color: "#ff9800" },
+                            ]
+                            return (
+                              <div className="space-y-5">
+                                {/* Step progress bar */}
+                                <div className="flex items-center gap-0">
+                                  {steps.map((step, i) => {
+                                    const Icon = step.icon
+                                    const isActive = atdlWizardStep === i
+                                    const isDone   = atdlWizardStep > i
+                                    return (
+                                      <div key={i} className="flex items-center flex-1 last:flex-none">
+                                        <button
+                                          onClick={() => setAtdlWizardStep(i)}
+                                          className="flex flex-col items-center gap-1.5 group"
+                                        >
+                                          <div className={`h-9 w-9 rounded-full flex items-center justify-center border-2 transition-all ${
+                                            isDone   ? "border-[#4caf50] bg-[#4caf50]" :
+                                            isActive ? "border-[#00e5ff] bg-[#00e5ff]/20" :
+                                            `${isDarkMode ? "border-[#1e4976] bg-[#0a1628]" : "border-gray-200 bg-white"}`
+                                          }`}>
+                                            <Icon className={`h-4 w-4 ${isDone ? "text-white" : isActive ? "text-[#00e5ff]" : textSecondary}`} />
+                                          </div>
+                                          <span className={`text-[10px] font-medium whitespace-nowrap ${isActive ? "text-[#00e5ff]" : isDone ? "text-[#4caf50]" : textSecondary}`}>
+                                            {step.label}
+                                          </span>
+                                        </button>
+                                        {i < steps.length - 1 && (
+                                          <div className={`flex-1 h-0.5 mx-2 mb-4 ${atdlWizardStep > i ? "bg-[#4caf50]" : isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`} />
+                                        )}
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+
+                                {/* Step 0: workflow selector + client/asset class */}
+                                {atdlWizardStep === 0 && (
+                                  <div className="space-y-4">
+                                    <div>
+                                      <label className={`block text-sm font-medium mb-3 ${textPrimary}`}>Workflow</label>
+                                      <div className="grid grid-cols-3 gap-3">
+                                        {workflowOpts.map((opt) => {
+                                          const Icon = opt.icon
+                                          const isSelected = atdlWorkflowType === opt.id
+                                          return (
+                                            <button
+                                              key={opt.id}
+                                              onClick={() => { setAtdlWorkflowType(opt.id); setAtdlWizardStep(0) }}
+                                              className="relative flex flex-col items-start gap-2 p-4 rounded-lg border-2 text-left transition-all"
+                                              style={{
+                                                borderColor: isSelected ? opt.color : isDarkMode ? "#1e4976" : "#e2e8f0",
+                                                backgroundColor: isSelected ? `${opt.color}12` : isDarkMode ? "rgba(10,22,40,0.4)" : "#f8fafc",
+                                              }}
+                                            >
+                                              {isSelected && (
+                                                <span className="absolute top-2.5 right-2.5 flex h-5 w-5 items-center justify-center rounded-full" style={{ backgroundColor: opt.color }}>
+                                                  <CheckCircle className="h-3 w-3 text-[#0a1628]" />
+                                                </span>
+                                              )}
+                                              <div className="p-2 rounded-md" style={{ backgroundColor: `${opt.color}20` }}>
+                                                <Icon className="h-4 w-4" style={{ color: opt.color }} />
+                                              </div>
+                                              <div>
+                                                <p className={`text-sm font-semibold ${textPrimary}`}>{opt.label}</p>
+                                                <p className="text-xs" style={{ color: opt.color }}>{opt.sub}</p>
+                                              </div>
+                                            </button>
+                                          )
+                                        })}
+                                      </div>
+                                    </div>
+                                    <div className={`border-t ${borderColor}`} />
+                                    <div className="grid grid-cols-2 gap-4">
+                                      <div>
+                                        <label className={`block text-sm font-medium mb-1.5 ${textPrimary}`}>Client</label>
+                                        <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"}`}>
+                                          <option>{selectedOnboardingCase?.client || "Nexus Trading Group"}</option>
+                                          <option>Apex Capital Partners</option>
+                                          <option>Velocity Securities</option>
+                                        </select>
+                                      </div>
+                                      <div>
+                                        <label className={`block text-sm font-medium mb-1.5 ${textPrimary}`}>Asset Class</label>
+                                        <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"}`}>
+                                          <option>Equities</option><option>Options</option><option>Futures</option><option>FX</option>
+                                        </select>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Steps 1+: placeholder content per step */}
+                                {atdlWizardStep > 0 && (
+                                  <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded-lg p-5 text-center space-y-2`}>
+                                    {(() => { const Icon = steps[atdlWizardStep]?.icon || Upload; return <Icon className={`h-8 w-8 mx-auto ${textSecondary}`} /> })()}
+                                    <p className={`font-medium ${textPrimary}`}>{steps[atdlWizardStep]?.label}</p>
+                                    <p className={`text-sm ${textSecondary}`}>{steps[atdlWizardStep]?.desc}</p>
+                                    <Button
+                                      variant="outline"
+                                      onClick={() => setCurrentScreen("atdl-wizard" as typeof currentScreen)}
+                                      className="mt-2"
+                                    >
+                                      Open Full {steps[atdlWizardStep]?.label} View
+                                    </Button>
+                                  </div>
+                                )}
+
+                                {/* Step navigation */}
+                                <div className={`flex items-center justify-between pt-4 border-t ${borderColor}`}>
+                                  <Button
+                                    variant="outline"
+                                    disabled={atdlWizardStep === 0}
+                                    onClick={() => setAtdlWizardStep(s => Math.max(0, s - 1))}
+                                  >
+                                    <ChevronLeft className="h-4 w-4 mr-1" /> Previous
+                                  </Button>
+                                  <span className={`text-xs ${textSecondary}`}>
+                                    Step {atdlWizardStep + 1} of {steps.length}
+                                  </span>
+                                  {atdlWizardStep < steps.length - 1 ? (
+                                    <Button
+                                      onClick={() => setAtdlWizardStep(s => Math.min(steps.length - 1, s + 1))}
+                                      className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
+                                    >
+                                      Next <ChevronRight className="h-4 w-4 ml-1" />
+                                    </Button>
+                                  ) : (
+                                    actualToolIndex < currentPhase.tools.length - 1 ? (
+                                      <Button
+                                        onClick={() => {
+                                          setCurrentToolIndex(actualToolIndex + 1)
+                                          setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id)
+                                        }}
+                                        className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
+                                      >
+                                        Next Step <ChevronRight className="h-4 w-4 ml-1" />
+                                      </Button>
+                                    ) : null
+                                  )}
+                                </div>
+                              </div>
+                            )
+                          })()}
+
                           {/* Generic fallback for other tools */}
-                          {!["intake", "docs", "gap", "spec-from-log"].includes(tool.id) && (
+                          {!["intake", "docs", "gap", "spec-from-log", "atdl"].includes(tool.id) && (
                             <div className="space-y-4">
                               <p className={textSecondary}>This tool is available for use. Click below to open the full interface.</p>
                               <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} mb-4`}>
