@@ -3728,124 +3728,189 @@ export default function BCometPlatform() {
               </div>
             </header>
 
-            <div className="p-6">
-              <div className="grid gap-6">
-                {myAssetClasses.map((asset) => (
-                  <Card key={asset.name} className={`${bgCard} border ${borderColor} overflow-hidden`}>
-                    <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
-                      <div>
-                        <h2 className={`text-lg font-bold ${textPrimary}`}>{asset.name}</h2>
-                        <p className={`text-sm ${textSecondary}`}>{asset.protocol}</p>
+            <div className="p-6 space-y-6">
+              {/* Client's Active Onboarding Cases */}
+              {(() => {
+                // Get cases for this client (simulate with first few onboarding cases)
+                const clientCases = onboardingCases.slice(0, 3)
+                const clientPhases = [
+                  { num: 1, name: "Intake", icon: ClipboardCheck, color: "#00e5ff" },
+                  { num: 2, name: "Design", icon: Cog, color: "#4caf50" },
+                  { num: 3, name: "Connect", icon: Wifi, color: "#2196f3" },
+                  { num: 4, name: "Plan", icon: Target, color: "#ff9800" },
+                  { num: 5, name: "Execute", icon: Play, color: "#9c27b0" },
+                  { num: 6, name: "Analyze", icon: Brain, color: "#f44336" },
+                  { num: 7, name: "Decide", icon: Award, color: "#2196f3" },
+                  { num: 8, name: "Launch", icon: Rocket, color: "#4caf50" },
+                ]
+                
+                return (
+                  <>
+                    {/* Summary Stats */}
+                    <div className="grid grid-cols-4 gap-4">
+                      <div className={`${bgCard} border ${borderColor} rounded-lg p-4`}>
+                        <p className={`text-sm ${textSecondary}`}>Active Cases</p>
+                        <p className="text-3xl font-bold text-[#00e5ff]">{clientCases.length}</p>
                       </div>
-                      {asset.alerts > 0 && (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336] text-xs font-medium">
-                          <Bell className="h-3 w-3" /> {asset.alerts} alerts
-                        </span>
-                      )}
-                    </div>
-                    <div className="p-6">
-                      {/* Tool Progress Grid */}
-                      <div className="grid grid-cols-4 gap-4 mb-4">
-                        {/* Spec Compare */}
-                        <div className={`p-3 rounded-lg border ${borderColor}`}>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className={`text-xs font-medium ${textPrimary}`}>Spec Compare</span>
-                            {getStatusBadge(asset.specCompare)}
-                          </div>
-                          <div className={`h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
-                            <div className={`h-full rounded-full ${getProgressColor(asset.specCompare)}`} style={{ width: getProgressWidth(asset.specCompare) }} />
-                          </div>
-                        </div>
-                        {/* Log Analysis */}
-                        <div className={`p-3 rounded-lg border ${borderColor}`}>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className={`text-xs font-medium ${textPrimary}`}>Log Analysis</span>
-                            {getStatusBadge(asset.logAnalysis)}
-                          </div>
-                          <div className={`h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
-                            <div className={`h-full rounded-full ${getProgressColor(asset.logAnalysis)}`} style={{ width: getProgressWidth(asset.logAnalysis) }} />
-                          </div>
-                        </div>
-                        {/* Scenario Creation */}
-                        <div className={`p-3 rounded-lg border ${borderColor}`}>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className={`text-xs font-medium ${textPrimary}`}>Scenarios</span>
-                            {getStatusBadge(asset.scenario)}
-                          </div>
-                          <div className={`h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
-                            <div className={`h-full rounded-full ${getProgressColor(asset.scenario)}`} style={{ width: getProgressWidth(asset.scenario) }} />
-                          </div>
-                        </div>
-                        {/* Test Case Gen */}
-                        <div className={`p-3 rounded-lg border ${borderColor}`}>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className={`text-xs font-medium ${textPrimary}`}>Test Cases</span>
-                            {getStatusBadge(asset.testCase)}
-                          </div>
-                          <div className={`h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
-                            <div className={`h-full rounded-full ${getProgressColor(asset.testCase)}`} style={{ width: getProgressWidth(asset.testCase) }} />
-                          </div>
-                        </div>
-                        {/* Certification */}
-                        <div className={`p-3 rounded-lg border ${borderColor}`}>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className={`text-xs font-medium ${textPrimary}`}>Certification</span>
-                            {getStatusBadge(asset.certification)}
-                          </div>
-                          <div className={`h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
-                            <div className={`h-full rounded-full ${getProgressColor(asset.certification)}`} style={{ width: getProgressWidth(asset.certification) }} />
-                          </div>
-                        </div>
-                        {/* ATDL Viewer */}
-                        <div className={`p-3 rounded-lg border ${borderColor}`}>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className={`text-xs font-medium ${textPrimary}`}>ATDL Validation</span>
-                            {getStatusBadge(asset.atdlViewer)}
-                          </div>
-                          <div className={`h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
-                            <div className={`h-full rounded-full ${getProgressColor(asset.atdlViewer)}`} style={{ width: getProgressWidth(asset.atdlViewer) }} />
-                          </div>
-                        </div>
-                        {/* FIX MSG Creator */}
-                        <div className={`p-3 rounded-lg border ${borderColor}`}>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className={`text-xs font-medium ${textPrimary}`}>FIX MSG</span>
-                            {getStatusBadge(asset.fixMsg)}
-                          </div>
-                          <div className={`h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-[#e2e8f0]"}`}>
-                            <div className={`h-full rounded-full ${getProgressColor(asset.fixMsg)}`} style={{ width: getProgressWidth(asset.fixMsg) }} />
-                          </div>
-                        </div>
+                      <div className={`${bgCard} border ${borderColor} rounded-lg p-4`}>
+                        <p className={`text-sm ${textSecondary}`}>Pending Actions</p>
+                        <p className="text-3xl font-bold text-[#ff9800]">{clientNotifications.filter(n => !n.read).length}</p>
                       </div>
-                      
-                      {/* Action Buttons */}
-                      <div className="flex flex-wrap gap-2">
-                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("spec-compare-overview")}>
-                          <GitCompare className="h-4 w-4 mr-1" /> Spec Compare
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("log-analysis")}>
-                          <FileSearch className="h-4 w-4 mr-1" /> Log Analysis
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("scenario-creation")}>
-                          <Activity className="h-4 w-4 mr-1" /> Scenarios
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("test-case-gen")}>
-                          <FileText className="h-4 w-4 mr-1" /> Test Cases
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("certification-gen")}>
-                          <Award className="h-4 w-4 mr-1" /> Certification
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("atdl-validate")}>
-                          <Cog className="h-4 w-4 mr-1" /> ATDL Validation
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => setCurrentScreen("fix-msg-creator")}>
-                          <MessageSquare className="h-4 w-4 mr-1" /> FIX MSG
-                        </Button>
+                      <div className={`${bgCard} border ${borderColor} rounded-lg p-4`}>
+                        <p className={`text-sm ${textSecondary}`}>Avg. Progress</p>
+                        <p className="text-3xl font-bold text-[#4caf50]">
+                          {Math.round(clientCases.reduce((sum, c) => sum + c.readinessScore, 0) / clientCases.length)}%
+                        </p>
+                      </div>
+                      <div className={`${bgCard} border ${borderColor} rounded-lg p-4`}>
+                        <p className={`text-sm ${textSecondary}`}>Next Milestone</p>
+                        <p className="text-lg font-bold text-[#9c27b0]">Test Execution</p>
                       </div>
                     </div>
-                  </Card>
-                ))}
-              </div>
+
+                    {/* Active Cases with Phase Progress */}
+                    <div className="grid gap-6">
+                      {clientCases.map((caseItem) => {
+                        const currentPhase = clientPhases.find(p => p.num === caseItem.stage) || clientPhases[0]
+                        const PhaseIcon = currentPhase.icon
+                        return (
+                          <Card key={caseItem.id} className={`${bgCard} border ${borderColor} overflow-hidden`}>
+                            <div className={`px-6 py-4 border-b ${borderColor} flex items-center justify-between`}>
+                              <div className="flex items-center gap-4">
+                                <div 
+                                  className="w-12 h-12 rounded-lg flex items-center justify-center"
+                                  style={{ backgroundColor: currentPhase.color + "20" }}
+                                >
+                                  <PhaseIcon className="h-6 w-6" style={{ color: currentPhase.color }} />
+                                </div>
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <h2 className={`text-lg font-bold ${textPrimary}`}>{caseItem.assetClass}</h2>
+                                    <span className={`text-xs px-2 py-0.5 rounded ${bgSecondary} ${textSecondary}`}>{caseItem.protocol}</span>
+                                  </div>
+                                  <p className={`text-sm ${textSecondary}`}>
+                                    Phase {currentPhase.num}: {currentPhase.name} - {caseItem.stageLabel}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <div className="text-right">
+                                  <p className="text-2xl font-bold" style={{ color: currentPhase.color }}>{caseItem.readinessScore}%</p>
+                                  <p className={`text-xs ${textSecondary}`}>Ready</p>
+                                </div>
+                                <Button 
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedCase(caseItem)
+                                    setCurrentScreen("case-workflow")
+                                  }}
+                                  style={{ backgroundColor: currentPhase.color }}
+                                  className="text-white"
+                                >
+                                  View Details
+                                </Button>
+                              </div>
+                            </div>
+                            <div className="p-6">
+                              {/* Phase Progress Timeline */}
+                              <div className="flex items-center justify-between mb-4">
+                                {clientPhases.map((phase, idx) => {
+                                  const Icon = phase.icon
+                                  const isComplete = phase.num < caseItem.stage
+                                  const isCurrent = phase.num === caseItem.stage
+                                  return (
+                                    <div key={phase.num} className="flex items-center">
+                                      <div className="flex flex-col items-center">
+                                        <div 
+                                          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                                            isComplete ? "bg-[#4caf50]" : isCurrent ? "" : "bg-[#1e4976]/30"
+                                          }`}
+                                          style={isCurrent ? { backgroundColor: phase.color } : undefined}
+                                        >
+                                          {isComplete ? (
+                                            <CheckCircle className="h-5 w-5 text-white" />
+                                          ) : (
+                                            <Icon className={`h-5 w-5 ${isCurrent ? "text-white" : textSecondary}`} />
+                                          )}
+                                        </div>
+                                        <span className={`text-xs mt-1 ${isCurrent ? "font-bold" : ""} ${isComplete || isCurrent ? textPrimary : textSecondary}`}>
+                                          {phase.name}
+                                        </span>
+                                      </div>
+                                      {idx < clientPhases.length - 1 && (
+                                        <div 
+                                          className={`w-8 h-0.5 mx-1 ${isComplete ? "bg-[#4caf50]" : "bg-[#1e4976]/30"}`}
+                                        />
+                                      )}
+                                    </div>
+                                  )
+                                })}
+                              </div>
+
+                              {/* Current Phase Actions */}
+                              <div className={`${bgSecondary} rounded-lg p-4`}>
+                                <p className={`text-sm font-medium ${textPrimary} mb-3`}>Your Action Items</p>
+                                <div className="space-y-2">
+                                  {caseItem.stage === 1 && (
+                                    <>
+                                      <div className="flex items-center gap-3">
+                                        <Upload className="h-4 w-4 text-[#ff9800]" />
+                                        <span className={`text-sm ${textPrimary}`}>Upload FIX specification document</span>
+                                        <Button size="sm" variant="outline" className="ml-auto" onClick={() => { setCurrentScreen("intake-portal"); setIntakeStep(4) }}>
+                                          Upload
+                                        </Button>
+                                      </div>
+                                      <div className="flex items-center gap-3">
+                                        <FileText className="h-4 w-4 text-[#00e5ff]" />
+                                        <span className={`text-sm ${textPrimary}`}>Complete connectivity questionnaire</span>
+                                        <Button size="sm" variant="outline" className="ml-auto">Start</Button>
+                                      </div>
+                                    </>
+                                  )}
+                                  {caseItem.stage === 2 && (
+                                    <div className="flex items-center gap-3">
+                                      <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                      <span className={`text-sm ${textPrimary}`}>Review and approve FIX configuration</span>
+                                      <Button size="sm" variant="outline" className="ml-auto">Review</Button>
+                                    </div>
+                                  )}
+                                  {caseItem.stage >= 3 && caseItem.stage <= 5 && (
+                                    <div className="flex items-center gap-3">
+                                      <Clock className="h-4 w-4 text-[#2196f3]" />
+                                      <span className={`text-sm ${textPrimary}`}>Awaiting Broadridge team action - No action required from you</span>
+                                    </div>
+                                  )}
+                                  {caseItem.stage === 6 && (
+                                    <div className="flex items-center gap-3">
+                                      <AlertTriangle className="h-4 w-4 text-[#f44336]" />
+                                      <span className={`text-sm ${textPrimary}`}>Review test results and provide feedback</span>
+                                      <Button size="sm" variant="outline" className="ml-auto">View Results</Button>
+                                    </div>
+                                  )}
+                                  {caseItem.stage === 7 && (
+                                    <div className="flex items-center gap-3">
+                                      <Award className="h-4 w-4 text-[#4caf50]" />
+                                      <span className={`text-sm ${textPrimary}`}>Sign certification approval document</span>
+                                      <Button size="sm" variant="outline" className="ml-auto">Sign</Button>
+                                    </div>
+                                  )}
+                                  {caseItem.stage === 8 && (
+                                    <div className="flex items-center gap-3">
+                                      <Rocket className="h-4 w-4 text-[#00e5ff]" />
+                                      <span className={`text-sm ${textPrimary}`}>Confirm go-live readiness</span>
+                                      <Button size="sm" variant="outline" className="ml-auto">Confirm</Button>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </Card>
+                        )
+                      })}
+                    </div>
+                  </>
+                )
+              })()}
             </div>
           </div>
         </div>
