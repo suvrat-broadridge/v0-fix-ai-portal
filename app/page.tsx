@@ -2256,45 +2256,41 @@ export default function BCometPlatform() {
                   <text x={CX} y={CY + 0.6} textAnchor="middle" dominantBaseline="middle"
                     fontSize="1.4" fill="white" fontWeight="700" opacity="0.9">Cases</text>
 
-                  {/* Realistic comet with dust tail and ion tail */}
+                  {/* Realistic comet with single unified tail */}
                   
-                  {/* DUST TAIL - broader, curved, warmer colors */}
+                  {/* MAIN TAIL - smooth gradient fade away from sun */}
                   <path
                     d={`M ${cometX} ${cometY} 
-                        Q ${cometX + Math.cos(tailRad + 0.25) * 10} ${cometY + Math.sin(tailRad + 0.25) * 10},
-                          ${cometX + Math.cos(tailRad + 0.35) * 22} ${cometY + Math.sin(tailRad + 0.35) * 22}`}
-                    stroke="url(#dustTailGrad)" strokeWidth="5" fill="none" opacity="0.5" strokeLinecap="round" filter="url(#softGlow)"
+                        Q ${cometX + Math.cos(tailRad) * 6} ${cometY + Math.sin(tailRad) * 6},
+                          ${cometX + Math.cos(tailRad) * 30} ${cometY + Math.sin(tailRad) * 30}`}
+                    stroke="url(#ionTailGrad)" strokeWidth="3.5" fill="none" strokeLinecap="round" filter="url(#softGlow)"
+                  />
+                  
+                  {/* Secondary softer tail for width */}
+                  <path
+                    d={`M ${cometX} ${cometY} 
+                        Q ${cometX + Math.cos(tailRad + 0.08) * 5} ${cometY + Math.sin(tailRad + 0.08) * 5},
+                          ${cometX + Math.cos(tailRad + 0.12) * 26} ${cometY + Math.sin(tailRad + 0.12) * 26}`}
+                    stroke="url(#ionTailGrad)" strokeWidth="5" fill="none" opacity="0.4" strokeLinecap="round"
                   />
                   <path
                     d={`M ${cometX} ${cometY} 
-                        Q ${cometX + Math.cos(tailRad + 0.15) * 8} ${cometY + Math.sin(tailRad + 0.15) * 8},
-                          ${cometX + Math.cos(tailRad + 0.22) * 18} ${cometY + Math.sin(tailRad + 0.22) * 18}`}
-                    stroke="url(#dustTailGrad)" strokeWidth="3.5" fill="none" opacity="0.4" strokeLinecap="round"
+                        Q ${cometX + Math.cos(tailRad - 0.08) * 5} ${cometY + Math.sin(tailRad - 0.08) * 5},
+                          ${cometX + Math.cos(tailRad - 0.12) * 26} ${cometY + Math.sin(tailRad - 0.12) * 26}`}
+                    stroke="url(#ionTailGrad)" strokeWidth="5" fill="none" opacity="0.4" strokeLinecap="round"
                   />
                   
-                  {/* ION TAIL - straighter, bluer, longer */}
-                  <line 
-                    x1={cometX} y1={cometY}
-                    x2={cometX + Math.cos(tailRad) * 28} y2={cometY + Math.sin(tailRad) * 28}
-                    stroke="url(#ionTailGrad)" strokeWidth="1.8" strokeLinecap="round"
-                  />
-                  <line 
-                    x1={cometX} y1={cometY}
-                    x2={cometX + Math.cos(tailRad - 0.05) * 24} y2={cometY + Math.sin(tailRad - 0.05) * 24}
-                    stroke="url(#ionTailGrad)" strokeWidth="1.2" strokeLinecap="round" opacity="0.6"
-                  />
-                  
-                  {/* Inner bright ion stream */}
+                  {/* Inner bright core stream */}
                   <line 
                     x1={cometX} y1={cometY}
                     x2={cometX + Math.cos(tailRad) * 12} y2={cometY + Math.sin(tailRad) * 12}
-                    stroke="white" strokeWidth="0.8" strokeLinecap="round" opacity="0.7"
+                    stroke="white" strokeWidth="1" strokeLinecap="round" opacity="0.8"
                   />
 
                   {/* COMA - layered fuzzy glow around nucleus */}
                   <circle cx={cometX} cy={cometY} r={4} fill="url(#cometCoreGrad)" opacity="0.2" filter="url(#softGlow)" />
-                  <circle cx={cometX} cy={cometY} r={2.8} fill="#22d3ee" opacity="0.25" filter="url(#cometGlow)" />
-                  <circle cx={cometX} cy={cometY} r={2} fill="#67e8f9" opacity="0.45" filter="url(#glow)" />
+                  <circle cx={cometX} cy={cometY} r={2.8} fill="#22d3ee" opacity="0.3" filter="url(#cometGlow)" />
+                  <circle cx={cometX} cy={cometY} r={2} fill="#67e8f9" opacity="0.5" filter="url(#glow)" />
                   
                   {/* NUCLEUS - intense bright center */}
                   <circle cx={cometX} cy={cometY} r={1.2} fill="#a5f3fc" opacity="1" />
