@@ -2169,13 +2169,13 @@ export default function BCometPlatform() {
                       <stop offset="100%" stopColor="#f44336" />
                     </radialGradient>
                     {/* Main tail gradient - smooth cyan to transparent fade like real comet */}
-                    {/* Ion tail gradient - blue/cyan, straighter */}
+                    {/* Ion tail gradient - bright at apex (head), fades to transparent at wide tip */}
                     <linearGradient id="ionTailGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#67e8f9" stopOpacity="0.95" />
-                      <stop offset="20%" stopColor="#22d3ee" stopOpacity="0.7" />
-                      <stop offset="45%" stopColor="#06b6d4" stopOpacity="0.4" />
-                      <stop offset="70%" stopColor="#0891b2" stopOpacity="0.15" />
-                      <stop offset="100%" stopColor="#164e63" stopOpacity="0" />
+                      <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
+                      <stop offset="10%" stopColor="#a5f3fc" stopOpacity="0.85" />
+                      <stop offset="30%" stopColor="#22d3ee" stopOpacity="0.6" />
+                      <stop offset="60%" stopColor="#06b6d4" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#0891b2" stopOpacity="0" />
                     </linearGradient>
                     {/* Dust tail gradient - warmer white/cream tones */}
                     <linearGradient id="dustTailGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -2257,30 +2257,34 @@ export default function BCometPlatform() {
                   <text x={CX} y={CY + 0.6} textAnchor="middle" dominantBaseline="middle"
                     fontSize="1.4" fill="white" fontWeight="700" opacity="0.9">Cases</text>
 
-                  {/* Realistic comet with single unified tail */}
-                  
-                  {/* MAIN TAIL - smooth gradient fade away from sun */}
-                  <path
-                    d={`M ${cometX} ${cometY} 
-                        Q ${cometX + Math.cos(tailRad) * 6} ${cometY + Math.sin(tailRad) * 6},
-                          ${cometX + Math.cos(tailRad) * 30} ${cometY + Math.sin(tailRad) * 30}`}
-                    stroke="url(#ionTailGrad)" strokeWidth="3.5" fill="none" strokeLinecap="round" filter="url(#softGlow)"
-                  />
-                  
-                  {/* Secondary softer tail for width */}
-                  <path
-                    d={`M ${cometX} ${cometY} 
-                        Q ${cometX + Math.cos(tailRad + 0.08) * 5} ${cometY + Math.sin(tailRad + 0.08) * 5},
-                          ${cometX + Math.cos(tailRad + 0.12) * 26} ${cometY + Math.sin(tailRad + 0.12) * 26}`}
-                    stroke="url(#ionTailGrad)" strokeWidth="5" fill="none" opacity="0.4" strokeLinecap="round"
-                  />
-                  <path
-                    d={`M ${cometX} ${cometY} 
-                        Q ${cometX + Math.cos(tailRad - 0.08) * 5} ${cometY + Math.sin(tailRad - 0.08) * 5},
-                          ${cometX + Math.cos(tailRad - 0.12) * 26} ${cometY + Math.sin(tailRad - 0.12) * 26}`}
-                    stroke="url(#ionTailGrad)" strokeWidth="5" fill="none" opacity="0.4" strokeLinecap="round"
-                  />
-                  
+                  {/* Single cone tail — narrow at head, wide and faint at tip */}
+                  {(() => {
+                    const tailLen = 30
+                    // Perpendicular axis to spread the cone width at the tip
+                    const perpRad = tailRad + Math.PI / 2
+                    const tipX = cometX + Math.cos(tailRad) * tailLen
+                    const tipY = cometY + Math.sin(tailRad) * tailLen
+                    const halfWidth = 6 // half-width of cone at the far end
+                    const leftX  = tipX + Math.cos(perpRad) * halfWidth
+                    const leftY  = tipY + Math.sin(perpRad) * halfWidth
+                    const rightX = tipX - Math.cos(perpRad) * halfWidth
+                    const rightY = tipY - Math.sin(perpRad) * halfWidth
+                    return (
+                      <>
+                        {/* Outer glow — slightly wider, very faint */}
+                        <path
+                          d={`M ${cometX} ${cometY} L ${leftX + Math.cos(perpRad) * 2} ${leftY + Math.sin(perpRad) * 2} L ${rightX - Math.cos(perpRad) * 2} ${rightY - Math.sin(perpRad) * 2} Z`}
+                          fill="url(#ionTailGrad)" opacity="0.18" filter="url(#softGlow)"
+                        />
+                        {/* Main cone tail */}
+                        <path
+                          d={`M ${cometX} ${cometY} L ${leftX} ${leftY} L ${rightX} ${rightY} Z`}
+                          fill="url(#ionTailGrad)" opacity="0.75"
+                        />
+                      </>
+                    )
+                  })()}
+
                   {/* COMA - layered fuzzy glow around nucleus */}
                   <circle cx={cometX} cy={cometY} r={4} fill="url(#cometCoreGrad)" opacity="0.2" filter="url(#softGlow)" />
                   <circle cx={cometX} cy={cometY} r={2.8} fill="#22d3ee" opacity="0.3" filter="url(#cometGlow)" />
