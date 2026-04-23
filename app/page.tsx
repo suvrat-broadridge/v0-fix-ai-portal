@@ -479,6 +479,8 @@ export default function BCometPlatform() {
   const [fieldMappings, setFieldMappings] = useState<Record<string, Array<{clientTag: string, clientName: string, broaderTag: string, broaderName: string, transform: string | null, status: "mapped" | "custom" | "unmapped"}>>>({})
   // Dashboard view mode
   const [dashboardView, setDashboardView] = useState<"cards" | "kanban">("cards")
+  // Phase filter — set from Workflow Overview to show cases in a specific phase
+  const [phaseFilter, setPhaseFilter] = useState<number | null>(null)
   // Go-live checklist
   const [goLiveChecklist, setGoLiveChecklist] = useState<Record<string, boolean>>({
     "spec-approved": true,
@@ -3873,6 +3875,28 @@ export default function BCometPlatform() {
             </div>
 
             <div className="p-6 space-y-6">
+              {/* Phase filter banner */}
+              {phaseFilter !== null && (() => {
+                const phaseNames = ["", "Intake & Discovery", "Solution Design & Configuration", "Connectivity Setup", "Certification Planning", "Test Execution", "Analysis & Remediation", "Certification Decisioning", "Production Enablement"]
+                const phaseColors = ["", "#00e5ff", "#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#f44336", "#2196f3", "#4caf50"]
+                return (
+                  <div className="flex items-center justify-between px-4 py-3 rounded-lg border" style={{ borderColor: phaseColors[phaseFilter], backgroundColor: phaseColors[phaseFilter] + "15" }}>
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: phaseColors[phaseFilter] }} />
+                      <span className={`text-sm font-medium ${textPrimary}`}>
+                        Showing cases in <span className="font-bold" style={{ color: phaseColors[phaseFilter] }}>Phase {phaseFilter}: {phaseNames[phaseFilter]}</span>
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setPhaseFilter(null)}
+                      className={`text-xs ${textSecondary} hover:text-[#f44336] flex items-center gap-1 transition-colors`}
+                    >
+                      <X className="h-3 w-3" /> Clear filter
+                    </button>
+                  </div>
+                )
+              })()}
+
               {/* KPI Cards Row - 5 cards per design brief */}
               <div className="grid grid-cols-5 gap-4">
                 <Card className={`${bgCard} border ${borderColor} p-4 cursor-pointer hover:border-[#00e5ff]/50 transition-colors`} onClick={() => setCurrentScreen("onboarding-cases")}>
@@ -4322,7 +4346,7 @@ export default function BCometPlatform() {
                       </tr>
                     </thead>
                     <tbody>
-                      {allCases.slice(0, 6).map((caseItem, idx) => {
+                      {(phaseFilter !== null ? allCases.filter(c => c.currentStage === phaseFilter) : allCases.slice(0, 6)).map((caseItem, idx) => {
                         const client = clients.find(c => c.id === caseItem.clientId)
                         if (!client) return null
                         const caseStageNames = ["Intake & Discovery", "Solution Design", "Connectivity Setup", "Cert Planning", "Test Execution", "Analysis & Remediation", "Cert Decisioning", "Production"]
@@ -5198,9 +5222,13 @@ const tools = [
                 {phases.map((phase, idx) => {
                   const PhaseIcon = phase.icon
                   return (
-                    <div
+                    <button
                       key={idx}
-                      className={`${bgSecondary} border ${borderColor} rounded-lg p-4 hover:shadow-lg transition-shadow`}
+                      className={`${bgSecondary} border ${borderColor} rounded-lg p-4 hover:shadow-lg transition-all text-left w-full cursor-pointer group`}
+                      style={{ borderColor: undefined }}
+                      onMouseEnter={e => (e.currentTarget.style.borderColor = phase.color)}
+                      onMouseLeave={e => (e.currentTarget.style.borderColor = "")}
+                      onClick={() => { setPhaseFilter(phase.num); setCurrentScreen("dashboard") }}
                     >
                       <div className="flex items-start gap-4">
                         <div
@@ -5222,10 +5250,7 @@ const tools = [
                             <div className="h-1.5 bg-[#1e4976]/30 rounded-full overflow-hidden">
                               <div
                                 className="h-full transition-all duration-300"
-                                style={{
-                                  width: `${phase.progress}%`,
-                                  backgroundColor: phase.color,
-                                }}
+                                style={{ width: `${phase.progress}%`, backgroundColor: phase.color }}
                               />
                             </div>
                             <p className={`text-xs ${textSecondary} mt-1`}>{phase.progress}% complete</p>
@@ -5241,16 +5266,21 @@ const tools = [
                             ))}
                           </div>
 
-                          {/* Active cases count */}
-                          <div className="flex items-center gap-2 pt-2 border-t border-[#1e4976]/30">
-                            <span className="text-xs font-bold" style={{ color: phase.color }}>
-                              {phase.activeCount}
+                          {/* Active cases count — call to action */}
+                          <div className="flex items-center justify-between pt-2 border-t border-[#1e4976]/30">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold" style={{ color: phase.color }}>
+                                {phase.activeCount}
+                              </span>
+                              <span className={`text-xs ${textSecondary}`}>active cases</span>
+                            </div>
+                            <span className="text-xs opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: phase.color }}>
+                              View cases &rarr;
                             </span>
-                            <span className={`text-xs ${textSecondary}`}>active cases in this phase</span>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </button>
                   )
                 })}
               </div>
