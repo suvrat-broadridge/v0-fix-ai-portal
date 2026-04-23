@@ -7118,19 +7118,145 @@ const tools = [
                                   </div>
                                 )}
 
-                                {/* Steps 1+: placeholder content per step */}
-                                {atdlWizardStep > 0 && (
-                                  <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded-lg p-5 text-center space-y-2`}>
-                                    {(() => { const Icon = steps[atdlWizardStep]?.icon || Upload; return <Icon className={`h-8 w-8 mx-auto ${textSecondary}`} /> })()}
-                                    <p className={`font-medium ${textPrimary}`}>{steps[atdlWizardStep]?.label}</p>
-                                    <p className={`text-sm ${textSecondary}`}>{steps[atdlWizardStep]?.desc}</p>
-                                    <Button
-                                      variant="outline"
-                                      onClick={() => setCurrentScreen("atdl-wizard" as typeof currentScreen)}
-                                      className="mt-2"
+                                {/* Step 1: Upload FIX Spec */}
+                                {atdlWizardStep === 1 && atdlWorkflowType === "conversion" && (
+                                  <div className="space-y-4">
+                                    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
+                                      <Upload className="h-5 w-5 text-[#00e5ff]" />
+                                      <div>
+                                        <p className={`font-medium ${textPrimary}`}>Upload FIX Spec</p>
+                                        <p className={`text-xs ${textSecondary}`}>Gate A: Inputs Locked</p>
+                                      </div>
+                                    </div>
+                                    <div 
+                                      className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center cursor-pointer hover:border-[#00e5ff] transition-all`}
+                                      onClick={() => {
+                                        const input = document.createElement("input")
+                                        input.type = "file"
+                                        input.accept = ".pdf,.xml,.txt"
+                                        input.click()
+                                      }}
                                     >
-                                      Open Full {steps[atdlWizardStep]?.label} View
-                                    </Button>
+                                      <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                                      <p className={`font-medium ${textPrimary}`}>Drop FIX specification here or click to upload</p>
+                                      <p className={`text-sm ${textSecondary} mt-1`}>Supports PDF, XML, TXT up to 50MB</p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Step 2: Convert (AI-Powered Conversion) */}
+                                {atdlWizardStep === 2 && atdlWorkflowType === "conversion" && (
+                                  <div className="space-y-4">
+                                    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
+                                      <RefreshCw className="h-5 w-5 text-[#00e5ff]" />
+                                      <div>
+                                        <p className={`font-medium ${textPrimary}`}>Convert</p>
+                                        <p className={`text-xs ${textSecondary}`}>Gate B: Structural Compliance</p>
+                                      </div>
+                                    </div>
+                                    <div className={`${bgCard} border ${borderColor} rounded-lg p-4 space-y-3`}>
+                                      <div className="flex items-center gap-2">
+                                        <Zap className="h-5 w-5 text-[#00e5ff]" />
+                                        <div>
+                                          <p className={`font-medium ${textPrimary}`}>AI-Powered Conversion</p>
+                                          <p className={`text-xs ${textSecondary}`}>Extracting strategies and parameters from FIX spec...</p>
+                                        </div>
+                                      </div>
+                                      <div className="h-2 bg-[#1e4976]/30 rounded-full overflow-hidden">
+                                        <div className="h-full bg-[#ff9800] rounded-full w-3/4 animate-pulse" />
+                                      </div>
+                                      <div className="space-y-1.5 pt-2">
+                                        <p className="text-sm text-[#4caf50] flex items-center gap-2"><CheckCircle className="h-3.5 w-3.5" /> Parsing PDF structure</p>
+                                        <p className="text-sm text-[#4caf50] flex items-center gap-2"><CheckCircle className="h-3.5 w-3.5" /> Extracting algo definitions</p>
+                                        <p className="text-sm text-[#4caf50] flex items-center gap-2"><CheckCircle className="h-3.5 w-3.5" /> Mapping parameters to ATDL types</p>
+                                        <p className="text-sm text-[#ff9800] flex items-center gap-2"><Loader className="h-3.5 w-3.5 animate-spin" /> Generating ATDL XML</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Step 3: Validate */}
+                                {atdlWizardStep === 3 && atdlWorkflowType === "conversion" && (
+                                  <div className="space-y-4">
+                                    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
+                                      <CheckCircle className="h-5 w-5 text-[#00e5ff]" />
+                                      <div>
+                                        <p className={`font-medium ${textPrimary}`}>Validate</p>
+                                        <p className={`text-xs ${textSecondary}`}>Gate C: Schema Validation</p>
+                                      </div>
+                                    </div>
+                                    <div className={`${bgCard} border ${borderColor} rounded-lg p-4`}>
+                                      <div className="flex items-center justify-between mb-3">
+                                        <p className={`font-medium ${textPrimary}`}>Validation Results</p>
+                                        <span className="text-xs px-2 py-1 rounded-full bg-[#4caf50]/20 text-[#4caf50]">All Passed</span>
+                                      </div>
+                                      <div className="space-y-2">
+                                        <div className="flex items-center justify-between text-sm"><span className={textSecondary}>Schema Compliance</span><span className="text-[#4caf50]">Passed</span></div>
+                                        <div className="flex items-center justify-between text-sm"><span className={textSecondary}>Parameter Validation</span><span className="text-[#4caf50]">Passed</span></div>
+                                        <div className="flex items-center justify-between text-sm"><span className={textSecondary}>Strategy Definitions</span><span className="text-[#4caf50]">Passed</span></div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Step 4: Preview */}
+                                {atdlWizardStep === 4 && atdlWorkflowType === "conversion" && (
+                                  <div className="space-y-4">
+                                    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
+                                      <Eye className="h-5 w-5 text-[#00e5ff]" />
+                                      <div>
+                                        <p className={`font-medium ${textPrimary}`}>Preview</p>
+                                        <p className={`text-xs ${textSecondary}`}>Gate D: Visual Review</p>
+                                      </div>
+                                    </div>
+                                    <div className={`${bgCard} border ${borderColor} rounded-lg p-4`}>
+                                      <p className={`text-sm font-medium ${textPrimary} mb-2`}>Strategy UI Preview</p>
+                                      <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded p-3 space-y-2`}>
+                                        <div className="flex items-center gap-2"><span className={`text-xs ${textSecondary} w-20`}>Strategy:</span><span className={`text-sm ${textPrimary}`}>VWAP</span></div>
+                                        <div className="flex items-center gap-2"><span className={`text-xs ${textSecondary} w-20`}>Start Time:</span><input type="time" className={`text-sm px-2 py-1 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`} defaultValue="09:30" /></div>
+                                        <div className="flex items-center gap-2"><span className={`text-xs ${textSecondary} w-20`}>End Time:</span><input type="time" className={`text-sm px-2 py-1 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`} defaultValue="16:00" /></div>
+                                        <div className="flex items-center gap-2"><span className={`text-xs ${textSecondary} w-20`}>Participation:</span><input type="number" className={`text-sm px-2 py-1 rounded border ${borderColor} w-16 ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`} defaultValue="15" /><span className={`text-xs ${textSecondary}`}>%</span></div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Step 5: Export (last step for conversion) — note: conversionSteps only has 5 steps (0-4) */}
+                                {((atdlWizardStep === 4 && atdlWorkflowType === "conversion") ? false : atdlWizardStep === steps.length - 1) && atdlWorkflowType !== "conversion" && (
+                                  <div className="space-y-4">
+                                    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
+                                      <Download className="h-5 w-5 text-[#00e5ff]" />
+                                      <div>
+                                        <p className={`font-medium ${textPrimary}`}>Export</p>
+                                        <p className={`text-xs ${textSecondary}`}>Gate E: Final Output</p>
+                                      </div>
+                                    </div>
+                                    <div className={`${bgCard} border ${borderColor} rounded-lg p-4 flex items-center justify-between`}>
+                                      <div>
+                                        <p className={`font-medium ${textPrimary}`}>ATDL Export Ready</p>
+                                        <p className={`text-xs ${textSecondary}`}>Generated ATDL file is ready for download</p>
+                                      </div>
+                                      <Button className="bg-[#4caf50] hover:bg-[#388e3c] text-white"><Download className="h-4 w-4 mr-1" /> Download ATDL</Button>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Generic step content for version-upgrade and remediation workflows */}
+                                {atdlWizardStep > 0 && atdlWorkflowType !== "conversion" && atdlWizardStep < steps.length - 1 && (
+                                  <div className="space-y-4">
+                                    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
+                                      {(() => { const Icon = steps[atdlWizardStep]?.icon || Upload; return <Icon className="h-5 w-5 text-[#00e5ff]" /> })()}
+                                      <div>
+                                        <p className={`font-medium ${textPrimary}`}>{steps[atdlWizardStep]?.label}</p>
+                                        <p className={`text-xs ${textSecondary}`}>{steps[atdlWizardStep]?.desc}</p>
+                                      </div>
+                                    </div>
+                                    <div className={`${bgCard} border ${borderColor} rounded-lg p-4 text-center`}>
+                                      <p className={`text-sm ${textSecondary}`}>Complete this step to proceed.</p>
+                                      <Button className="mt-3 bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">
+                                        Mark Step Complete
+                                      </Button>
+                                    </div>
                                   </div>
                                 )}
 
@@ -16242,7 +16368,7 @@ const copyToClipboard = () => {
                               {b.severity.toUpperCase()}
                             </span>
                           </div>
-                          <p className={`text-xs ${textSecondary} mb-2`}>Owner: {b.owner} · Due: {b.dueDate} · Created: {b.createdDate || "N/A"}</p>
+                          <p className={`text-xs ${textSecondary} mb-2`}>Owner: {b.owner} · Due: {b.dueDate} �� Created: {b.createdDate || "N/A"}</p>
                           {b.status === "resolved" && (
                             <p className={`text-xs text-[#4caf50] font-medium`}>Resolved: {b.resolutionNotes || "No notes"}</p>
                           )}
