@@ -8,6 +8,245 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
+// ── Test Plan Generator ─────────────────────────────────────────────────────
+interface TestSuite {
+  id: string
+  label: string
+  categories: { name: string; count: number }[]
+}
+
+function TestPlanGeneratorTool({
+  availableSuites,
+  defaultSuiteId,
+  caseClient,
+  caseAsset,
+  caseProtocol,
+  isDarkMode,
+  textPrimary,
+  textSecondary,
+  bgCard,
+  borderColor,
+  onNextStep,
+}: {
+  availableSuites: TestSuite[]
+  defaultSuiteId: string
+  caseClient: string
+  caseAsset: string
+  caseProtocol: string
+  isDarkMode: boolean
+  textPrimary: string
+  textSecondary: string
+  bgCard: string
+  borderColor: string
+  onNextStep?: () => void
+}) {
+  const [selectedSuiteId, setSelectedSuiteId] = React.useState(defaultSuiteId)
+  const [specLoaded] = React.useState(true) // standardized spec always present
+  const [customizing, setCustomizing] = React.useState(false)
+  const [customized, setCustomized] = React.useState(false)
+
+  const selectedSuite = availableSuites.find(s => s.id === selectedSuiteId) ?? availableSuites[0]
+  const totalCases = selectedSuite.categories.reduce((acc, c) => acc + c.count, 0)
+  const customizedTotal = selectedSuite.categories.reduce((acc, c) => acc + Math.round(c.count * 1.15), 0)
+
+  const bg0 = isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"
+  const bg1 = isDarkMode ? "bg-[#0d1f35]" : "bg-white"
+
+  return (
+    <div className="space-y-4">
+
+      {/* Section A — Load Certification Test Suite */}
+      <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+        <div className={`px-4 py-3 border-b ${borderColor} flex items-center gap-2`}>
+          <ClipboardCheck className="h-4 w-4 text-[#ff9800]" />
+          <span className={`text-sm font-semibold ${textPrimary}`}>Load Certification Test Suite</span>
+        </div>
+        <div className="px-4 py-4 space-y-3">
+          {/* Suite selector */}
+          <div>
+            <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Available Test Suites</label>
+            <div className={`relative border ${borderColor} rounded-lg overflow-hidden`}>
+              <select
+                value={selectedSuiteId}
+                onChange={e => { setSelectedSuiteId(e.target.value); setCustomized(false) }}
+                className={`w-full appearance-none px-3 py-2.5 pr-8 text-sm font-medium ${textPrimary} ${bg0} focus:outline-none`}
+              >
+                {availableSuites.map(suite => (
+                  <option key={suite.id} value={suite.id}>{suite.label}</option>
+                ))}
+              </select>
+              <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none ${textSecondary}`} />
+            </div>
+            {/* Preloaded badge */}
+            {selectedSuiteId === defaultSuiteId && (
+              <div className="flex items-center gap-1.5 mt-1.5">
+                <CheckCircle className="h-3.5 w-3.5 text-[#4caf50]" />
+                <span className="text-xs text-[#4caf50]">Auto-matched from case: {caseClient} — {caseAsset} / {caseProtocol}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Suite summary row */}
+          <div className={`${bg0} rounded-lg px-4 py-3 flex items-center justify-between`}>
+            <div className="flex items-center gap-3">
+              <div className="flex flex-col gap-0.5">
+                <span className={`text-xs ${textSecondary}`}>Categories</span>
+                <span className={`text-lg font-bold ${textPrimary}`}>{selectedSuite.categories.length}</span>
+              </div>
+              <div className={`w-px h-8 ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`} />
+              <div className="flex flex-col gap-0.5">
+                <span className={`text-xs ${textSecondary}`}>Total Cases</span>
+                <span className={`text-lg font-bold ${customized ? "text-[#00e5ff]" : "text-[#ff9800]"}`}>
+                  {customized ? customizedTotal : totalCases}
+                </span>
+              </div>
+              {customized && (
+                <>
+                  <div className={`w-px h-8 ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`} />
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs text-[#4caf50]">Spec-adjusted</span>
+                    <span className="text-xs font-medium text-[#4caf50]">+{customizedTotal - totalCases} cases added</span>
+                  </div>
+                </>
+              )}
+            </div>
+            <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? "bg-[#4caf50]/15 text-[#4caf50]" : "bg-green-100 text-green-700"}`}>
+              Standard Suite
+            </span>
+          </div>
+
+          {/* Category breakdown */}
+          <div className={`border ${borderColor} rounded-lg overflow-hidden`}>
+            {selectedSuite.categories.map((cat, i) => {
+              const adjustedCount = customized ? Math.round(cat.count * 1.15) : cat.count
+              return (
+                <div
+                  key={i}
+                  className={`flex items-center justify-between px-4 py-2.5 text-sm ${i < selectedSuite.categories.length - 1 ? `border-b ${borderColor}` : ""} ${bg1}`}
+                >
+                  <span className={textSecondary}>{cat.name}</span>
+                  <div className="flex items-center gap-2">
+                    {customized && cat.count !== adjustedCount && (
+                      <span className={`text-xs line-through ${textSecondary} opacity-50`}>{cat.count}</span>
+                    )}
+                    <span className={`font-medium ${customized ? "text-[#00e5ff]" : "text-[#4caf50]"}`}>{adjustedCount} cases</span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Section B — Standardized Spec */}
+      <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+        <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+          <div className="flex items-center gap-2">
+            <FileCheck className="h-4 w-4 text-[#00e5ff]" />
+            <span className={`text-sm font-semibold ${textPrimary}`}>Loaded Standardized Spec</span>
+          </div>
+          {specLoaded && (
+            <span className="flex items-center gap-1 text-xs text-[#4caf50]">
+              <CheckCircle className="h-3.5 w-3.5" /> Loaded
+            </span>
+          )}
+        </div>
+        <div className="px-4 py-3">
+          <div className={`${bg0} rounded-lg px-4 py-3 flex items-center justify-between`}>
+            <div className="flex items-center gap-3">
+              <FileText className={`h-5 w-5 ${textSecondary}`} />
+              <div>
+                <p className={`text-sm font-medium ${textPrimary}`}>{caseClient} — {caseAsset} Spec</p>
+                <p className={`text-xs ${textSecondary}`}>{caseProtocol} · 5 message types · 59 fields</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm"><Eye className="h-3.5 w-3.5 mr-1" /> View Spec</Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Section C — Customize to Spec */}
+      <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+        <div className={`px-4 py-3 border-b ${borderColor}`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sliders className="h-4 w-4 text-[#9c27b0]" />
+              <span className={`text-sm font-semibold ${textPrimary}`}>Customize Test Cases to Spec</span>
+            </div>
+            {!customized && (
+              <Button
+                size="sm"
+                disabled={customizing}
+                onClick={() => {
+                  setCustomizing(true)
+                  setTimeout(() => { setCustomizing(false); setCustomized(true) }, 1800)
+                }}
+                className="bg-[#9c27b0] hover:bg-[#7b1fa2] text-white"
+              >
+                {customizing ? (
+                  <><Loader className="h-3.5 w-3.5 mr-1 animate-spin" /> Analyzing Spec...</>
+                ) : (
+                  <><Zap className="h-3.5 w-3.5 mr-1" /> Generate Spec-Adjusted Suite</>
+                )}
+              </Button>
+            )}
+            {customized && (
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1 text-xs text-[#4caf50]"><CheckCircle className="h-3.5 w-3.5" /> Suite Generated</span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setCustomized(false)}
+                  className={`text-xs ${textSecondary}`}
+                >Reset</Button>
+              </div>
+            )}
+          </div>
+          <p className={`text-xs ${textSecondary} mt-1`}>
+            Compares the loaded spec against the standard suite and adds, removes, or adjusts test cases accordingly.
+          </p>
+        </div>
+        {customized && (
+          <div className="px-4 py-3 space-y-2">
+            <div className={`flex items-start gap-2 text-sm ${textSecondary}`}>
+              <CheckCircle className="h-4 w-4 text-[#4caf50] flex-shrink-0 mt-0.5" />
+              <span>Added 8 test cases for custom tags detected in spec (tags 9001, 9002, 9003)</span>
+            </div>
+            <div className={`flex items-start gap-2 text-sm ${textSecondary}`}>
+              <CheckCircle className="h-4 w-4 text-[#4caf50] flex-shrink-0 mt-0.5" />
+              <span>Updated 4 Order Flow cases to validate conditional field logic (tag 44 required when OrdType=2)</span>
+            </div>
+            <div className={`flex items-start gap-2 text-sm ${textSecondary}`}>
+              <AlertTriangle className="h-4 w-4 text-[#ff9800] flex-shrink-0 mt-0.5" />
+              <span>Removed 1 standard case — IOC order type not in client spec (TimeInForce=3)</span>
+            </div>
+            <div className={`flex items-center gap-2 mt-3 pt-3 border-t ${borderColor}`}>
+              <Button size="sm" className="bg-[#4caf50] hover:bg-[#388e3c] text-white">
+                <Download className="h-3.5 w-3.5 mr-1" /> Export Suite
+              </Button>
+              <Button size="sm" variant="outline">
+                <Eye className="h-3.5 w-3.5 mr-1" /> Preview All Cases
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Next Step */}
+      {onNextStep && (
+        <div className={`flex pt-4 border-t ${borderColor}`}>
+          <Button onClick={onNextStep} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">
+            Next Step <ChevronRight className="h-4 w-4 ml-1" />
+          </Button>
+        </div>
+      )}
+    </div>
+  )
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "workflow-overview" | "intake-portal" | "dashboard" | "clients" | "client-detail" | "case-workflow" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "onboarding-case-detail" | "approvals" | "evidence-vault" | "prod-config" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case" | "presentation" | "client-cert-report">("home")
@@ -7298,48 +7537,67 @@ const tools = [
                           })()}
 
                           {/* Test Plan Generator — Phase 4 */}
-                          {tool.id === "test-plan" && (
-                            <div className="space-y-4">
-                              <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
-                                <FileText className="h-5 w-5 text-[#ff9800]" />
-                                <div>
-                                  <p className={`font-medium ${textPrimary}`}>Test Plan Generator</p>
-                                  <p className={`text-xs ${textSecondary}`}>Auto-generate comprehensive test plans from specs</p>
-                                </div>
-                              </div>
-                              <div className={`${bgCard} border ${borderColor} rounded-lg p-4 space-y-3`}>
-                                <div className="flex items-center justify-between">
-                                  <p className={`font-medium ${textPrimary}`}>Generate Test Plan</p>
-                                  <Button size="sm" className="bg-[#ff9800] hover:bg-[#f57c00] text-white">
-                                    <Zap className="h-4 w-4 mr-1" /> Generate
-                                  </Button>
-                                </div>
-                                <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded p-3 space-y-2`}>
-                                  <div className="flex items-center justify-between text-sm">
-                                    <span className={textSecondary}>Connectivity Tests</span>
-                                    <span className="text-[#4caf50]">12 cases</span>
-                                  </div>
-                                  <div className="flex items-center justify-between text-sm">
-                                    <span className={textSecondary}>Session Tests</span>
-                                    <span className="text-[#4caf50]">8 cases</span>
-                                  </div>
-                                  <div className="flex items-center justify-between text-sm">
-                                    <span className={textSecondary}>Order Flow Tests</span>
-                                    <span className="text-[#4caf50]">24 cases</span>
-                                  </div>
-                                  <div className="flex items-center justify-between text-sm">
-                                    <span className={textSecondary}>Edge Cases</span>
-                                    <span className="text-[#4caf50]">15 cases</span>
-                                  </div>
-                                </div>
-                              </div>
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
-                                <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
-                                </div>
-                              )}
-                            </div>
-                          )}
+                          {tool.id === "test-plan" && (() => {
+                            // Derive the preselected suite from the case context
+                            const caseClient = selectedOnboardingCase?.client || "Nexus Trading Group"
+                            const caseAsset  = selectedOnboardingCase?.assetClass || "Equities"
+                            const caseProtocol = "FIX 4.2"
+                            const defaultSuite = `${caseClient} — ${caseAsset} / ${caseProtocol}`
+
+                            const availableSuites = [
+                              { id: "nexus-eq-42", label: `${caseClient} — ${caseAsset} / ${caseProtocol}`, categories: [
+                                  { name: "Connectivity Tests",   count: 12 },
+                                  { name: "Session Tests",        count: 8  },
+                                  { name: "Order Flow Tests",     count: 24 },
+                                  { name: "Execution Reports",    count: 18 },
+                                  { name: "Cancel / Replace",     count: 10 },
+                                  { name: "Edge Cases",           count: 15 },
+                                ]},
+                              { id: "std-eq-44", label: "Standard Equities — FIX 4.4", categories: [
+                                  { name: "Connectivity Tests",   count: 10 },
+                                  { name: "Session Tests",        count: 6  },
+                                  { name: "Order Flow Tests",     count: 20 },
+                                  { name: "Edge Cases",           count: 12 },
+                                ]},
+                              { id: "std-opt-44", label: "Standard Options — FIX 4.4", categories: [
+                                  { name: "Connectivity Tests",   count: 10 },
+                                  { name: "Session Tests",        count: 6  },
+                                  { name: "Multi-Leg Orders",     count: 16 },
+                                  { name: "Exercise / Expire",    count: 8  },
+                                  { name: "Edge Cases",           count: 10 },
+                                ]},
+                              { id: "std-fx-50", label: "Standard FX — FIX 5.0 SP2", categories: [
+                                  { name: "Connectivity Tests",   count: 8  },
+                                  { name: "Quote Request/Response", count: 14 },
+                                  { name: "Order Flow Tests",     count: 18 },
+                                  { name: "Edge Cases",           count: 9  },
+                                ]},
+                            ]
+
+                            const [selectedSuiteId, setSelectedSuiteId]             = [
+                              "nexus-eq-42",
+                              () => {},
+                            ] as const
+                            // We use component-level state via a wrapper
+                            return (
+                              <TestPlanGeneratorTool
+                                availableSuites={availableSuites}
+                                defaultSuiteId="nexus-eq-42"
+                                caseClient={caseClient}
+                                caseAsset={caseAsset}
+                                caseProtocol={caseProtocol}
+                                isDarkMode={isDarkMode}
+                                textPrimary={textPrimary}
+                                textSecondary={textSecondary}
+                                bgCard={bgCard}
+                                borderColor={borderColor}
+                                onNextStep={actualToolIndex < currentPhase.tools.length - 1 ? () => {
+                                  setCurrentToolIndex(actualToolIndex + 1)
+                                  setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id)
+                                } : undefined}
+                              />
+                            )
+                          })()}
 
                           {/* Test Case Creator — Phase 4 */}
                           {tool.id === "test-cases" && (
