@@ -2259,7 +2259,7 @@ export default function BCometPlatform() {
 
                   {/* Single cone tail — narrow at head, wide and faint at tip */}
                   {(() => {
-                    const tailLen = 30
+                    const tailLen = 15
                     // Perpendicular axis to spread the cone width at the tip
                     const perpRad = tailRad + Math.PI / 2
                     const tipX = cometX + Math.cos(tailRad) * tailLen
