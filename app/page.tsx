@@ -7297,8 +7297,532 @@ const tools = [
                             )
                           })()}
 
+                          {/* Test Plan Generator — Phase 4 */}
+                          {tool.id === "test-plan" && (
+                            <div className="space-y-4">
+                              <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
+                                <FileText className="h-5 w-5 text-[#ff9800]" />
+                                <div>
+                                  <p className={`font-medium ${textPrimary}`}>Test Plan Generator</p>
+                                  <p className={`text-xs ${textSecondary}`}>Auto-generate comprehensive test plans from specs</p>
+                                </div>
+                              </div>
+                              <div className={`${bgCard} border ${borderColor} rounded-lg p-4 space-y-3`}>
+                                <div className="flex items-center justify-between">
+                                  <p className={`font-medium ${textPrimary}`}>Generate Test Plan</p>
+                                  <Button size="sm" className="bg-[#ff9800] hover:bg-[#f57c00] text-white">
+                                    <Zap className="h-4 w-4 mr-1" /> Generate
+                                  </Button>
+                                </div>
+                                <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded p-3 space-y-2`}>
+                                  <div className="flex items-center justify-between text-sm">
+                                    <span className={textSecondary}>Connectivity Tests</span>
+                                    <span className="text-[#4caf50]">12 cases</span>
+                                  </div>
+                                  <div className="flex items-center justify-between text-sm">
+                                    <span className={textSecondary}>Session Tests</span>
+                                    <span className="text-[#4caf50]">8 cases</span>
+                                  </div>
+                                  <div className="flex items-center justify-between text-sm">
+                                    <span className={textSecondary}>Order Flow Tests</span>
+                                    <span className="text-[#4caf50]">24 cases</span>
+                                  </div>
+                                  <div className="flex items-center justify-between text-sm">
+                                    <span className={textSecondary}>Edge Cases</span>
+                                    <span className="text-[#4caf50]">15 cases</span>
+                                  </div>
+                                </div>
+                              </div>
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex pt-4 border-t border-[#1e4976]/30">
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Test Case Creator — Phase 4 */}
+                          {tool.id === "test-cases" && (
+                            <div className="space-y-4">
+                              <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
+                                <TestTube className="h-5 w-5 text-[#ff9800]" />
+                                <div>
+                                  <p className={`font-medium ${textPrimary}`}>Test Case Creator</p>
+                                  <p className={`text-xs ${textSecondary}`}>Create and manage individual test cases</p>
+                                </div>
+                              </div>
+                              <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                <div className={`px-4 py-2 border-b ${borderColor} flex items-center justify-between`}>
+                                  <span className={`text-sm font-medium ${textPrimary}`}>Test Cases</span>
+                                  <Button size="sm" variant="outline"><Plus className="h-3 w-3 mr-1" /> Add Case</Button>
+                                </div>
+                                <div className="divide-y divide-[#1e4976]/30">
+                                  {[
+                                    { id: "TC-001", name: "Session Logon", status: "passed", category: "Session" },
+                                    { id: "TC-002", name: "New Order Single", status: "passed", category: "Order" },
+                                    { id: "TC-003", name: "Order Cancel", status: "in-progress", category: "Order" },
+                                    { id: "TC-004", name: "Execution Report", status: "pending", category: "Execution" },
+                                  ].map(tc => (
+                                    <div key={tc.id} className="px-4 py-2 flex items-center justify-between">
+                                      <div className="flex items-center gap-3">
+                                        <span className={`text-xs font-mono ${textSecondary}`}>{tc.id}</span>
+                                        <span className={`text-sm ${textPrimary}`}>{tc.name}</span>
+                                        <span className={`text-xs px-2 py-0.5 rounded ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-100"} ${textSecondary}`}>{tc.category}</span>
+                                      </div>
+                                      <span className={`text-xs px-2 py-1 rounded-full ${tc.status === "passed" ? "bg-[#4caf50]/20 text-[#4caf50]" : tc.status === "in-progress" ? "bg-[#2196f3]/20 text-[#2196f3]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>{tc.status}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex pt-4 border-t border-[#1e4976]/30">
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Readiness Checklist — Phase 4 */}
+                          {tool.id === "checklist" && (
+                            <div className="space-y-4">
+                              <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
+                                <ClipboardCheck className="h-5 w-5 text-[#ff9800]" />
+                                <div>
+                                  <p className={`font-medium ${textPrimary}`}>Readiness Checklist</p>
+                                  <p className={`text-xs ${textSecondary}`}>Pre-certification readiness verification</p>
+                                </div>
+                              </div>
+                              <div className={`${bgCard} border ${borderColor} rounded-lg p-4 space-y-3`}>
+                                {[
+                                  { item: "Spec comparison completed", done: true },
+                                  { item: "Session configuration verified", done: true },
+                                  { item: "Field mappings approved", done: true },
+                                  { item: "Test plan generated", done: false },
+                                  { item: "All critical test cases passed", done: false },
+                                  { item: "Evidence artifacts uploaded", done: false },
+                                ].map((check, i) => (
+                                  <div key={i} className="flex items-center gap-3">
+                                    <div className={`h-5 w-5 rounded border-2 flex items-center justify-center ${check.done ? "border-[#4caf50] bg-[#4caf50]" : `${borderColor}`}`}>
+                                      {check.done && <Check className="h-3 w-3 text-white" />}
+                                    </div>
+                                    <span className={`text-sm ${check.done ? textPrimary : textSecondary}`}>{check.item}</span>
+                                  </div>
+                                ))}
+                                <div className="pt-2 border-t border-[#1e4976]/30">
+                                  <div className="flex items-center justify-between text-sm">
+                                    <span className={textSecondary}>Readiness Score</span>
+                                    <span className="text-[#ff9800] font-semibold">50%</span>
+                                  </div>
+                                </div>
+                              </div>
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex pt-4 border-t border-[#1e4976]/30">
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Session Tests — Phase 5 */}
+                          {tool.id === "session-tests" && (
+                            <div className="space-y-4">
+                              <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#9c27b0]/20" : "bg-purple-50"}`}>
+                                <Server className="h-5 w-5 text-[#9c27b0]" />
+                                <div>
+                                  <p className={`font-medium ${textPrimary}`}>Session Tests</p>
+                                  <p className={`text-xs ${textSecondary}`}>FIX session connectivity and protocol tests</p>
+                                </div>
+                              </div>
+                              <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                <div className={`px-4 py-2 border-b ${borderColor} flex items-center justify-between`}>
+                                  <span className={`text-sm font-medium ${textPrimary}`}>Test Results</span>
+                                  <Button size="sm" className="bg-[#9c27b0] hover:bg-[#7b1fa2] text-white"><Play className="h-3 w-3 mr-1" /> Run All</Button>
+                                </div>
+                                <div className="divide-y divide-[#1e4976]/30">
+                                  {[
+                                    { name: "Logon/Logout", passed: 4, failed: 0, total: 4 },
+                                    { name: "Heartbeat", passed: 2, failed: 0, total: 2 },
+                                    { name: "Sequence Reset", passed: 3, failed: 1, total: 4 },
+                                    { name: "Resend Request", passed: 2, failed: 0, total: 2 },
+                                  ].map((t, i) => (
+                                    <div key={i} className="px-4 py-2 flex items-center justify-between">
+                                      <span className={`text-sm ${textPrimary}`}>{t.name}</span>
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-xs text-[#4caf50]">{t.passed} passed</span>
+                                        {t.failed > 0 && <span className="text-xs text-[#f44336]">{t.failed} failed</span>}
+                                        <span className={`text-xs ${textSecondary}`}>/ {t.total}</span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex pt-4 border-t border-[#1e4976]/30">
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Application Tests — Phase 5 */}
+                          {tool.id === "app-tests" && (
+                            <div className="space-y-4">
+                              <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#9c27b0]/20" : "bg-purple-50"}`}>
+                                <Activity className="h-5 w-5 text-[#9c27b0]" />
+                                <div>
+                                  <p className={`font-medium ${textPrimary}`}>Application Tests</p>
+                                  <p className={`text-xs ${textSecondary}`}>Order flow and business logic validation</p>
+                                </div>
+                              </div>
+                              <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                <div className={`px-4 py-2 border-b ${borderColor} flex items-center justify-between`}>
+                                  <span className={`text-sm font-medium ${textPrimary}`}>Application Test Suites</span>
+                                  <Button size="sm" className="bg-[#9c27b0] hover:bg-[#7b1fa2] text-white"><Play className="h-3 w-3 mr-1" /> Run All</Button>
+                                </div>
+                                <div className="divide-y divide-[#1e4976]/30">
+                                  {[
+                                    { name: "New Order Single", passed: 12, failed: 0, total: 12 },
+                                    { name: "Order Cancel/Replace", passed: 8, failed: 2, total: 10 },
+                                    { name: "Execution Reports", passed: 15, failed: 0, total: 15 },
+                                    { name: "Rejects & Errors", passed: 6, failed: 1, total: 7 },
+                                  ].map((t, i) => (
+                                    <div key={i} className="px-4 py-2 flex items-center justify-between">
+                                      <span className={`text-sm ${textPrimary}`}>{t.name}</span>
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-xs text-[#4caf50]">{t.passed} passed</span>
+                                        {t.failed > 0 && <span className="text-xs text-[#f44336]">{t.failed} failed</span>}
+                                        <span className={`text-xs ${textSecondary}`}>/ {t.total}</span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex pt-4 border-t border-[#1e4976]/30">
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Evidence Capture — Phase 5 */}
+                          {tool.id === "evidence" && (
+                            <div className="space-y-4">
+                              <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#9c27b0]/20" : "bg-purple-50"}`}>
+                                <FolderArchive className="h-5 w-5 text-[#9c27b0]" />
+                                <div>
+                                  <p className={`font-medium ${textPrimary}`}>Evidence Capture</p>
+                                  <p className={`text-xs ${textSecondary}`}>Collect and archive test artifacts</p>
+                                </div>
+                              </div>
+                              <div className={`${bgCard} border ${borderColor} rounded-lg p-4`}>
+                                <div className="flex items-center justify-between mb-3">
+                                  <span className={`text-sm font-medium ${textPrimary}`}>Uploaded Artifacts</span>
+                                  <Button size="sm" variant="outline"><Upload className="h-3 w-3 mr-1" /> Upload</Button>
+                                </div>
+                                <div className="space-y-2">
+                                  {[
+                                    { name: "session_logs_20240115.log", size: "2.4 MB", type: "Log" },
+                                    { name: "test_results_summary.pdf", size: "156 KB", type: "Report" },
+                                    { name: "execution_screenshots.zip", size: "8.2 MB", type: "Screenshot" },
+                                  ].map((file, i) => (
+                                    <div key={i} className={`flex items-center justify-between p-2 rounded ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                                      <div className="flex items-center gap-2">
+                                        <FileText className={`h-4 w-4 ${textSecondary}`} />
+                                        <span className={`text-sm ${textPrimary}`}>{file.name}</span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <span className={`text-xs ${textSecondary}`}>{file.size}</span>
+                                        <span className={`text-xs px-2 py-0.5 rounded ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"} ${textSecondary}`}>{file.type}</span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex pt-4 border-t border-[#1e4976]/30">
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Log Analysis — Phase 5 */}
+                          {tool.id === "log-analysis" && (
+                            <div className="space-y-4">
+                              <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#9c27b0]/20" : "bg-purple-50"}`}>
+                                <FileSearch className="h-5 w-5 text-[#9c27b0]" />
+                                <div>
+                                  <p className={`font-medium ${textPrimary}`}>Log Analysis</p>
+                                  <p className={`text-xs ${textSecondary}`}>AI-powered FIX message analysis</p>
+                                </div>
+                              </div>
+                              <div className={`${bgCard} border ${borderColor} rounded-lg p-4 space-y-3`}>
+                                <div className="flex items-center gap-2">
+                                  <Zap className="h-5 w-5 text-[#00e5ff]" />
+                                  <p className={`font-medium ${textPrimary}`}>Analysis Summary</p>
+                                </div>
+                                <div className="grid grid-cols-3 gap-3">
+                                  <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded p-3 text-center`}>
+                                    <p className="text-2xl font-bold text-[#4caf50]">1,247</p>
+                                    <p className={`text-xs ${textSecondary}`}>Messages Parsed</p>
+                                  </div>
+                                  <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded p-3 text-center`}>
+                                    <p className="text-2xl font-bold text-[#ff9800]">3</p>
+                                    <p className={`text-xs ${textSecondary}`}>Anomalies Found</p>
+                                  </div>
+                                  <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded p-3 text-center`}>
+                                    <p className="text-2xl font-bold text-[#f44336]">1</p>
+                                    <p className={`text-xs ${textSecondary}`}>Critical Issue</p>
+                                  </div>
+                                </div>
+                              </div>
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex pt-4 border-t border-[#1e4976]/30">
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Failure Analysis — Phase 6 */}
+                          {tool.id === "failure-analysis" && (
+                            <div className="space-y-4">
+                              <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#f44336]/20" : "bg-red-50"}`}>
+                                <AlertTriangle className="h-5 w-5 text-[#f44336]" />
+                                <div>
+                                  <p className={`font-medium ${textPrimary}`}>Failure Analysis</p>
+                                  <p className={`text-xs ${textSecondary}`}>Identify and categorize test failures</p>
+                                </div>
+                              </div>
+                              <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                <div className={`px-4 py-2 border-b ${borderColor}`}>
+                                  <span className={`text-sm font-medium ${textPrimary}`}>Recent Failures</span>
+                                </div>
+                                <div className="divide-y divide-[#1e4976]/30">
+                                  {[
+                                    { test: "Order Cancel - TC-003", error: "Invalid MsgSeqNum", severity: "high" },
+                                    { test: "Sequence Reset - TC-007", error: "Gap fill mismatch", severity: "medium" },
+                                    { test: "Reject Handling - TC-012", error: "Missing tag 58", severity: "low" },
+                                  ].map((f, i) => (
+                                    <div key={i} className="px-4 py-3">
+                                      <div className="flex items-center justify-between mb-1">
+                                        <span className={`text-sm font-medium ${textPrimary}`}>{f.test}</span>
+                                        <span className={`text-xs px-2 py-0.5 rounded-full ${f.severity === "high" ? "bg-[#f44336]/20 text-[#f44336]" : f.severity === "medium" ? "bg-[#ff9800]/20 text-[#ff9800]" : "bg-[#2196f3]/20 text-[#2196f3]"}`}>{f.severity}</span>
+                                      </div>
+                                      <p className={`text-xs ${textSecondary}`}>{f.error}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex pt-4 border-t border-[#1e4976]/30">
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* AI Root Cause — Phase 6 */}
+                          {tool.id === "root-cause" && (
+                            <div className="space-y-4">
+                              <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#f44336]/20" : "bg-red-50"}`}>
+                                <Brain className="h-5 w-5 text-[#f44336]" />
+                                <div>
+                                  <p className={`font-medium ${textPrimary}`}>AI Root Cause Analysis</p>
+                                  <p className={`text-xs ${textSecondary}`}>ML-powered failure diagnosis</p>
+                                </div>
+                              </div>
+                              <div className={`${bgCard} border ${borderColor} rounded-lg p-4 space-y-3`}>
+                                <div className="flex items-center gap-2 text-[#00e5ff]">
+                                  <Zap className="h-5 w-5" />
+                                  <p className="font-medium">AI Analysis Result</p>
+                                </div>
+                                <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded p-3`}>
+                                  <p className={`text-sm ${textPrimary} mb-2`}>Root Cause: Sequence number mismatch during session recovery</p>
+                                  <p className={`text-xs ${textSecondary}`}>The client is sending ResendRequest with incorrect BeginSeqNo. Expected: 145, Received: 142. This causes a gap fill mismatch when the server attempts to replay messages.</p>
+                                </div>
+                                <div className="flex items-center justify-between pt-2">
+                                  <span className={`text-xs ${textSecondary}`}>Confidence: <span className="text-[#4caf50]">94%</span></span>
+                                  <Button size="sm" variant="outline">View Details</Button>
+                                </div>
+                              </div>
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex pt-4 border-t border-[#1e4976]/30">
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Defect Tracking — Phase 6 */}
+                          {tool.id === "defects" && (
+                            <div className="space-y-4">
+                              <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#f44336]/20" : "bg-red-50"}`}>
+                                <AlertCircle className="h-5 w-5 text-[#f44336]" />
+                                <div>
+                                  <p className={`font-medium ${textPrimary}`}>Defect Tracking</p>
+                                  <p className={`text-xs ${textSecondary}`}>Track and manage identified issues</p>
+                                </div>
+                              </div>
+                              <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                <div className={`px-4 py-2 border-b ${borderColor} flex items-center justify-between`}>
+                                  <span className={`text-sm font-medium ${textPrimary}`}>Open Defects</span>
+                                  <Button size="sm" variant="outline"><Plus className="h-3 w-3 mr-1" /> Log Defect</Button>
+                                </div>
+                                <div className="divide-y divide-[#1e4976]/30">
+                                  {[
+                                    { id: "DEF-001", title: "MsgSeqNum handling in resend", status: "open", priority: "high" },
+                                    { id: "DEF-002", title: "Missing tag 58 in rejects", status: "in-progress", priority: "medium" },
+                                  ].map((d, i) => (
+                                    <div key={i} className="px-4 py-2 flex items-center justify-between">
+                                      <div className="flex items-center gap-3">
+                                        <span className={`text-xs font-mono ${textSecondary}`}>{d.id}</span>
+                                        <span className={`text-sm ${textPrimary}`}>{d.title}</span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <span className={`text-xs px-2 py-0.5 rounded-full ${d.priority === "high" ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>{d.priority}</span>
+                                        <span className={`text-xs px-2 py-0.5 rounded ${d.status === "open" ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#2196f3]/20 text-[#2196f3]"}`}>{d.status}</span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex pt-4 border-t border-[#1e4976]/30">
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Completion Evaluation — Phase 7 */}
+                          {tool.id === "eval" && (
+                            <div className="space-y-4">
+                              <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#2196f3]/20" : "bg-blue-50"}`}>
+                                <CheckSquare className="h-5 w-5 text-[#2196f3]" />
+                                <div>
+                                  <p className={`font-medium ${textPrimary}`}>Completion Evaluation</p>
+                                  <p className={`text-xs ${textSecondary}`}>Assess certification readiness</p>
+                                </div>
+                              </div>
+                              <div className={`${bgCard} border ${borderColor} rounded-lg p-4`}>
+                                <div className="flex items-center justify-between mb-4">
+                                  <span className={`font-medium ${textPrimary}`}>Certification Readiness</span>
+                                  <span className="text-2xl font-bold text-[#4caf50]">85%</span>
+                                </div>
+                                <div className="space-y-2">
+                                  {[
+                                    { category: "Session Tests", score: 100 },
+                                    { category: "Application Tests", score: 90 },
+                                    { category: "Evidence Collection", score: 80 },
+                                    { category: "Defect Resolution", score: 70 },
+                                  ].map((c, i) => (
+                                    <div key={i} className="flex items-center gap-3">
+                                      <span className={`text-sm ${textSecondary} w-36`}>{c.category}</span>
+                                      <div className="flex-1 h-2 bg-[#1e4976]/30 rounded-full overflow-hidden">
+                                        <div className="h-full bg-[#4caf50] rounded-full" style={{ width: `${c.score}%` }} />
+                                      </div>
+                                      <span className={`text-xs ${textPrimary} w-10 text-right`}>{c.score}%</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex pt-4 border-t border-[#1e4976]/30">
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Certification Report — Phase 7 */}
+                          {tool.id === "report" && (
+                            <div className="space-y-4">
+                              <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#2196f3]/20" : "bg-blue-50"}`}>
+                                <FileCheck className="h-5 w-5 text-[#2196f3]" />
+                                <div>
+                                  <p className={`font-medium ${textPrimary}`}>Certification Report</p>
+                                  <p className={`text-xs ${textSecondary}`}>Generate official certification documentation</p>
+                                </div>
+                              </div>
+                              <div className={`${bgCard} border ${borderColor} rounded-lg p-4`}>
+                                <div className="flex items-center justify-between mb-3">
+                                  <div>
+                                    <p className={`font-medium ${textPrimary}`}>Certification Report</p>
+                                    <p className={`text-xs ${textSecondary}`}>{selectedOnboardingCase?.client} - {selectedOnboardingCase?.assetClass}</p>
+                                  </div>
+                                  <Button size="sm" className="bg-[#2196f3] hover:bg-[#1976d2] text-white">
+                                    <Zap className="h-3 w-3 mr-1" /> Generate Report
+                                  </Button>
+                                </div>
+                                <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded p-3 space-y-1 text-sm`}>
+                                  <p className={textSecondary}>Report will include:</p>
+                                  <ul className={`list-disc list-inside ${textSecondary} text-xs space-y-1`}>
+                                    <li>Executive summary</li>
+                                    <li>Test results breakdown</li>
+                                    <li>Evidence artifacts</li>
+                                    <li>Compliance checklist</li>
+                                    <li>Signoff pages</li>
+                                  </ul>
+                                </div>
+                              </div>
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex pt-4 border-t border-[#1e4976]/30">
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Signoff Collection — Phase 7 */}
+                          {tool.id === "signoff" && (
+                            <div className="space-y-4">
+                              <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#2196f3]/20" : "bg-blue-50"}`}>
+                                <UserCheck className="h-5 w-5 text-[#2196f3]" />
+                                <div>
+                                  <p className={`font-medium ${textPrimary}`}>Signoff Collection</p>
+                                  <p className={`text-xs ${textSecondary}`}>Collect required approvals for certification</p>
+                                </div>
+                              </div>
+                              <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                <div className={`px-4 py-2 border-b ${borderColor}`}>
+                                  <span className={`text-sm font-medium ${textPrimary}`}>Required Signoffs</span>
+                                </div>
+                                <div className="divide-y divide-[#1e4976]/30">
+                                  {[
+                                    { role: "QA Lead", name: "Susan Clark", status: "signed", date: "Jan 15, 2024" },
+                                    { role: "Tech Lead", name: "Mike Johnson", status: "signed", date: "Jan 15, 2024" },
+                                    { role: "Compliance", name: "Sarah Williams", status: "pending", date: null },
+                                    { role: "Client", name: "John Smith (Nexus)", status: "pending", date: null },
+                                  ].map((s, i) => (
+                                    <div key={i} className="px-4 py-2 flex items-center justify-between">
+                                      <div>
+                                        <p className={`text-sm ${textPrimary}`}>{s.role}</p>
+                                        <p className={`text-xs ${textSecondary}`}>{s.name}</p>
+                                      </div>
+                                      {s.status === "signed" ? (
+                                        <div className="flex items-center gap-2">
+                                          <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                          <span className={`text-xs ${textSecondary}`}>{s.date}</span>
+                                        </div>
+                                      ) : (
+                                        <Button size="sm" variant="outline">Request</Button>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex pt-4 border-t border-[#1e4976]/30">
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
                           {/* Generic fallback for other tools */}
-                          {!["intake", "docs", "gap", "spec-from-log", "atdl"].includes(tool.id) && (
+                          {!["intake", "docs", "gap", "spec-from-log", "atdl", "test-plan", "test-cases", "checklist", "session-tests", "app-tests", "evidence", "log-analysis", "failure-analysis", "root-cause", "defects", "eval", "report", "signoff"].includes(tool.id) && (
                             <div className="space-y-4">
                               <p className={textSecondary}>This tool is available for use. Click below to open the full interface.</p>
                               <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} mb-4`}>
