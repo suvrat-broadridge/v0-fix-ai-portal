@@ -2321,21 +2321,20 @@ export default function BCometPlatform() {
                   style={{
                     left: `${apPx}%`,
                     top: `${apPy}%`,
-                    // Clamp popup toward sun depending on planet screen position
-                    // Aggressive thresholds ensure Decide/Launch stay on screen
+                    // Popup opens closer to planet, leaning toward sun
                     transform: (() => {
                       const tooFarRight = apPx > 50
                       const tooFarDown  = apPy > 55
                       const tooFarLeft  = apPx < 15
                       const tooFarUp    = apPy < 15
-                      if (tooFarRight && tooFarDown)  return "translate(-110%, -110%)"
-                      if (tooFarRight && tooFarUp)    return "translate(-110%, 10%)"
-                      if (tooFarRight)                return "translate(-110%, -50%)"
-                      if (tooFarDown)                 return "translate(-50%, -115%)"
-                      if (tooFarLeft && tooFarDown)   return "translate(10%, -110%)"
+                      if (tooFarRight && tooFarDown)  return "translate(-90%, -90%)"
+                      if (tooFarRight && tooFarUp)    return "translate(-90%, 10%)"
+                      if (tooFarRight)                return "translate(-90%, -50%)"
+                      if (tooFarDown)                 return "translate(-50%, -100%)"
+                      if (tooFarLeft && tooFarDown)   return "translate(10%, -90%)"
                       if (tooFarLeft)                 return "translate(10%, -50%)"
                       if (tooFarUp)                   return "translate(-50%, 10%)"
-                      return "translate(-50%, -120%)"
+                      return "translate(-50%, -100%)"
                     })(),
                   }}
                 >
@@ -13293,7 +13292,7 @@ const copyToClipboard = () => {
 
             {/* ══════════════════════════════════════��══════════════��═
                 STEP 3: GATEWAY DELTA ANALYSIS
-            ═══════════════════════════════════════════════════════ */}
+            ═════════════════════════════════════════════���═════════ */}
             {certReportStep === "delta" && (
               <div className="space-y-6">
                 <div className="grid grid-cols-3 gap-4">
