@@ -6742,224 +6742,246 @@ const tools = [
                           )}
                           
                           {/* Create Spec from Log File Tool */}
-                          {tool.id === "spec-from-log" && (
+                          {tool.id === "spec-from-log" && (() => {
+                            const specLogMsgTabs = [
+                              { id: "D", label: "New Order Single (D)" },
+                              { id: "F", label: "Order Cancel Request (F)" },
+                              { id: "G", label: "Order Cancel/Replace (G)" },
+                              { id: "8", label: "Execution Report (8)" },
+                              { id: "9", label: "Order Cancel Reject (9)" },
+                            ]
+                            const specLogRows: Record<string, {tag:string, groupTag:string, name:string, required:string, crCondition:string, dataType:string, values:string, comment:string}[]> = {
+                              D: [
+                                { tag: "11", groupTag: "", name: "ClOrdID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "Unique client order identifier" },
+                                { tag: "21", groupTag: "", name: "HandlInst", required: "Y", crCondition: "", dataType: "Char", values: "1,2,3", comment: "" },
+                                { tag: "38", groupTag: "", name: "OrderQty", required: "CR", crCondition: "152=N", dataType: "Qty", values: "", comment: "Required if CashOrderQty not specified" },
+                                { tag: "40", groupTag: "", name: "OrdType", required: "Y", crCondition: "", dataType: "Char", values: "1,2,3,4", comment: "" },
+                                { tag: "44", groupTag: "", name: "Price", required: "CR", crCondition: "40=2", dataType: "Price", values: "", comment: "Required for Limit orders" },
+                                { tag: "54", groupTag: "", name: "Side", required: "Y", crCondition: "", dataType: "Char", values: "1,2,5,6", comment: "" },
+                                { tag: "55", groupTag: "", name: "Symbol", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                                { tag: "59", groupTag: "", name: "TimeInForce", required: "N", crCondition: "", dataType: "Char", values: "0,1,3,4,6", comment: "" },
+                                { tag: "60", groupTag: "", name: "TransactTime", required: "Y", crCondition: "", dataType: "UTCTimestamp", values: "", comment: "" },
+                                { tag: "453", groupTag: "", name: "NoPartyIDs", required: "N", crCondition: "", dataType: "NumInGroup", values: "", comment: "Repeating group" },
+                              ],
+                              F: [
+                                { tag: "11", groupTag: "", name: "ClOrdID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                                { tag: "37", groupTag: "", name: "OrderID", required: "CR", crCondition: "41=N", dataType: "String", values: "", comment: "Broker order ID" },
+                                { tag: "41", groupTag: "", name: "OrigClOrdID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                                { tag: "54", groupTag: "", name: "Side", required: "Y", crCondition: "", dataType: "Char", values: "1,2,5,6", comment: "" },
+                                { tag: "55", groupTag: "", name: "Symbol", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                                { tag: "60", groupTag: "", name: "TransactTime", required: "Y", crCondition: "", dataType: "UTCTimestamp", values: "", comment: "" },
+                              ],
+                              G: [
+                                { tag: "11", groupTag: "", name: "ClOrdID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "New client order ID" },
+                                { tag: "38", groupTag: "", name: "OrderQty", required: "Y", crCondition: "", dataType: "Qty", values: "", comment: "" },
+                                { tag: "40", groupTag: "", name: "OrdType", required: "Y", crCondition: "", dataType: "Char", values: "1,2,3,4", comment: "" },
+                                { tag: "41", groupTag: "", name: "OrigClOrdID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                                { tag: "44", groupTag: "", name: "Price", required: "CR", crCondition: "40=2", dataType: "Price", values: "", comment: "" },
+                                { tag: "54", groupTag: "", name: "Side", required: "Y", crCondition: "", dataType: "Char", values: "1,2", comment: "" },
+                                { tag: "55", groupTag: "", name: "Symbol", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                                { tag: "60", groupTag: "", name: "TransactTime", required: "Y", crCondition: "", dataType: "UTCTimestamp", values: "", comment: "" },
+                              ],
+                              "8": [
+                                { tag: "6", groupTag: "", name: "AvgPx", required: "Y", crCondition: "", dataType: "Price", values: "", comment: "" },
+                                { tag: "11", groupTag: "", name: "ClOrdID", required: "CR", crCondition: "150!=3", dataType: "String", values: "", comment: "" },
+                                { tag: "14", groupTag: "", name: "CumQty", required: "Y", crCondition: "", dataType: "Qty", values: "", comment: "" },
+                                { tag: "17", groupTag: "", name: "ExecID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                                { tag: "20", groupTag: "", name: "ExecTransType", required: "Y", crCondition: "", dataType: "Char", values: "0,1,2,3", comment: "" },
+                                { tag: "37", groupTag: "", name: "OrderID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                                { tag: "38", groupTag: "", name: "OrderQty", required: "CR", crCondition: "40!=3", dataType: "Qty", values: "", comment: "" },
+                                { tag: "39", groupTag: "", name: "OrdStatus", required: "Y", crCondition: "", dataType: "Char", values: "0,1,2,3,4,5,6,7,8", comment: "" },
+                                { tag: "150", groupTag: "", name: "ExecType", required: "Y", crCondition: "", dataType: "Char", values: "0,1,2,3,4,5,6,7,8", comment: "" },
+                              ],
+                              "9": [
+                                { tag: "11", groupTag: "", name: "ClOrdID", required: "CR", crCondition: "434=1", dataType: "String", values: "", comment: "" },
+                                { tag: "37", groupTag: "", name: "OrderID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                                { tag: "39", groupTag: "", name: "OrdStatus", required: "Y", crCondition: "", dataType: "Char", values: "0,1,2,3,4,5,6", comment: "" },
+                                { tag: "41", groupTag: "", name: "OrigClOrdID", required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                                { tag: "102", groupTag: "", name: "CxlRejReason", required: "N", crCondition: "", dataType: "Int", values: "0,1,2,3", comment: "" },
+                                { tag: "434", groupTag: "", name: "CxlRejResponseTo", required: "Y", crCondition: "", dataType: "Char", values: "1,2", comment: "" },
+                              ],
+                            }
+                            return (
                             <div className="space-y-4">
-                              <div className="flex items-center justify-between">
-                                <p className={textSecondary}>Upload a client FIX log file to automatically generate a standardized FIX specification.</p>
-                                <Button 
-                                  variant="outline" 
-                                  size="sm"
-                                  onClick={() => {
-                                    setClientNotifications(prev => [...prev, {
-                                      id: Date.now().toString(),
-                                      type: "document-request",
-                                      title: "Log File Upload Required",
-                                      message: "Please upload your FIX log file so we can generate your specification.",
-                                      timestamp: new Date().toISOString(),
-                                      read: false,
-                                    }])
-                                    alert("Log file request sent to client. They will see a notification on their next login.")
-                                  }}
-                                  className="text-[#ff9800] border-[#ff9800] hover:bg-[#ff9800]/10"
-                                >
-                                  <Send className="h-3 w-3 mr-1" /> Request Log from Client
-                                </Button>
-                              </div>
-
-                              {/* Log File Upload Area */}
-                              <div 
-                                className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center cursor-pointer hover:border-[#4caf50] hover:bg-[#4caf50]/5 transition-all`}
-                                onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-[#4caf50]", "bg-[#4caf50]/10") }}
-                                onDragLeave={(e) => { e.currentTarget.classList.remove("border-[#4caf50]", "bg-[#4caf50]/10") }}
-                                onDrop={(e) => {
-                                  e.preventDefault()
-                                  e.currentTarget.classList.remove("border-[#4caf50]", "bg-[#4caf50]/10")
-                                  const files = Array.from(e.dataTransfer.files)
-                                  if (files.length > 0) {
-                                    setLogFileForSpec({
-                                      name: files[0].name,
-                                      size: `${(files[0].size / (1024*1024)).toFixed(2)} MB`
-                                    })
-                                    setGeneratedSpecFromLog(null)
-                                  }
-                                }}
-                                onClick={() => {
-                                  const input = document.createElement("input")
-                                  input.type = "file"
-                                  input.accept = ".log,.txt,.fix"
-                                  input.onchange = (e) => {
-                                    const files = Array.from((e.target as HTMLInputElement).files || [])
-                                    if (files.length > 0) {
-                                      setLogFileForSpec({
-                                        name: files[0].name,
-                                        size: `${(files[0].size / (1024*1024)).toFixed(2)} MB`
-                                      })
+                              {/* Header row — description + actions */}
+                              <div className="flex items-center justify-between gap-4">
+                                <p className={textSecondary}>Upload a client FIX log file or generate a standardized FIX specification directly.</p>
+                                <div className="flex items-center gap-2 flex-shrink-0">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      setClientNotifications(prev => [...prev, {
+                                        id: Date.now().toString(),
+                                        type: "document-request",
+                                        title: "Log File Upload Required",
+                                        message: "Please upload your FIX log file so we can generate your specification.",
+                                        timestamp: new Date().toISOString(),
+                                        read: false,
+                                      }])
+                                    }}
+                                    className="text-[#ff9800] border-[#ff9800] hover:bg-[#ff9800]/10"
+                                  >
+                                    <Send className="h-3 w-3 mr-1" /> Request Log from Client
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    disabled={isGeneratingSpec}
+                                    onClick={() => {
+                                      setIsGeneratingSpec(true)
                                       setGeneratedSpecFromLog(null)
-                                    }
-                                  }
-                                  input.click()
-                                }}
-                              >
-                                <FileSearch className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                                <p className={`${textPrimary} font-medium`}>Drop log file here or click to upload</p>
-                                <p className={`text-sm ${textSecondary} mt-1`}>Supports .log, .txt, .fix files</p>
+                                      setTimeout(() => {
+                                        setGeneratedSpecFromLog({ fields: [], messageTypes: [] })
+                                        setIsGeneratingSpec(false)
+                                      }, 1800)
+                                    }}
+                                    className="bg-[#4caf50] hover:bg-[#388e3c] text-white"
+                                  >
+                                    {isGeneratingSpec ? (
+                                      <><Loader className="h-4 w-4 mr-1 animate-spin" /> Generating...</>
+                                    ) : (
+                                      <><Zap className="h-4 w-4 mr-1" /> Create Spec</>
+                                    )}
+                                  </Button>
+                                </div>
                               </div>
 
-                              {/* Uploaded Log File */}
-                              {logFileForSpec && (
-                                <div className={`${bgSecondary} rounded-lg p-4`}>
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                      <FileText className="h-5 w-5 text-[#4caf50]" />
-                                      <div>
-                                        <p className={`text-sm font-medium ${textPrimary}`}>{logFileForSpec.name}</p>
-                                        <p className={`text-xs ${textSecondary}`}>{logFileForSpec.size}</p>
-                                      </div>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => {
-                                          setLogFileForSpec(null)
-                                          setGeneratedSpecFromLog(null)
-                                        }}
-                                        className="text-[#f44336] border-[#f44336] hover:bg-[#f44336]/10"
-                                      >
-                                        Remove
-                                      </Button>
-                                      {!generatedSpecFromLog && (
-                                        <Button
-                                          size="sm"
-                                          disabled={isGeneratingSpec}
-                                          onClick={() => {
-                                            setIsGeneratingSpec(true)
-                                            // Simulate spec generation
-                                            setTimeout(() => {
-                                              setGeneratedSpecFromLog({
-                                                fields: [
-                                                  { tag: "35", name: "MsgType", type: "String", required: true, description: "Defines message type" },
-                                                  { tag: "49", name: "SenderCompID", type: "String", required: true, description: "Sender identifier" },
-                                                  { tag: "56", name: "TargetCompID", type: "String", required: true, description: "Target identifier" },
-                                                  { tag: "34", name: "MsgSeqNum", type: "Int", required: true, description: "Message sequence number" },
-                                                  { tag: "52", name: "SendingTime", type: "UTCTimestamp", required: true, description: "Time of message transmission" },
-                                                  { tag: "11", name: "ClOrdID", type: "String", required: true, description: "Client order ID" },
-                                                  { tag: "55", name: "Symbol", type: "String", required: true, description: "Instrument symbol" },
-                                                  { tag: "54", name: "Side", type: "Char", required: true, description: "Side of order (1=Buy, 2=Sell)" },
-                                                  { tag: "38", name: "OrderQty", type: "Qty", required: true, description: "Order quantity" },
-                                                  { tag: "40", name: "OrdType", type: "Char", required: true, description: "Order type (1=Market, 2=Limit)" },
-                                                  { tag: "44", name: "Price", type: "Price", required: false, description: "Limit price" },
-                                                  { tag: "59", name: "TimeInForce", type: "Char", required: false, description: "Time in force" },
-                                                ],
-                                                messageTypes: [
-                                                  { msgType: "D", name: "NewOrderSingle", category: "Order" },
-                                                  { msgType: "F", name: "OrderCancelRequest", category: "Order" },
-                                                  { msgType: "G", name: "OrderCancelReplaceRequest", category: "Order" },
-                                                  { msgType: "8", name: "ExecutionReport", category: "Execution" },
-                                                  { msgType: "9", name: "OrderCancelReject", category: "Execution" },
-                                                  { msgType: "0", name: "Heartbeat", category: "Session" },
-                                                  { msgType: "A", name: "Logon", category: "Session" },
-                                                  { msgType: "5", name: "Logout", category: "Session" },
-                                                ]
-                                              })
-                                              setIsGeneratingSpec(false)
-                                            }, 2000)
-                                          }}
-                                          className="bg-[#4caf50] hover:bg-[#388e3c] text-white"
-                                        >
-                                          {isGeneratingSpec ? (
-                                            <>
-                                              <Loader className="h-4 w-4 mr-1 animate-spin" /> Analyzing...
-                                            </>
-                                          ) : (
-                                            <>
-                                              <Zap className="h-4 w-4 mr-1" /> Generate Spec
-                                            </>
-                                          )}
-                                        </Button>
-                                      )}
-                                    </div>
+                              {/* Log File Upload Area — only shown when no spec yet */}
+                              {!generatedSpecFromLog && !isGeneratingSpec && (
+                                <>
+                                  <div
+                                    className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center cursor-pointer hover:border-[#4caf50] hover:bg-[#4caf50]/5 transition-all`}
+                                    onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-[#4caf50]") }}
+                                    onDragLeave={(e) => { e.currentTarget.classList.remove("border-[#4caf50]") }}
+                                    onDrop={(e) => {
+                                      e.preventDefault()
+                                      e.currentTarget.classList.remove("border-[#4caf50]")
+                                      const files = Array.from(e.dataTransfer.files)
+                                      if (files.length > 0) setLogFileForSpec({ name: files[0].name, size: `${(files[0].size / (1024*1024)).toFixed(2)} MB` })
+                                    }}
+                                    onClick={() => {
+                                      const input = document.createElement("input")
+                                      input.type = "file"
+                                      input.accept = ".log,.txt,.fix"
+                                      input.onchange = (e) => {
+                                        const files = Array.from((e.target as HTMLInputElement).files || [])
+                                        if (files.length > 0) setLogFileForSpec({ name: files[0].name, size: `${(files[0].size / (1024*1024)).toFixed(2)} MB` })
+                                      }
+                                      input.click()
+                                    }}
+                                  >
+                                    <FileSearch className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                                    <p className={`${textPrimary} font-medium`}>Drop log file here or click to upload</p>
+                                    <p className={`text-sm ${textSecondary} mt-1`}>Supports .log, .txt, .fix files</p>
                                   </div>
+                                  {logFileForSpec && (
+                                    <div className={`${bgSecondary} rounded-lg px-4 py-3 flex items-center justify-between`}>
+                                      <div className="flex items-center gap-3">
+                                        <FileText className="h-5 w-5 text-[#4caf50]" />
+                                        <div>
+                                          <p className={`text-sm font-medium ${textPrimary}`}>{logFileForSpec.name}</p>
+                                          <p className={`text-xs ${textSecondary}`}>{logFileForSpec.size}</p>
+                                        </div>
+                                      </div>
+                                      <Button variant="outline" size="sm" onClick={() => setLogFileForSpec(null)} className="text-[#f44336] border-[#f44336] hover:bg-[#f44336]/10">Remove</Button>
+                                    </div>
+                                  )}
+                                </>
+                              )}
+
+                              {/* Generating spinner */}
+                              {isGeneratingSpec && (
+                                <div className={`${bgSecondary} rounded-lg p-8 flex flex-col items-center gap-3`}>
+                                  <Loader className="h-8 w-8 text-[#4caf50] animate-spin" />
+                                  <p className={`text-sm font-medium ${textPrimary}`}>Analyzing log data and generating FIX specification...</p>
+                                  <p className={`text-xs ${textSecondary}`}>Extracting message types, fields, and data types</p>
                                 </div>
                               )}
 
-                              {/* Generated Spec Viewer */}
-                              {generatedSpecFromLog && (
+                              {/* Generated Spec Viewer — matches Load Standardized Spec format */}
+                              {generatedSpecFromLog && !isGeneratingSpec && (
                                 <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                  {/* Header */}
                                   <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
                                     <div className="flex items-center gap-2">
                                       <CheckCircle className="h-5 w-5 text-[#4caf50]" />
-                                      <h4 className={`font-semibold ${textPrimary}`}>Generated FIX Specification</h4>
+                                      <div>
+                                        <h4 className={`font-semibold ${textPrimary}`}>Generated FIX Specification</h4>
+                                        <p className={`text-xs ${textSecondary}`}>Extracted from log file — review before proceeding</p>
+                                      </div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                      <Button variant="outline" size="sm">
-                                        <Download className="h-3 w-3 mr-1" /> Export XML
-                                      </Button>
-                                      <Button variant="outline" size="sm">
-                                        <Copy className="h-3 w-3 mr-1" /> Copy
+                                      <Button variant="outline" size="sm"><Download className="h-3 w-3 mr-1" /> Export XML</Button>
+                                      <Button variant="outline" size="sm"><Copy className="h-3 w-3 mr-1" /> Copy</Button>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setGeneratedSpecFromLog(null)}
+                                        className="text-[#f44336] border-[#f44336] hover:bg-[#f44336]/10"
+                                      >
+                                        Reset
                                       </Button>
                                     </div>
                                   </div>
 
-                                  {/* Message Types */}
-                                  <div className={`px-4 py-3 border-b ${borderColor}`}>
-                                    <p className={`text-sm font-medium ${textPrimary} mb-2`}>Message Types Detected ({generatedSpecFromLog.messageTypes.length})</p>
-                                    <div className="flex flex-wrap gap-2">
-                                      {generatedSpecFromLog.messageTypes.map(mt => (
-                                        <span 
-                                          key={mt.msgType} 
-                                          className={`text-xs px-2 py-1 rounded ${
-                                            mt.category === "Order" ? "bg-[#2196f3]/20 text-[#2196f3]" :
-                                            mt.category === "Execution" ? "bg-[#4caf50]/20 text-[#4caf50]" :
-                                            "bg-[#ff9800]/20 text-[#ff9800]"
-                                          }`}
-                                        >
-                                          {mt.msgType} - {mt.name}
-                                        </span>
-                                      ))}
-                                    </div>
+                                  {/* Message Type Tabs */}
+                                  <div className={`px-4 py-2 border-b ${borderColor} flex gap-1 overflow-x-auto`}>
+                                    {specLogMsgTabs.map(tab => (
+                                      <button
+                                        key={tab.id}
+                                        onClick={() => setStandardizedMsgTypeTab(tab.id)}
+                                        className={`px-3 py-1.5 rounded text-xs font-medium whitespace-nowrap transition-colors ${
+                                          standardizedMsgTypeTab === tab.id
+                                            ? "bg-[#00e5ff] text-[#0a1628]"
+                                            : `${textSecondary} hover:bg-[#1e4976]/30`
+                                        }`}
+                                      >
+                                        {tab.label}
+                                      </button>
+                                    ))}
                                   </div>
 
                                   {/* Fields Table */}
-                                  <div className="px-4 py-3">
-                                    <p className={`text-sm font-medium ${textPrimary} mb-2`}>Fields Extracted ({generatedSpecFromLog.fields.length})</p>
-                                    <div className="max-h-64 overflow-auto">
-                                      <table className="w-full text-sm">
-                                        <thead>
-                                          <tr className={`text-left ${textSecondary} border-b ${borderColor}`}>
-                                            <th className="pb-2 pr-4">Tag</th>
-                                            <th className="pb-2 pr-4">Name</th>
-                                            <th className="pb-2 pr-4">Type</th>
-                                            <th className="pb-2 pr-4">Required</th>
-                                            <th className="pb-2">Description</th>
+                                  <div className="overflow-auto max-h-80">
+                                    <table className="w-full text-xs">
+                                      <thead className={`sticky top-0 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+                                        <tr className={`border-b ${borderColor}`}>
+                                          <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Tag</th>
+                                          <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>GroupTag</th>
+                                          <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>TagName</th>
+                                          <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Req</th>
+                                          <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>CRCondition</th>
+                                          <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>DataType</th>
+                                          <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Values</th>
+                                          <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Comment</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {(specLogRows[standardizedMsgTypeTab] || specLogRows["D"]).map((row, i) => (
+                                          <tr key={i} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
+                                            <td className={`px-3 py-2 font-mono text-[#00e5ff]`}>{row.tag}</td>
+                                            <td className={`px-3 py-2 ${textSecondary}`}>{row.groupTag || "—"}</td>
+                                            <td className={`px-3 py-2 ${textPrimary} font-medium`}>{row.name}</td>
+                                            <td className="px-3 py-2">
+                                              <span className={`font-medium ${row.required === "Y" ? "text-[#4caf50]" : row.required === "CR" ? "text-[#ff9800]" : textSecondary}`}>
+                                                {row.required}
+                                              </span>
+                                            </td>
+                                            <td className={`px-3 py-2 font-mono text-xs ${textSecondary}`}>{row.crCondition || "—"}</td>
+                                            <td className={`px-3 py-2 ${textSecondary}`}>{row.dataType}</td>
+                                            <td className={`px-3 py-2 ${textSecondary}`}>{row.values || "—"}</td>
+                                            <td className={`px-3 py-2 ${textSecondary}`}>{row.comment || "—"}</td>
                                           </tr>
-                                        </thead>
-                                        <tbody>
-                                          {generatedSpecFromLog.fields.map(field => (
-                                            <tr key={field.tag} className={`border-b ${borderColor}`}>
-                                              <td className={`py-2 pr-4 font-mono text-[#00e5ff]`}>{field.tag}</td>
-                                              <td className={`py-2 pr-4 ${textPrimary}`}>{field.name}</td>
-                                              <td className={`py-2 pr-4 ${textSecondary}`}>{field.type}</td>
-                                              <td className="py-2 pr-4">
-                                                {field.required ? (
-                                                  <span className="text-[#4caf50]">Yes</span>
-                                                ) : (
-                                                  <span className={textSecondary}>No</span>
-                                                )}
-                                              </td>
-                                              <td className={`py-2 ${textSecondary}`}>{field.description}</td>
-                                            </tr>
-                                          ))}
-                                        </tbody>
-                                      </table>
-                                    </div>
+                                        ))}
+                                      </tbody>
+                                    </table>
                                   </div>
                                 </div>
                               )}
 
                               {/* Next Step Button */}
                               {actualToolIndex < currentPhase.tools.length - 1 && (
-                                <div className="flex gap-3 pt-4 border-t border-[#1e4976]/30">
+                                <div className="flex pt-4 border-t border-[#1e4976]/30">
                                   <Button
                                     onClick={() => {
                                       setCurrentToolIndex(actualToolIndex + 1)
@@ -6972,7 +6994,8 @@ const tools = [
                                 </div>
                               )}
                             </div>
-                          )}
+                            )
+                          })()}
 
                           {/* Generic fallback for other tools */}
                           {!["intake", "docs", "gap", "spec-from-log"].includes(tool.id) && (
