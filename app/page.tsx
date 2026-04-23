@@ -2100,8 +2100,10 @@ export default function BCometPlatform() {
         {/* Full-page solar system background — SVG decorative layer */}
         {(() => {
           // All radii in % units (viewBox 0 0 100 100)
-          // Center shifted further to lower-left so planets spread into north/northeast
-          const CX = 25, CY = 65
+          // Sun position centered, planets spread via angle offset to fill north/northeast
+          const CX = 50, CY = 50
+          // Angle offset: rotate entire system so planets favor north/northeast quadrant
+          const ANGLE_OFFSET = -60 // degrees, shifts distribution toward upper-right
           // Radii adjusted for better spread
           const solarPlanets = [
             { name: "Intake",  radius: 6,  color: "#2196f3", size: 1.0, tools: ["Create onboarding request", "Collect data", "AI document analysis", "Gap analysis"] },
@@ -2116,9 +2118,9 @@ export default function BCometPlatform() {
           
           // Comet follows expanding spiral, passing through each planet's position
           // After last planet (315 deg), continues outward off-screen
-          // Each planet is at a fixed angle: (i/8)*360 degrees from top
+          // Each planet is at a fixed angle: (i/8)*360 + ANGLE_OFFSET degrees from top
           
-          const cometAngleRad = (cometAngleDeg - 90) * Math.PI / 180 // -90 to start from top
+          const cometAngleRad = (cometAngleDeg + ANGLE_OFFSET - 90) * Math.PI / 180 // offset + -90 to start from top
           const maxRadius = solarPlanets[7].radius
           
           let cometRadius: number
@@ -2221,7 +2223,7 @@ export default function BCometPlatform() {
 
                   {/* Planets — brighter, full opacity in SVG; global container has no opacity */}
                   {solarPlanets.map((planet, i) => {
-                    const pAngle = ((i / 8) * 360 - 90) * Math.PI / 180
+                    const pAngle = ((i / 8) * 360 + ANGLE_OFFSET - 90) * Math.PI / 180
                     const px = CX + planet.radius * Math.cos(pAngle)
                     const py = CY + planet.radius * Math.sin(pAngle)
                     const isVisited = visitedPlanets.includes(i)
