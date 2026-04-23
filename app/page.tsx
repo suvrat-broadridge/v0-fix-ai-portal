@@ -2281,13 +2281,6 @@ export default function BCometPlatform() {
                     stroke="url(#ionTailGrad)" strokeWidth="5" fill="none" opacity="0.4" strokeLinecap="round"
                   />
                   
-                  {/* Inner bright core stream */}
-                  <line 
-                    x1={cometX} y1={cometY}
-                    x2={cometX + Math.cos(tailRad) * 12} y2={cometY + Math.sin(tailRad) * 12}
-                    stroke="white" strokeWidth="1" strokeLinecap="round" opacity="0.8"
-                  />
-
                   {/* COMA - layered fuzzy glow around nucleus */}
                   <circle cx={cometX} cy={cometY} r={4} fill="url(#cometCoreGrad)" opacity="0.2" filter="url(#softGlow)" />
                   <circle cx={cometX} cy={cometY} r={2.8} fill="#22d3ee" opacity="0.3" filter="url(#cometGlow)" />
