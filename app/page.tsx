@@ -8415,7 +8415,6 @@ const tools = [
               </div>
             </Card>
           </div>
-
         </div>
       </div>
     )
