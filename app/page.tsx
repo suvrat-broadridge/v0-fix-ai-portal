@@ -3752,7 +3752,7 @@ export default function BCometPlatform() {
           </button>
         </div>
       </div>
-          <AIAssistant />
+      <AIAssistant />
     )
   }
 
