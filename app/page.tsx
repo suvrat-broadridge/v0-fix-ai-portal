@@ -14186,7 +14186,7 @@ const tools = [
                       </Button>
                     </div>
                   </div>
-      <AIAssistant />
+                  <AIAssistant />
                 )}
               </div>
             </div>
