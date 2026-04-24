@@ -18857,8 +18857,8 @@ ValidateFieldsHaveValues=Y`}
                             </div>
                           </div>
                         ))}
+                        <AIAssistant />
                       </div>
-                      <AIAssistant />
                     )}
                   </Card>
                 )
