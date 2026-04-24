@@ -241,12 +241,11 @@ function TestPlanGeneratorTool({
           <Button onClick={onNextStep} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">
             Next Step <ChevronRight className="h-4 w-4 ml-1" />
           </Button>
+        </div>
+      )}
     </div>
-  )}
-      {aiAssistantPortal}
-    </>
-    )
-  }
+  )
+}
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function BCometPlatform() {
@@ -2359,15 +2358,21 @@ export default function BCometPlatform() {
   }
 
   // Render AI Assistant once per render cycle via createPortal
-  // The AIAssistant component uses createPortal to render into document.body
-  // This ensures it persists across all screen changes independently
+  // This ensures it persists across all screen changes
   const aiAssistantPortal = <AIAssistant />
+
+  // Helper: wrap any screen JSX with the AI Assistant portal
+  const renderScreenWithAI = (screenJSX: React.ReactNode) => (
+    <>
+      {screenJSX}
+      {aiAssistantPortal}
+    </>
+  )
 
   // Home Screen
   if (currentScreen === "home") {
-    return (
-      <>
-        <div className={`min-h-screen ${bgPrimary} transition-colors overflow-hidden`}>
+    return renderScreenWithAI(
+      <div className={`min-h-screen ${bgPrimary} transition-colors overflow-hidden`}>
         {/* Full-page solar system background — SVG decorative layer */}
         {/* Dims and freezes when any panel is open */}
         <div className={`transition-opacity duration-700 ${showContactPanel || showDemoForm || showWalkthrough ? "opacity-15 pointer-events-none" : "opacity-100"}`}>
@@ -2572,7 +2577,6 @@ export default function BCometPlatform() {
                                 ${cometX} ${cometY} Z`}
                           fill="url(#ionTailGrad)" opacity="0.7" filter="url(#glow)"
                         />
-                      {aiAssistantPortal}
                       </>
                     )
                   })()}
@@ -3723,11 +3727,14 @@ export default function BCometPlatform() {
       </Card>
     </div>
   )}
+      </div>
+    )
+  )
+  }
   
   // Role Selection Screen
   if (currentScreen === "role-select") {
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex items-center justify-center`}>
         <div className="text-center">
           <div className="flex items-center justify-center gap-3 mb-8">
@@ -3762,9 +3769,6 @@ export default function BCometPlatform() {
           </button>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -3800,7 +3804,6 @@ export default function BCometPlatform() {
     }
     
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex items-center justify-center`}>
         <Card className={`${bgCard} p-8 w-full max-w-md border ${borderColor}`}>
           <div className="flex items-center justify-center gap-3 mb-6">
@@ -3887,9 +3890,6 @@ export default function BCometPlatform() {
           </div>
         </Card>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -5561,7 +5561,6 @@ const tools = [
   ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -5594,9 +5593,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -6030,7 +6026,6 @@ const tools = [
     }
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -6444,9 +6439,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -9463,7 +9455,6 @@ const tools = [
     const logIsLastToolInPhase = currentToolIndex >= (logPhaseInfo?.tools.length || 1) - 1
     
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -9687,9 +9678,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -9703,7 +9691,6 @@ const tools = [
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -9831,9 +9818,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -9922,7 +9906,6 @@ const tools = [
     // Ad-hoc mode: Show step-by-step workflow
     if (isAdHocMode) {
       return (
-      <>
         <div className={`min-h-screen ${bgPrimary} flex`}>
           <Sidebar />
           <div className="flex-1 overflow-auto">
@@ -10309,9 +10292,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -10833,7 +10813,6 @@ const tools = [
     const pipelineCounts = pipeline.reduce((acc, s) => { acc[s] = workOrders.filter(w => w.status === s).length; return acc }, {} as Record<string,number>)
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -10980,9 +10959,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -11025,7 +11001,6 @@ const tools = [
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -11138,9 +11113,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -11178,7 +11150,6 @@ const tools = [
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -11278,9 +11249,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -11335,7 +11303,6 @@ const tools = [
             const Icon = opt.icon
             const isSelected = atdlWorkflowType === opt.id
             return (
-      <>
               <button
                 key={opt.id}
                 onClick={() => { setAtdlWorkflowType(opt.id); setAtdlWizardStep(0) }}
@@ -12190,9 +12157,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -12225,7 +12189,6 @@ const tools = [
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto">
@@ -12374,9 +12337,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
   
@@ -12401,7 +12361,6 @@ const tools = [
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto">
@@ -12645,9 +12604,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
   
@@ -12655,7 +12611,6 @@ const tools = [
   if (currentScreen === "atdl-compare") {
     
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto">
@@ -12796,9 +12751,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -12806,7 +12758,6 @@ const tools = [
   if (currentScreen === "fix-atdl-compare") {
     
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto">
@@ -12962,9 +12913,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -12972,7 +12920,6 @@ const tools = [
   if (currentScreen === "fix-to-atdl") {
     
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto">
@@ -13144,9 +13091,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
   
@@ -13169,7 +13113,6 @@ const tools = [
     const blockerCount = findings.filter(f => f.severity === "Error").length
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -13269,9 +13212,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -13316,7 +13256,6 @@ const tools = [
     }
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -13431,9 +13370,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -13688,10 +13624,7 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
-    )
+)
   }
 
   // Client Specs Screen - For clients to upload and manage their specs
@@ -13723,7 +13656,6 @@ const tools = [
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -13822,9 +13754,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -13873,7 +13802,6 @@ const tools = [
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -14002,9 +13930,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
   
@@ -14020,7 +13945,6 @@ const tools = [
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         
@@ -14278,9 +14202,6 @@ const tools = [
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -14454,7 +14375,6 @@ const copyToClipboard = () => {
     }
     
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto flex flex-col">
@@ -14771,9 +14691,6 @@ const copyToClipboard = () => {
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
   
@@ -14788,7 +14705,6 @@ const copyToClipboard = () => {
     ]
     
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -14962,9 +14878,6 @@ const copyToClipboard = () => {
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -15648,7 +15561,6 @@ const copyToClipboard = () => {
     ]
     
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -15807,16 +15719,12 @@ const copyToClipboard = () => {
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
   // Test Execution Results Dashboard
   if (currentScreen === "test-results") {
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -15943,9 +15851,6 @@ const copyToClipboard = () => {
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -15966,7 +15871,6 @@ const copyToClipboard = () => {
     const readyForGoLive = completedCount === totalCount
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -16071,9 +15975,6 @@ const copyToClipboard = () => {
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -16180,7 +16081,6 @@ const copyToClipboard = () => {
       : onboardingCases.filter(c => c.assignedUser === currentUser?.name)
     
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -16493,9 +16393,6 @@ const copyToClipboard = () => {
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -16537,7 +16434,6 @@ const copyToClipboard = () => {
     const readinessScore = inputScore + scopeScore + ownerScore + blockerScore
     
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -17156,9 +17052,6 @@ const copyToClipboard = () => {
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -17184,7 +17077,6 @@ const copyToClipboard = () => {
     ))
     
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -17353,9 +17245,6 @@ const copyToClipboard = () => {
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -17425,7 +17314,6 @@ const copyToClipboard = () => {
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex flex-col`}>
         {/* Header */}
         <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
@@ -17517,9 +17405,6 @@ const copyToClipboard = () => {
           </div>
         </footer>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -17550,7 +17435,6 @@ const copyToClipboard = () => {
     })
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -18009,9 +17893,6 @@ const copyToClipboard = () => {
           )}
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -18032,7 +17913,6 @@ const copyToClipboard = () => {
     const signatureRate = Math.round((totalSigned / totalCollected) * 100)
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -18265,9 +18145,6 @@ const copyToClipboard = () => {
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -18282,7 +18159,6 @@ const copyToClipboard = () => {
     ]
     
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -18425,9 +18301,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -18579,7 +18452,6 @@ ValidateFieldsHaveValues=Y`}
       const isActive = ruleSortCol === col
       const hasFilter = filterValue && filterValue !== "All"
       return (
-      <>
         <th className={`px-3 py-2 text-left text-xs ${width ?? ""}`}>
           <div className="flex items-center gap-1 flex-wrap">
             <button
@@ -19000,9 +18872,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -19044,7 +18913,6 @@ ValidateFieldsHaveValues=Y`}
     const avgConfidence = Math.round(aiReviewItems.reduce((acc, i) => acc + i.confidence, 0) / aiReviewItems.length * 100)
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -19295,16 +19163,12 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
   // SLA Analytics Dashboard
   if (currentScreen === "sla-analytics") {
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
@@ -19469,9 +19333,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -19490,7 +19351,6 @@ ValidateFieldsHaveValues=Y`}
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto">
@@ -19561,9 +19421,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -19576,7 +19433,6 @@ ValidateFieldsHaveValues=Y`}
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto">
@@ -19641,16 +19497,12 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
   // CHANGE 5: Counterparty Profile Screen
   if (currentScreen === "counterparty-profile") {
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto">
@@ -19691,9 +19543,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -19707,7 +19556,6 @@ ValidateFieldsHaveValues=Y`}
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto">
@@ -19736,9 +19584,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -19750,7 +19595,6 @@ ValidateFieldsHaveValues=Y`}
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto">
@@ -19795,9 +19639,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -19811,7 +19652,6 @@ ValidateFieldsHaveValues=Y`}
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto">
@@ -19847,9 +19687,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -19863,7 +19700,6 @@ ValidateFieldsHaveValues=Y`}
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto">
@@ -19910,9 +19746,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -19929,7 +19762,6 @@ ValidateFieldsHaveValues=Y`}
     const total = results.length
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto">
@@ -19983,9 +19815,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -20002,7 +19831,6 @@ ValidateFieldsHaveValues=Y`}
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto">
@@ -20044,9 +19872,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -20067,7 +19892,6 @@ ValidateFieldsHaveValues=Y`}
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto">
@@ -20120,9 +19944,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -20134,7 +19955,6 @@ ValidateFieldsHaveValues=Y`}
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto">
@@ -20169,9 +19989,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -20192,7 +20009,6 @@ ValidateFieldsHaveValues=Y`}
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto">
@@ -20233,9 +20049,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
@@ -20254,7 +20067,6 @@ ValidateFieldsHaveValues=Y`}
     ]
 
     return (
-      <>
       <div className={`min-h-screen ${bgPrimary} flex`}>
         {selectedRole && <Sidebar />}
         <div className="flex-1 overflow-auto">
@@ -20293,9 +20105,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      {aiAssistantElement}
-    {aiAssistantPortal}
-    </>
     )
   }
 
