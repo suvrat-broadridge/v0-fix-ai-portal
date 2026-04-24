@@ -2358,38 +2358,9 @@ export default function BCometPlatform() {
   }
 
   // Render AI Assistant once per render cycle via createPortal
-  // This ensures it persists across all screen changes
+  // The AIAssistant component uses createPortal to render into document.body
+  // This ensures it persists across all screen changes independently
   const aiAssistantPortal = <AIAssistant />
-
-  // Helper: wrap any screen JSX with the AI Assistant portal
-  const renderScreenWithAI = (screenJSX: React.ReactNode) => (
-    <>
-      {screenJSX}
-      {aiAssistantPortal}
-    </>
-  )
-
-  // Render AI Assistant floating button across all screens via createPortal
-  useEffect(() => {
-    // This ref ensures AIAssistant renders at least once per component
-    const root = document.getElementById("ai-assistant-root") || (() => {
-      const div = document.createElement("div")
-      div.id = "ai-assistant-root"
-      document.body.appendChild(div)
-      return div
-    })()
-
-    // Return empty fragment to trigger AIAssistant render
-    return () => {}
-  }, [])
-
-  // Define AIAssistant helper that can be called in any screen
-  const renderAIAssistant = () => <AIAssistant />
-
-  // Render AI Assistant floating button globally — persists across all screens
-  // It's defined as a nested function and uses createPortal to render into document.body
-  // This ensures the chatbot button is always available regardless of screen changes
-  const aiAssistantElement = typeof document !== "undefined" ? <AIAssistant /> : null
 
   // Home Screen
   if (currentScreen === "home") {
