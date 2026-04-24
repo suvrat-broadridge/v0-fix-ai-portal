@@ -3906,7 +3906,6 @@ export default function BCometPlatform() {
       return (
         <div className={`min-h-screen ${bgPrimary} flex`}>
           <Sidebar />
-      <AIAssistant />
           <div className="flex-1 overflow-auto">
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
               <div className="flex items-center gap-4">
@@ -4275,7 +4274,6 @@ export default function BCometPlatform() {
       return (
         <div className={`min-h-screen ${bgPrimary} flex`}>
           <Sidebar />
-      <AIAssistant />
           <div className="flex-1 overflow-auto">
             {/* Header with title */}
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
@@ -6427,7 +6425,6 @@ const tools = [
             </Card>
           </div>
         </div>
-      <AIAssistant />
       </div>
     )
   }
@@ -10947,7 +10944,6 @@ const tools = [
               })}
             </div>
           </div>
-      <AIAssistant />
         </div>
       </div>
     )
@@ -11101,7 +11097,6 @@ const tools = [
                 </div>
               </div>
             </div>
-      <AIAssistant />
           </div>
         </div>
       </div>
@@ -11237,7 +11232,6 @@ const tools = [
                   </Button>
                 </div>
               </div>
-      <AIAssistant />
             </div>
           </div>
         </div>
@@ -12325,7 +12319,6 @@ const tools = [
                     </Button>
                   </div>
                 </div>
-      <AIAssistant />
               </Card>
             )}
           </div>
@@ -14866,7 +14859,6 @@ const copyToClipboard = () => {
                         </Button>
                       </div>
                     </div>
-      <AIAssistant />
                   </Card>
                 )
               })}
@@ -17233,7 +17225,6 @@ const copyToClipboard = () => {
                           </span>
                         </div>
                       </div>
-      <AIAssistant />
                     </div>
                   )
                 })}
@@ -17866,7 +17857,6 @@ const copyToClipboard = () => {
                     })}
                   </div>
                 </div>
-      <AIAssistant />
 
                 {/* Action Buttons */}
                 {(selectedApproval.status === "pending" || selectedApproval.status === "overdue") && (
@@ -19526,7 +19516,6 @@ ValidateFieldsHaveValues=Y`}
                   <Input placeholder="549300ABCD1234567890" />
                 </div>
               </div>
-      <AIAssistant />
             </Card>
 
             <Card className={`${bgCard} border ${borderColor} p-6`}>
@@ -19687,7 +19676,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -19945,7 +19933,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
