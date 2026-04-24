@@ -5576,8 +5576,8 @@ const tools = [
             </div>
           </div>
         </div>
+        <AIAssistant />
       </div>
-      <AIAssistant />
     )
   }
 
