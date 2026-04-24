@@ -18856,9 +18856,9 @@ ValidateFieldsHaveValues=Y`}
                               <RuleTable rules={subsection.rules} />
                             </div>
                           </div>
-      <AIAssistant />
                         ))}
                       </div>
+                      <AIAssistant />
                     )}
                   </Card>
                 )
