@@ -135,12 +135,7 @@ function TestPlanGeneratorTool({
         </div>
         <AIAssistant />
       </div>
-
-      </Card>
-    </div>
-  )}
-  </div>
-  )
+    )
   }
   
   // Role Selection Screen
@@ -11785,7 +11780,7 @@ const copyToClipboard = () => {
 
             {/* ══════════════════════════════════════��══════════════��═
                 STEP 3: GATEWAY DELTA ANALYSIS
-            ═══════════════════��═════════════════════════���═════════ */}
+            ═��═════════════════��═════════════════════════���═════════ */}
             {certReportStep === "delta" && (
               <div className="space-y-6">
                 <div className="grid grid-cols-3 gap-4">
