@@ -9664,7 +9664,6 @@ const tools = [
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -9805,7 +9804,6 @@ const tools = [
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -10280,7 +10278,6 @@ const tools = [
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -10948,7 +10945,6 @@ const tools = [
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -11103,7 +11099,6 @@ const tools = [
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -11240,7 +11235,6 @@ const tools = [
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -12149,7 +12143,6 @@ const tools = [
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -12330,7 +12323,6 @@ const tools = [
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
   
@@ -12598,7 +12590,6 @@ const tools = [
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
   
@@ -12746,7 +12737,6 @@ const tools = [
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -12909,7 +12899,6 @@ const tools = [
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -13088,7 +13077,6 @@ const tools = [
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
   
@@ -13210,7 +13198,6 @@ const tools = [
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -13369,7 +13356,6 @@ const tools = [
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -13755,7 +13741,6 @@ const tools = [
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -13932,7 +13917,6 @@ const tools = [
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
   
@@ -14882,7 +14866,6 @@ const copyToClipboard = () => {
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -15724,7 +15707,6 @@ const copyToClipboard = () => {
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -15857,7 +15839,6 @@ const copyToClipboard = () => {
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -15982,7 +15963,6 @@ const copyToClipboard = () => {
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -16401,7 +16381,6 @@ const copyToClipboard = () => {
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -17061,7 +17040,6 @@ const copyToClipboard = () => {
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -17255,7 +17233,6 @@ const copyToClipboard = () => {
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -17416,7 +17393,6 @@ const copyToClipboard = () => {
           </div>
         </footer>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -17905,7 +17881,6 @@ const copyToClipboard = () => {
           )}
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -18158,7 +18133,6 @@ const copyToClipboard = () => {
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -18315,7 +18289,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -19179,7 +19152,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -19350,7 +19322,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -19439,7 +19410,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -19516,7 +19486,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -19563,7 +19532,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -19605,7 +19573,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -19661,7 +19628,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -19710,7 +19676,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -19770,7 +19735,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -19840,7 +19804,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -19898,7 +19861,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -19971,7 +19933,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -20017,7 +19978,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -20078,7 +20038,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
@@ -20135,7 +20094,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
