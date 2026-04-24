@@ -1,7 +1,8 @@
 "use client"
 
 // B- COMET Platform - FIX Protocol Testing Suite v2
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
+import { createPortal } from "react-dom"
 import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, ChevronUp, ChevronsUpDown, FileText, Activity, Zap, Check, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, Stamp, Code, ScrollText, Navigation, Sparkles, Minus, Loader, FolderArchive, Sliders, Bot, ExternalLink, GitMerge, FileCode, Presentation, ShoppingCart, Network, Circle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -253,7 +254,6 @@ export default function BCometPlatform() {
   const [settingsTab, setSettingsTab] = useState<"profile" | "notifications" | "security" | "integrations" | "appearance" | "api-keys">("profile")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [isManager, setIsManager] = useState(false)
-  const [showAIChat, setShowAIChat] = useState(false)
   const [currentUser, setCurrentUser] = useState<{ name: string; email: string } | null>(null)
   const [userProfile, setUserProfile] = useState({
     firstName: "",
@@ -2098,11 +2098,14 @@ export default function BCometPlatform() {
   }
 
   // AI Assistant Floating Button & Panel - GitHub Copilot Style
+  // Rendered via createPortal so it persists across every screen's early return
   const AIAssistant = () => {
     const atRiskCount = onboardingCases.filter(c => c.status === "at-risk").length
     const pendingCount = onboardingCases.filter(c => c.status === "pending").length
-    
-    return (
+
+    if (typeof document === "undefined") return null
+
+    return createPortal(
     <>
       {/* Floating AI Button */}
       {selectedRole && currentScreen !== "home" && currentScreen !== "role-select" && currentScreen !== "login" && (
@@ -2351,8 +2354,8 @@ export default function BCometPlatform() {
           onClick={() => setShowAIAssistant(false)}
         />
       )}
-    </>
-  )}
+    </>, document.body)
+  }
 
   // Home Screen
   if (currentScreen === "home") {
@@ -3714,8 +3717,8 @@ export default function BCometPlatform() {
   )}
   </div>
   )
-}
-
+  }
+  
   // Role Selection Screen
   if (currentScreen === "role-select") {
     return (
@@ -3752,7 +3755,6 @@ export default function BCometPlatform() {
             Back to Home
           </button>
         </div>
-        <AIAssistant />
       </div>
     )
   }
@@ -3903,6 +3905,7 @@ export default function BCometPlatform() {
       return (
         <div className={`min-h-screen ${bgPrimary} flex`}>
           <Sidebar />
+          <AIAssistant />
           <div className="flex-1 overflow-auto">
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
               <div className="flex items-center gap-4">
@@ -4271,6 +4274,7 @@ export default function BCometPlatform() {
       return (
         <div className={`min-h-screen ${bgPrimary} flex`}>
           <Sidebar />
+          <AIAssistant />
           <div className="flex-1 overflow-auto">
             {/* Header with title */}
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
@@ -5166,21 +5170,11 @@ const clientProgressData = [
                                   }`}
                                   style={{ width: `${caseItem.progress}%` }}
                                 />
-            </div>
-          </div>
-
-          {/* Floating Chatbot Button */}
-          <button 
-            onClick={() => setShowAIChat(!showAIChat)}
-            className="fixed bottom-6 right-6 w-16 h-16 bg-[#00e5ff] rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 transition-all z-50"
-            title="Chat with AI Assistant"
-          >
-            <Sparkles className="h-7 w-7 text-[#0a1628]" />
-            <span className="absolute -top-2 -right-2 w-6 h-6 bg-[#f44336] rounded-full text-white text-xs font-bold flex items-center justify-center">6</span>
-          </button>
-        </div>
-      </div>
-    )
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )
                     })}
                   </div>
                 ) : (
@@ -5585,7 +5579,6 @@ const tools = [
             </div>
           </div>
         </div>
-        <AIAssistant />
       </div>
     )
   }
@@ -8416,11 +8409,12 @@ const tools = [
             </Card>
           </div>
         )}
+      </div>
+    )
+  }
 
-      // Spec Compare Screen
-      if (currentScreen === "spec-compare") {
-        return (
-          <div className={`min-h-screen ${bgPrimary}`}>
+  // Spec Compare Screen
+  if (currentScreen === "spec-compare") {
     const specCompareResults = [
       { id: "diff-1", title: "Undefined Message Types", left: "35=K, 35=H Undefined In Counterparty Spec", right: "35=DF, 35=L Undefined In Counterparty Spec" },
       { id: "diff-2", title: "Unsupported Tags", left: "35=D: tags 375, 943\n35=G: tags 524, 133", right: "35=D: tags 111, 6454\n35=8: tags 5124, 1331" },
@@ -13614,21 +13608,11 @@ const tools = [
                 </Card>
               ))}
             </div>
-            </div>
           </div>
-
-          {/* Floating Chatbot Button */}
-          <button 
-            onClick={() => setShowAIChat(!showAIChat)}
-            className="fixed bottom-6 right-6 w-16 h-16 bg-[#00e5ff] rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 transition-all z-50"
-            title="Chat with AI Assistant"
-          >
-            <Sparkles className="h-7 w-7 text-[#0a1628]" />
-            <span className="absolute -top-2 -right-2 w-6 h-6 bg-[#f44336] rounded-full text-white text-xs font-bold flex items-center justify-center">6</span>
-          </button>
         </div>
-      )
-    }
+      </div>
+)
+  }
 
   // Client Specs Screen - For clients to upload and manage their specs
   if (currentScreen === "client-specs") {
@@ -14198,7 +14182,6 @@ const tools = [
                         <Plus className="h-4 w-4 mr-2" /> Create New API Key
                       </Button>
                     </div>
-                    <AIAssistant />
                   </div>
                 )}
               </div>
@@ -15164,7 +15147,7 @@ const copyToClipboard = () => {
 
             {/* ═════════════════��════���═════════���══════════��═══════════
                 STEP 2: CORRELATION RESULTS
-            ═════════════���════════════════════════════════����═��══════ */}
+            ═════════════���════════════════════════════════��════════ */}
             {certReportStep === "results" && (
               <div className="space-y-6">
                 {/* KPI Row 1 */}
@@ -15431,7 +15414,7 @@ const copyToClipboard = () => {
               </div>
             )}
 
-            {/* ══════════════════════════════════���══════════�����════════
+            {/* ═════════════════════════════════════════════���═════════
                 STEP 4: GENERATE CLIENT REPORT
             ═══════════════════��═══════════════════════════════════ */}
             {certReportStep === "generate" && (
@@ -18867,7 +18850,6 @@ ValidateFieldsHaveValues=Y`}
                             </div>
                           </div>
                         ))}
-                        <AIAssistant />
                       </div>
                     )}
                   </Card>
