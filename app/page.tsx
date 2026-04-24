@@ -253,6 +253,7 @@ export default function BCometPlatform() {
   const [settingsTab, setSettingsTab] = useState<"profile" | "notifications" | "security" | "integrations" | "appearance" | "api-keys">("profile")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [isManager, setIsManager] = useState(false)
+  const [showAIChat, setShowAIChat] = useState(false)
   const [currentUser, setCurrentUser] = useState<{ name: string; email: string } | null>(null)
   const [userProfile, setUserProfile] = useState({
     firstName: "",
@@ -5171,11 +5172,21 @@ const clientProgressData = [
                                   }`}
                                   style={{ width: `${caseItem.progress}%` }}
                                 />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )
+            </div>
+          </div>
+
+          {/* Floating Chatbot Button */}
+          <button 
+            onClick={() => setShowAIChat(!showAIChat)}
+            className="fixed bottom-6 right-6 w-16 h-16 bg-[#00e5ff] rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 transition-all z-50"
+            title="Chat with AI Assistant"
+          >
+            <Sparkles className="h-7 w-7 text-[#0a1628]" />
+            <span className="absolute -top-2 -right-2 w-6 h-6 bg-[#f44336] rounded-full text-white text-xs font-bold flex items-center justify-center">6</span>
+          </button>
+        </div>
+      </div>
+    )
                     })}
                   </div>
                 ) : (
