@@ -3902,7 +3902,7 @@ export default function BCometPlatform() {
       return (
         <div className={`min-h-screen ${bgPrimary} flex`}>
           <Sidebar />
-          <AIAssistant />
+      <AIAssistant />
           <div className="flex-1 overflow-auto">
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
               <div className="flex items-center gap-4">
@@ -4271,7 +4271,7 @@ export default function BCometPlatform() {
       return (
         <div className={`min-h-screen ${bgPrimary} flex`}>
           <Sidebar />
-          <AIAssistant />
+      <AIAssistant />
           <div className="flex-1 overflow-auto">
             {/* Header with title */}
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
@@ -5577,7 +5577,7 @@ const tools = [
           </div>
         </div>
       </div>
-          <AIAssistant />
+      <AIAssistant />
     )
   }
 
@@ -6423,7 +6423,7 @@ const tools = [
             </Card>
           </div>
         </div>
-          <AIAssistant />
+      <AIAssistant />
       </div>
     )
   }
@@ -10943,7 +10943,7 @@ const tools = [
               })}
             </div>
           </div>
-          <AIAssistant />
+      <AIAssistant />
         </div>
       </div>
     )
@@ -11097,7 +11097,7 @@ const tools = [
                 </div>
               </div>
             </div>
-          <AIAssistant />
+      <AIAssistant />
           </div>
         </div>
       </div>
@@ -11233,7 +11233,7 @@ const tools = [
                   </Button>
                 </div>
               </div>
-          <AIAssistant />
+      <AIAssistant />
             </div>
           </div>
         </div>
@@ -12321,7 +12321,7 @@ const tools = [
                     </Button>
                   </div>
                 </div>
-          <AIAssistant />
+      <AIAssistant />
               </Card>
             )}
           </div>
@@ -14186,7 +14186,7 @@ const tools = [
                       </Button>
                     </div>
                   </div>
-          <AIAssistant />
+      <AIAssistant />
                 )}
               </div>
             </div>
@@ -14862,7 +14862,7 @@ const copyToClipboard = () => {
                         </Button>
                       </div>
                     </div>
-          <AIAssistant />
+      <AIAssistant />
                   </Card>
                 )
               })}
@@ -17229,7 +17229,7 @@ const copyToClipboard = () => {
                           </span>
                         </div>
                       </div>
-          <AIAssistant />
+      <AIAssistant />
                     </div>
                   )
                 })}
@@ -17862,7 +17862,7 @@ const copyToClipboard = () => {
                     })}
                   </div>
                 </div>
-          <AIAssistant />
+      <AIAssistant />
 
                 {/* Action Buttons */}
                 {(selectedApproval.status === "pending" || selectedApproval.status === "overdue") && (
@@ -18856,7 +18856,7 @@ ValidateFieldsHaveValues=Y`}
                               <RuleTable rules={subsection.rules} />
                             </div>
                           </div>
-          <AIAssistant />
+      <AIAssistant />
                         ))}
                       </div>
                     )}
@@ -19522,7 +19522,7 @@ ValidateFieldsHaveValues=Y`}
                   <Input placeholder="549300ABCD1234567890" />
                 </div>
               </div>
-          <AIAssistant />
+      <AIAssistant />
             </Card>
 
             <Card className={`${bgCard} border ${borderColor} p-6`}>
@@ -19539,7 +19539,7 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-          <AIAssistant />
+      <AIAssistant />
     )
   }
 
@@ -19581,7 +19581,7 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-          <AIAssistant />
+      <AIAssistant />
     )
   }
 
@@ -19685,7 +19685,7 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-          <AIAssistant />
+      <AIAssistant />
     )
   }
 
@@ -19943,7 +19943,7 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-          <AIAssistant />
+      <AIAssistant />
     )
   }
 
