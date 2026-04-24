@@ -3711,19 +3711,7 @@ export default function BCometPlatform() {
           </Button>
         </div>
       </Card>
-
-      {/* Floating Chatbot Button */}
-      <button 
-        onClick={() => setShowAIChat(!showAIChat)}
-        className="fixed bottom-6 right-6 w-16 h-16 bg-[#00e5ff] rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 transition-all z-50"
-        title="Chat with AI Assistant"
-      >
-        <Sparkles className="h-7 w-7 text-[#0a1628]" />
-        <span className="absolute -top-2 -right-2 w-6 h-6 bg-[#f44336] rounded-full text-white text-xs font-bold flex items-center justify-center">6</span>
-      </button>
-        </div>
-      </div>
-    )
+    </div>
   }
   
   // Role Selection Screen
@@ -15175,7 +15163,7 @@ const copyToClipboard = () => {
 
             {/* ═════════════════��════���═════════���══════════��═══════════
                 STEP 2: CORRELATION RESULTS
-            ═════════════���════════════════════════════════��════════ */}
+            ═════════════���════════════════════════════════����════════ */}
             {certReportStep === "results" && (
               <div className="space-y-6">
                 {/* KPI Row 1 */}
@@ -15442,7 +15430,7 @@ const copyToClipboard = () => {
               </div>
             )}
 
-            {/* ═════════════════════════════════════════════���═════════
+            {/* ═════════════════════════════════════════════�����════════
                 STEP 4: GENERATE CLIENT REPORT
             ═══════════════════��═══════════════════════════════════ */}
             {certReportStep === "generate" && (
