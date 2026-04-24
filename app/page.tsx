@@ -3751,8 +3751,8 @@ export default function BCometPlatform() {
             Back to Home
           </button>
         </div>
+        <AIAssistant />
       </div>
-      <AIAssistant />
     </div>
     )
   }
