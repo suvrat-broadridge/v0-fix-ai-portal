@@ -2386,6 +2386,11 @@ export default function BCometPlatform() {
   // Define AIAssistant helper that can be called in any screen
   const renderAIAssistant = () => <AIAssistant />
 
+  // Render AI Assistant floating button globally — persists across all screens
+  // It's defined as a nested function and uses createPortal to render into document.body
+  // This ensures the chatbot button is always available regardless of screen changes
+  const aiAssistantElement = typeof document !== "undefined" ? <AIAssistant /> : null
+
   // Home Screen
   if (currentScreen === "home") {
     return (
@@ -13642,7 +13647,9 @@ const tools = [
           </div>
         </div>
       </div>
-)
+      {aiAssistantElement}
+    </>
+    )
   }
 
   // Client Specs Screen - For clients to upload and manage their specs
