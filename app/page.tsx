@@ -8415,12 +8415,9 @@ const tools = [
               </div>
             </Card>
           </div>
-        </div>
-      </div>
-    )
-  }
+        )}
 
-  // Spec Compare Screen
+      // Spec Compare Screen
   if (currentScreen === "spec-compare") {
     const specCompareResults = [
       { id: "diff-1", title: "Undefined Message Types", left: "35=K, 35=H Undefined In Counterparty Spec", right: "35=DF, 35=L Undefined In Counterparty Spec" },
