@@ -2353,10 +2353,6 @@ export default function BCometPlatform() {
     </>
   )}
 
-  // Render AI Assistant globally — persists across all screens via createPortal
-  // Call AIAssistant once per render so it renders via portal directly into document.body
-  AIAssistant()
-
   // Home Screen
   if (currentScreen === "home") {
     return (
