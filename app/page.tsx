@@ -8418,7 +8418,9 @@ const tools = [
         )}
 
       // Spec Compare Screen
-  if (currentScreen === "spec-compare") {
+      if (currentScreen === "spec-compare") {
+        return (
+          <div className={`min-h-screen ${bgPrimary}`}>
     const specCompareResults = [
       { id: "diff-1", title: "Undefined Message Types", left: "35=K, 35=H Undefined In Counterparty Spec", right: "35=DF, 35=L Undefined In Counterparty Spec" },
       { id: "diff-2", title: "Unsupported Tags", left: "35=D: tags 375, 943\n35=G: tags 524, 133", right: "35=D: tags 111, 6454\n35=8: tags 5124, 1331" },
