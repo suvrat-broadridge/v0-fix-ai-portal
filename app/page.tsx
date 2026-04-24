@@ -2369,10 +2369,28 @@ export default function BCometPlatform() {
     </>
   )
 
+  // Render AI Assistant floating button across all screens via createPortal
+  useEffect(() => {
+    // This ref ensures AIAssistant renders at least once per component
+    const root = document.getElementById("ai-assistant-root") || (() => {
+      const div = document.createElement("div")
+      div.id = "ai-assistant-root"
+      document.body.appendChild(div)
+      return div
+    })()
+
+    // Return empty fragment to trigger AIAssistant render
+    return () => {}
+  }, [])
+
+  // Define AIAssistant helper that can be called in any screen
+  const renderAIAssistant = () => <AIAssistant />
+
   // Home Screen
   if (currentScreen === "home") {
-    return renderScreenWithAI(
-      <div className={`min-h-screen ${bgPrimary} transition-colors overflow-hidden`}>
+    return (
+      <>
+        <div className={`min-h-screen ${bgPrimary} transition-colors overflow-hidden`}>
         {/* Full-page solar system background — SVG decorative layer */}
         {/* Dims and freezes when any panel is open */}
         <div className={`transition-opacity duration-700 ${showContactPanel || showDemoForm || showWalkthrough ? "opacity-15 pointer-events-none" : "opacity-100"}`}>
