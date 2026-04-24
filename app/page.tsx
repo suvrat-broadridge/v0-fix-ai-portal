@@ -3709,6 +3709,7 @@ export default function BCometPlatform() {
           </Button>
         </div>
         <AIAssistant />
+
       </Card>
     </div>
   )}
@@ -3753,6 +3754,7 @@ export default function BCometPlatform() {
           </button>
         </div>
         <AIAssistant />
+
       </div>
     )
   }
@@ -3874,6 +3876,7 @@ export default function BCometPlatform() {
             <button onClick={() => { setCurrentScreen("home"); setIsManager(false); }} className={`text-sm ${textSecondary} hover:text-[#00e5ff]`}>Back to Home</button>
           </div>
           <AIAssistant />
+
         </Card>
       </div>
     )
@@ -4942,6 +4945,7 @@ export default function BCometPlatform() {
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
+
         {addClientModalJSX}
         
         <div className="flex-1 overflow-auto">
@@ -5066,6 +5070,7 @@ const clientProgressData = [
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
+
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
             <div>
@@ -5577,6 +5582,7 @@ const tools = [
           </div>
         </div>
         <AIAssistant />
+
       </div>
     )
   }
@@ -5622,6 +5628,7 @@ const tools = [
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
+
         <div className="flex-1 overflow-auto">
           {/* Header */}
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
@@ -5852,6 +5859,7 @@ const tools = [
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
+
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <h1 className={`text-2xl font-bold ${textPrimary}`}>Onboarding Lifecycle</h1>
@@ -6424,6 +6432,7 @@ const tools = [
           </div>
         </div>
         <AIAssistant />
+
       </div>
     )
   }
@@ -6519,6 +6528,7 @@ const tools = [
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
+
         <div className="flex-1 flex overflow-hidden">
           {/* Phase Navigation Sidebar */}
           <div className={`w-72 ${bgSecondary} border-r ${borderColor} overflow-y-auto`}>
@@ -8942,6 +8952,7 @@ const tools = [
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
+
         <div className="flex-1 overflow-auto">
           {/* Phase Context Banner - shows when coming from case workflow */}
           {selectedCaseId && adHocPhaseInfo && (
@@ -9663,8 +9674,9 @@ const tools = [
             )}
           </div>
         </div>
+        <AIAssistant />
       </div>
-      <AIAssistant />
+
     )
   }
 
@@ -9806,6 +9818,7 @@ const tools = [
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -10281,6 +10294,7 @@ const tools = [
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -10561,6 +10575,7 @@ const tools = [
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
+
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => setCurrentScreen("asset-tools")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
@@ -10949,6 +10964,7 @@ const tools = [
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -11104,6 +11120,7 @@ const tools = [
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -11241,6 +11258,7 @@ const tools = [
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -12150,6 +12168,7 @@ const tools = [
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -12331,6 +12350,7 @@ const tools = [
         </div>
       </div>
       <AIAssistant />
+
     )
   }
   
@@ -12599,6 +12619,7 @@ const tools = [
         </div>
       </div>
       <AIAssistant />
+
     )
   }
   
@@ -12747,6 +12768,7 @@ const tools = [
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -12910,6 +12932,7 @@ const tools = [
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -13089,6 +13112,7 @@ const tools = [
         </div>
       </div>
       <AIAssistant />
+
     )
   }
   
@@ -13211,6 +13235,7 @@ const tools = [
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -13370,6 +13395,7 @@ const tools = [
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -13624,6 +13650,7 @@ const tools = [
           </div>
         </div>
         <AIAssistant />
+
       </div>
     )
   }
@@ -13756,6 +13783,7 @@ const tools = [
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -13933,6 +13961,7 @@ const tools = [
         </div>
       </div>
       <AIAssistant />
+
     )
   }
   
@@ -14199,6 +14228,7 @@ const tools = [
                       </Button>
                     </div>
                     <AIAssistant />
+
                   </div>
                 )}
               </div>
@@ -14696,6 +14726,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       <AIAssistant />
+
     )
   }
   
@@ -14884,6 +14915,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -14931,6 +14963,7 @@ const copyToClipboard = () => {
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
+
         <div className="flex-1 overflow-auto">
           {/* Header */}
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
@@ -15726,6 +15759,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -15859,6 +15893,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -15984,6 +16019,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -16002,6 +16038,7 @@ const copyToClipboard = () => {
       <div className={`min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
+
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => selectedClient ? setCurrentScreen("client-detail") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
@@ -16403,6 +16440,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -17063,6 +17101,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -17257,6 +17296,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -17418,6 +17458,7 @@ const copyToClipboard = () => {
         </footer>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -17907,6 +17948,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -18160,6 +18202,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -18317,6 +18360,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -18880,6 +18924,7 @@ ValidateFieldsHaveValues=Y`}
                           </div>
                         ))}
                         <AIAssistant />
+
                       </div>
                     )}
                   </Card>
@@ -19181,6 +19226,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -19352,6 +19398,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -19441,6 +19488,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -19518,6 +19566,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -19565,6 +19614,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -19607,6 +19657,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -19663,6 +19714,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -19712,6 +19764,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -19772,6 +19825,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -19842,6 +19896,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -19900,6 +19955,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -19973,6 +20029,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -20019,6 +20076,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -20080,6 +20138,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
@@ -20137,6 +20196,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       <AIAssistant />
+
     )
   }
 
