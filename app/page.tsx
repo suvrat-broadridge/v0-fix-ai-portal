@@ -378,7 +378,6 @@ export default function BCometPlatform() {
   const [showAddClientModal, setShowAddClientModal] = useState(false)
   const [newClient, setNewClient] = useState({ name: "", jira: "", accountManager: "", assetClasses: [] as string[] })
   const [isAdHocMode, setIsAdHocMode] = useState(false)
-  const [showAIChat, setShowAIChat] = useState(false)
   const [toolsExpanded, setToolsExpanded] = useState(false)
   const [atdlToolsExpanded, setAtdlToolsExpanded] = useState(false)
   const [adminSpecsExpanded, setAdminSpecsExpanded] = useState(false)
@@ -3713,7 +3712,10 @@ export default function BCometPlatform() {
       </Card>
     </div>
   )}
-  
+  </div>
+  )
+}
+
   // Role Selection Screen
   if (currentScreen === "role-select") {
     return (
