@@ -2357,9 +2357,21 @@ export default function BCometPlatform() {
     </>, document.body)
   }
 
+  // Render AI Assistant once per render cycle via createPortal
+  // This ensures it persists across all screen changes
+  const aiAssistantPortal = <AIAssistant />
+
+  // Helper: wrap any screen JSX with the AI Assistant portal
+  const renderScreenWithAI = (screenJSX: React.ReactNode) => (
+    <>
+      {screenJSX}
+      {aiAssistantPortal}
+    </>
+  )
+
   // Home Screen
   if (currentScreen === "home") {
-    return (
+    return renderScreenWithAI(
       <div className={`min-h-screen ${bgPrimary} transition-colors overflow-hidden`}>
         {/* Full-page solar system background — SVG decorative layer */}
         {/* Dims and freezes when any panel is open */}
@@ -3715,7 +3727,8 @@ export default function BCometPlatform() {
       </Card>
     </div>
   )}
-  </div>
+      </div>
+    )
   )
   }
   
