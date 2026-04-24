@@ -2572,6 +2572,7 @@ export default function BCometPlatform() {
                                 ${cometX} ${cometY} Z`}
                           fill="url(#ionTailGrad)" opacity="0.7" filter="url(#glow)"
                         />
+                      {aiAssistantPortal}
                       </>
                     )
                   })()}
@@ -3762,6 +3763,7 @@ export default function BCometPlatform() {
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -3886,6 +3888,7 @@ export default function BCometPlatform() {
         </Card>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -5592,6 +5595,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -6441,6 +6445,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -9683,6 +9688,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -9826,6 +9832,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -10303,6 +10310,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -10973,6 +10981,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -11130,6 +11139,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -11269,6 +11279,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -12180,6 +12191,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -12363,6 +12375,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -12633,6 +12646,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -12783,6 +12797,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -12948,6 +12963,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -13129,6 +13145,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -13253,6 +13270,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -13414,6 +13432,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -13670,6 +13689,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -13803,6 +13823,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -13982,6 +14003,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -14257,6 +14279,7 @@ const tools = [
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -14749,6 +14772,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -14939,6 +14963,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -15783,6 +15808,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -15918,6 +15944,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -16045,6 +16072,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -16466,6 +16494,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -17128,6 +17157,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -17324,6 +17354,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -17487,6 +17518,7 @@ const copyToClipboard = () => {
         </footer>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -17978,6 +18010,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -18233,6 +18266,7 @@ const copyToClipboard = () => {
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -18392,6 +18426,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -18966,6 +19001,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -19260,6 +19296,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -19433,6 +19470,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -19524,6 +19562,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -19603,6 +19642,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -19652,6 +19692,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -19696,6 +19737,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -19754,6 +19796,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -19805,6 +19848,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -19867,6 +19911,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -19939,6 +19984,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -19999,6 +20045,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -20074,6 +20121,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -20122,6 +20170,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -20185,6 +20234,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
@@ -20244,6 +20294,7 @@ ValidateFieldsHaveValues=Y`}
         </div>
       </div>
       {aiAssistantElement}
+    {aiAssistantPortal}
     </>
     )
   }
