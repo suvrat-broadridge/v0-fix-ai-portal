@@ -3712,8 +3712,7 @@ export default function BCometPlatform() {
         </div>
       </Card>
     </div>
-    )
-  }
+  )}
   
   // Role Selection Screen
   if (currentScreen === "role-select") {
