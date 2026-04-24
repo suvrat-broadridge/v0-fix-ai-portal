@@ -1,8 +1,7 @@
 "use client"
 
 // B- COMET Platform - FIX Protocol Testing Suite v2
-import React, { useState, useEffect, useRef } from "react"
-import { createPortal } from "react-dom"
+import React, { useState, useEffect } from "react"
 import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, ChevronUp, ChevronsUpDown, FileText, Activity, Zap, Check, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, Stamp, Code, ScrollText, Navigation, Sparkles, Minus, Loader, FolderArchive, Sliders, Bot, ExternalLink, GitMerge, FileCode, Presentation, ShoppingCart, Network, Circle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -2098,14 +2097,11 @@ export default function BCometPlatform() {
   }
 
   // AI Assistant Floating Button & Panel - GitHub Copilot Style
-  // Rendered via createPortal so it persists across every screen's early return
   const AIAssistant = () => {
     const atRiskCount = onboardingCases.filter(c => c.status === "at-risk").length
     const pendingCount = onboardingCases.filter(c => c.status === "pending").length
-
-    if (typeof document === "undefined") return null
-
-    return createPortal(
+    
+    return (
     <>
       {/* Floating AI Button */}
       {selectedRole && currentScreen !== "home" && currentScreen !== "role-select" && currentScreen !== "login" && (
@@ -2354,24 +2350,12 @@ export default function BCometPlatform() {
           onClick={() => setShowAIAssistant(false)}
         />
       )}
-    </>, document.body)
-  }
-
-  // Render AI Assistant once per render cycle via createPortal
-  // This ensures it persists across all screen changes
-  const aiAssistantPortal = <AIAssistant />
-
-  // Helper: wrap any screen JSX with the AI Assistant portal
-  const renderScreenWithAI = (screenJSX: React.ReactNode) => (
-    <>
-      {screenJSX}
-      {aiAssistantPortal}
     </>
-  )
+  )}
 
   // Home Screen
   if (currentScreen === "home") {
-    return renderScreenWithAI(
+    return (
       <div className={`min-h-screen ${bgPrimary} transition-colors overflow-hidden`}>
         {/* Full-page solar system background — SVG decorative layer */}
         {/* Dims and freezes when any panel is open */}
@@ -3727,8 +3711,7 @@ export default function BCometPlatform() {
       </Card>
     </div>
   )}
-      </div>
-    )
+  </div>
   )
   }
   
