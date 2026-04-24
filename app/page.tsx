@@ -3708,11 +3708,11 @@ export default function BCometPlatform() {
             Submit Request
           </Button>
         </div>
+        <AIAssistant />
       </Card>
     </div>
   )}
   </div>
-      <AIAssistant />
   )
   }
   
