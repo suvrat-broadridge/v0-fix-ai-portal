@@ -3873,9 +3873,9 @@ export default function BCometPlatform() {
           <div className="mt-6 text-center">
             <button onClick={() => { setCurrentScreen("home"); setIsManager(false); }} className={`text-sm ${textSecondary} hover:text-[#00e5ff]`}>Back to Home</button>
           </div>
+          <AIAssistant />
         </Card>
       </div>
-      <AIAssistant />
     )
   }
 
