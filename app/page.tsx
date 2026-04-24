@@ -6423,8 +6423,8 @@ const tools = [
             </Card>
           </div>
         </div>
+        <AIAssistant />
       </div>
-      <AIAssistant />
     )
   }
 
