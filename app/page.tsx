@@ -241,11 +241,12 @@ function TestPlanGeneratorTool({
           <Button onClick={onNextStep} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">
             Next Step <ChevronRight className="h-4 w-4 ml-1" />
           </Button>
-        </div>
-      )}
     </div>
-  )
-}
+  )}
+      {aiAssistantPortal}
+    </>
+    )
+  }
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function BCometPlatform() {
