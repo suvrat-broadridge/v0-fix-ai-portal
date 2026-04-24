@@ -19584,7 +19584,6 @@ ValidateFieldsHaveValues=Y`}
           </div>
         </div>
       </div>
-      <AIAssistant />
     )
   }
 
