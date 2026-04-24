@@ -4,92 +4,66 @@ const path = require('path');
 const filePath = path.join(__dirname, '../app/page.tsx');
 let content = fs.readFileSync(filePath, 'utf-8');
 
-// Split file into lines for easier processing
-const lines = content.split('\n');
-const newLines = [];
+// Find all screen block patterns - each screen is:
+// if (currentScreen === "screen-name") {
+//   return (
+//     <div>...</div>
+//   )
+// }
 
-let i = 0;
-let screensProcessed = 0;
-let screensWithAI = 0;
+// Strategy: Find each closing pattern of ")\n  }" that follows a screen return
+// and inject <AIAssistant /> before the closing div
 
-while (i < lines.length) {
-  const line = lines[i];
+// Pattern: find lines that look like:
+//      </div>
+//    )
+//  }
+// And replace with:
+//      </div>
+//      <AIAssistant />
+//    )
+//  }
+
+// But we need to be careful about nesting. Let's use a more targeted approach:
+// 1. Split by "if (currentScreen ===" to find all screen blocks
+// 2. For each block, find its return JSX and add <AIAssistant /> to it
+
+const screenRegex = /if\s*\(\s*currentScreen\s*===\s*"([^"]+)"\s*\)\s*\{[\s\S]*?return\s*\(([\s\S]*?)\n\s{2}\}\s/g;
+
+let match;
+let replacements = 0;
+
+while ((match = screenRegex.exec(content)) !== null) {
+  const screenName = match[1];
+  const returnContent = match[2];
   
-  // Check if this is a screen block start
-  if (line.match(/^  if \(currentScreen === "[^"]+"\) \{/)) {
-    const screenName = line.match(/currentScreen === "([^"]+)"/)[1];
-    newLines.push(line);
-    screensProcessed++;
-    
-    // Scan forward to find the end of this screen block
-    let blockStartLine = i + 1;
-    let depth = 1;
-    let blockEndLine = -1;
-    
-    for (let j = i + 1; j < lines.length; j++) {
-      if (lines[j].match(/^  if \(currentScreen === "[^"]*"\) \{/) || lines[j] === '  }') {
-        if (lines[j] === '  }') {
-          blockEndLine = j;
-          break;
-        }
-      }
-    }
-    
-    if (blockEndLine > 0) {
-      // Extract the block content
-      const blockLines = lines.slice(blockStartLine, blockEndLine);
-      
-      // Check if block already has <AIAssistant />
-      const hasAI = blockLines.some(l => l.includes('<AIAssistant'));
-      
-      if (hasAI) {
-        screensWithAI++;
-        // Add lines as-is
-        for (let j = blockStartLine; j < blockEndLine; j++) {
-          newLines.push(lines[j]);
-        }
-      } else {
-        // Add <AIAssistant /> before the closing )
-        // Find the line with just ")"
-        let closingLineIdx = -1;
-        for (let j = blockEndLine - 1; j >= blockStartLine; j--) {
-          if (lines[j].trim() === ')') {
-            closingLineIdx = j;
-            break;
-          }
-        }
-        
-        if (closingLineIdx > 0) {
-          // Add all lines up to closing
-          for (let j = blockStartLine; j < closingLineIdx; j++) {
-            newLines.push(lines[j]);
-          }
-          // Add <AIAssistant /> with proper indentation
-          newLines.push('      <AIAssistant />');
-          // Add closing
-          newLines.push(lines[closingLineIdx]);
-        } else {
-          // Fallback: just add all lines
-          for (let j = blockStartLine; j < blockEndLine; j++) {
-            newLines.push(lines[j]);
-          }
-        }
-      }
-      
-      // Add closing brace
-      newLines.push(lines[blockEndLine]);
-      i = blockEndLine + 1;
-      continue;
-    }
+  // Check if this screen already has <AIAssistant />
+  if (returnContent.includes('<AIAssistant')) {
+    console.log(`✓ Screen "${screenName}" already has <AIAssistant />`);
+    continue;
   }
   
-  newLines.push(line);
-  i++;
+  // Find the last closing </div> or </> before the return ends
+  // We need to insert <AIAssistant /> as a sibling to the main return element
+  const lastDivMatch = returnContent.lastIndexOf('</div>');
+  const lastFragmentMatch = returnContent.lastIndexOf('</>');
+  
+  const insertPos = Math.max(lastDivMatch + 6, lastFragmentMatch);
+  
+  if (insertPos > 0) {
+    const newReturnContent = 
+      returnContent.substring(0, insertPos) + 
+      '\n      <AIAssistant />' + 
+      returnContent.substring(insertPos);
+    
+    const oldBlock = match[0];
+    const newBlock = oldBlock.replace(returnContent, newReturnContent);
+    
+    content = content.replace(oldBlock, newBlock);
+    replacements++;
+    console.log(`✓ Added <AIAssistant /> to screen "${screenName}"`);
+  }
 }
 
-const newContent = newLines.join('\n');
-fs.writeFileSync(filePath, newContent, 'utf-8');
-console.log(`✓ Processed ${screensProcessed} screens`);
-console.log(`✓ ${screensWithAI} screens already had <AIAssistant />`);
-console.log(`✓ Added <AIAssistant /> to ${screensProcessed - screensWithAI} screens`);
-
+fs.writeFileSync(filePath, content, 'utf-8');
+console.log(`\n✓ Successfully added <AIAssistant /> to ${replacements} screens`);
