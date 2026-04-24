@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import AIAssistant from "@/components/ai-assistant"
 import { AIAssistant } from "@/components/ai-assistant"
 
 // ── Test Plan Generator ─────────────────────────────────────────────────────
@@ -11784,7 +11785,7 @@ const copyToClipboard = () => {
 
             {/* ══════════════════════════════════════��══════════════��═
                 STEP 3: GATEWAY DELTA ANALYSIS
-            ═════════════════════════════════════════════���═════════ */}
+            ═══════════════════��═════════════════════════���═════════ */}
             {certReportStep === "delta" && (
               <div className="space-y-6">
                 <div className="grid grid-cols-3 gap-4">
