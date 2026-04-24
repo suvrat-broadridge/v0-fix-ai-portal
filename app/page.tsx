@@ -13623,9 +13623,9 @@ const tools = [
             </div>
           </div>
         </div>
+        <AIAssistant />
       </div>
-      <AIAssistant />
-)
+    )
   }
 
   // Client Specs Screen - For clients to upload and manage their specs
@@ -15446,7 +15446,7 @@ const copyToClipboard = () => {
                         { key: "clientMessages", label: "Include client original messages", sub: "Shows client's actual FIX messages, not internal gateway format" },
                         { key: "passFailResults", label: "Include pass/fail results per test case", sub: "Result for each of the 234 test cases" },
                         { key: "gatewayNotes", label: "Include gateway transformation notes", sub: "Annotates expected transforms vs unexpected changes" },
-                        { key: "rawConductor", label: "Include raw Conductor report", sub: "Internal format reference — typically for internal use only" },
+                        { key: "rawConductor", label: "Include raw Conductor report", sub: "Internal format reference ��� typically for internal use only" },
                         { key: "unmatchedCases", label: "Include unmatched test cases", sub: `${unmatched} test cases with no client message match` },
                       ].map(opt => (
                         <label key={opt.key} className="flex items-start gap-3 cursor-pointer group">
