@@ -1961,6 +1961,29 @@ export default function BCometPlatform() {
   )
 
   // AI Agent configurations
+  // Map screens to workflow phases
+  const phaseMapping: Record<string, { phase: keyof typeof aiAgents, description: string }> = {
+    "onboarding-cases": { phase: "intake", description: "Intake and Discovery" },
+    "scenario-creation": { phase: "design", description: "Solution Design & Configuration" },
+    "field-mapping": { phase: "connectivity", description: "Connectivity Setup" },
+    "certification-gen": { phase: "planning", description: "Certification Planning" },
+    "test-case-gen": { phase: "testing", description: "Test Execution" },
+    "log-analysis": { phase: "analysis", description: "Analysis & Remediation" },
+    "approvals": { phase: "decisioning", description: "Certification Decisioning" },
+    "go-live": { phase: "golive", description: "Production Enablement" },
+    dashboard: { phase: "general", description: "General" },
+  }
+
+  // Auto-set AI agent mode based on current phase
+  React.useEffect(() => {
+    const currentPhase = phaseMapping[currentScreen]
+    if (currentPhase) {
+      setAiAgentMode(currentPhase.phase as any)
+    } else {
+      setAiAgentMode("general")
+    }
+  }, [currentScreen])
+
   const aiAgents = {
     general: { name: "General", icon: Bot, color: "text-[#00e5ff]", bg: "bg-[#00e5ff]/10", description: "Navigate platform, answer questions", phase: 0 },
     intake: { name: "Intake", icon: Briefcase, color: "text-[#4caf50]", bg: "bg-[#4caf50]/10", description: "Intake and Discovery", phase: 1 },
@@ -1973,19 +1996,21 @@ export default function BCometPlatform() {
     golive: { name: "Go-Live", icon: Rocket, color: "text-[#8bc34a]", bg: "bg-[#8bc34a]/10", description: "Production Enablement", phase: 8 },
   }
 
-  // Context-aware suggestions based on current screen
+  // Context-aware suggestions based on current phase
   const getContextSuggestions = () => {
-    const suggestions: Record<string, string[]> = {
-      dashboard: ["Show me pending approvals", "What cases need attention?", "Summarize today's activity"],
-      "onboarding-cases": ["Create a new case", "Show at-risk cases", "What's the average onboarding time?"],
-      "spec-compare": ["Compare these two specs", "What are the key differences?", "Generate a diff report"],
-      "log-analysis": ["Parse this FIX log", "Find errors in the log", "Explain message sequence"],
-      "test-case-gen": ["Generate edge cases", "Add negative test scenarios", "Explain coverage gaps"],
-      "certification-gen": ["Run full certification", "Explain failing tests", "Generate cert report"],
-      "case-workflow": ["What's the next step?", "Show case history", "Who needs to approve?"],
-      "client-cert-report": ["Correlate messages", "Explain gateway deltas", "Generate client report"],
+    const phaseSuggestions: Record<string, string[]> = {
+      intake: ["Review client requirements", "Upload spec documents", "What info do I need?"],
+      design: ["Configure field mappings", "Set business rules", "Generate ATDL config"],
+      connectivity: ["Test FIX connection", "Configure session params", "Verify network routes"],
+      planning: ["Create test plan", "Define acceptance criteria", "Analyze coverage gaps"],
+      testing: ["Run test suite", "Check test results", "Export test report"],
+      analysis: ["Analyze failures", "Find root causes", "Apply fixes"],
+      decisioning: ["Review certification", "Generate approval", "Final decision"],
+      golive: ["Enable production", "Schedule deployment", "Notify client"],
+      general: ["Show me pending approvals", "What cases need attention?", "Summarize activity"],
     }
-    return suggestions[currentScreen] || ["How can I help?", "Show me around", "What can you do?"]
+    const phase = phaseMapping[currentScreen]?.phase || "general"
+    return phaseSuggestions[phase] || phaseSuggestions["general"]
   }
 
   // Execute AI action
@@ -2150,7 +2175,9 @@ export default function BCometPlatform() {
       }
       // Help
       else if (userMsg.includes("help") || userMsg.includes("what can you do")) {
-        response = `I'm your AI copilot for B-COMET. I can help with:\n\n**8-Phase Workflow**\n1. Intake & Discovery\n2. Solution Design & Config\n3. Connectivity Setup\n4. Certification Planning\n5. Test Execution\n6. Analysis & Remediation\n7. Certification Decisioning\n8. Production Enablement\n\n**Commands**\n- "Start workflow" - Begin guided 8-phase process\n- "Go to [screen]" - Navigate instantly\n- "What's the status?" - System overview\n\nTry "start workflow" to begin!`
+        const phase = phaseMapping[currentScreen]?.phase || "general"
+        const phaseAgent = aiAgents[phase as keyof typeof aiAgents]
+        response = `I'm **${phaseAgent.name}** agent helping with: **${phaseAgent.description}**\n\nYou're currently in Phase ${phaseAgent.phase} of the 8-phase workflow.\n\n**Available in all phases:**\n- "Go to [phase]" - Navigate to different phases\n- "Show workflow" - See all 8 phases\n- "What's next?" - Guidance for this phase\n\n**Current phase help:**\nTry asking me about ${phaseAgent.description.toLowerCase()}!`
       }
       // Default contextual response
       else {
