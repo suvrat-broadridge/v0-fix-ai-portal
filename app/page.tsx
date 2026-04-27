@@ -2246,23 +2246,18 @@ export default function BCometPlatform() {
         showAIAssistant ? "translate-x-0" : "translate-x-full"
       }`} style={{ width: "440px" }}>
         <div className={`h-full flex flex-col ${isDarkMode ? "bg-[#0d2137]" : "bg-white"} border-l ${borderColor} shadow-2xl`}>
-          {/* Header */}
-          <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-[#00e5ff] to-[#0091ea]">
-                <Sparkles className="h-5 w-5 text-[#0a1628]" />
+          {/* Header - Orchestrator Agent */}
+          <div className={`px-4 py-3 border-b ${borderColor}`}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-[#00e5ff] to-[#0091ea]">
+                  <Bot className="h-5 w-5 text-[#0a1628]" />
+                </div>
+                <div>
+                  <h3 className={`font-semibold ${textPrimary}`}>Orchestrator Agent</h3>
+                  <p className={`text-xs ${textSecondary}`}>Coordinating workflow execution</p>
+                </div>
               </div>
-              <div>
-                <h3 className={`font-semibold ${textPrimary}`}>B-COMET Copilot</h3>
-                <p className={`text-xs ${textSecondary}`}>AI-powered assistant</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-1">
-              {aiWorkflowMode && (
-                <span className="px-2 py-1 rounded text-[10px] font-bold bg-[#4caf50]/20 text-[#4caf50] mr-2">
-                  WORKFLOW MODE
-                </span>
-              )}
               <button
                 onClick={() => setShowAIAssistant(false)}
                 className={`p-1.5 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}
@@ -2270,26 +2265,89 @@ export default function BCometPlatform() {
                 <X className="h-5 w-5" />
               </button>
             </div>
+            
+            {/* Linear Workflow Phase Indicator */}
+            <div className={`p-2 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+              <div className="flex items-center justify-between mb-2">
+                <span className={`text-[10px] font-semibold uppercase tracking-wider ${textSecondary}`}>Workflow Phase</span>
+                <span className="text-[10px] font-medium text-[#00e5ff]">
+                  {aiAgentMode === "general" ? "Ready" : `Phase ${aiAgents[aiAgentMode as keyof typeof aiAgents]?.phase || 0}/8`}
+                </span>
+              </div>
+              <div className="flex gap-1">
+                {[1,2,3,4,5,6,7,8].map((phase) => {
+                  const currentPhase = aiAgents[aiAgentMode as keyof typeof aiAgents]?.phase || 0
+                  const phaseColors = ["#4caf50", "#ff9800", "#9c27b0", "#2196f3", "#e91e63", "#00bcd4", "#ffc107", "#8bc34a"]
+                  return (
+                    <div
+                      key={phase}
+                      className={`flex-1 h-1.5 rounded-full transition-all ${
+                        phase <= currentPhase ? "" : "bg-[#1e4976]/30"
+                      }`}
+                      style={{ backgroundColor: phase <= currentPhase ? phaseColors[phase - 1] : undefined }}
+                    />
+                  )
+                })}
+              </div>
+            </div>
           </div>
 
-          {/* Agent Selector */}
-          <div className={`px-3 py-2 border-b ${borderColor} overflow-x-auto`}>
-            <div className="flex items-center gap-1.5" style={{ minWidth: "max-content" }}>
-              {(Object.entries(aiAgents) as [keyof typeof aiAgents, typeof aiAgents[keyof typeof aiAgents]][]).map(([key, agent]) => (
+          {/* Sub-Agents Section */}
+          <div className={`px-3 py-2 border-b ${borderColor}`}>
+            <div className="flex items-center justify-between mb-2">
+              <span className={`text-[10px] font-semibold uppercase tracking-wider ${textSecondary}`}>Sub-Agents</span>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {(Object.entries(aiAgents) as [keyof typeof aiAgents, typeof aiAgents[keyof typeof aiAgents]][])
+                .filter(([key]) => key !== "general")
+                .map(([key, agent]) => (
                 <button
                   key={key}
                   onClick={() => setAiAgentMode(key)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
+                  className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-colors ${
                     aiAgentMode === key
                       ? `${agent.bg} ${agent.color} ring-1 ring-current`
                       : `${textSecondary} hover:bg-[#1e4976]/30`
                   }`}
+                  title={agent.description}
                 >
-                  <agent.icon className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{agent.name.split(" ")[0]}</span>
+                  <span className={`w-1.5 h-1.5 rounded-full`} style={{ backgroundColor: agent.color.replace("text-[", "").replace("]", "") }} />
+                  <span>{agent.name}</span>
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Tools Section */}
+          <div className={`px-3 py-2 border-b ${borderColor}`}>
+            <button
+              onClick={() => setToolsExpanded(!toolsExpanded)}
+              className={`w-full flex items-center justify-between`}
+            >
+              <span className={`text-[10px] font-semibold uppercase tracking-wider ${textSecondary}`}>Tools</span>
+              <ChevronDown className={`h-3 w-3 ${textSecondary} transition-transform ${toolsExpanded ? "rotate-180" : ""}`} />
+            </button>
+            {toolsExpanded && (
+              <div className="mt-2 grid grid-cols-2 gap-1">
+                {[
+                  { icon: GitCompare, label: "Spec Compare", cmd: "spec compare" },
+                  { icon: FileSearch, label: "Log Parser", cmd: "parse log" },
+                  { icon: TestTube, label: "Test Gen", cmd: "generate tests" },
+                  { icon: Code, label: "ATDL Validator", cmd: "validate atdl" },
+                  { icon: FileText, label: "Report Gen", cmd: "generate report" },
+                  { icon: Database, label: "Knowledge Base", cmd: "search kb" },
+                ].map((tool, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { setAiChatInput(tool.cmd); }}
+                    className={`flex items-center gap-1.5 px-2 py-1.5 rounded text-[10px] ${textSecondary} hover:bg-[#1e4976]/30 transition-colors`}
+                  >
+                    <tool.icon className="h-3 w-3" />
+                    <span>{tool.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Chat Messages */}
