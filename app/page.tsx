@@ -2227,12 +2227,16 @@ export default function BCometPlatform() {
       {selectedRole && currentScreen !== "home" && currentScreen !== "role-select" && currentScreen !== "login" && (
         <button
           onClick={() => setShowAIAssistant(true)}
-          className={`fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110 ${
+          className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-2xl shadow-xl transition-all duration-300 hover:scale-110 hover:brightness-110 flex items-center justify-center ${
             showAIAssistant ? "opacity-0 pointer-events-none" : "opacity-100"
-          } ${isDarkMode ? "bg-[#00e5ff] text-[#0a1628]" : "bg-[#0a1628] text-white"}`}
-          style={{ boxShadow: "0 0 20px rgba(0, 229, 255, 0.4)" }}
+          }`}
+          style={{
+            background: "linear-gradient(135deg, #29d9f5 0%, #0095e8 100%)",
+            boxShadow: "0 8px 24px rgba(0, 180, 230, 0.45)",
+          }}
+          title="Open FixPilot"
         >
-          <Sparkles className="h-6 w-6" />
+          <Bot className="h-7 w-7 text-white" />
           {atRiskCount > 0 && (
             <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#f44336] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
               {atRiskCount}
@@ -2250,8 +2254,8 @@ export default function BCometPlatform() {
           <div className={`px-4 py-3 border-b ${borderColor}`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-[#00e5ff] to-[#0091ea]">
-                  <Bot className="h-5 w-5 text-[#0a1628]" />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "linear-gradient(135deg, #29d9f5 0%, #0095e8 100%)" }}>
+                  <Bot className="h-5 w-5 text-white" />
                 </div>
                 <div>
                   <h3 className={`font-semibold ${textPrimary}`}>FixPilot</h3>
