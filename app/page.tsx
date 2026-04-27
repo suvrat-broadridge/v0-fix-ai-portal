@@ -2292,64 +2292,6 @@ export default function BCometPlatform() {
             </div>
           </div>
 
-          {/* Sub-Agents Section */}
-          <div className={`px-3 py-2 border-b ${borderColor}`}>
-            <div className="flex items-center justify-between mb-2">
-              <span className={`text-[10px] font-semibold uppercase tracking-wider ${textSecondary}`}>Sub-Agents</span>
-            </div>
-            <div className="flex flex-wrap gap-1">
-              {(Object.entries(aiAgents) as [keyof typeof aiAgents, typeof aiAgents[keyof typeof aiAgents]][])
-                .filter(([key]) => key !== "general")
-                .map(([key, agent]) => (
-                <button
-                  key={key}
-                  onClick={() => setAiAgentMode(key)}
-                  className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium transition-colors ${
-                    aiAgentMode === key
-                      ? `${agent.bg} ${agent.color} ring-1 ring-current`
-                      : `${textSecondary} hover:bg-[#1e4976]/30`
-                  }`}
-                  title={agent.description}
-                >
-                  <span className={`w-1.5 h-1.5 rounded-full`} style={{ backgroundColor: agent.color.replace("text-[", "").replace("]", "") }} />
-                  <span>{agent.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Tools Section */}
-          <div className={`px-3 py-2 border-b ${borderColor}`}>
-            <button
-              onClick={() => setToolsExpanded(!toolsExpanded)}
-              className={`w-full flex items-center justify-between`}
-            >
-              <span className={`text-[10px] font-semibold uppercase tracking-wider ${textSecondary}`}>Tools</span>
-              <ChevronDown className={`h-3 w-3 ${textSecondary} transition-transform ${toolsExpanded ? "rotate-180" : ""}`} />
-            </button>
-            {toolsExpanded && (
-              <div className="mt-2 grid grid-cols-2 gap-1">
-                {[
-                  { icon: GitCompare, label: "Spec Compare", cmd: "spec compare" },
-                  { icon: FileSearch, label: "Log Parser", cmd: "parse log" },
-                  { icon: TestTube, label: "Test Gen", cmd: "generate tests" },
-                  { icon: Code, label: "ATDL Validator", cmd: "validate atdl" },
-                  { icon: FileText, label: "Report Gen", cmd: "generate report" },
-                  { icon: Database, label: "Knowledge Base", cmd: "search kb" },
-                ].map((tool, i) => (
-                  <button
-                    key={i}
-                    onClick={() => { setAiChatInput(tool.cmd); }}
-                    className={`flex items-center gap-1.5 px-2 py-1.5 rounded text-[10px] ${textSecondary} hover:bg-[#1e4976]/30 transition-colors`}
-                  >
-                    <tool.icon className="h-3 w-3" />
-                    <span>{tool.label}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
           {/* Chat Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {aiChatHistory.map((msg, i) => (
@@ -2434,31 +2376,116 @@ export default function BCometPlatform() {
                 </p>
               </div>
             )}
-            <div className="flex items-center gap-2">
-              <Input
-                ref={chatInputRef}
-                autoFocus
-                value={aiChatInput}
-                onChange={e => setAiChatInput(e.target.value)}
-                onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleAISend(); } }}
-                placeholder={aiWorkflowMode ? "yes / skip / stop" : "Ask me anything or give a command..."}
-                className={`flex-1 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder-[#64b5f6]" : ""}`}
-              />
-              <Button
-                onClick={handleAISend}
-                disabled={!aiChatInput.trim() || aiIsTyping}
-                className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] disabled:opacity-50"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="flex items-center justify-between mt-2">
-              <p className={`text-[10px] ${textSecondary}`}>
-                Enter to send
-              </p>
-              <p className={`text-[10px] ${textSecondary}`}>
-                Powered by B-COMET AI
-              </p>
+            <Input
+              ref={chatInputRef}
+              autoFocus
+              value={aiChatInput}
+              onChange={e => setAiChatInput(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleAISend(); } }}
+              placeholder={aiWorkflowMode ? "yes / skip / stop" : "Ask FixPilot anything..."}
+              className={`w-full mb-2 ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white placeholder-[#64b5f6]" : ""}`}
+            />
+            {/* Bottom Toolbar */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                {/* Send / Plus */}
+                <button
+                  onClick={handleAISend}
+                  disabled={!aiChatInput.trim() || aiIsTyping}
+                  className={`p-1.5 rounded-md transition-colors disabled:opacity-40 ${isDarkMode ? "text-[#64b5f6] hover:bg-[#1e4976]/40" : "text-gray-500 hover:bg-gray-100"}`}
+                  title="Send"
+                >
+                  <Send className="h-4 w-4" />
+                </button>
+
+                {/* Agent Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setToolsExpanded(!toolsExpanded)}
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                      isDarkMode
+                        ? "border-[#1e4976] text-[#90caf9] hover:bg-[#1e4976]/40"
+                        : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    <Bot className="h-3.5 w-3.5" />
+                    <span>
+                      {aiAgentMode === "general"
+                        ? "Agent"
+                        : aiAgents[aiAgentMode as keyof typeof aiAgents]?.name}
+                    </span>
+                    <ChevronDown className={`h-3 w-3 transition-transform ${toolsExpanded ? "rotate-180" : ""}`} />
+                  </button>
+                  {toolsExpanded && (
+                    <div className={`absolute bottom-full mb-2 left-0 w-52 rounded-xl border shadow-xl z-10 overflow-hidden ${isDarkMode ? "bg-[#0d2137] border-[#1e4976]" : "bg-white border-gray-200"}`}>
+                      <div className={`px-3 py-2 border-b ${borderColor}`}>
+                        <span className={`text-[10px] font-semibold uppercase tracking-wider ${textSecondary}`}>Sub-Agents</span>
+                      </div>
+                      {(Object.entries(aiAgents) as [keyof typeof aiAgents, typeof aiAgents[keyof typeof aiAgents]][])
+                        .map(([key, agent]) => (
+                        <button
+                          key={key}
+                          onClick={() => { setAiAgentMode(key); setToolsExpanded(false); }}
+                          className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs transition-colors ${
+                            aiAgentMode === key
+                              ? `${agent.bg} ${agent.color}`
+                              : `${textSecondary} ${isDarkMode ? "hover:bg-[#1e4976]/30" : "hover:bg-gray-50"}`
+                          }`}
+                        >
+                          <agent.icon className="h-3.5 w-3.5 shrink-0" />
+                          <div className="text-left">
+                            <div className="font-medium">{agent.name}</div>
+                            <div className={`text-[10px] opacity-60`}>{agent.description}</div>
+                          </div>
+                          {aiAgentMode === key && <CheckCircle className="h-3 w-3 ml-auto shrink-0" />}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Tools Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setWorkflowsExpanded(!workflowsExpanded)}
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                      isDarkMode
+                        ? "border-[#1e4976] text-[#90caf9] hover:bg-[#1e4976]/40"
+                        : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    <Wrench className="h-3.5 w-3.5" />
+                    <span>Tools</span>
+                    <ChevronDown className={`h-3 w-3 transition-transform ${workflowsExpanded ? "rotate-180" : ""}`} />
+                  </button>
+                  {workflowsExpanded && (
+                    <div className={`absolute bottom-full mb-2 left-0 w-44 rounded-xl border shadow-xl z-10 overflow-hidden ${isDarkMode ? "bg-[#0d2137] border-[#1e4976]" : "bg-white border-gray-200"}`}>
+                      <div className={`px-3 py-2 border-b ${borderColor}`}>
+                        <span className={`text-[10px] font-semibold uppercase tracking-wider ${textSecondary}`}>Standalone Tools</span>
+                      </div>
+                      {[
+                        { icon: GitCompare, label: "Spec Compare", cmd: "spec compare" },
+                        { icon: FileSearch, label: "Log Parser", cmd: "parse log" },
+                        { icon: TestTube, label: "Test Gen", cmd: "generate tests" },
+                        { icon: Code, label: "ATDL Validator", cmd: "validate atdl" },
+                        { icon: FileText, label: "Report Gen", cmd: "generate report" },
+                        { icon: Database, label: "Knowledge Base", cmd: "search kb" },
+                      ].map((tool, i) => (
+                        <button
+                          key={i}
+                          onClick={() => { setAiChatInput(tool.cmd); setWorkflowsExpanded(false); }}
+                          className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs transition-colors ${textSecondary} ${isDarkMode ? "hover:bg-[#1e4976]/30" : "hover:bg-gray-50"}`}
+                        >
+                          <tool.icon className="h-3.5 w-3.5 shrink-0" />
+                          <span>{tool.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <p className={`text-[10px] ${textSecondary}`}>↵ to send</p>
             </div>
           </div>
         </div>
