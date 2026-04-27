@@ -379,6 +379,8 @@ export default function BCometPlatform() {
   const [newClient, setNewClient] = useState({ name: "", jira: "", accountManager: "", assetClasses: [] as string[] })
   const [isAdHocMode, setIsAdHocMode] = useState(false)
   const [toolsExpanded, setToolsExpanded] = useState(false)
+  const [workflowsExpanded, setWorkflowsExpanded] = useState(true)
+  const [selectedPhase, setSelectedPhase] = useState<number | null>(null)
   const [atdlToolsExpanded, setAtdlToolsExpanded] = useState(false)
   const [adminSpecsExpanded, setAdminSpecsExpanded] = useState(false)
   const [clientSpecsExpanded, setClientSpecsExpanded] = useState(false)
@@ -1676,15 +1678,15 @@ export default function BCometPlatform() {
       <div className="space-y-1">
         {[
           { icon: LayoutDashboard, label: "Dashboard", screen: "dashboard", roles: ["admin", "client"] },
+          { icon: Briefcase, label: "Onboarding Cases", screen: "onboarding-cases", roles: ["admin"] },
           { icon: Users, label: "Clients", screen: "clients", roles: ["admin"] },
           { icon: BookOpen, label: "Rule Library", screen: "rule-library", roles: ["admin"] },
-          { icon: Server, label: "Prod Config", screen: "prod-config", roles: ["admin"] },
         ].filter(item => item.roles.includes(selectedRole || "")).map((item: any) => (
           <button
             key={item.label}
-            onClick={() => { setCurrentScreen(item.screen as any); setIsAdHocMode(false); }}
+            onClick={() => { setCurrentScreen(item.screen as any); setIsAdHocMode(false); setSelectedPhase(null); }}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-              currentScreen === item.screen && !isAdHocMode
+              currentScreen === item.screen && !isAdHocMode && selectedPhase === null
               ? "bg-[#00e5ff]/10 text-[#00e5ff]"
               : `${textSecondary} hover:bg-[#1e4976]/30`
             }`}
@@ -1701,38 +1703,48 @@ export default function BCometPlatform() {
       </div>
     </div>
 
-    {/* Workflows Section - 8 Phases */}
+    {/* Workflows Section - Collapsible 8 Phases */}
     <div>
-      {!sidebarCollapsed && <div className="text-xs uppercase tracking-wider font-semibold text-[#64b5f6] px-3 py-2">Workflows</div>}
-      <div className="space-y-1">
-        {[
-          { icon: Navigation, label: "Overview", screen: "workflow-overview", roles: ["admin"], phase: 0 },
-          { icon: Briefcase, label: "Initiation", screen: "onboarding-cases", roles: ["admin"], phase: 1 },
-          { icon: FileSearch, label: "Analysis", screen: "log-analysis", roles: ["admin", "client"], phase: 2 },
-          { icon: Activity, label: "Design", screen: "scenario-creation", roles: ["admin"], phase: 3 },
-          { icon: TestTube, label: "Testing", screen: "test-case-gen", roles: ["admin"], phase: 4 },
-          { icon: CheckCircle, label: "Validation", screen: "atdl-validate", roles: ["admin"], phase: 5 },
-          { icon: Award, label: "Certification", screen: "certification-gen", roles: ["admin"], phase: 6 },
-          { icon: Rocket, label: "Go-Live", screen: "go-live", roles: ["admin"], phase: 7 },
-        ].filter(item => item.roles.includes(selectedRole || "")).map((item: any) => (
-          <button
-            key={item.label}
-            onClick={() => { setCurrentScreen(item.screen as any); setIsAdHocMode(false); }}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
-              currentScreen === item.screen && !isAdHocMode
-              ? "bg-[#00e5ff]/10 text-[#00e5ff]"
-              : `${textSecondary} hover:bg-[#1e4976]/30`
-            }`}
-          >
-            <item.icon className="h-4 w-4" />
-            {!sidebarCollapsed && (
-              <span className="flex-1">
-                {item.label}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
+      <button
+        onClick={() => setWorkflowsExpanded(!workflowsExpanded)}
+        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${textSecondary} hover:bg-[#1e4976]/30`}
+      >
+        <div className="flex items-center gap-3">
+          <Navigation className="h-5 w-5" />
+          {!sidebarCollapsed && <span className="text-xs uppercase tracking-wider font-semibold text-[#64b5f6]">Workflows</span>}
+        </div>
+        {!sidebarCollapsed && (
+          <ChevronDown className={`h-4 w-4 transition-transform ${workflowsExpanded ? "rotate-180" : ""}`} />
+        )}
+      </button>
+      
+      {workflowsExpanded && !sidebarCollapsed && (
+        <div className="ml-4 mt-1 space-y-0.5 border-l border-[#1e4976]/50 pl-2">
+          {[
+            { label: "Intake & Discovery", phase: 1, color: "bg-[#4caf50]" },
+            { label: "Solution Design", phase: 2, color: "bg-[#ff9800]" },
+            { label: "Connectivity Setup", phase: 3, color: "bg-[#9c27b0]" },
+            { label: "Cert Planning", phase: 4, color: "bg-[#2196f3]" },
+            { label: "Test Execution", phase: 5, color: "bg-[#e91e63]" },
+            { label: "Analysis & Remediation", phase: 6, color: "bg-[#00bcd4]" },
+            { label: "Cert Decisioning", phase: 7, color: "bg-[#ffc107]" },
+            { label: "Production", phase: 8, color: "bg-[#8bc34a]" },
+          ].map((item) => (
+            <button
+              key={item.phase}
+              onClick={() => { setCurrentScreen("onboarding-cases"); setSelectedPhase(item.phase); setIsAdHocMode(false); }}
+              className={`w-full flex items-center gap-2 px-2 py-1.5 rounded transition-colors text-xs ${
+                selectedPhase === item.phase
+                ? "bg-[#00e5ff]/10 text-[#00e5ff]"
+                : `${textSecondary} hover:bg-[#1e4976]/30`
+              }`}
+            >
+              <span className={`w-2 h-2 rounded-full ${item.color}`}></span>
+              <span className="truncate">{item.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
 
     {/* Management Section */}
@@ -2252,43 +2264,11 @@ export default function BCometPlatform() {
                 </span>
               )}
               <button
-                onClick={() => { setAiChatHistory(getDefaultAiWelcomeMessage()); setAiWorkflowMode(false); }}
-                className={`p-1.5 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}
-                title="Clear chat"
-              >
-                <RefreshCw className="h-4 w-4" />
-              </button>
-              <button
                 onClick={() => setShowAIAssistant(false)}
                 className={`p-1.5 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}
               >
                 <X className="h-5 w-5" />
               </button>
-            </div>
-          </div>
-
-          {/* Live System Status Bar */}
-          <div className={`px-4 py-2 ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} border-b ${borderColor}`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-[#4caf50] animate-pulse" />
-                  <span className={`text-[10px] font-medium ${textSecondary}`}>LIVE</span>
-                </div>
-                <span className={`text-xs ${textPrimary}`}>{currentScreen.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                {atRiskCount > 0 && (
-                  <span className="flex items-center gap-1 text-[10px] font-medium text-[#f44336]">
-                    <AlertTriangle className="h-3 w-3" /> {atRiskCount} at-risk
-                  </span>
-                )}
-                {pendingCount > 0 && (
-                  <span className="flex items-center gap-1 text-[10px] font-medium text-[#ff9800]">
-                    <Clock className="h-3 w-3" /> {pendingCount} pending
-                  </span>
-                )}
-              </div>
             </div>
           </div>
 
@@ -2385,6 +2365,33 @@ export default function BCometPlatform() {
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Quick Actions Bar */}
+          <div className={`px-3 py-2 border-t ${borderColor}`}>
+            <div className="flex items-center gap-2 mb-2">
+              <span className={`text-[10px] font-medium ${textSecondary}`}>QUICK ACTIONS</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { label: "Go to Dashboard", cmd: "go to dashboard" },
+                { label: "View Cases", cmd: "go to onboarding cases" },
+                { label: "Start Workflow", cmd: "start workflow" },
+                { label: "System Status", cmd: "what's the status" },
+              ].map((action, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setAiChatInput(action.cmd); handleAISend(); }}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors border ${
+                    isDarkMode
+                      ? "border-[#1e4976] text-[#90caf9] hover:bg-[#1e4976]/40 hover:border-[#00e5ff]"
+                      : "border-gray-200 text-gray-600 hover:bg-gray-100 hover:border-gray-300"
+                  }`}
+                >
+                  {action.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Input Area */}
