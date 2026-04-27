@@ -600,7 +600,7 @@ export default function BCometPlatform() {
   const getDefaultAiWelcomeMessage = () => [
     { 
       role: "assistant" as const, 
-      content: "Hello! I'm your B-COMET AI assistant. I can execute actions, navigate screens, create files, and guide you through workflows.\n\nTry commands like:\n- \"Go to Spec Compare\"\n- \"Create a new onboarding case\"\n- \"Start certification workflow\"\n- \"Show me at-risk cases\"", 
+      content: "Hello! I'm FixPilot, your AI certification agent. I can guide you through workflows, analyze cases, execute tools, and help you navigate the 8-phase certification process.\n\nTry commands like:\n- \"Start workflow\"\n- \"Show intake cases\"\n- \"Analyze this log\"\n- \"What's next?\"", 
       timestamp: new Date(), 
       agent: "general" 
     }
@@ -2254,8 +2254,8 @@ export default function BCometPlatform() {
                   <Bot className="h-5 w-5 text-[#0a1628]" />
                 </div>
                 <div>
-                  <h3 className={`font-semibold ${textPrimary}`}>Orchestrator Agent</h3>
-                  <p className={`text-xs ${textSecondary}`}>Coordinating workflow execution</p>
+                  <h3 className={`font-semibold ${textPrimary}`}>FixPilot</h3>
+                  <p className={`text-xs ${textSecondary}`}>AI-powered certification agent</p>
                 </div>
               </div>
               <button
