@@ -2102,6 +2102,14 @@ export default function BCometPlatform() {
   const AIAssistant = () => {
     const atRiskCount = onboardingCases.filter(c => c.status === "at-risk").length
     const pendingCount = onboardingCases.filter(c => c.status === "pending").length
+    const chatInputRef = React.useRef<HTMLInputElement>(null)
+
+    // Focus input when chat panel opens
+    React.useEffect(() => {
+      if (showAIAssistant && chatInputRef.current) {
+        setTimeout(() => chatInputRef.current?.focus(), 100)
+      }
+    }, [showAIAssistant])
 
     if (typeof document === "undefined") return null
 
@@ -2321,6 +2329,8 @@ export default function BCometPlatform() {
             )}
             <div className="flex items-center gap-2">
               <Input
+                ref={chatInputRef}
+                autoFocus
                 value={aiChatInput}
                 onChange={e => setAiChatInput(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleAISend(); } }}
