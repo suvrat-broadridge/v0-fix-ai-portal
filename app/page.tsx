@@ -2246,6 +2246,9 @@ export default function BCometPlatform() {
       )}
 
       {/* AI Assistant Panel */}
+      <style>{`
+        .fixpilot-layout { transition: padding-right 0.3s ease; padding-right: ${showAIAssistant ? "440px" : "0"}; }
+      `}</style>
       <div className={`fixed top-0 right-0 h-full z-50 transition-transform duration-300 ease-in-out ${
         showAIAssistant ? "translate-x-0" : "translate-x-full"
       }`} style={{ width: "440px" }}>
@@ -2495,13 +2498,7 @@ export default function BCometPlatform() {
         </div>
       </div>
 
-      {/* Backdrop */}
-      {showAIAssistant && (
-        <div
-          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
-          onClick={() => setShowAIAssistant(false)}
-        />
-      )}
+
     </>, document.body)
   }
 
@@ -4051,7 +4048,7 @@ export default function BCometPlatform() {
       }
       
       return (
-        <div className={`min-h-screen ${bgPrimary} flex`}>
+        <div className={`fixpilot-layout min-h-screen ${bgPrimary} flex`}>
           <Sidebar />
           <AIAssistant />
           <div className="flex-1 overflow-auto">
@@ -4420,7 +4417,7 @@ export default function BCometPlatform() {
       const readyForGoLive = clients.filter(c => c.assetClasses.every(a => a.certification === "completed")).length
 
       return (
-        <div className={`min-h-screen ${bgPrimary} flex`}>
+        <div className={`fixpilot-layout min-h-screen ${bgPrimary} flex`}>
           <Sidebar />
           <AIAssistant />
           <div className="flex-1 overflow-auto">
@@ -8598,7 +8595,7 @@ const tools = [
     // Client-specific flow: When coming from Dashboard -> Client -> Compare
     if (!isAdHocMode && selectedClient && selectedAssetClass) {
       return (
-        <div className={`min-h-screen ${bgPrimary} flex`}>
+        <div className={`fixpilot-layout min-h-screen ${bgPrimary} flex`}>
           <Sidebar />
           <div className="flex-1 overflow-auto">
             {/* Phase Context Banner - shows when coming from case workflow */}
@@ -10041,7 +10038,7 @@ const tools = [
     // Ad-hoc mode: Show step-by-step workflow
     if (isAdHocMode) {
       return (
-        <div className={`min-h-screen ${bgPrimary} flex`}>
+        <div className={`fixpilot-layout min-h-screen ${bgPrimary} flex`}>
           <Sidebar />
           <div className="flex-1 overflow-auto">
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
@@ -10526,7 +10523,7 @@ const tools = [
     // Ad-hoc mode: Show step-by-step workflow
     if (isAdHocMode) {
       return (
-        <div className={`min-h-screen ${bgPrimary} flex`}>
+        <div className={`fixpilot-layout min-h-screen ${bgPrimary} flex`}>
           <Sidebar />
           <div className="flex-1 overflow-auto">
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
