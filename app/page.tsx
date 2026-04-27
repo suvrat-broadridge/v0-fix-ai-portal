@@ -1962,12 +1962,15 @@ export default function BCometPlatform() {
 
   // AI Agent configurations
   const aiAgents = {
-    general: { name: "General Assistant", icon: Bot, color: "text-[#00e5ff]", bg: "bg-[#00e5ff]/10", description: "Navigate platform, answer questions" },
-    "spec-compare": { name: "Spec Compare Agent", icon: GitCompare, color: "text-[#4caf50]", bg: "bg-[#4caf50]/10", description: "Compare FIX specifications" },
-    "log-analysis": { name: "Log Analysis Agent", icon: FileSearch, color: "text-[#ff9800]", bg: "bg-[#ff9800]/10", description: "Parse and analyze FIX logs" },
-    "test-gen": { name: "Test Generation Agent", icon: TestTube, color: "text-[#9c27b0]", bg: "bg-[#9c27b0]/10", description: "Generate test scenarios" },
-    certification: { name: "Certification Agent", icon: Award, color: "text-[#2196f3]", bg: "bg-[#2196f3]/10", description: "Guide certification workflow" },
-    atdl: { name: "ATDL Agent", icon: Code, color: "text-[#e91e63]", bg: "bg-[#e91e63]/10", description: "Validate ATDL configurations" },
+    general: { name: "General", icon: Bot, color: "text-[#00e5ff]", bg: "bg-[#00e5ff]/10", description: "Navigate platform, answer questions", phase: 0 },
+    intake: { name: "Intake", icon: Briefcase, color: "text-[#4caf50]", bg: "bg-[#4caf50]/10", description: "Intake and Discovery", phase: 1 },
+    design: { name: "Design", icon: Cog, color: "text-[#ff9800]", bg: "bg-[#ff9800]/10", description: "Solution Design & Configuration", phase: 2 },
+    connectivity: { name: "Connectivity", icon: Network, color: "text-[#9c27b0]", bg: "bg-[#9c27b0]/10", description: "Connectivity Setup", phase: 3 },
+    planning: { name: "Planning", icon: Calendar, color: "text-[#2196f3]", bg: "bg-[#2196f3]/10", description: "Certification Planning", phase: 4 },
+    testing: { name: "Testing", icon: TestTube, color: "text-[#e91e63]", bg: "bg-[#e91e63]/10", description: "Test Execution", phase: 5 },
+    analysis: { name: "Analysis", icon: FileSearch, color: "text-[#00bcd4]", bg: "bg-[#00bcd4]/10", description: "Analysis & Remediation", phase: 6 },
+    decisioning: { name: "Decisioning", icon: Award, color: "text-[#ffc107]", bg: "bg-[#ffc107]/10", description: "Certification Decisioning", phase: 7 },
+    golive: { name: "Go-Live", icon: Rocket, color: "text-[#8bc34a]", bg: "bg-[#8bc34a]/10", description: "Production Enablement", phase: 8 },
   }
 
   // Context-aware suggestions based on current screen
@@ -2008,10 +2011,10 @@ export default function BCometPlatform() {
       setAiWorkflowStep(0)
       setAiChatHistory(prev => [...prev, { 
         role: "assistant", 
-        content: "Workflow mode activated! I'll guide you step-by-step. Just type 'yes' or 'y' to proceed, 'skip' to skip a step, or 'stop' to exit.\n\n**Step 1/5: Navigate to Onboarding Cases**\nI'll take you to the cases list first.\n\nProceed? (yes/no)", 
+        content: "**8-Phase Workflow Activated!**\n\nI'll guide you through each certification phase. Type 'yes' to proceed, 'skip' to skip, or 'stop' to exit.\n\n**Starting Phase 1/8: Intake and Discovery**\nLet's begin by reviewing client onboarding cases.\n\nProceed? (yes/no)", 
         timestamp: new Date(), 
         agent: aiAgentMode,
-        actions: [{ id: "wf-1", type: "navigate", label: "Go to Onboarding Cases", target: "onboarding-cases" }]
+        actions: [{ id: "wf-1", type: "navigate", label: "Start Intake & Discovery", target: "onboarding-cases" }]
       }])
     }
     // Mark action as applied in pending list
@@ -2030,11 +2033,14 @@ export default function BCometPlatform() {
     if (aiWorkflowMode) {
       if (userMsg === "yes" || userMsg === "y") {
         const workflowSteps = [
-          { screen: "onboarding-cases", msg: "Step 1 complete. Now viewing Onboarding Cases.\n\n**Step 2/5: Review At-Risk Cases**\nI found 2 cases that need attention. Want me to filter to show only at-risk cases?\n\nProceed? (yes/no)" },
-          { screen: "onboarding-cases", msg: "Filtered to at-risk cases.\n\n**Step 3/5: Open Goldman Sachs Case**\nThis case is at 78% but has pending approvals. Want me to open the workflow view?\n\nProceed? (yes/no)" },
-          { screen: "case-workflow", msg: "Viewing Goldman Sachs - Equities workflow.\n\n**Step 4/5: Check Pending Stage**\nCurrent stage: ATDL Configuration. There's a validation warning. Want me to run the ATDL validator?\n\nProceed? (yes/no)" },
-          { screen: "case-workflow", msg: "ATDL validation complete - 2 warnings found.\n\n**Step 5/5: Generate Progress Report**\nWant me to generate a summary report for this case?\n\nProceed? (yes/no)" },
-          { screen: "case-workflow", msg: "Workflow complete! Here's what we accomplished:\n\n- Reviewed 2 at-risk cases\n- Identified Goldman Sachs as priority\n- Found 2 ATDL validation warnings\n- Generated progress report\n\nWorkflow mode ended. How else can I help?" },
+          { screen: "onboarding-cases", msg: "**Phase 1/8: Intake and Discovery**\nGathering client requirements and FIX specifications.\n\n- Client profile created\n- Spec documents uploaded\n- Initial assessment complete\n\nProceed to Solution Design? (yes/no)" },
+          { screen: "scenario-creation", msg: "**Phase 2/8: Solution Design & Configuration**\nConfiguring system based on client requirements.\n\n- Field mappings defined\n- Business rules configured\n- ATDL parameters set\n\nProceed to Connectivity Setup? (yes/no)" },
+          { screen: "field-mapping", msg: "**Phase 3/8: Connectivity Setup**\nEstablishing FIX session connectivity.\n\n- Session parameters configured\n- Network routes verified\n- Heartbeat testing complete\n\nProceed to Certification Planning? (yes/no)" },
+          { screen: "certification-gen", msg: "**Phase 4/8: Certification Planning**\nDefining test scenarios and certification criteria.\n\n- Test plan generated\n- Coverage analysis: 94%\n- Acceptance criteria defined\n\nProceed to Test Execution? (yes/no)" },
+          { screen: "test-case-gen", msg: "**Phase 5/8: Test Execution**\nRunning automated test suite.\n\n- 247 test cases executed\n- 12 failures detected\n- Logs captured for analysis\n\nProceed to Analysis & Remediation? (yes/no)" },
+          { screen: "log-analysis", msg: "**Phase 6/8: Analysis & Remediation**\nAnalyzing failures and applying fixes.\n\n- Root cause identified for 10/12 failures\n- Configuration updates applied\n- Retest queued\n\nProceed to Certification Decisioning? (yes/no)" },
+          { screen: "approvals", msg: "**Phase 7/8: Certification Decisioning**\nReviewing results and making certification decision.\n\n- All tests passing\n- Compliance verified\n- Awaiting final approval\n\nProceed to Production Enablement? (yes/no)" },
+          { screen: "go-live", msg: "**Phase 8/8: Production Enablement**\nWorkflow complete!\n\n- Certification approved\n- Production config deployed\n- Client notified\n- Go-live scheduled\n\nAll 8 phases complete. How else can I help?" },
         ]
         
         if (aiWorkflowStep < workflowSteps.length) {
@@ -2126,10 +2132,9 @@ export default function BCometPlatform() {
       }
       // Workflow commands
       else if (userMsg.includes("workflow") || userMsg.includes("guide me") || userMsg.includes("step by step") || userMsg.includes("start") && userMsg.includes("certification")) {
-        response = "I can guide you through complete workflows. Available workflows:\n\n**1. Onboarding Review** - Check at-risk cases and take action\n**2. Certification Run** - Full certification flow with reporting\n**3. Spec Migration** - Compare specs and generate mapping\n\nType \"start [workflow name]\" or click below to begin."
+        response = "I can guide you through the **8-Phase Certification Workflow**:\n\n**1. Intake & Discovery** - Gather requirements\n**2. Solution Design & Config** - Configure system\n**3. Connectivity Setup** - Establish FIX sessions\n**4. Certification Planning** - Define test criteria\n**5. Test Execution** - Run test suite\n**6. Analysis & Remediation** - Fix issues\n**7. Certification Decisioning** - Final approval\n**8. Production Enablement** - Go live\n\nClick below to start the guided workflow."
         actions = [
-          { id: `wf-onboard-${Date.now()}`, type: "execute", label: "Start Onboarding Review", target: "workflow", data: { workflow: "onboarding" } },
-          { id: `wf-cert-${Date.now()}`, type: "execute", label: "Start Certification", target: "workflow", data: { workflow: "certification" } },
+          { id: `wf-cert-${Date.now()}`, type: "execute", label: "Start 8-Phase Workflow", target: "workflow", data: { workflow: "certification" } },
         ]
       }
       // Status/info commands  
@@ -2145,7 +2150,7 @@ export default function BCometPlatform() {
       }
       // Help
       else if (userMsg.includes("help") || userMsg.includes("what can you do")) {
-        response = `I'm your AI copilot for B-COMET. I can:\n\n**Execute Actions**\n- "Go to Spec Compare" - Navigate instantly\n- "Create new case" - Open forms\n- "Run certification" - Execute workflows\n\n**Live Awareness**\n- "What's the status?" - System overview\n- "Show at-risk cases" - Filter and display\n\n**Guided Workflows**\n- "Start workflow" - Step-by-step guidance\n- Just type "yes" to proceed through steps\n\nTry a command!`
+        response = `I'm your AI copilot for B-COMET. I can help with:\n\n**8-Phase Workflow**\n1. Intake & Discovery\n2. Solution Design & Config\n3. Connectivity Setup\n4. Certification Planning\n5. Test Execution\n6. Analysis & Remediation\n7. Certification Decisioning\n8. Production Enablement\n\n**Commands**\n- "Start workflow" - Begin guided 8-phase process\n- "Go to [screen]" - Navigate instantly\n- "What's the status?" - System overview\n\nTry "start workflow" to begin!`
       }
       // Default contextual response
       else {
