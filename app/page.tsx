@@ -1669,38 +1669,102 @@ export default function BCometPlatform() {
         </button>
       </div>
       
-  <nav className="p-2 space-y-1">
-  {[
-  { icon: LayoutDashboard, label: "Dashboard", screen: "dashboard", roles: ["admin", "client"] },
-  { icon: Navigation, label: "Workflow Overview", screen: "workflow-overview", roles: ["admin"] },
+  <nav className="p-2 space-y-3">
+    {/* General Section */}
+    <div>
+      {!sidebarCollapsed && <div className="text-xs uppercase tracking-wider font-semibold text-[#64b5f6] px-3 py-2">General</div>}
+      <div className="space-y-1">
+        {[
+          { icon: LayoutDashboard, label: "Dashboard", screen: "dashboard", roles: ["admin", "client"] },
+          { icon: Users, label: "Clients", screen: "clients", roles: ["admin"] },
+          { icon: BookOpen, label: "Rule Library", screen: "rule-library", roles: ["admin"] },
+          { icon: Server, label: "Prod Config", screen: "prod-config", roles: ["admin"] },
+        ].filter(item => item.roles.includes(selectedRole || "")).map((item: any) => (
+          <button
+            key={item.label}
+            onClick={() => { setCurrentScreen(item.screen as any); setIsAdHocMode(false); }}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+              currentScreen === item.screen && !isAdHocMode
+              ? "bg-[#00e5ff]/10 text-[#00e5ff]"
+              : `${textSecondary} hover:bg-[#1e4976]/30`
+            }`}
+          >
+            <item.icon className="h-5 w-5" />
+            {!sidebarCollapsed && (
+              <span className="flex-1 flex items-center justify-between">
+                {item.label}
+                {item.badge && <span className="px-1.5 py-0.5 text-[10px] rounded-full bg-[#f44336] text-white">{item.badge}</span>}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
 
-  { icon: Users, label: "Clients", screen: "clients", roles: ["admin"] },
-  { icon: Briefcase, label: "Onboarding Cases", screen: "onboarding-cases", roles: ["admin"] },
-  { icon: Scale, label: "Approvals", screen: "approvals", roles: ["admin"], badge: 3 },
-  { icon: Archive, label: "Evidence Vault", screen: "evidence-vault", roles: ["admin"] },
-  { icon: Server, label: "Prod Config", screen: "prod-config", roles: ["admin"] },
-  { icon: BookOpen, label: "Rule Library", screen: "rule-library", roles: ["admin"] },
-  { icon: Brain, label: "AI Review Queue", screen: "ai-review-queue", roles: ["admin"], badge: 2 },
-  { icon: Gauge, label: "SLA Analytics", screen: "sla-analytics", roles: ["admin"] },
-  ].filter(item => item.roles.includes(selectedRole || "")).map((item: any) => (
-  <button
-  key={item.label}
-  onClick={() => { setCurrentScreen(item.screen as any); setIsAdHocMode(false); }}
-  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-  currentScreen === item.screen && !isAdHocMode
-  ? "bg-[#00e5ff]/10 text-[#00e5ff]"
-  : `${textSecondary} hover:bg-[#1e4976]/30`
-  }`}
-  >
-  <item.icon className="h-5 w-5" />
-  {!sidebarCollapsed && (
-    <span className="flex-1 flex items-center justify-between">
-      {item.label}
-      {item.badge && <span className="px-1.5 py-0.5 text-[10px] rounded-full bg-[#f44336] text-white">{item.badge}</span>}
-    </span>
-  )}
-  </button>
-  ))}
+    {/* Workflows Section - 8 Phases */}
+    <div>
+      {!sidebarCollapsed && <div className="text-xs uppercase tracking-wider font-semibold text-[#64b5f6] px-3 py-2">Workflows</div>}
+      <div className="space-y-1">
+        {[
+          { icon: Navigation, label: "Overview", screen: "workflow-overview", roles: ["admin"], phase: 0 },
+          { icon: Briefcase, label: "Initiation", screen: "onboarding-cases", roles: ["admin"], phase: 1 },
+          { icon: FileSearch, label: "Analysis", screen: "log-analysis", roles: ["admin", "client"], phase: 2 },
+          { icon: Activity, label: "Design", screen: "scenario-creation", roles: ["admin"], phase: 3 },
+          { icon: TestTube, label: "Testing", screen: "test-case-gen", roles: ["admin"], phase: 4 },
+          { icon: CheckCircle, label: "Validation", screen: "atdl-validate", roles: ["admin"], phase: 5 },
+          { icon: Award, label: "Certification", screen: "certification-gen", roles: ["admin"], phase: 6 },
+          { icon: Rocket, label: "Go-Live", screen: "go-live", roles: ["admin"], phase: 7 },
+        ].filter(item => item.roles.includes(selectedRole || "")).map((item: any) => (
+          <button
+            key={item.label}
+            onClick={() => { setCurrentScreen(item.screen as any); setIsAdHocMode(false); }}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
+              currentScreen === item.screen && !isAdHocMode
+              ? "bg-[#00e5ff]/10 text-[#00e5ff]"
+              : `${textSecondary} hover:bg-[#1e4976]/30`
+            }`}
+          >
+            <item.icon className="h-4 w-4" />
+            {!sidebarCollapsed && (
+              <span className="flex-1">
+                {item.label}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    {/* Management Section */}
+    <div>
+      {!sidebarCollapsed && <div className="text-xs uppercase tracking-wider font-semibold text-[#64b5f6] px-3 py-2">Management</div>}
+      <div className="space-y-1">
+        {[
+          { icon: Scale, label: "Approvals", screen: "approvals", roles: ["admin"], badge: 3 },
+          { icon: Archive, label: "Evidence Vault", screen: "evidence-vault", roles: ["admin"] },
+          { icon: Brain, label: "AI Review Queue", screen: "ai-review-queue", roles: ["admin"], badge: 2 },
+          { icon: Gauge, label: "SLA Analytics", screen: "sla-analytics", roles: ["admin"] },
+        ].filter(item => item.roles.includes(selectedRole || "")).map((item: any) => (
+          <button
+            key={item.label}
+            onClick={() => { setCurrentScreen(item.screen as any); setIsAdHocMode(false); }}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
+              currentScreen === item.screen && !isAdHocMode
+              ? "bg-[#00e5ff]/10 text-[#00e5ff]"
+              : `${textSecondary} hover:bg-[#1e4976]/30`
+            }`}
+          >
+            <item.icon className="h-5 w-5" />
+            {!sidebarCollapsed && (
+              <span className="flex-1 flex items-center justify-between">
+                {item.label}
+                {item.badge && <span className="px-1.5 py-0.5 text-[10px] rounded-full bg-[#f44336] text-white">{item.badge}</span>}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
   </nav>
 
       {/* Tools Section - Collapsible */}
