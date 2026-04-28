@@ -9073,7 +9073,7 @@ const tools = [
                           )}
 
                           {/* Generic fallback for other tools */}
-                          {!["intake", "docs", "gap", "spec-from-log", "atdl", "test-plan", "test-cases", "checklist", "session-tests", "app-tests", "evidence", "log-analysis", "failure-analysis", "root-cause", "defects", "eval", "report", "signoff"].includes(tool.id) && (
+                          {!["intake", "docs", "gap", "spec-from-log", "atdl", "test-plan", "test-cases", "checklist", "session-tests", "app-tests", "evidence", "log-analysis", "failure-analysis", "root-cause", "defects", "eval", "report", "signoff", "convert-spec"].includes(tool.id) && (
                             <div className="space-y-4">
                               <p className={textSecondary}>This tool is available for use. Click below to open the full interface.</p>
                               <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} mb-4`}>
