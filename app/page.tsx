@@ -789,6 +789,7 @@ export default function BCometPlatform() {
   const [showSpecResults, setShowSpecResults] = useState(false)
   const [showStandardizedSpecs, setShowStandardizedSpecs] = useState(false)
   const [standardizedMsgTypeTab, setStandardizedMsgTypeTab] = useState<string>("D")
+  const [convertSpecDone, setConvertSpecDone] = useState(false)
   const [viewingClientSpec, setViewingClientSpec] = useState<{asset: string, protocol: string, specName: string, clientSpecFile?: string, clientName?: string} | null>(null)
   const [clientSpecStandardized, setClientSpecStandardized] = useState(false)
   const [isConverting, setIsConverting] = useState(false)
@@ -7607,7 +7608,6 @@ const tools = [
                           
                           {/* Convert to Standardized Spec Tool */}
                           {tool.id === "convert-spec" && (() => {
-                            const [convertDone, setConvertDone] = React.useState(false)
                             const specRows: Record<string, any[]> = {
                               "D": [
                                 { tag: "11", groupTag: "", name: "ClOrdID",      required: "Y",  crCondition: "",      dataType: "String",       values: "",        comment: "" },
@@ -7712,10 +7712,10 @@ const tools = [
                                 </div>
 
                                 {/* Convert action button */}
-                                {!convertDone && (
+                                {!convertSpecDone && (
                                   <div className="flex justify-center py-2">
                                     <Button
-                                      onClick={() => setConvertDone(true)}
+                                      onClick={() => setConvertSpecDone(true)}
                                       className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] font-semibold px-8"
                                     >
                                       <RefreshCw className="h-4 w-4 mr-2" /> Convert to Standardized Spec
@@ -7724,7 +7724,7 @@ const tools = [
                                 )}
 
                                 {/* Conversion Result summary — shown after conversion */}
-                                {convertDone && (
+                                {convertSpecDone && (
                                   <>
                                     <div className={`rounded-lg border ${borderColor} overflow-hidden`}>
                                       <div className={`px-4 py-2.5 border-b ${borderColor} flex items-center justify-between ${isDarkMode ? "bg-[#0a1628]/60" : "bg-gray-50"}`}>
