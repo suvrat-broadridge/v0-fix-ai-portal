@@ -9,6 +9,138 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
+// ── AI Confidence Matrix ────────────────────────────────────────────────────
+function AIConfidenceMatrix({ isDarkMode, bgCard, borderColor, textPrimary, textSecondary, score, basis }: {
+  isDarkMode: boolean; bgCard: string; borderColor: string; textPrimary: string; textSecondary: string; score: number; basis: string;
+}) {
+  const [expanded, setExpanded] = React.useState(false)
+
+  const tier = score >= 85 ? { label: "High Confidence", color: "#4caf50", bg: "rgba(76,175,80,0.12)", track: "#4caf50" }
+             : score >= 65 ? { label: "Moderate Confidence", color: "#ff9800", bg: "rgba(255,152,0,0.12)", track: "#ff9800" }
+             : { label: "Low Confidence", color: "#f44336", bg: "rgba(244,67,54,0.12)", track: "#f44336" }
+
+  const factors = [
+    { label: "Spec Field Coverage",      score: 94, weight: 30, detail: "All 20 enum fields mapped; 0 unmapped required fields." },
+    { label: "Suite Auto-Match Quality", score: 91, weight: 25, detail: "FIX 4.2 Equities suite matched on client + asset + protocol with exact version hit." },
+    { label: "Historical Pass Rate",     score: 88, weight: 20, detail: "Last 3 cert cycles for this client averaged 88% first-attempt pass rate." },
+    { label: "Pairwise Combination Depth", score: 79, weight: 15, detail: "1047 pairwise tests cover 79% of theoretical field combinations." },
+    { label: "Conditional Rule Completeness", score: 72, weight: 10, detail: "7 of 9 conditional rules (e.g. Price required for Limit) are explicitly handled." },
+  ]
+
+  const weightedScore = Math.round(factors.reduce((acc, f) => acc + (f.score * f.weight) / 100, 0))
+
+  const factorColor = (s: number) =>
+    s >= 85 ? "#4caf50" : s >= 65 ? "#ff9800" : "#f44336"
+
+  const bg0 = isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"
+
+  return (
+    <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+      {/* Header */}
+      <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="h-4 w-4" style={{ color: tier.color }} />
+          <span className={`text-sm font-semibold ${textPrimary}`}>AI Confidence Matrix</span>
+        </div>
+        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: tier.bg, color: tier.color }}>
+          FixPilot Analysis
+        </span>
+      </div>
+
+      <div className="px-4 py-4 space-y-4">
+        {/* Score row */}
+        <div className="flex items-center gap-5">
+          {/* Circular score */}
+          <div className="relative flex-shrink-0 w-16 h-16">
+            <svg viewBox="0 0 56 56" className="w-full h-full -rotate-90">
+              <circle cx="28" cy="28" r="22" fill="none" stroke={isDarkMode ? "#1e4976" : "#e5e7eb"} strokeWidth="5" />
+              <circle
+                cx="28" cy="28" r="22" fill="none"
+                stroke={tier.track} strokeWidth="5" strokeLinecap="round"
+                strokeDasharray={`${2 * Math.PI * 22}`}
+                strokeDashoffset={`${2 * Math.PI * 22 * (1 - score / 100)}`}
+                style={{ transition: "stroke-dashoffset 0.8s ease" }}
+              />
+            </svg>
+            <span className={`absolute inset-0 flex items-center justify-center text-sm font-bold ${textPrimary}`}>
+              {score}%
+            </span>
+          </div>
+
+          {/* Score details */}
+          <div className="flex-1 space-y-2">
+            <div>
+              <p className="text-base font-bold" style={{ color: tier.color }}>{score}% — {tier.label}</p>
+              <p className={`text-xs ${textSecondary} mt-0.5`}>{basis}</p>
+            </div>
+            {/* Colour-tiered bar */}
+            <div className="space-y-1">
+              <div className={`h-2.5 rounded-full overflow-hidden ${isDarkMode ? "bg-[#1e4976]/40" : "bg-gray-200"}`}>
+                <div className="h-full rounded-full flex overflow-hidden" style={{ width: `${score}%`, transition: "width 0.8s ease" }}>
+                  <div className="flex-1" style={{ background: `linear-gradient(90deg, #f44336 0%, #ff9800 40%, #4caf50 100%)`, opacity: 1 }} />
+                </div>
+              </div>
+              <div className={`flex justify-between text-[9px] font-medium ${textSecondary}`}>
+                <span>0</span><span>Low</span><span>Moderate</span><span>High</span><span>100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Drill-down toggle */}
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="flex items-center gap-1.5 text-xs font-semibold transition-colors"
+          style={{ color: tier.color }}
+        >
+          <ChevronDown className={`h-3.5 w-3.5 transition-transform ${expanded ? "rotate-180" : ""}`} />
+          {expanded ? "Hide scoring factors" : "View scoring factors"}
+        </button>
+
+        {/* Explainability panel */}
+        {expanded && (
+          <div className={`rounded-lg border ${borderColor} overflow-hidden`}>
+            {/* Panel header */}
+            <div className={`px-3 py-2 border-b ${borderColor} ${bg0} flex items-center justify-between`}>
+              <span className={`text-[10px] font-bold uppercase tracking-wider ${textSecondary}`}>Scoring Factors</span>
+              <span className={`text-[10px] ${textSecondary}`}>Weighted score: <span className="font-bold" style={{ color: tier.color }}>{weightedScore}%</span></span>
+            </div>
+            <div className="divide-y divide-[#1e4976]/20">
+              {factors.map((f, i) => {
+                const fc = factorColor(f.score)
+                const barWidth = f.score
+                return (
+                  <div key={i} className={`px-3 py-3 space-y-1.5 ${isDarkMode ? "hover:bg-[#1e4976]/15" : "hover:bg-gray-50"} transition-colors`}>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className={`text-xs font-medium ${textPrimary}`}>{f.label}</span>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded" style={{ backgroundColor: `${fc}18`, color: fc }}>
+                          {f.score}%
+                        </span>
+                        <span className={`text-[10px] ${textSecondary}`}>×{f.weight}%</span>
+                      </div>
+                    </div>
+                    <div className={`h-1.5 rounded-full overflow-hidden ${isDarkMode ? "bg-[#1e4976]/40" : "bg-gray-200"}`}>
+                      <div className="h-full rounded-full" style={{ width: `${barWidth}%`, backgroundColor: fc, transition: "width 0.6s ease" }} />
+                    </div>
+                    <p className={`text-[10px] ${textSecondary}`}>{f.detail}</p>
+                  </div>
+                )
+              })}
+            </div>
+            {/* Footer note */}
+            <div className={`px-3 py-2 border-t ${borderColor} ${bg0}`}>
+              <p className={`text-[10px] ${textSecondary}`}>
+                Confidence is computed by FixPilot based on spec coverage, suite match quality, and historical certification outcomes. Not a guarantee of pass.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ── Spec Analysis Preview ───────────────────────────────────────────────────
 function SpecAnalysisPreview({ isDarkMode, bgCard, borderColor, textPrimary, textSecondary, caseClient, caseAsset, caseProtocol, tabs, summaryFields, singleTests, coreTests, pairTests, coverageFields }: any) {
   const [activeTab, setActiveTab] = React.useState("Summary")
@@ -402,6 +534,17 @@ function TestPlanGeneratorTool({
           </div>
         </div>
       </div>
+
+      {/* AI Confidence Matrix */}
+      <AIConfidenceMatrix
+        isDarkMode={isDarkMode}
+        bgCard={bgCard}
+        borderColor={borderColor}
+        textPrimary={textPrimary}
+        textSecondary={textSecondary}
+        score={87}
+        basis="Spec field coverage is complete and suite auto-matched to FIX 4.2 Equities with high historical pass rate."
+      />
 
       {/* Section B — Standardized Spec */}
       <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
