@@ -1322,8 +1322,8 @@ export default function BCometPlatform() {
     },
     { id: "OB-2024-003", client: "Horizon Investments", legalEntity: "Horizon Fund Management", region: "APAC", assetClass: "Futures", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 2, stageLabel: "Solution Design", priority: "Medium", riskRating: "Low", owner: "Mike Chen", assignedUser: "John Smith", slaDate: "Mar 1, 2024", blockers: 0, status: "on-track", createdDate: "Jan 8, 2024", readinessScore: 78, gateA: { status: "passed", unlockedDate: "Jan 10, 2024", passedDate: "Jan 12, 2024" }, gateB: { status: "locked", unlockedDate: null, passedDate: null }, gateC: { status: "locked", unlockedDate: null, passedDate: null }, owners: { onboardingManager: { name: "Mike Chen", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Alex Kumar", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Patricia White", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Richard Davis", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
     { id: "OB-2024-004", client: "Velocity Securities", legalEntity: "Velocity Trading Ltd", region: "AMER", assetClass: "Equities", protocol: "FIX 4.4", environment: "Prod", stage: 6, stageLabel: "Analysis & Remediation", priority: "High", riskRating: "Low", owner: "Lisa Wang", assignedUser: "Alice Brown", slaDate: "Jan 20, 2024", blockers: 0, status: "on-track", createdDate: "Nov 20, 2023", readinessScore: 95, gateA: { status: "passed", unlockedDate: "Dec 1, 2023", passedDate: "Dec 5, 2023" }, gateB: { status: "passed", unlockedDate: "Dec 5, 2023", passedDate: "Dec 10, 2023" }, gateC: { status: "passed", unlockedDate: "Dec 10, 2023", passedDate: "Dec 15, 2023" }, owners: { onboardingManager: { name: "Lisa Wang", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Steven Brown", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Michelle Garcia", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "William Martinez", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
-    { id: "OB-2024-005", client: "Summit Financial", legalEntity: "Summit Advisory Group", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.4", environment: "UAT", stage: 1, stageLabel: "Intake & Discovery", priority: "Medium", riskRating: "Low", owner: "Tom Brown", assignedUser: "John Smith", slaDate: "May 30, 2024", blockers: 0, status: "on-track", createdDate: "Apr 25, 2024", readinessScore: 8, gateA: { status: "locked" as "locked" | "unlocked" | "passed", unlockedDate: null, passedDate: null }, gateB: { status: "locked" as "locked" | "unlocked" | "passed", unlockedDate: null, passedDate: null }, gateC: { status: "locked" as "locked" | "unlocked" | "passed", unlockedDate: null, passedDate: null }, owners: { onboardingManager: { name: "Tom Brown", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Christopher Hall", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Amanda Lewis", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Daniel Robinson", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
-    { id: "OB-2024-019", client: "Meridian Capital Group", legalEntity: "Meridian Capital LLC", region: "AMER", assetClass: "Equities", protocol: "FIX 4.4", environment: "UAT", stage: 1, stageLabel: "Intake & Discovery", priority: "High", riskRating: "Low", owner: "John Smith", assignedUser: "John Smith", slaDate: "Jun 15, 2024", blockers: 0, status: "on-track", createdDate: "Apr 28, 2024", readinessScore: 0, gateA: { status: "locked" as "locked" | "unlocked" | "passed", unlockedDate: null, passedDate: null }, gateB: { status: "locked" as "locked" | "unlocked" | "passed", unlockedDate: null, passedDate: null }, gateC: { status: "locked" as "locked" | "unlocked" | "passed", unlockedDate: null, passedDate: null }, owners: { onboardingManager: { name: "John Smith", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "David Park", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Karen Mitchell", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Michael Torres", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
+    { id: "OB-2024-005", client: "Summit Financial", legalEntity: "Summit Advisory Group", region: "EMEA", assetClass: "Fixed Income", protocol: "FIX 4.4", environment: "UAT", stage: 1, stageLabel: "Intake & Discovery", priority: "Medium", riskRating: "Low", owner: "Tom Brown", assignedUser: "John Smith", slaDate: "May 30, 2024", blockers: 0, status: "on-track", createdDate: "Apr 25, 2024", readinessScore: 8, highestCompletedPhase: 0, gateA: { status: "locked" as "locked" | "unlocked" | "passed", unlockedDate: null, passedDate: null }, gateB: { status: "locked" as "locked" | "unlocked" | "passed", unlockedDate: null, passedDate: null }, gateC: { status: "locked" as "locked" | "unlocked" | "passed", unlockedDate: null, passedDate: null }, owners: { onboardingManager: { name: "Tom Brown", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Christopher Hall", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Amanda Lewis", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Daniel Robinson", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
+    { id: "OB-2024-019", client: "Meridian Capital Group", legalEntity: "Meridian Capital LLC", region: "AMER", assetClass: "Equities", protocol: "FIX 4.4", environment: "UAT", stage: 1, stageLabel: "Intake & Discovery", priority: "High", riskRating: "Low", owner: "John Smith", assignedUser: "John Smith", slaDate: "Jun 15, 2024", blockers: 0, status: "on-track", createdDate: "Apr 28, 2024", readinessScore: 0, highestCompletedPhase: 0, gateA: { status: "locked" as "locked" | "unlocked" | "passed", unlockedDate: null, passedDate: null }, gateB: { status: "locked" as "locked" | "unlocked" | "passed", unlockedDate: null, passedDate: null }, gateC: { status: "locked" as "locked" | "unlocked" | "passed", unlockedDate: null, passedDate: null }, owners: { onboardingManager: { name: "John Smith", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "David Park", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Karen Mitchell", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Michael Torres", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
     { id: "OB-2024-006", client: "Quantum Asset Management", legalEntity: "Quantum Holdings LLC", region: "AMER", assetClass: "Commodities", protocol: "FIX 4.4", environment: "UAT", stage: 4, stageLabel: "Cert Planning", priority: "Medium", riskRating: "Medium", owner: "John Smith", assignedUser: "John Smith", slaDate: "Feb 28, 2024", blockers: 1, status: "at-risk", createdDate: "Jan 5, 2024", readinessScore: 72, gateA: { status: "passed", unlockedDate: "Jan 6, 2024", passedDate: "Jan 9, 2024" }, gateB: { status: "passed", unlockedDate: "Jan 9, 2024", passedDate: "Jan 13, 2024" }, gateC: { status: "unlocked", unlockedDate: "Jan 13, 2024", passedDate: null }, owners: { onboardingManager: { name: "John Smith", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "James Miller", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Emily Davis", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Charles Wilson", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
     { id: "OB-2024-007", client: "Atlantic Trading Corp", legalEntity: "Atlantic Trading Inc", region: "AMER", assetClass: "Drop Copy", protocol: "FIX 4.4", environment: "UAT", stage: 5, stageLabel: "Test Execution", priority: "High", riskRating: "Low", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Feb 18, 2024", blockers: 0, status: "on-track", createdDate: "Jan 3, 2024", readinessScore: 88, gateA: { status: "passed", unlockedDate: "Jan 4, 2024", passedDate: "Jan 7, 2024" }, gateB: { status: "passed", unlockedDate: "Jan 7, 2024", passedDate: "Jan 11, 2024" }, gateC: { status: "unlocked", unlockedDate: "Jan 11, 2024", passedDate: null }, owners: { onboardingManager: { name: "Sarah Johnson", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Paul Harris", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Susan Clark", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "George Taylor", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [] },
     { id: "OB-2024-008", client: "Atlantic Trading Corp", legalEntity: "Atlantic Trading Inc", region: "AMER", assetClass: "Market Data", protocol: "FIX 5.0 SP2", environment: "UAT", stage: 3, stageLabel: "Connectivity Setup", priority: "Medium", riskRating: "Medium", owner: "Sarah Johnson", assignedUser: "Jane Doe", slaDate: "Mar 1, 2024", blockers: 1, status: "at-risk", createdDate: "Jan 5, 2024", readinessScore: 55, gateA: { status: "passed", unlockedDate: "Jan 6, 2024", passedDate: "Jan 9, 2024" }, gateB: { status: "unlocked", unlockedDate: "Jan 12, 2024", passedDate: null }, gateC: { status: "locked", unlockedDate: null, passedDate: null }, owners: { onboardingManager: { name: "Sarah Johnson", slaByStage: { 1: 3, 2: 5, 3: 7, 4: 7, 5: 5, 6: 3, 7: 1 } }, techLead: { name: "Mark Jackson", slaByStage: { 1: 5, 2: 7, 3: 10, 4: 14, 5: 7, 6: 5, 7: 2 } }, qaLead: { name: "Nancy Thomas", slaByStage: { 1: 7, 2: 5, 3: 7, 4: 14, 5: 14, 6: 10, 7: 3 } }, businessApprover: { name: "Frank Anderson", slaByStage: { 1: 10, 2: 7, 3: 7, 4: 10, 5: 7, 6: 5, 7: 2 } } }, criticalBlockers: [{ id: "BLK-004", title: "Schema Validation Failure", severity: "high", owner: "Mark Jackson", dueDate: "Jan 22, 2024" }] },
@@ -1916,6 +1916,9 @@ export default function BCometPlatform() {
     setSelectedCase(caseItem)
     setSelectedCaseId(caseItem.id)
     setCurrentCasePhase(Math.min(caseItem.currentStage || caseItem.stage || 1, 8))
+    // Use case-specific progress if available, otherwise default based on stage
+    const caseProgress = caseItem.highestCompletedPhase ?? (caseItem.stage > 1 ? caseItem.stage - 1 : 0)
+    setHighestCompletedPhase(caseProgress)
     setCurrentScreen("case-workflow")
   }
 
@@ -7218,8 +7221,32 @@ const tools = [
       switch (status) {
         case "completed": return "#4caf50"
         case "in-progress": return "#ff9800"
+        case "available": return "#00e5ff"
         default: return isDarkMode ? "#64748b" : "#94a3b8"
       }
+    }
+
+    // Compute dynamic tool status based on case progress
+    const getToolStatus = (phaseNum: number, toolIndex: number): "completed" | "in-progress" | "available" | "pending" => {
+      // If phase is already completed, all its tools are completed
+      if (phaseNum < highestCompletedPhase + 1) return "completed"
+      // If phase is current in-progress phase
+      if (phaseNum === highestCompletedPhase + 1) {
+        // For a fresh case (highestCompletedPhase = 0), first tool is available, rest pending
+        if (toolIndex === 0) return "available"
+        return "pending"
+      }
+      // Phase not yet reached
+      return "pending"
+    }
+
+    // Create phase tools with dynamic status
+    const currentPhaseWithDynamicStatus = {
+      ...currentPhase,
+      tools: currentPhase.tools.map((tool, idx) => ({
+        ...tool,
+        status: getToolStatus(currentPhase.num, idx)
+      }))
     }
 
     const getToolStatusIcon = (status: string) => {
@@ -9581,7 +9608,7 @@ const tools = [
                   {/* Step indicator bar */}
                   <div className={`flex items-center gap-2 mb-6 p-3 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
                     <span className={`text-sm font-medium ${textSecondary}`}>Steps:</span>
-                    {currentPhase.tools.map((tool, idx) => (
+                    {currentPhaseWithDynamicStatus.tools.map((tool, idx) => (
                       <button
                         key={tool.id}
                         onClick={() => { setCurrentToolIndex(idx); setSelectedToolId(tool.id); }}
@@ -9605,7 +9632,7 @@ const tools = [
 
                   <h2 className={`text-lg font-semibold ${textPrimary} mb-4`}>Available Tools & Actions</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {currentPhase.tools.map((tool, idx) => {
+                    {currentPhaseWithDynamicStatus.tools.map((tool, idx) => {
                       const ToolIcon = tool.icon
                       const isCurrentStep = idx === currentToolIndex
                       return (
@@ -9686,19 +9713,21 @@ const tools = [
                   <div className={`mt-8 ${bgSecondary} border ${borderColor} rounded-lg p-6`}>
                     <h3 className={`font-semibold ${textPrimary} mb-4`}>Phase Completion Requirements</h3>
                     <div className="space-y-3">
-                      {currentPhase.tools.map((tool, idx) => (
-                        <div key={tool.id} className="flex items-center gap-3">
+                    {currentPhaseWithDynamicStatus.tools.map((tool, idx) => (
+                        <li key={tool.id} className={`flex items-center gap-2 text-sm ${tool.status === "completed" ? "line-through text-gray-500" : textPrimary}`}>
                           {tool.status === "completed" ? (
-                            <CheckCircle className="h-5 w-5 text-[#4caf50]" />
+                            <CheckCircle className="h-4 w-4 text-[#4caf50]" />
                           ) : tool.status === "in-progress" ? (
-                            <Clock className="h-5 w-5 text-[#ff9800]" />
+                            <div className="h-4 w-4 rounded-full border-2 border-[#ff9800] border-t-transparent animate-spin" />
+                          ) : tool.status === "available" ? (
+                            <div className="h-4 w-4 rounded-full border-2 border-[#00e5ff]" />
                           ) : (
-                            <Circle className="h-5 w-5" style={{ color: isDarkMode ? "#64748b" : "#94a3b8" }} />
+                            <div className={`h-4 w-4 rounded-full border-2 ${borderColor}`} />
                           )}
                           <span className={`text-sm ${tool.status === "completed" ? "line-through text-gray-500" : textPrimary}`}>
                             Step {idx + 1}: {tool.name}
                           </span>
-                        </div>
+                        </li>
                       ))}
                     </div>
                     <div className="mt-4 pt-4 border-t border-[#1e4976]/30">
@@ -17811,6 +17840,9 @@ const copyToClipboard = () => {
                               setSelectedToolId(null) // Reset selected tool
                               const safePhase = Math.max(1, Math.min(caseItem.stage || 1, 8))
                               setCurrentCasePhase(safePhase)
+                              // Use case-specific progress if available
+                              const caseProgress = caseItem.highestCompletedPhase ?? (caseItem.stage > 1 ? caseItem.stage - 1 : 0)
+                              setHighestCompletedPhase(caseProgress)
                               // Also set selectedCase and selectedClient for compatibility
                               setSelectedCase(workflowCase)
                               setSelectedClient(matchingClient || null)
