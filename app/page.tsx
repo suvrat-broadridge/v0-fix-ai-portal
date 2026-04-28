@@ -983,6 +983,7 @@ export default function BCometPlatform() {
       tools: [
         { id: "intake", name: "Intake Portal", screen: "intake-portal", icon: FileText, status: "completed" as const },
         { id: "docs", name: "Document Upload", screen: "intake-portal", icon: Upload, status: "completed" as const },
+        { id: "convert-spec", name: "Convert to Standardized Spec", screen: "intake-portal", icon: RefreshCw, status: "available" as const },
         { id: "gap", name: "AI Gap Analysis", screen: "intake-portal", icon: Brain, status: "in-progress" as const },
       ],
     },
@@ -7461,9 +7462,9 @@ const tools = [
                           
                           {/* Document Upload Tool */}
                           {tool.id === "docs" && (
-                            <div className="space-y-4">
+                            <div className="space-y-5">
                               <div className="flex items-center justify-between">
-                                <p className={textSecondary}>Upload counterparty FIX specifications and supporting documents.</p>
+                                <p className={textSecondary}>Upload counterparty FIX specifications, log files, and supporting documents.</p>
                                 <Button 
                                   variant="outline" 
                                   size="sm"
@@ -7483,59 +7484,107 @@ const tools = [
                                   <Send className="h-3 w-3 mr-1" /> Request from Client
                                 </Button>
                               </div>
-                              <div 
-                                className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center cursor-pointer hover:border-[#00e5ff] hover:bg-[#00e5ff]/5 transition-all`}
-                                onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-[#00e5ff]", "bg-[#00e5ff]/10") }}
-                                onDragLeave={(e) => { e.currentTarget.classList.remove("border-[#00e5ff]", "bg-[#00e5ff]/10") }}
-                                onDrop={(e) => {
-                                  e.preventDefault()
-                                  e.currentTarget.classList.remove("border-[#00e5ff]", "bg-[#00e5ff]/10")
-                                  const files = Array.from(e.dataTransfer.files)
-                                  const newFiles = files.map(f => ({
-                                    name: f.name,
-                                    size: `${(f.size / (1024*1024)).toFixed(2)} MB`,
-                                    type: f.type.includes("pdf") ? "PDF" : f.type.includes("xml") ? "XML" : "DOC"
-                                  }))
-                                  setCaseWorkflowFiles(prev => [...prev, ...newFiles])
-                                }}
-                                onClick={() => {
-                                  const input = document.createElement("input")
-                                  input.type = "file"
-                                  input.multiple = true
-                                  input.accept = ".xml,.pdf,.doc,.docx"
-                                  input.onchange = (e) => {
-                                    const files = Array.from((e.target as HTMLInputElement).files || [])
-                                    const newFiles = files.map(f => ({
-                                      name: f.name,
-                                      size: `${(f.size / (1024*1024)).toFixed(2)} MB`,
-                                      type: f.type.includes("pdf") ? "PDF" : f.type.includes("xml") ? "XML" : "DOC"
-                                    }))
-                                    setCaseWorkflowFiles(prev => [...prev, ...newFiles])
-                                  }
-                                  input.click()
-                                }}
-                              >
-                                <Upload className={`h-12 w-12 mx-auto mb-4 ${textSecondary}`} />
-                                <p className={`${textPrimary} font-medium`}>Drop files here or click to upload</p>
-                                <p className={`text-sm ${textSecondary} mt-1`}>Supports XML, PDF, DOC up to 50MB</p>
-                              </div>
-                              <div className={`${bgSecondary} p-4 rounded-lg`}>
-                                <p className={`text-sm font-medium ${textPrimary} mb-2`}>Uploaded Documents ({caseWorkflowFiles.length + 1})</p>
-                                <div className="space-y-2">
-                                  <div className="flex items-center gap-3 py-2">
-                                    <FileText className="h-5 w-5 text-[#00e5ff]" />
-                                    <span className={`text-sm ${textPrimary}`}>client_fix_spec_v1.2.xml</span>
-                                    <span className={`text-xs ${textSecondary}`}>2.4 MB</span>
-                                    <CheckCircle className="h-4 w-4 text-[#4caf50] ml-auto" />
+
+                              {/* FIX Spec Upload */}
+                              <div className={`rounded-lg border ${borderColor} overflow-hidden`}>
+                                <div className={`px-4 py-2.5 border-b ${borderColor} flex items-center gap-2 ${isDarkMode ? "bg-[#0a1628]/60" : "bg-gray-50"}`}>
+                                  <FileText className="h-4 w-4 text-[#00e5ff]" />
+                                  <span className={`text-sm font-semibold ${textPrimary}`}>FIX Spec Upload</span>
+                                  <span className={`ml-auto text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-[#4caf50]/15 text-[#4caf50]`}>Required</span>
+                                </div>
+                                <div className="p-4">
+                                  <div
+                                    className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center cursor-pointer hover:border-[#00e5ff] hover:bg-[#00e5ff]/5 transition-all`}
+                                    onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-[#00e5ff]", "bg-[#00e5ff]/10") }}
+                                    onDragLeave={(e) => { e.currentTarget.classList.remove("border-[#00e5ff]", "bg-[#00e5ff]/10") }}
+                                    onDrop={(e) => {
+                                      e.preventDefault()
+                                      e.currentTarget.classList.remove("border-[#00e5ff]", "bg-[#00e5ff]/10")
+                                      const files = Array.from(e.dataTransfer.files)
+                                      const newFiles = files.map(f => ({ name: f.name, size: `${(f.size / (1024*1024)).toFixed(2)} MB`, type: f.type.includes("pdf") ? "PDF" : f.type.includes("xml") ? "XML" : "DOC" }))
+                                      setCaseWorkflowFiles(prev => [...prev, ...newFiles])
+                                    }}
+                                    onClick={() => {
+                                      const input = document.createElement("input")
+                                      input.type = "file"; input.multiple = true; input.accept = ".xml,.pdf,.doc,.docx"
+                                      input.onchange = (e) => {
+                                        const files = Array.from((e.target as HTMLInputElement).files || [])
+                                        const newFiles = files.map(f => ({ name: f.name, size: `${(f.size / (1024*1024)).toFixed(2)} MB`, type: f.type.includes("pdf") ? "PDF" : f.type.includes("xml") ? "XML" : "DOC" }))
+                                        setCaseWorkflowFiles(prev => [...prev, ...newFiles])
+                                      }
+                                      input.click()
+                                    }}
+                                  >
+                                    <Upload className={`h-8 w-8 mx-auto mb-2 ${textSecondary}`} />
+                                    <p className={`${textPrimary} font-medium text-sm`}>Drop FIX spec here or click to upload</p>
+                                    <p className={`text-xs ${textSecondary} mt-1`}>Supports XML, PDF, DOC up to 50MB</p>
                                   </div>
-                                  {caseWorkflowFiles.map((file, idx) => (
-                                    <div key={idx} className="flex items-center gap-3 py-2">
-                                      <FileText className="h-5 w-5 text-[#00e5ff]" />
-                                      <span className={`text-sm ${textPrimary}`}>{file.name}</span>
-                                      <span className={`text-xs ${textSecondary}`}>{file.size}</span>
-                                      <CheckCircle className="h-4 w-4 text-[#4caf50] ml-auto" />
+                                  <div className={`mt-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded-lg p-3 space-y-2`}>
+                                    <div className="flex items-center gap-3">
+                                      <FileText className="h-4 w-4 text-[#00e5ff] shrink-0" />
+                                      <span className={`text-sm ${textPrimary} flex-1`}>client_fix_spec_v1.2.xml</span>
+                                      <span className={`text-xs ${textSecondary}`}>2.4 MB</span>
+                                      <CheckCircle className="h-4 w-4 text-[#4caf50]" />
                                     </div>
-                                  ))}
+                                    {caseWorkflowFiles.filter((_: any, i: number) => i % 2 === 0).map((file: any, idx: number) => (
+                                      <div key={idx} className="flex items-center gap-3">
+                                        <FileText className="h-4 w-4 text-[#00e5ff] shrink-0" />
+                                        <span className={`text-sm ${textPrimary} flex-1`}>{file.name}</span>
+                                        <span className={`text-xs ${textSecondary}`}>{file.size}</span>
+                                        <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Log File Upload */}
+                              <div className={`rounded-lg border ${borderColor} overflow-hidden`}>
+                                <div className={`px-4 py-2.5 border-b ${borderColor} flex items-center gap-2 ${isDarkMode ? "bg-[#0a1628]/60" : "bg-gray-50"}`}>
+                                  <ScrollText className="h-4 w-4 text-[#ff9800]" />
+                                  <span className={`text-sm font-semibold ${textPrimary}`}>Log File Upload</span>
+                                  <span className={`ml-auto text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-[#ff9800]/15 text-[#ff9800]`}>Optional</span>
+                                </div>
+                                <div className="p-4">
+                                  <p className={`text-xs ${textSecondary} mb-3`}>Upload FIX session log files to allow FixPilot to auto-derive field usage and generate spec from log.</p>
+                                  <div
+                                    className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center cursor-pointer hover:border-[#ff9800] hover:bg-[#ff9800]/5 transition-all`}
+                                    onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-[#ff9800]", "bg-[#ff9800]/10") }}
+                                    onDragLeave={(e) => { e.currentTarget.classList.remove("border-[#ff9800]", "bg-[#ff9800]/10") }}
+                                    onDrop={(e) => {
+                                      e.preventDefault()
+                                      e.currentTarget.classList.remove("border-[#ff9800]", "bg-[#ff9800]/10")
+                                      const files = Array.from(e.dataTransfer.files)
+                                      const newFiles = files.map(f => ({ name: f.name, size: `${(f.size / (1024*1024)).toFixed(2)} MB`, type: "LOG" }))
+                                      setCaseWorkflowFiles(prev => [...prev, ...newFiles])
+                                    }}
+                                    onClick={() => {
+                                      const input = document.createElement("input")
+                                      input.type = "file"; input.multiple = true; input.accept = ".log,.txt,.csv"
+                                      input.onchange = (e) => {
+                                        const files = Array.from((e.target as HTMLInputElement).files || [])
+                                        const newFiles = files.map(f => ({ name: f.name, size: `${(f.size / (1024*1024)).toFixed(2)} MB`, type: "LOG" }))
+                                        setCaseWorkflowFiles(prev => [...prev, ...newFiles])
+                                      }
+                                      input.click()
+                                    }}
+                                  >
+                                    <ScrollText className={`h-8 w-8 mx-auto mb-2 ${textSecondary}`} />
+                                    <p className={`${textPrimary} font-medium text-sm`}>Drop log files here or click to upload</p>
+                                    <p className={`text-xs ${textSecondary} mt-1`}>Supports .log, .txt, .csv up to 100MB</p>
+                                  </div>
+                                  {caseWorkflowFiles.filter((f: any) => f.type === "LOG").length > 0 && (
+                                    <div className={`mt-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded-lg p-3 space-y-2`}>
+                                      {caseWorkflowFiles.filter((f: any) => f.type === "LOG").map((file: any, idx: number) => (
+                                        <div key={idx} className="flex items-center gap-3">
+                                          <ScrollText className="h-4 w-4 text-[#ff9800] shrink-0" />
+                                          <span className={`text-sm ${textPrimary} flex-1`}>{file.name}</span>
+                                          <span className={`text-xs ${textSecondary}`}>{file.size}</span>
+                                          <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
 
@@ -7556,6 +7605,115 @@ const tools = [
                             </div>
                           )}
                           
+                          {/* Convert to Standardized Spec Tool */}
+                          {tool.id === "convert-spec" && (
+                            <div className="space-y-5">
+                              <p className={textSecondary}>Convert the uploaded FIX spec or log file into a standardized Broadridge-compatible spec format.</p>
+
+                              {/* Source selector */}
+                              <div className={`rounded-lg border ${borderColor} overflow-hidden`}>
+                                <div className={`px-4 py-2.5 border-b ${borderColor} flex items-center gap-2 ${isDarkMode ? "bg-[#0a1628]/60" : "bg-gray-50"}`}>
+                                  <RefreshCw className="h-4 w-4 text-[#00e5ff]" />
+                                  <span className={`text-sm font-semibold ${textPrimary}`}>Conversion Source</span>
+                                </div>
+                                <div className="p-4 grid grid-cols-2 gap-3">
+                                  {[
+                                    { id: "fix-spec", label: "FIX Spec Upload", sub: "client_fix_spec_v1.2.xml", icon: FileText, color: "#00e5ff", available: true },
+                                    { id: "log-file", label: "Log File Upload", sub: "No log file uploaded", icon: ScrollText, color: "#ff9800", available: false },
+                                  ].map((src) => (
+                                    <div key={src.id} className={`rounded-lg border-2 p-3 flex items-start gap-3 cursor-pointer transition-all ${src.available ? `border-[${src.color}] bg-[${src.color}]/5` : `${borderColor} opacity-50 cursor-not-allowed`}`}
+                                      style={src.available ? { borderColor: src.color, backgroundColor: `${src.color}10` } : {}}>
+                                      <src.icon className="h-5 w-5 mt-0.5 shrink-0" style={{ color: src.color }} />
+                                      <div>
+                                        <p className={`text-sm font-medium ${textPrimary}`}>{src.label}</p>
+                                        <p className={`text-xs ${textSecondary} mt-0.5`}>{src.sub}</p>
+                                        {src.available && <span className="text-[10px] font-semibold mt-1 inline-block" style={{ color: src.color }}>Selected</span>}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Conversion config */}
+                              <div className={`rounded-lg border ${borderColor} overflow-hidden`}>
+                                <div className={`px-4 py-2.5 border-b ${borderColor} flex items-center gap-2 ${isDarkMode ? "bg-[#0a1628]/60" : "bg-gray-50"}`}>
+                                  <Cog className="h-4 w-4 text-[#9c27b0]" />
+                                  <span className={`text-sm font-semibold ${textPrimary}`}>Conversion Settings</span>
+                                </div>
+                                <div className="p-4 grid grid-cols-2 gap-4">
+                                  <div>
+                                    <label className={`text-xs font-medium ${textSecondary} block mb-1`}>Target Format</label>
+                                    <div className={`rounded px-3 py-2 text-sm ${textPrimary} border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>Broadridge Standard XML</div>
+                                  </div>
+                                  <div>
+                                    <label className={`text-xs font-medium ${textSecondary} block mb-1`}>FIX Version</label>
+                                    <div className={`rounded px-3 py-2 text-sm ${textPrimary} border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>FIX 4.2 (auto-detected)</div>
+                                  </div>
+                                  <div>
+                                    <label className={`text-xs font-medium ${textSecondary} block mb-1`}>Asset Class</label>
+                                    <div className={`rounded px-3 py-2 text-sm ${textPrimary} border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>Equities</div>
+                                  </div>
+                                  <div>
+                                    <label className={`text-xs font-medium ${textSecondary} block mb-1`}>Message Type</label>
+                                    <div className={`rounded px-3 py-2 text-sm ${textPrimary} border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>NewOrderSingle</div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Conversion result preview */}
+                              <div className={`rounded-lg border ${borderColor} overflow-hidden`}>
+                                <div className={`px-4 py-2.5 border-b ${borderColor} flex items-center justify-between ${isDarkMode ? "bg-[#0a1628]/60" : "bg-gray-50"}`}>
+                                  <div className="flex items-center gap-2">
+                                    <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                    <span className={`text-sm font-semibold ${textPrimary}`}>Conversion Result</span>
+                                  </div>
+                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#4caf50]/15 text-[#4caf50]">Ready</span>
+                                </div>
+                                <div className="p-4 space-y-2">
+                                  {[
+                                    { label: "Fields Mapped", value: "20 / 20", ok: true },
+                                    { label: "Required Fields", value: "3 validated", ok: true },
+                                    { label: "Enum Values Normalized", value: "168 values", ok: true },
+                                    { label: "Warnings", value: "2 optional fields unset", ok: false },
+                                  ].map((r) => (
+                                    <div key={r.label} className="flex items-center justify-between py-1">
+                                      <span className={`text-sm ${textSecondary}`}>{r.label}</span>
+                                      <div className="flex items-center gap-2">
+                                        <span className={`text-sm font-medium ${textPrimary}`}>{r.value}</span>
+                                        {r.ok
+                                          ? <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                          : <AlertTriangle className="h-4 w-4 text-[#ff9800]" />}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                                <div className={`px-4 py-3 border-t ${borderColor} flex gap-3`}>
+                                  <Button size="sm" className="bg-[#4caf50] text-white hover:bg-[#43a047]">
+                                    <Download className="h-3.5 w-3.5 mr-1.5" /> Download Standardized Spec
+                                  </Button>
+                                  <Button size="sm" variant="outline" className={`${borderColor} ${textSecondary}`}>
+                                    <Eye className="h-3.5 w-3.5 mr-1.5" /> Preview
+                                  </Button>
+                                </div>
+                              </div>
+
+                              {/* Next Step */}
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex gap-3 pt-4 border-t border-[#1e4976]/30">
+                                  <Button
+                                    onClick={() => {
+                                      setCurrentToolIndex(actualToolIndex + 1)
+                                      setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id)
+                                    }}
+                                    className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto"
+                                  >
+                                    Next Step <ChevronRight className="h-4 w-4 ml-1" />
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
                           {/* AI Gap Analysis Tool */}
                           {tool.id === "gap" && (
                             <div className="space-y-4">
