@@ -825,13 +825,13 @@ export default function BCometPlatform() {
   
   // User roster for assignment
   const userRoster = [
-    { id: "U001", name: "John Smith", email: "john.smith@broadridge.com", role: "ic" },
-    { id: "U002", name: "Jane Doe", email: "jane.doe@broadridge.com", role: "ic" },
-    { id: "U003", name: "Bob Wilson", email: "bob.wilson@broadridge.com", role: "ic" },
-    { id: "U004", name: "Alice Brown", email: "alice.brown@broadridge.com", role: "ic" },
-    { id: "U005", name: "Charlie Davis", email: "charlie.davis@broadridge.com", role: "ic" },
-    { id: "U006", name: "Sarah Johnson", email: "sarah.johnson@broadridge.com", role: "manager" },
-    { id: "U007", name: "David Park", email: "david.park@broadridge.com", role: "manager" },
+    { id: "U001", name: "John Smith", email: "john.smith@admin.com", role: "ic" },
+    { id: "U002", name: "Jane Doe", email: "jane.doe@admin.com", role: "ic" },
+    { id: "U003", name: "Bob Wilson", email: "bob.wilson@admin.com", role: "ic" },
+    { id: "U004", name: "Alice Brown", email: "alice.brown@admin.com", role: "ic" },
+    { id: "U005", name: "Charlie Davis", email: "charlie.davis@admin.com", role: "ic" },
+    { id: "U006", name: "Sarah Johnson", email: "sarah.johnson@admin.com", role: "manager" },
+    { id: "U007", name: "David Park", email: "david.park@admin.com", role: "manager" },
   ]
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [selectedClient, setSelectedClient] = useState<any>(null)
@@ -1037,7 +1037,7 @@ export default function BCometPlatform() {
       description: "Collect counterparty information, upload documents, and analyze requirements",
       icon: ClipboardCheck,
       color: "#00e5ff",
-      tools: [
+      steps: [
         { id: "intake", name: "Intake Portal", screen: "intake-portal", icon: FileText, status: "completed" as const },
         { id: "docs", name: "Document Upload", screen: "intake-portal", icon: Upload, status: "completed" as const },
       ],
@@ -1048,7 +1048,7 @@ export default function BCometPlatform() {
       description: "Configure FIX sessions, compare specs, and set up field mappings",
       icon: Cog,
       color: "#4caf50",
-      tools: [
+      steps: [
         { id: "convert-spec", name: "Convert to Standardized Spec", screen: "intake-portal", icon: RefreshCw, status: "available" as const },
         { id: "spec-compare", name: "Spec Compare", screen: "spec-compare", icon: GitCompare, status: "pending" as const },
         { id: "spec-from-log", name: "Create Spec from Log", screen: "spec-from-log", icon: FileSearch, status: "pending" as const },
@@ -1063,7 +1063,7 @@ export default function BCometPlatform() {
       description: "Provision network, run smoke tests, and validate session readiness",
       icon: Wifi,
       color: "#2196f3",
-      tools: [
+      steps: [
         { id: "network", name: "Network Provisioning", screen: "session-config", icon: Globe, status: "pending" as const },
         { id: "smoke", name: "Connectivity Test", screen: "test-results", icon: Zap, status: "pending" as const },
         { id: "validate", name: "Session Validation", screen: "session-config", icon: CheckCircle, status: "pending" as const },
@@ -1075,7 +1075,7 @@ export default function BCometPlatform() {
       description: "Generate test plans, create test cases, and prepare certification checklist",
       icon: Target,
       color: "#ff9800",
-      tools: [
+      steps: [
         { id: "test-plan", name: "Test Plan Generator", screen: "test-case-gen", icon: FileText, status: "pending" as const },
         { id: "test-cases", name: "Test Case Creator", screen: "test-case-gen", icon: TestTube, status: "pending" as const },
         { id: "checklist", name: "Readiness Checklist", screen: "certification-gen", icon: ClipboardCheck, status: "pending" as const },
@@ -1087,7 +1087,7 @@ export default function BCometPlatform() {
       description: "Run session and application tests, capture evidence, and record results",
       icon: Play,
       color: "#9c27b0",
-      tools: [
+      steps: [
         { id: "session-tests", name: "Session Tests", screen: "test-results", icon: Server, status: "pending" as const },
         { id: "app-tests", name: "Application Tests", screen: "test-results", icon: Activity, status: "pending" as const },
         { id: "evidence", name: "Evidence Capture", screen: "evidence-vault", icon: FolderArchive, status: "pending" as const },
@@ -1100,7 +1100,7 @@ export default function BCometPlatform() {
       description: "Analyze failures, diagnose root causes, and track defect resolution",
       icon: Brain,
       color: "#f44336",
-      tools: [
+      steps: [
         { id: "failure-analysis", name: "Failure Analysis", screen: "log-analysis", icon: AlertTriangle, status: "pending" as const },
         { id: "root-cause", name: "AI Root Cause", screen: "log-analysis", icon: Brain, status: "pending" as const },
         { id: "defects", name: "Defect Tracking", screen: "onboarding-case-detail", icon: AlertCircle, status: "pending" as const },
@@ -1112,7 +1112,7 @@ export default function BCometPlatform() {
       description: "Evaluate completion, generate certification report, and collect signoffs",
       icon: Award,
       color: "#2196f3",
-      tools: [
+      steps: [
         { id: "eval", name: "Completion Evaluation", screen: "certification-gen", icon: CheckSquare, status: "pending" as const },
         { id: "cert-report", name: "Certification Report", screen: "client-cert-report", icon: Award, status: "pending" as const },
         { id: "signoffs", name: "Signoff Collection", screen: "approvals", icon: Stamp, status: "pending" as const },
@@ -1124,7 +1124,7 @@ export default function BCometPlatform() {
       description: "Generate production configs, complete go-live checklist, and begin hypercare",
       icon: Rocket,
       color: "#4caf50",
-      tools: [
+      steps: [
         { id: "prod-config", name: "Production Config", screen: "prod-config", icon: Server, status: "pending" as const },
         { id: "go-live", name: "Go-Live Checklist", screen: "go-live", icon: Rocket, status: "pending" as const },
         { id: "hypercare", name: "Hypercare Monitor", screen: "dashboard", icon: Activity, status: "pending" as const },
@@ -1284,7 +1284,7 @@ export default function BCometPlatform() {
     "regression-passed": true,
     "certification-passed": false,
     "client-signoff": false,
-    "broadridge-signoff": false,
+    "admin-signoff": false,
     "production-config": false,
   })
   
@@ -1946,7 +1946,7 @@ export default function BCometPlatform() {
   // Features for landing page
   const features = [
     { icon: Building2, title: "Case-Based Onboarding", desc: "Track multiple onboarding cases per client - Equities, Options, ATDL/Algo - each with full workflow visibility" },
-    { icon: GitCompare, title: "AI Spec Compare", desc: "Upload client FIX specs and let AI extract, compare, and identify gaps against Broadridge standards" },
+    { icon: GitCompare, title: "AI Spec Compare", desc: "Upload client FIX specs and let AI extract, compare, and identify gaps against Admin standards" },
     { icon: FileSearch, title: "FIX Log Analysis", desc: "Parse production logs with AI to detect patterns, errors, and auto-generate test scenarios" },
     { icon: Sliders, title: "ATDL Viewer", desc: "Configure and validate algorithmic trading parameters - VWAP, TWAP, POV strategies" },
     { icon: TestTube, title: "AI Test Generation", desc: "Generate regression and certification test suites from specs, logs, or custom scenarios" },
@@ -3084,14 +3084,14 @@ export default function BCometPlatform() {
           const ANGLE_OFFSET = -60 // degrees, shifts distribution toward upper-right
           // Radii adjusted for better spread
           const solarPlanets = [
-            { name: "Intake",  radius: 6,  color: "#2196f3", size: 1.0, tools: ["Create onboarding request", "Collect data", "AI document analysis", "Gap analysis"] },
-            { name: "Design",  radius: 14, color: "#9c27b0", size: 1.1, tools: ["Build counterparty profile", "Generate FIX session config", "Generate FIX dictionary", "Internal review/approval"] },
-            { name: "Connect", radius: 22, color: "#00bcd4", size: 1.2, tools: ["Provision network", "Connectivity smoke test", "Session readiness validation"] },
-            { name: "Plan",    radius: 30, color: "#ff9800", size: 1.3, tools: ["Generate cert test plan", "Create test cases", "Share readiness checklist"] },
-            { name: "Execute", radius: 38, color: "#e91e63", size: 1.4, tools: ["Session-level tests", "Application-level tests", "Negative tests", "Recovery tests", "Capture evidence"] },
-            { name: "Analyze", radius: 46, color: "#f44336", size: 1.5, tools: ["Auto-evaluate results", "AI root cause analysis", "Defect creation", "Retest cycle"] },
-            { name: "Decide",  radius: 54, color: "#4caf50", size: 1.6, tools: ["Evaluate completion", "Generate cert report", "Collect formal signoffs"] },
-            { name: "Launch",  radius: 62, color: "#00e5ff", size: 1.7, tools: ["Generate prod config pack", "Readiness checklist", "Prod smoke test", "Go-live & hypercare"] },
+            { name: "Intake",  radius: 6,  color: "#2196f3", size: 1.0, steps: ["Create onboarding request", "Collect data", "AI document analysis", "Gap analysis"] },
+            { name: "Design",  radius: 14, color: "#9c27b0", size: 1.1, steps: ["Build counterparty profile", "Generate FIX session config", "Generate FIX dictionary", "Internal review/approval"] },
+            { name: "Connect", radius: 22, color: "#00bcd4", size: 1.2, steps: ["Provision network", "Connectivity smoke test", "Session readiness validation"] },
+            { name: "Plan",    radius: 30, color: "#ff9800", size: 1.3, steps: ["Generate cert test plan", "Create test cases", "Share readiness checklist"] },
+            { name: "Execute", radius: 38, color: "#e91e63", size: 1.4, steps: ["Session-level tests", "Application-level tests", "Negative tests", "Recovery tests", "Capture evidence"] },
+            { name: "Analyze", radius: 46, color: "#f44336", size: 1.5, steps: ["Auto-evaluate results", "AI root cause analysis", "Defect creation", "Retest cycle"] },
+            { name: "Decide",  radius: 54, color: "#4caf50", size: 1.6, steps: ["Evaluate completion", "Generate cert report", "Collect formal signoffs"] },
+            { name: "Launch",  radius: 62, color: "#00e5ff", size: 1.7, steps: ["Generate prod config pack", "Readiness checklist", "Prod smoke test", "Go-live & hypercare"] },
           ]
           
           // Comet follows expanding spiral, passing through each planet's position
@@ -3723,7 +3723,7 @@ export default function BCometPlatform() {
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle className="h-4 w-4 text-[#4caf50] flex-shrink-0 mt-0.5" />
-                        <span>Compares against Broadridge standard specification</span>
+                        <span>Compares against Admin standard specification</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle className="h-4 w-4 text-[#4caf50] flex-shrink-0 mt-0.5" />
@@ -4176,12 +4176,12 @@ export default function BCometPlatform() {
                               </div>
 
                               {/* Next Step Button */}
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                              {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <div className="flex gap-3 pt-4 border-t border-[#1e4976]/30">
                                   <Button
                                     onClick={() => {
                                       setCurrentToolIndex(actualToolIndex + 1)
-                                      setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id)
+                                      setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id)
                                     }}
                                     className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto"
                                   >
@@ -4226,9 +4226,9 @@ export default function BCometPlatform() {
         
         <div className="space-y-4">
           {[
-            { name: "Suvrat Dandekar", email: "Suvrat.Dandekar@broadridge.com" },
-            { name: "Kirk Kvist", email: "Kirk.Kvist@broadridge.com" },
-            { name: "Adishree Sane", email: "Adishree.Sane@broadridge.com" },
+            { name: "Suvrat Dandekar", email: "Suvrat.Dandekar@admin.com" },
+            { name: "Kirk Kvist", email: "Kirk.Kvist@admin.com" },
+            { name: "Adishree Sane", email: "Adishree.Sane@admin.com" },
           ].map((person) => (
             <div 
               key={person.email}
@@ -4370,7 +4370,7 @@ export default function BCometPlatform() {
             <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Hosting Preference</label>
             <div className="flex gap-4">
               {[
-                { value: "hosted", label: "Hosted by Broadridge", desc: "We manage everything" },
+                { value: "hosted", label: "Hosted by Admin", desc: "We manage everything" },
                 { value: "self", label: "Self-Hosted", desc: "On your infrastructure" },
                 { value: "undecided", label: "Not Sure Yet", desc: "Discuss options" },
               ].map((option) => (
@@ -4476,8 +4476,8 @@ export default function BCometPlatform() {
     // Demo credentials config
     const demoCredentials = selectedRole === "admin"
       ? [
-          { label: "Manager", email: "sarah.johnson@broadridge.com", password: "Demo@1234", name: "Sarah Johnson", manager: true },
-          { label: "IC", email: "john.smith@broadridge.com", password: "Demo@1234", name: "John Smith", manager: false },
+          { label: "Manager", email: "sarah.johnson@admin.com", password: "Demo@1234", name: "Sarah Johnson", manager: true },
+          { label: "IC", email: "john.smith@admin.com", password: "Demo@1234", name: "John Smith", manager: false },
         ]
       : [
           { label: "Client", email: "trader@apexcapital.com", password: "Demo@1234", name: "Apex Capital Trader", manager: false },
@@ -4486,7 +4486,7 @@ export default function BCometPlatform() {
     const handleLogin = () => {
       if (selectedRole === "admin") {
         const userName = loginEmail ? loginEmail.split("@")[0].split(".").map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" ") : (isManager ? "Sarah Johnson" : "John Smith")
-        const userEmail = loginEmail || (isManager ? "sarah.johnson@broadridge.com" : "john.smith@broadridge.com")
+        const userEmail = loginEmail || (isManager ? "sarah.johnson@admin.com" : "john.smith@admin.com")
         setCurrentUser({ name: userName, email: userEmail })
       } else {
         setIsManager(false)
@@ -6929,12 +6929,12 @@ const tools = [
                               </div>
 
                               {/* Next Step Button */}
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                              {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <div className="flex gap-3 pt-4 border-t border-[#1e4976]/30">
                                   <Button
                                     onClick={() => {
                                       setCurrentToolIndex(actualToolIndex + 1)
-                                      setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id)
+                                      setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id)
                                     }}
                                     className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto"
                                   >
@@ -7168,7 +7168,7 @@ const tools = [
     const currentPhase = casePhases.find(p => p.num === validPhase) || casePhases[0]
     
     // Safety check - if currentPhase is somehow undefined, show error UI
-    if (!currentPhase || !currentPhase.tools) {
+    if (!currentPhase || !currentPhase.steps) {
       return (
         <div className={`min-h-screen ${bgPrimary} flex items-center justify-center`}>
           <div className="text-center">
@@ -7218,7 +7218,7 @@ const tools = [
     const isCurrentPhaseComplete = () => {
       const phase = casePhases.find(p => p.num === currentCasePhase)
       if (!phase) return true
-      return phase.tools.every(tool => tool.status === "completed")
+      return phase.steps.every(tool => tool.status === "completed")
     }
     
     // Status colors for visual distinction
@@ -7258,7 +7258,7 @@ const tools = [
     // Create phase tools with dynamic status
     const currentPhaseWithDynamicStatus = {
       ...currentPhase,
-      tools: currentPhase.tools.map((tool, idx) => ({
+      tools: currentPhase.steps.map((tool, idx) => ({
         ...tool,
         status: getToolStatus(currentPhase.num, idx)
       }))
@@ -7361,7 +7361,7 @@ const tools = [
                           {phase.name}
                         </p>
                         <p className={`text-xs truncate ${textSecondary}`}>
-                          {phase.tools.length} tools
+                          {phase.steps.length} steps
                         </p>
                       </div>
                       {isBlocked && <Lock className="h-4 w-4 text-gray-500" />}
@@ -7500,8 +7500,8 @@ const tools = [
                   
                   {/* Inline Tool Content */}
                   {(() => {
-                    const toolIdx = currentPhase.tools.findIndex(t => t.id === selectedToolId)
-                    const tool = toolIdx >= 0 ? currentPhase.tools[toolIdx] : null
+                    const toolIdx = currentPhase.steps.findIndex(t => t.id === selectedToolId)
+                    const tool = toolIdx >= 0 ? currentPhase.steps[toolIdx] : null
                     if (!tool) return null
                     const ToolIcon = tool.icon
                     const actualToolIndex = toolIdx // Use this instead of currentToolIndex for accuracy
@@ -7512,7 +7512,7 @@ const tools = [
                           <div className="flex items-center gap-3">
                             <div className="flex items-center gap-2">
                               <span className={`text-xs font-bold px-2 py-1 rounded bg-[#00e5ff] text-[#0a1628]`}>
-                                Step {actualToolIndex + 1} of {currentPhase.tools.length}
+                                Step {actualToolIndex + 1} of {currentPhase.steps.length}
                               </span>
                               <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: currentPhase.color + "20" }}>
                                 <ToolIcon className="h-5 w-5" style={{ color: currentPhase.color }} />
@@ -7759,12 +7759,12 @@ const tools = [
                               </div>
 
                               {/* Next Step Button */}
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                              {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <div className="flex gap-3 pt-4 border-t border-[#1e4976]/30">
                                   <Button
                                     onClick={() => {
                                       setCurrentToolIndex(actualToolIndex + 1)
-                                      setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id)
+                                      setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id)
                                     }}
                                     className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto"
                                   >
@@ -7778,7 +7778,7 @@ const tools = [
                           {/* Convert to Standardized Spec Tool */}
                           {tool.id === "convert-spec" && (
                             <div className="space-y-5">
-                                <p className={textSecondary}>Convert the uploaded FIX spec or log file into a standardized Broadridge-compatible spec format.</p>
+                                <p className={textSecondary}>Convert the uploaded FIX spec or log file into a standardized Admin-compatible spec format.</p>
 
                                 {/* Conversion Source */}
                                 <div className={`rounded-lg border ${borderColor} overflow-hidden`}>
@@ -7813,7 +7813,7 @@ const tools = [
                                   </div>
                                   <div className="p-4 grid grid-cols-2 gap-4">
                                     {[
-                                      { label: "Target Format", value: "Broadridge Standard XML" },
+                                      { label: "Target Format", value: "Admin Standard XML" },
                                       { label: "FIX Version",   value: "FIX 4.2 (auto-detected)" },
                                       { label: "Asset Class",   value: "Equities" },
                                       { label: "Message Type",  value: "NewOrderSingle" },
@@ -8008,12 +8008,12 @@ const tools = [
                                 )}
 
                                 {/* Next Step */}
-                                {actualToolIndex < currentPhase.tools.length - 1 && (
+                                {actualToolIndex < currentPhase.steps.length - 1 && (
                                   <div className="flex gap-3 pt-4 border-t border-[#1e4976]/30">
                                     <Button
                                       onClick={() => {
                                         setCurrentToolIndex(actualToolIndex + 1)
-                                        setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id)
+                                        setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id)
                                       }}
                                       className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto"
                                     >
@@ -8446,12 +8446,12 @@ const tools = [
                               )}
 
                               {/* Next Step Button */}
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                              {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <div className="flex pt-4 border-t border-[#1e4976]/30">
                                   <Button
                                     onClick={() => {
                                       setCurrentToolIndex(actualToolIndex + 1)
-                                      setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id)
+                                      setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id)
                                     }}
                                     className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto"
                                   >
@@ -10344,11 +10344,11 @@ const tools = [
                                       Next <ChevronRight className="h-4 w-4 ml-1" />
                                     </Button>
                                   ) : (
-                                    actualToolIndex < currentPhase.tools.length - 1 ? (
+                                    actualToolIndex < currentPhase.steps.length - 1 ? (
                                       <Button
                                         onClick={() => {
                                           setCurrentToolIndex(actualToolIndex + 1)
-                                          setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id)
+                                          setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id)
                                         }}
                                         className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
                                       >
@@ -10416,9 +10416,9 @@ const tools = [
                                 textSecondary={textSecondary}
                                 bgCard={bgCard}
                                 borderColor={borderColor}
-                                onNextStep={actualToolIndex < currentPhase.tools.length - 1 ? () => {
+                                onNextStep={actualToolIndex < currentPhase.steps.length - 1 ? () => {
                                   setCurrentToolIndex(actualToolIndex + 1)
-                                  setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id)
+                                  setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id)
                                 } : undefined}
                               />
                             )
@@ -10457,9 +10457,9 @@ const tools = [
                                   ))}
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                              {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
                                 </div>
                               )}
                             </div>
@@ -10498,9 +10498,9 @@ const tools = [
                                   </div>
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                              {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
                                 </div>
                               )}
                             </div>
@@ -10539,9 +10539,9 @@ const tools = [
                                   ))}
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                              {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
                                 </div>
                               )}
                             </div>
@@ -10580,9 +10580,9 @@ const tools = [
                                   ))}
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                              {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
                                 </div>
                               )}
                             </div>
@@ -10622,9 +10622,9 @@ const tools = [
                                   ))}
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                              {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
                                 </div>
                               )}
                             </div>
@@ -10660,9 +10660,9 @@ const tools = [
                                   </div>
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                              {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
                                 </div>
                               )}
                             </div>
@@ -10698,9 +10698,9 @@ const tools = [
                                   ))}
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                              {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
                                 </div>
                               )}
                             </div>
@@ -10730,9 +10730,9 @@ const tools = [
                                   <Button size="sm" variant="outline">View Details</Button>
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                              {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
                                 </div>
                               )}
                             </div>
@@ -10771,9 +10771,9 @@ const tools = [
                                   ))}
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                              {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
                                 </div>
                               )}
                             </div>
@@ -10811,9 +10811,9 @@ const tools = [
                                   ))}
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                              {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
                                 </div>
                               )}
                             </div>
@@ -10850,9 +10850,9 @@ const tools = [
                                   </ul>
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                              {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
                                 </div>
                               )}
                             </div>
@@ -10896,9 +10896,9 @@ const tools = [
                                   ))}
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                              {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
                                 </div>
                               )}
                             </div>
@@ -10986,9 +10986,9 @@ const tools = [
                                 </div>
                               </div>
 
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                              {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
                                 </div>
                               )}
                             </div>
@@ -11001,8 +11001,8 @@ const tools = [
                               <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} mb-4`}>
                                 <p className={`text-xs ${textSecondary}`}>
                                   Next step after this: <span className="font-medium text-[#00e5ff]">
-                                    {actualToolIndex < currentPhase.tools.length - 1 
-                                      ? currentPhase.tools[actualToolIndex + 1].name 
+                                    {actualToolIndex < currentPhase.steps.length - 1 
+                                      ? currentPhase.steps[actualToolIndex + 1].name 
                                       : `Phase ${currentCasePhase + 1}`}
                                   </span>
                                 </p>
@@ -11029,12 +11029,12 @@ const tools = [
                               </Button>
 
                               {/* Next Step Button */}
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                              {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <Button
                                   variant="outline"
                                   onClick={() => {
                                     setCurrentToolIndex(actualToolIndex + 1)
-                                    setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id)
+                                    setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id)
                                   }}
                                   className="w-full mt-2"
                                 >
@@ -11130,7 +11130,7 @@ const tools = [
                       onClick={() => {
                         if (currentToolIndex > 0) {
                           setCurrentToolIndex(currentToolIndex - 1)
-                          setSelectedToolId(currentPhase.tools[currentToolIndex - 1].id)
+                          setSelectedToolId(currentPhase.steps[currentToolIndex - 1].id)
                         }
                       }}
                       disabled={currentToolIndex === 0}
@@ -11139,16 +11139,16 @@ const tools = [
                       <ChevronLeft className="h-4 w-4 mr-1" /> Previous Step
                     </Button>
                     <div className={`text-sm ${textSecondary}`}>
-                      Step {currentToolIndex + 1} of {currentPhase.tools.length} in Phase {currentCasePhase}
+                      Step {currentToolIndex + 1} of {currentPhase.steps.length} in Phase {currentCasePhase}
                     </div>
                     <Button
                       onClick={() => {
-                        if (currentToolIndex < currentPhase.tools.length - 1) {
+                        if (currentToolIndex < currentPhase.steps.length - 1) {
                           setCurrentToolIndex(currentToolIndex + 1)
-                          setSelectedToolId(currentPhase.tools[currentToolIndex + 1].id)
+                          setSelectedToolId(currentPhase.steps[currentToolIndex + 1].id)
                         }
                       }}
-                      disabled={currentToolIndex === currentPhase.tools.length - 1}
+                      disabled={currentToolIndex === currentPhase.steps.length - 1}
                       className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] disabled:opacity-50"
                     >
                       Next Step <ChevronRight className="h-4 w-4 ml-1" />
@@ -11257,9 +11257,9 @@ const tools = [
                       if (showForceCompleteDialog === "step") {
                         // Mark the step complete and advance to next step
                         const nextIndex = forceCompleteTargetToolIndex + 1
-                        if (nextIndex < currentPhase.tools.length) {
+                        if (nextIndex < currentPhase.steps.length) {
                           setCurrentToolIndex(nextIndex)
-                          setSelectedToolId(currentPhase.tools[nextIndex].id)
+                          setSelectedToolId(currentPhase.steps[nextIndex].id)
                         }
                       } else {
                         // Force complete the whole phase — advance to next phase
@@ -18960,8 +18960,8 @@ const copyToClipboard = () => {
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Client Tag</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Client Name</th>
                       <th className={`px-4 py-3 text-center font-semibold ${textPrimary}`}></th>
-                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Broadridge Tag</th>
-                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Broadridge Name</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Admin Tag</th>
+                      <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Admin Name</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Transform</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Status</th>
                       <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Actions</th>
@@ -19159,7 +19159,7 @@ const copyToClipboard = () => {
       { key: "regression-passed", label: "Regression Tests Passed", description: "100% pass rate on all regression test suites", stage: 5, icon: TestTube },
       { key: "certification-passed", label: "Certification Completed", description: "All certification test cases passed", stage: 6, icon: Award },
       { key: "client-signoff", label: "Client Sign-off", description: "Client has reviewed and approved all test results", stage: 6, icon: CheckSquare },
-      { key: "broadridge-signoff", label: "Broadridge Sign-off", description: "Internal review and approval completed", stage: 6, icon: Shield },
+      { key: "admin-signoff", label: "Admin Sign-off", description: "Internal review and approval completed", stage: 6, icon: Shield },
       { key: "production-config", label: "Production Configuration", description: "Production FIX sessions configured and verified", stage: 7, icon: Rocket },
     ]
     
@@ -19279,7 +19279,7 @@ const copyToClipboard = () => {
   if (currentScreen === "reports") {
     const reportTypes = [
       { id: "onboarding-summary", name: "Onboarding Summary Report", description: "Overall status, timeline, and key findings", icon: FileText, format: "PDF" },
-      { id: "spec-comparison", name: "Spec Comparison Report", description: "Detailed comparison of client vs Broadridge specs", icon: GitCompare, format: "PDF/Excel" },
+      { id: "spec-comparison", name: "Spec Comparison Report", description: "Detailed comparison of client vs Admin specs", icon: GitCompare, format: "PDF/Excel" },
       { id: "test-execution", name: "Test Execution Report", description: "Complete test results with pass/fail details", icon: TestTube, format: "PDF" },
       { id: "certification", name: "Certification Report", description: "Official certification documentation for audit", icon: Award, format: "PDF" },
       { id: "field-mapping", name: "Field Mapping Report", description: "All field mappings and transformation rules", icon: Link2, format: "Excel" },
@@ -21603,9 +21603,9 @@ SSLCertFile=/certs/client.pem
 SSLKeyFile=/certs/client.key
 
 [NETWORK]
-SocketConnectHost=fix-gw01.broadridge.com
+SocketConnectHost=fix-gw01.admin.com
 SocketConnectPort=9876
-SocketConnectHostBackup=fix-gw02.broadridge.com
+SocketConnectHostBackup=fix-gw02.admin.com
 SocketConnectPortBackup=9876
 
 [VALIDATION]
