@@ -9,6 +9,270 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
+// ── Spec Analysis Preview ───────────────────────────────────────────────────
+function SpecAnalysisPreview({ isDarkMode, bgCard, bgSecondary, borderColor, textPrimary, textSecondary, caseClient, caseAsset, caseProtocol, tabs, summaryFields, singleTests, coreTests, pairTests, coverageFields }: any) {
+  const [activeTab, setActiveTab] = React.useState("Summary")
+
+  const tabColors: Record<string, string> = {
+    "Summary": "#00e5ff",
+    "Field Value Map": "#4caf50",
+    "Single Value Tests": "#2196f3",
+    "Core Cartesian Tests": "#ff9800",
+    "Pairwise Tests": "#e91e63",
+    "Coverage Matrix": "#9c27b0",
+  }
+
+  const thCls = `px-3 py-2 text-left text-[11px] font-bold uppercase tracking-wider text-white`
+  const tdCls = `px-3 py-1.5 text-xs whitespace-nowrap`
+  const trBase = `border-b ${isDarkMode ? "border-[#1e4976]/40" : "border-gray-100"} ${isDarkMode ? "hover:bg-[#1e4976]/20" : "hover:bg-gray-50"} transition-colors`
+
+  const headerBg = "#1a3a5c"
+
+  return (
+    <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+      {/* Header */}
+      <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+        <div className="flex items-center gap-2">
+          <BarChart3 className="h-4 w-4 text-[#00e5ff]" />
+          <span className={`text-sm font-semibold ${textPrimary}`}>Spec Analysis — {caseClient} {caseAsset} ({caseProtocol})</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className={`text-xs ${textSecondary}`}>FIX {caseProtocol} · NewOrderSingle</span>
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#00e5ff]/15 text-[#00e5ff]">LIVE PREVIEW</span>
+        </div>
+      </div>
+
+      {/* Stats row */}
+      <div className={`grid grid-cols-5 divide-x ${isDarkMode ? "divide-[#1e4976]/50 bg-[#0a1628]" : "divide-gray-200 bg-gray-50"}`}>
+        {[
+          { label: "Enum Fields", value: "20", color: "#4caf50" },
+          { label: "Single-Value Tests", value: "168", color: "#2196f3" },
+          { label: "Core Cartesian", value: "756", color: "#ff9800" },
+          { label: "Pairwise Tests", value: "1047", color: "#e91e63" },
+          { label: "Total Tests", value: "1971", color: "#00e5ff" },
+        ].map((s) => (
+          <div key={s.label} className="px-4 py-2.5 text-center">
+            <div className="text-lg font-bold" style={{ color: s.color }}>{s.value}</div>
+            <div className={`text-[10px] ${textSecondary}`}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Tabs */}
+      <div className={`flex overflow-x-auto border-b ${borderColor} ${isDarkMode ? "bg-[#0d2137]" : "bg-gray-50"}`}>
+        {tabs.map((tab: string) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-4 py-2.5 text-xs font-semibold whitespace-nowrap transition-colors border-b-2 ${
+              activeTab === tab
+                ? "border-b-2 text-white"
+                : `border-transparent ${textSecondary} hover:text-white`
+            }`}
+            style={activeTab === tab ? { borderBottomColor: tabColors[tab], color: tabColors[tab] } : {}}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab Content */}
+      <div className="overflow-auto max-h-72">
+
+        {/* SUMMARY TAB */}
+        {activeTab === "Summary" && (
+          <table className="w-full text-xs">
+            <thead style={{ backgroundColor: headerBg }}>
+              <tr>
+                <th className={thCls}>Tag</th>
+                <th className={thCls}>Field Name</th>
+                <th className={thCls}>Type</th>
+                <th className={thCls}>Required</th>
+                <th className={`${thCls} text-right`}>#Values</th>
+              </tr>
+            </thead>
+            <tbody>
+              {summaryFields.map((f: any) => (
+                <tr key={f.tag} className={trBase}>
+                  <td className={`${tdCls} font-mono ${textSecondary}`}>{f.tag}</td>
+                  <td className={`${tdCls} font-medium text-[#2196f3]`}>{f.name}</td>
+                  <td className={`${tdCls} font-mono ${textSecondary}`}>{f.type}</td>
+                  <td className={tdCls}>
+                    {f.required && <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#f44336]/15 text-[#f44336]">Y</span>}
+                  </td>
+                  <td className={`${tdCls} text-right font-semibold ${textPrimary}`}>{f.values}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        {/* FIELD VALUE MAP TAB */}
+        {activeTab === "Field Value Map" && (
+          <div className="divide-y divide-[#1e4976]/30">
+            {[
+              { tag: 63, name: "SettlmntTyp", type: "(char)", required: false, values: [{ n: 1, v: "0", name: "Regular", since: "FIX.2.7" }, { n: 2, v: "1", name: "Cash", since: "FIX.2.7" }, { n: 3, v: "2", name: "NextDay", since: "FIX.2.7" }, { n: 4, v: "3", name: "TPlus2", since: "FIX.2.7" }, { n: 5, v: "4", name: "TPlus3", since: "FIX.2.7" }] },
+              { tag: 21, name: "HandlInst", type: "(char)", required: true, values: [{ n: 1, v: "1", name: "AutomatedExecutionNoIntervention", since: "FIX.2.7" }, { n: 2, v: "2", name: "AutomatedExecutionInterventionOK", since: "FIX.2.7" }, { n: 3, v: "3", name: "ManualOrder", since: "FIX.2.7" }] },
+              { tag: 18, name: "ExecInst", type: "(MultipleStringValue)", required: false, values: [{ n: 1, v: "0", name: "StayOnOfferSide", since: "FIX.2.7" }, { n: 2, v: "1", name: "NotHeld", since: "FIX.2.7" }, { n: 3, v: "2", name: "Work", since: "FIX.2.7" }, { n: 4, v: "3", name: "GoAlong", since: "FIX.2.7" }] },
+            ].map((field) => (
+              <div key={field.tag}>
+                <div className={`px-3 py-2 flex items-center gap-3 ${isDarkMode ? "bg-[#0a1628]/70" : "bg-gray-50"}`}>
+                  <span className={`text-xs font-bold ${textPrimary}`}>Tag {field.tag}</span>
+                  <span className="text-xs text-[#2196f3] font-semibold">{field.name}</span>
+                  <span className={`text-[10px] ${textSecondary}`}>{field.type}</span>
+                  {field.required && <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#f44336]/15 text-[#f44336]">REQUIRED</span>}
+                </div>
+                <table className="w-full">
+                  <thead style={{ backgroundColor: headerBg }}>
+                    <tr>
+                      <th className={thCls}>#</th>
+                      <th className={thCls}>Value</th>
+                      <th className={thCls}>Name</th>
+                      <th className={thCls}>Since</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {field.values.map((v: any) => (
+                      <tr key={v.n} className={trBase}>
+                        <td className={`${tdCls} ${textSecondary}`}>{v.n}</td>
+                        <td className={`${tdCls} font-mono font-bold ${textPrimary}`}>{v.v}</td>
+                        <td className={`${tdCls} text-[#4caf50]`}>{v.name}</td>
+                        <td className={`${tdCls} ${textSecondary}`}>{v.since}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* SINGLE VALUE TESTS TAB */}
+        {activeTab === "Single Value Tests" && (
+          <table className="w-full text-xs">
+            <thead style={{ backgroundColor: headerBg }}>
+              <tr>
+                <th className={thCls}>Test ID</th>
+                <th className={thCls}>Field</th>
+                <th className={thCls}>Tag</th>
+                <th className={thCls}>Value</th>
+                <th className={thCls}>Value Name</th>
+                <th className={thCls}>Req</th>
+                <th className={thCls}>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {singleTests.map((t: any) => (
+                <tr key={t.id} className={trBase}>
+                  <td className={`${tdCls} font-mono font-semibold text-[#2196f3]`}>{t.id}</td>
+                  <td className={`${tdCls} font-medium ${textPrimary}`}>{t.field}</td>
+                  <td className={`${tdCls} font-mono ${textSecondary}`}>{t.tag}</td>
+                  <td className={`${tdCls} font-mono font-bold ${textPrimary}`}>{t.value}</td>
+                  <td className={`${tdCls} text-[#4caf50]`}>{t.valueName}</td>
+                  <td className={tdCls}>{t.required && <span className="px-1 py-0.5 rounded text-[10px] bg-[#f44336]/15 text-[#f44336] font-bold">Y</span>}</td>
+                  <td className={`${tdCls} ${textSecondary} max-w-xs truncate`}>{t.desc}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        {/* CORE CARTESIAN TESTS TAB */}
+        {activeTab === "Core Cartesian Tests" && (
+          <table className="w-full text-xs">
+            <thead style={{ backgroundColor: headerBg }}>
+              <tr>
+                <th className={thCls}>Test ID</th>
+                <th className={thCls}>Category</th>
+                <th className={thCls}>Name</th>
+                <th className={thCls}>Description</th>
+                <th className={thCls}>Conditional</th>
+                <th className={thCls}>Combination Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {coreTests.map((t: any) => (
+                <tr key={t.id} className={trBase}>
+                  <td className={`${tdCls} font-mono font-semibold text-[#ff9800]`}>{t.id}</td>
+                  <td className={`${tdCls} text-[10px] ${textSecondary}`}>CORE_COMBINATION</td>
+                  <td className={`${tdCls} font-medium ${textPrimary} max-w-xs`}>{t.name}</td>
+                  <td className={`${tdCls} ${textSecondary} max-w-xs truncate`}>{t.desc}</td>
+                  <td className={`${tdCls} text-[#ff9800]`}>{t.conditional}</td>
+                  <td className={`${tdCls} ${textSecondary} whitespace-pre-line text-[10px]`}>{t.details}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        {/* PAIRWISE TESTS TAB */}
+        {activeTab === "Pairwise Tests" && (
+          <table className="w-full text-xs">
+            <thead style={{ backgroundColor: headerBg }}>
+              <tr>
+                <th className={thCls}>Test ID</th>
+                <th className={thCls}>Category</th>
+                <th className={thCls}>Name</th>
+                <th className={thCls}>Description</th>
+                <th className={thCls}>Conditional</th>
+                <th className={thCls}>Combination Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pairTests.map((t: any) => (
+                <tr key={t.id} className={trBase}>
+                  <td className={`${tdCls} font-mono font-semibold text-[#e91e63]`}>{t.id}</td>
+                  <td className={`${tdCls} text-[10px] ${textSecondary}`}>PAIRWISE_COMBINATION</td>
+                  <td className={`${tdCls} font-medium ${textPrimary}`}>{t.name}</td>
+                  <td className={`${tdCls} ${textSecondary} max-w-xs truncate`}>{t.desc}</td>
+                  <td className={`${tdCls} text-[#ff9800]`}>{t.conditional}</td>
+                  <td className={`${tdCls} ${textSecondary} whitespace-pre-line text-[10px]`}>{t.details}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        {/* COVERAGE MATRIX TAB */}
+        {activeTab === "Coverage Matrix" && (
+          <div>
+            <div className={`px-4 py-2 flex items-center gap-4 border-b ${borderColor} ${isDarkMode ? "bg-[#0a1628]/70" : "bg-gray-50"}`}>
+              <span className={`text-xs ${textSecondary}`}>Total Core Combos:</span>
+              <span className={`text-lg font-bold ${textPrimary}`}>756</span>
+            </div>
+            <div className={`px-4 py-2 border-b ${borderColor}`}>
+              <span className="text-xs font-bold text-[#2196f3]">Full Field Coverage Summary</span>
+            </div>
+            <table className="w-full text-xs">
+              <thead style={{ backgroundColor: headerBg }}>
+                <tr>
+                  <th className={thCls}>Tag</th>
+                  <th className={thCls}>Field</th>
+                  <th className={`${thCls} text-right`}>#Values</th>
+                  <th className={`${thCls} text-right`}>Single Tests</th>
+                  <th className={`${thCls} text-right`}>In Pairwise</th>
+                </tr>
+              </thead>
+              <tbody>
+                {coverageFields.map((f: any) => (
+                  <tr key={f.tag} className={trBase}>
+                    <td className={`${tdCls} font-mono ${textSecondary}`}>{f.tag}</td>
+                    <td className={`${tdCls} text-[#2196f3] font-medium`}>{f.field}</td>
+                    <td className={`${tdCls} text-right ${textPrimary}`}>{f.values}</td>
+                    <td className={`${tdCls} text-right ${textPrimary}`}>{f.single}</td>
+                    <td className={`${tdCls} text-right font-semibold text-[#9c27b0]`}>{f.pairwise}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+      </div>
+    </div>
+  )
+}
+
 // ── Test Plan Generator ─────────────────────────────────────────────────────
 interface TestSuite {
   id: string
@@ -167,6 +431,78 @@ function TestPlanGeneratorTool({
           </div>
         </div>
       </div>
+
+      {/* Section B2 — Spec Analysis Preview (shown when spec is loaded) */}
+      {specLoaded && (() => {
+        const specTabs = ["Summary", "Field Value Map", "Single Value Tests", "Core Cartesian Tests", "Pairwise Tests", "Coverage Matrix"]
+        const activeSpecTab = (typeof window !== "undefined" && (window as any).__specTab) || "Summary"
+        const setSpecTab = (t: string) => { (window as any).__specTab = t; }
+
+        const summaryFields = [
+          { tag: 63, name: "SettlmntTyp", type: "char", required: false, values: 10 },
+          { tag: 21, name: "HandlInst", type: "char", required: true, values: 3 },
+          { tag: 18, name: "ExecInst", type: "MultipleStringValue", required: false, values: 29 },
+          { tag: 81, name: "ProcessCode", type: "char", required: false, values: 7 },
+          { tag: 22, name: "IDSource", type: "String", required: false, values: 9 },
+          { tag: 167, name: "SecurityType", type: "String", required: false, values: 33 },
+          { tag: 201, name: "PutOrCall", type: "int", required: false, values: 2 },
+          { tag: 54, name: "Side", type: "char", required: true, values: 9 },
+          { tag: 40, name: "OrdType", type: "char", required: true, values: 12 },
+          { tag: 59, name: "TimeInForce", type: "char", required: false, values: 7 },
+          { tag: 427, name: "GTBookingInst", type: "int", required: false, values: 3 },
+          { tag: 47, name: "Rule80A", type: "char", required: false, values: 23 },
+        ]
+        const singleTests = [
+          { id: "TC_SINGLE_0001", field: "SettlmntTyp", tag: 63, value: "0", valueName: "Regular", desc: "Single-value test: SettlmntTyp (tag 63) = 0 (Regular)", steps: "Send NewOrderSingle with SettlmntTyp=0 (Regular)\nVerify ExecutionReport received" },
+          { id: "TC_SINGLE_0002", field: "SettlmntTyp", tag: 63, value: "1", valueName: "Cash", desc: "Single-value test: SettlmntTyp (tag 63) = 1 (Cash)", steps: "Send NewOrderSingle with SettlmntTyp=1 (Cash)\nVerify ExecutionReport received" },
+          { id: "TC_SINGLE_0003", field: "SettlmntTyp", tag: 63, value: "2", valueName: "NextDay", desc: "Single-value test: SettlmntTyp (tag 63) = 2 (NextDay)", steps: "Send NewOrderSingle with SettlmntTyp=2 (NextDay)\nVerify ExecutionReport received" },
+          { id: "TC_SINGLE_0011", field: "HandlInst", tag: 21, value: "1", valueName: "AutomatedExecutionNoIntervention", desc: "Single-value test: HandlInst (tag 21) = 1", steps: "Send NewOrderSingle with HandlInst=1\nVerify ExecutionReport received", required: true },
+          { id: "TC_SINGLE_0012", field: "HandlInst", tag: 21, value: "2", valueName: "AutomatedExecutionInterventionOK", desc: "Single-value test: HandlInst (tag 21) = 2", steps: "Send NewOrderSingle with HandlInst=2\nVerify ExecutionReport received", required: true },
+          { id: "TC_SINGLE_0014", field: "ExecInst", tag: 18, value: "0", valueName: "StayOnOfferSide", desc: "Single-value test: ExecInst (tag 18) = 0 (StayOnOfferSide)", steps: "Send NewOrderSingle with ExecInst=0\nVerify ExecutionReport received" },
+          { id: "TC_SINGLE_0015", field: "ExecInst", tag: 18, value: "1", valueName: "NotHeld", desc: "Single-value test: ExecInst (tag 18) = 1 (NotHeld)", steps: "Send NewOrderSingle with ExecInst=1\nVerify ExecutionReport received" },
+        ]
+        const coreTests = [
+          { id: "TC_CORE_0169", name: "Side=Buy(1) | OrdType=Market(1) | TimeInForce=Day(0)", desc: "Core combination: Side=Buy(1), OrdType=Market(1), TimeInForce=Day(0)", details: "tag 54 Side = 1 (Buy)\ntag 40 OrdType = 1 (Market)\ntag 59 TimeInForce = 0 (Day)", steps: "Send NewOrderSingle with Side=Buy(1), OrdType=Market(1)\nVerify ExecutionReport received" },
+          { id: "TC_CORE_0170", name: "Side=Buy(1) | OrdType=Market(1) | TimeInForce=GoodTillCancel(1)", desc: "Core combination: Side=Buy(1), OrdType=Market(1), TimeInForce=GoodTillCancel(1)", details: "tag 54 Side = 1 (Buy)\ntag 40 OrdType = 1 (Market)\ntag 59 TimeInForce = 1 (GoodTillCancel)", steps: "Send NewOrderSingle with Side=Buy(1), OrdType=Market(1)\nVerify ExecutionReport received" },
+          { id: "TC_CORE_0171", name: "Side=Buy(1) | OrdType=Limit(2) | TimeInForce=Day(0)", desc: "Core combination: Side=Buy(1), OrdType=Limit(2), TimeInForce=Day(0)", conditional: "Price=150.0", details: "tag 54 Side = 1 (Buy)\ntag 40 OrdType = 2 (Limit)\ntag 59 TimeInForce = 0 (Day)", steps: "Send NewOrderSingle with Side=Buy(1), OrdType=Limit(2)\nInclude Limit requires Price\nVerify ExecutionReport received" },
+        ]
+        const pairTests = [
+          { id: "TC_PAIR_0925", name: "Pairwise #1", desc: "Pairwise combination: SettlmntTyp=Cash, HandlInst=AutomatedExecutionNoIntervention, ExecInst=PrimaryPeg, ProcessCode=StepIn, IDSource=ISINNumber...", conditional: "", details: "tag 63 SettlmntTyp = 1 (Cash)\ntag 21 HandlInst = 1 (AutomatedExecutionNoIntervention)\ntag 18 ExecInst = R (PrimaryPeg)\ntag 81 ProcessCode = 2 (StepIn)\ntag 22 IDSource = 4 (ISINNumber)\ntag 54 Side = 2 (Sell)\ntag 40 OrdType = A (OnClose)" },
+          { id: "TC_PAIR_0926", name: "Pairwise #2", desc: "Pairwise combination: SettlmntTyp=TPlus4, HandlInst=ManualOrder, ExecInst=TryToScale, ProcessCode=SoftDollarStepOut, IDSource=ISOCountryCode...", conditional: "StopPx=145.0", details: "tag 63 SettlmntTyp = 5 (TPlus4)\ntag 21 HandlInst = 3 (ManualOrder)\ntag 18 ExecInst = 8 (TryToScale)\ntag 40 OrdType = 3 (Stop)\ntag 59 TimeInForce = 4 (FillOrKill)" },
+        ]
+        const coverageFields = [
+          { tag: 63, field: "SettlmntTyp", values: 10, single: 10, pairwise: 1047 },
+          { tag: 21, field: "HandlInst", values: 3, single: 3, pairwise: 1047 },
+          { tag: 18, field: "ExecInst", values: 29, single: 29, pairwise: 1047 },
+          { tag: 81, field: "ProcessCode", values: 7, single: 7, pairwise: 1047 },
+          { tag: 22, field: "IDSource", values: 9, single: 9, pairwise: 1047 },
+          { tag: 167, field: "SecurityType", values: 33, single: 33, pairwise: 1047 },
+          { tag: 54, field: "Side", values: 9, single: 9, pairwise: 1047 },
+          { tag: 40, field: "OrdType", values: 12, single: 12, pairwise: 1047 },
+          { tag: 59, field: "TimeInForce", values: 7, single: 7, pairwise: 1047 },
+          { tag: 47, field: "Rule80A", values: 23, single: 23, pairwise: 1047 },
+        ]
+
+        return (
+          <SpecAnalysisPreview
+            isDarkMode={isDarkMode}
+            bgCard={bgCard}
+            bgSecondary={bgSecondary}
+            borderColor={borderColor}
+            textPrimary={textPrimary}
+            textSecondary={textSecondary}
+            caseClient={caseClient}
+            caseAsset={caseAsset}
+            caseProtocol={caseProtocol}
+            tabs={specTabs}
+            summaryFields={summaryFields}
+            singleTests={singleTests}
+            coreTests={coreTests}
+            pairTests={pairTests}
+            coverageFields={coverageFields}
+          />
+        )
+      })()}
 
       {/* Section C — Customize to Spec */}
       <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
