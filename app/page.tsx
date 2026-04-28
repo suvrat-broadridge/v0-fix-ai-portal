@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 // ── Spec Analysis Preview ───────────────────────────────────────────────────
-function SpecAnalysisPreview({ isDarkMode, bgCard, bgSecondary, borderColor, textPrimary, textSecondary, caseClient, caseAsset, caseProtocol, tabs, summaryFields, singleTests, coreTests, pairTests, coverageFields }: any) {
+function SpecAnalysisPreview({ isDarkMode, bgCard, borderColor, textPrimary, textSecondary, caseClient, caseAsset, caseProtocol, tabs, summaryFields, singleTests, coreTests, pairTests, coverageFields }: any) {
   const [activeTab, setActiveTab] = React.useState("Summary")
 
   const tabColors: Record<string, string> = {
@@ -487,7 +487,6 @@ function TestPlanGeneratorTool({
           <SpecAnalysisPreview
             isDarkMode={isDarkMode}
             bgCard={bgCard}
-            bgSecondary={bgSecondary}
             borderColor={borderColor}
             textPrimary={textPrimary}
             textSecondary={textSecondary}
