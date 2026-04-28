@@ -14605,28 +14605,46 @@ const tools = [
 
   // Client Specs Screen - For clients to upload and manage their specs
   if (currentScreen === "client-specs") {
+    // Client My Specs screen - matches admin specs layout with Original and Standardized columns
     const clientSpecsData = [
-      {
-        asset: "Equities",
+      { 
+        asset: "Equities", 
         versions: [
-          { protocol: "FIX 4.2", specs: [{ name: "client_eq_42_v1.xml", uploaded: "2024-01-10", status: "active" }] },
-          { protocol: "FIX 4.4", specs: [{ name: "client_eq_44_v2.xml", uploaded: "2024-01-12", status: "active" }] },
-          { protocol: "FIX 5.0", specs: [] },
+          { protocol: "FIX 4.2", originalSpec: { name: "client_eq_42_v1.xml", uploaded: true }, standardizedSpec: { name: "client_eq_42_v1_Standardized.xlsx", available: true } },
+          { protocol: "FIX 4.4", originalSpec: { name: "client_eq_44_v2.xml", uploaded: true }, standardizedSpec: { name: "client_eq_44_v2_Standardized.xlsx", available: true } },
+          { protocol: "FIX 5.0", originalSpec: { name: null, uploaded: false }, standardizedSpec: { name: null, available: false } },
+          { protocol: "FIX 5.0 SP2", originalSpec: { name: "client_eq_50sp2.xml", uploaded: true }, standardizedSpec: { name: null, available: false } },
         ]
       },
-      {
-        asset: "Options",
+      { 
+        asset: "Options", 
         versions: [
-          { protocol: "FIX 4.2", specs: [] },
-          { protocol: "FIX 4.4", specs: [{ name: "client_opt_44_v1.xml", uploaded: "2024-01-08", status: "active" }] },
+          { protocol: "FIX 4.2", originalSpec: { name: null, uploaded: false }, standardizedSpec: { name: null, available: false } },
+          { protocol: "FIX 4.4", originalSpec: { name: "client_opt_44_v1.xml", uploaded: true }, standardizedSpec: { name: "client_opt_44_v1_Standardized.xlsx", available: true } },
+          { protocol: "FIX 5.0 SP2", originalSpec: { name: null, uploaded: false }, standardizedSpec: { name: null, available: false } },
         ]
       },
-      {
-        asset: "Futures",
+      { 
+        asset: "Futures", 
         versions: [
-          { protocol: "FIX 4.2", specs: [] },
-          { protocol: "FIX 4.4", specs: [] },
-          { protocol: "FIX 5.0 SP2", specs: [{ name: "client_fut_50sp2_v1.xml", uploaded: "2024-01-15", status: "active" }] },
+          { protocol: "FIX 4.2", originalSpec: { name: null, uploaded: false }, standardizedSpec: { name: null, available: false } },
+          { protocol: "FIX 4.4", originalSpec: { name: null, uploaded: false }, standardizedSpec: { name: null, available: false } },
+          { protocol: "FIX 5.0 SP2", originalSpec: { name: "client_fut_50sp2_v1.xml", uploaded: true }, standardizedSpec: { name: "client_fut_50sp2_v1_Standardized.xlsx", available: true } },
+        ]
+      },
+      { 
+        asset: "Fixed Income", 
+        versions: [
+          { protocol: "FIX 4.2", originalSpec: { name: null, uploaded: false }, standardizedSpec: { name: null, available: false } },
+          { protocol: "FIX 4.4", originalSpec: { name: "client_fi_44.xml", uploaded: true }, standardizedSpec: { name: "client_fi_44_Standardized.xlsx", available: true } },
+          { protocol: "FIX 5.0", originalSpec: { name: null, uploaded: false }, standardizedSpec: { name: null, available: false } },
+        ]
+      },
+      { 
+        asset: "FX", 
+        versions: [
+          { protocol: "FIX 4.4", originalSpec: { name: null, uploaded: false }, standardizedSpec: { name: null, available: false } },
+          { protocol: "FIX 5.0 SP2", originalSpec: { name: "client_fx_50sp2.xml", uploaded: true }, standardizedSpec: { name: "client_fx_50sp2_Standardized.xlsx", available: true } },
         ]
       },
     ]
@@ -14640,7 +14658,7 @@ const tools = [
               <ArrowLeft className="h-4 w-4" /> Back to Dashboard
             </button>
             <h1 className={`text-2xl font-bold ${textPrimary}`}>My Specifications</h1>
-            <p className={textSecondary}>Upload and manage your FIX specifications by asset class</p>
+            <p className={textSecondary}>View and manage your FIX specifications by asset class</p>
           </header>
 
           <div className="p-6">
@@ -14651,74 +14669,82 @@ const tools = [
                     <h2 className={`text-lg font-bold ${textPrimary}`}>{assetClass.asset}</h2>
                   </div>
                   
-                  {/* Table Header */}
-                  <div className={`grid grid-cols-12 gap-4 px-6 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} border-b ${borderColor}`}>
-                    <div className={`col-span-2 font-semibold text-sm ${textPrimary}`}>Protocol</div>
-                    <div className={`col-span-4 font-semibold text-sm ${textPrimary}`}>Specification File</div>
-                    <div className={`col-span-2 font-semibold text-sm ${textPrimary}`}>Uploaded</div>
-                    <div className={`col-span-2 font-semibold text-sm ${textPrimary}`}>Status</div>
-                    <div className={`col-span-2 font-semibold text-sm ${textPrimary}`}>Actions</div>
+                  {/* Table Header - matches admin view */}
+                  <div className={`grid grid-cols-[140px_1fr_1fr_120px] gap-4 px-6 py-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"} border-b ${borderColor}`}>
+                    <div className={`font-semibold text-sm ${textPrimary}`}>Protocol</div>
+                    <div className={`font-semibold text-sm ${textPrimary}`}>My Spec (Original)</div>
+                    <div className={`font-semibold text-sm ${textPrimary}`}>My Spec (Standardized)</div>
+                    <div className={`font-semibold text-sm ${textPrimary}`}>Actions</div>
                   </div>
-                  
+
                   {/* Table Rows */}
                   <div className="divide-y divide-[#1e4976]/30">
-                    {assetClass.versions.map((version) => (
-                      <div 
-                        key={`${assetClass.asset}-${version.protocol}`}
-                        className={`grid grid-cols-12 gap-4 px-6 py-4 hover:bg-[#1e4976]/10 transition-colors items-center`}
-                      >
-                        {/* Protocol Column */}
-                        <div className={`col-span-2 font-medium ${textPrimary}`}>
-                          {version.protocol}
-                        </div>
+                    {assetClass.versions.map((version: any) => (
+                      <div key={`${assetClass.asset}-${version.protocol}`} className={`grid grid-cols-[140px_1fr_1fr_120px] gap-4 px-6 py-3 items-center hover:bg-[#1e4976]/10 transition-colors`}>
+                        {/* Protocol */}
+                        <div className={`font-semibold ${textPrimary}`}>{version.protocol}</div>
                         
-                        {/* Spec File Column */}
-                        <div className="col-span-4">
-                          {version.specs.length > 0 ? (
-                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded ${isDarkMode ? "bg-[#4caf50]/20" : "bg-[#4caf50]/10"} border border-[#4caf50]/30 w-fit`}>
-                              <CheckCircle className="h-4 w-4 text-[#4caf50]" />
-                              <span className={`text-sm ${textPrimary}`}>{version.specs[0].name}</span>
+                        {/* Original Spec */}
+                        <div className="flex items-center gap-1.5">
+                          {version.originalSpec.uploaded ? (
+                            <div className="flex items-center gap-2 px-2.5 py-1.5 rounded border max-w-[220px]"
+                              style={{ borderColor: "#00e5ff40", backgroundColor: "#00e5ff10" }}>
+                              <FileText className="h-3.5 w-3.5 flex-shrink-0 text-[#00e5ff]" />
+                              <span className={`text-sm truncate ${textPrimary}`}>{version.originalSpec.name}</span>
                             </div>
-                          ) : (
-                            <span className={`text-sm ${textSecondary}`}>No spec uploaded</span>
-                          )}
-                        </div>
-                        
-                        {/* Uploaded Column */}
-                        <div className={`col-span-2 text-sm ${textSecondary}`}>
-                          {version.specs.length > 0 ? version.specs[0].uploaded : "-"}
-                        </div>
-                        
-                        {/* Status Column */}
-                        <div className="col-span-2">
-                          {version.specs.length > 0 ? (
-                            <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">Active</span>
-                          ) : (
-                            <span className="px-2 py-1 rounded text-xs bg-gray-500/20 text-gray-400">Pending</span>
-                          )}
-                        </div>
-                        
-                        {/* Actions Column */}
-                        <div className="col-span-2 flex gap-2">
-                          {version.specs.length > 0 ? (
-                            <>
-                              <Button size="sm" variant="outline" className="text-xs h-8">
-                                <Eye className="h-3 w-3 mr-1" /> View
-                              </Button>
-                              <label className="cursor-pointer">
-                                <input type="file" className="hidden" accept=".xml,.txt,.csv" />
-                                <Button size="sm" variant="outline" className="text-xs h-8" asChild>
-                                  <span><Upload className="h-3 w-3 mr-1" /> Replace</span>
-                                </Button>
-                              </label>
-                            </>
                           ) : (
                             <label className="cursor-pointer">
                               <input type="file" className="hidden" accept=".xml,.txt,.csv" />
-                              <Button size="sm" className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 text-xs h-8" asChild>
-                                <span><Upload className="h-3 w-3 mr-1" /> Upload</span>
-                              </Button>
+                              <div className="flex items-center gap-2 px-2.5 py-1.5 rounded border border-dashed cursor-pointer hover:border-[#00e5ff] transition-colors"
+                                style={{ borderColor: isDarkMode ? "#1e4976" : "#cbd5e1" }}>
+                                <Upload className="h-3.5 w-3.5 text-[#00e5ff]" />
+                                <span className={`text-sm ${textSecondary}`}>Upload Spec</span>
+                              </div>
                             </label>
+                          )}
+                          {version.originalSpec.uploaded && (
+                            <Button size="sm" variant="ghost" className="h-7 w-7 p-0">
+                              <Eye className="h-3.5 w-3.5 text-[#00e5ff]" />
+                            </Button>
+                          )}
+                        </div>
+                        
+                        {/* Standardized Spec */}
+                        <div className="flex items-center gap-1.5">
+                          {version.standardizedSpec.available ? (
+                            <>
+                              <div className="flex items-center gap-2 px-2.5 py-1.5 rounded border max-w-[220px]"
+                                style={{ borderColor: "#4caf5040", backgroundColor: "#4caf5010" }}>
+                                <FileSpreadsheet className="h-3.5 w-3.5 flex-shrink-0 text-[#4caf50]" />
+                                <span className={`text-sm truncate ${textPrimary}`}>{version.standardizedSpec.name}</span>
+                              </div>
+                              <Button size="sm" variant="ghost" className="h-7 w-7 p-0">
+                                <Eye className="h-3.5 w-3.5 text-[#4caf50]" />
+                              </Button>
+                              <Button size="sm" variant="ghost" className="h-7 w-7 p-0">
+                                <Download className="h-3.5 w-3.5 text-[#4caf50]" />
+                              </Button>
+                            </>
+                          ) : version.originalSpec.uploaded ? (
+                            <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#ff9800]/20 text-[#ff9800]" : "bg-orange-100 text-orange-600"}`}>
+                              Pending Conversion
+                            </span>
+                          ) : (
+                            <span className={`text-sm ${textSecondary}`}>-</span>
+                          )}
+                        </div>
+                        
+                        {/* Actions */}
+                        <div className="flex items-center gap-1">
+                          {version.originalSpec.uploaded && (
+                            <>
+                              <label className="cursor-pointer">
+                                <input type="file" className="hidden" accept=".xml,.txt,.csv" />
+                                <Button size="sm" variant="outline" className="text-xs h-7 px-2" asChild>
+                                  <span><RefreshCw className="h-3 w-3 mr-1" /> Replace</span>
+                                </Button>
+                              </label>
+                            </>
                           )}
                         </div>
                       </div>
