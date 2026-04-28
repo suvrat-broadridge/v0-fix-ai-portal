@@ -4696,8 +4696,8 @@ export default function BCometPlatform() {
             <div className="p-6 space-y-6">
               {/* Client's Active Onboarding Cases */}
               {(() => {
-                // Get cases for this client (simulate with first few onboarding cases)
-                const clientCases = onboardingCases.slice(0, 3)
+                // Get cases for this client - filter out cases waiting on admin (stages 3-5)
+                const clientCases = onboardingCases.slice(0, 3).filter(c => !(c.stage >= 3 && c.stage <= 5))
                 const clientPhases = [
                   { num: 1, name: "Intake", icon: ClipboardCheck, color: "#00e5ff" },
                   { num: 2, name: "Design", icon: Cog, color: "#4caf50" },
@@ -4891,7 +4891,7 @@ export default function BCometPlatform() {
                                   {caseItem.stage >= 3 && caseItem.stage <= 5 && (
                                     <div className="flex items-center gap-3">
                                       <Clock className="h-4 w-4 text-[#2196f3]" />
-                                      <span className={`text-sm ${textPrimary}`}>Awaiting Broadridge team action - No action required from you</span>
+                                      <span className={`text-sm ${textPrimary}`}>Waiting on Admin - No action required from you</span>
                                     </div>
                                   )}
                                   {caseItem.stage === 6 && (
