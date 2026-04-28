@@ -20928,7 +20928,23 @@ ValidateFieldsHaveValues=Y`}
             <div className="space-y-4">
               <Card className={`${bgCard} border ${borderColor} p-6`}>
                 <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload Documents</h3>
-                <div className={`border-2 border-dashed ${borderColor} rounded p-8 text-center cursor-pointer hover:bg-opacity-50 transition`}>
+                <div 
+                  className={`border-2 border-dashed ${borderColor} rounded p-8 text-center cursor-pointer hover:border-[#00e5ff] hover:bg-[#00e5ff]/5 transition`}
+                  onClick={() => {
+                    const input = document.createElement("input")
+                    input.type = "file"
+                    input.accept = ".pdf,.xlsx,.docx,.xml,.csv,.txt"
+                    input.multiple = true
+                    input.onchange = (e) => {
+                      const files = (e.target as HTMLInputElement).files
+                      if (files && files.length > 0) {
+                        // Simulate adding files to queue (demo only)
+                        console.log("[v0] Files selected:", Array.from(files).map(f => f.name))
+                      }
+                    }
+                    input.click()
+                  }}
+                >
                   <Upload className="h-8 w-8 mx-auto mb-2 text-[#00e5ff]" />
                   <p className={textPrimary}>Drop files here or click to upload</p>
                   <p className={`text-xs ${textSecondary}`}>PDF, XLSX, DOCX, XML, CSV, TXT supported</p>
