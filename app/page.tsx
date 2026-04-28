@@ -7824,7 +7824,7 @@ const tools = [
                                                 <th key={h} className="px-3 py-2 text-left text-[11px] font-bold text-white uppercase tracking-wide whitespace-nowrap">{h}</th>
                                               ))}
                                               <th className="px-2 py-2 text-center text-[11px] font-bold text-white uppercase tracking-wide whitespace-nowrap">
-                                                {isClientPortal ? "Client Verified" : "Admin Verified"}
+                                                {selectedRole === "client" ? "Client Verified" : "Admin Verified"}
                                               </th>
                                             </tr>
                                           </thead>
@@ -7860,9 +7860,9 @@ const tools = [
                                                   <td className="px-2 py-1.5 text-center">
                                                     <input
                                                       type="checkbox"
-                                                      defaultChecked={isClientPortal ? row.clientVerified : row.adminVerified}
+                                                      defaultChecked={selectedRole === "client" ? row.clientVerified : row.adminVerified}
                                                       className="h-4 w-4 rounded border-gray-400 text-[#00e5ff] focus:ring-[#00e5ff] cursor-pointer"
-                                                      title={isClientPortal ? "Mark as client verified" : "Mark as admin verified"}
+                                                      title={selectedRole === "client" ? "Mark as client verified" : "Mark as admin verified"}
                                                     />
                                                   </td>
                                                 </tr>
@@ -7882,7 +7882,7 @@ const tools = [
                                             <span className="font-semibold text-[#9c27b0]">{(CONVERT_SPEC_ROWS[standardizedMsgTypeTab] || CONVERT_SPEC_ROWS["D"]).filter((r: any) => r.modified).length}</span> user modified
                                           </span>
                                           <span className={textSecondary}>
-                                            <span className="font-semibold text-[#4caf50]">{(CONVERT_SPEC_ROWS[standardizedMsgTypeTab] || CONVERT_SPEC_ROWS["D"]).filter((r: any) => isClientPortal ? r.clientVerified : r.adminVerified).length}</span> / {(CONVERT_SPEC_ROWS[standardizedMsgTypeTab] || CONVERT_SPEC_ROWS["D"]).length} verified
+                                            <span className="font-semibold text-[#4caf50]">{(CONVERT_SPEC_ROWS[standardizedMsgTypeTab] || CONVERT_SPEC_ROWS["D"]).filter((r: any) => selectedRole === "client" ? r.clientVerified : r.adminVerified).length}</span> / {(CONVERT_SPEC_ROWS[standardizedMsgTypeTab] || CONVERT_SPEC_ROWS["D"]).length} verified
                                           </span>
                                         </div>
                                         <Button size="sm" className="bg-[#4caf50] text-white hover:bg-[#43a047]">
