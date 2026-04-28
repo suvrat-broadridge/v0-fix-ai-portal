@@ -9,6 +9,61 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
+// ── Convert Spec Tool ───────────────────────────────────────────────────────
+const CONVERT_SPEC_ROWS: Record<string, any[]> = {
+  "D": [
+    { tag: "11", groupTag: "", name: "ClOrdID",      required: "Y",  crCondition: "",      dataType: "String",       values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+    { tag: "21", groupTag: "", name: "HandlInst",    required: "Y",  crCondition: "",      dataType: "Char",         values: "1,2,3",   comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+    { tag: "38", groupTag: "", name: "OrderQty",     required: "CR", crCondition: "152=N", dataType: "Qty",          values: "",        comment: "Required if CashOrderQty not specified", confidence: "medium", adminVerified: false, clientVerified: false, modified: false },
+    { tag: "40", groupTag: "", name: "OrdType",      required: "Y",  crCondition: "",      dataType: "Char",         values: "1,2,3,4,P", comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
+    { tag: "44", groupTag: "", name: "Price",        required: "CR", crCondition: "40=2",  dataType: "Price",        values: "",        comment: "Required for Limit orders", confidence: "low", adminVerified: false, clientVerified: false, modified: false },
+    { tag: "54", groupTag: "", name: "Side",         required: "Y",  crCondition: "",      dataType: "Char",         values: "1,2,5,6", comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
+    { tag: "55", groupTag: "", name: "Symbol",       required: "Y",  crCondition: "",      dataType: "String",       values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+    { tag: "59", groupTag: "", name: "TimeInForce",  required: "N",  crCondition: "",      dataType: "Char",         values: "0,1,3,4,6", comment: "", confidence: "medium", adminVerified: false, clientVerified: false, modified: true },
+    { tag: "60", groupTag: "", name: "TransactTime", required: "Y",  crCondition: "",      dataType: "UTCTimestamp", values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+    { tag: "453", groupTag: "", name: "NoPartyIDs", required: "N",   crCondition: "",      dataType: "NumInGroup",   values: "",        comment: "Repeating group", confidence: "low", adminVerified: false, clientVerified: false, modified: false },
+  ],
+  "F": [
+    { tag: "11", groupTag: "", name: "ClOrdID",    required: "Y", crCondition: "", dataType: "String", values: "", comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
+    { tag: "41", groupTag: "", name: "OrigClOrdID",required: "Y", crCondition: "", dataType: "String", values: "", comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+    { tag: "54", groupTag: "", name: "Side",       required: "Y", crCondition: "", dataType: "Char",   values: "1,2,5,6", comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
+    { tag: "55", groupTag: "", name: "Symbol",     required: "Y", crCondition: "", dataType: "String", values: "", comment: "", confidence: "medium", adminVerified: false, clientVerified: false, modified: true },
+  ],
+  "G": [
+    { tag: "11", groupTag: "", name: "ClOrdID",    required: "Y",  crCondition: "",     dataType: "String", values: "", comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
+    { tag: "38", groupTag: "", name: "OrderQty",   required: "CR", crCondition: "40=2", dataType: "Qty",    values: "", comment: "", confidence: "low", adminVerified: false, clientVerified: false, modified: false },
+    { tag: "40", groupTag: "", name: "OrdType",    required: "Y",  crCondition: "",     dataType: "Char",   values: "1,2,3,4", comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+    { tag: "44", groupTag: "", name: "Price",      required: "CR", crCondition: "40=2", dataType: "Price",  values: "", comment: "Required for Limit", confidence: "medium", adminVerified: false, clientVerified: false, modified: false },
+  ],
+  "8": [
+    { tag: "6",   groupTag: "", name: "AvgPx",     required: "Y", crCondition: "", dataType: "Price",  values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
+    { tag: "14",  groupTag: "", name: "CumQty",    required: "Y", crCondition: "", dataType: "Qty",    values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+    { tag: "17",  groupTag: "", name: "ExecID",    required: "Y", crCondition: "", dataType: "String", values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+    { tag: "39",  groupTag: "", name: "OrdStatus", required: "Y", crCondition: "", dataType: "Char",   values: "0,1,2,4,8", comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
+    { tag: "150", groupTag: "", name: "ExecType",  required: "Y", crCondition: "", dataType: "Char",   values: "0,F,4,8", comment: "", confidence: "medium", adminVerified: false, clientVerified: false, modified: false },
+    { tag: "151", groupTag: "", name: "LeavesQty", required: "Y", crCondition: "", dataType: "Qty",    values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+  ],
+  "9": [
+    { tag: "11",  groupTag: "", name: "ClOrdID",     required: "Y", crCondition: "", dataType: "String", values: "",    comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
+    { tag: "39",  groupTag: "", name: "OrdStatus",   required: "Y", crCondition: "", dataType: "Char",   values: "8,4", comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+    { tag: "102", groupTag: "", name: "CxlRejReason",required: "N", crCondition: "", dataType: "int",    values: "",    comment: "", confidence: "low", adminVerified: false, clientVerified: false, modified: false },
+  ],
+  "j": [
+    { tag: "45",  groupTag: "", name: "RefSeqNum",   required: "N", crCondition: "", dataType: "int",    values: "", comment: "", confidence: "medium", adminVerified: false, clientVerified: false, modified: false },
+    { tag: "372", groupTag: "", name: "RefMsgType",  required: "Y", crCondition: "", dataType: "String", values: "", comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+    { tag: "373", groupTag: "", name: "SessionRejectReason", required: "N", crCondition: "", dataType: "int", values: "", comment: "", confidence: "low", adminVerified: false, clientVerified: false, modified: false },
+  ],
+}
+
+const CONVERT_SPEC_MSG_TABS = [
+  { id: "D", label: "New Order Single (D)" },
+  { id: "F", label: "Order Cancel Request (F)" },
+  { id: "G", label: "Order Cancel/Replace (G)" },
+  { id: "8", label: "Execution Report (8)" },
+  { id: "9", label: "Order Cancel Reject (9)" },
+  { id: "j", label: "Business Reject (j)" },
+]
+
 // ── AI Confidence Matrix ────────────────────────────────────────────────────
 function AIConfidenceMatrix({ isDarkMode, bgCard, borderColor, textPrimary, textSecondary, score, basis }: {
   isDarkMode: boolean; bgCard: string; borderColor: string; textPrimary: string; textSecondary: string; score: number; basis: string;
@@ -7607,62 +7662,8 @@ const tools = [
                           )}
                           
                           {/* Convert to Standardized Spec Tool */}
-                          {tool.id === "convert-spec" && (() => {
-                            const specRows: Record<string, any[]> = {
-                              "D": [
-                                { tag: "11", groupTag: "", name: "ClOrdID",      required: "Y",  crCondition: "",      dataType: "String",       values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
-                                { tag: "21", groupTag: "", name: "HandlInst",    required: "Y",  crCondition: "",      dataType: "Char",         values: "1,2,3",   comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
-                                { tag: "38", groupTag: "", name: "OrderQty",     required: "CR", crCondition: "152=N", dataType: "Qty",          values: "",        comment: "Required if CashOrderQty not specified", confidence: "medium", adminVerified: false, clientVerified: false, modified: false },
-                                { tag: "40", groupTag: "", name: "OrdType",      required: "Y",  crCondition: "",      dataType: "Char",         values: "1,2,3,4,P", comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
-                                { tag: "44", groupTag: "", name: "Price",        required: "CR", crCondition: "40=2",  dataType: "Price",        values: "",        comment: "Required for Limit orders", confidence: "low", adminVerified: false, clientVerified: false, modified: false },
-                                { tag: "54", groupTag: "", name: "Side",         required: "Y",  crCondition: "",      dataType: "Char",         values: "1,2,5,6", comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
-                                { tag: "55", groupTag: "", name: "Symbol",       required: "Y",  crCondition: "",      dataType: "String",       values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
-                                { tag: "59", groupTag: "", name: "TimeInForce",  required: "N",  crCondition: "",      dataType: "Char",         values: "0,1,3,4,6", comment: "", confidence: "medium", adminVerified: false, clientVerified: false, modified: true },
-                                { tag: "60", groupTag: "", name: "TransactTime", required: "Y",  crCondition: "",      dataType: "UTCTimestamp", values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
-                                { tag: "453", groupTag: "", name: "NoPartyIDs", required: "N",   crCondition: "",      dataType: "NumInGroup",   values: "",        comment: "Repeating group", confidence: "low", adminVerified: false, clientVerified: false, modified: false },
-                              ],
-                              "F": [
-                                { tag: "11", groupTag: "", name: "ClOrdID",    required: "Y", crCondition: "", dataType: "String", values: "", comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
-                                { tag: "41", groupTag: "", name: "OrigClOrdID",required: "Y", crCondition: "", dataType: "String", values: "", comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
-                                { tag: "54", groupTag: "", name: "Side",       required: "Y", crCondition: "", dataType: "Char",   values: "1,2,5,6", comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
-                                { tag: "55", groupTag: "", name: "Symbol",     required: "Y", crCondition: "", dataType: "String", values: "", comment: "", confidence: "medium", adminVerified: false, clientVerified: false, modified: true },
-                              ],
-                              "G": [
-                                { tag: "11", groupTag: "", name: "ClOrdID",    required: "Y",  crCondition: "",     dataType: "String", values: "", comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
-                                { tag: "38", groupTag: "", name: "OrderQty",   required: "CR", crCondition: "40=2", dataType: "Qty",    values: "", comment: "", confidence: "low", adminVerified: false, clientVerified: false, modified: false },
-                                { tag: "40", groupTag: "", name: "OrdType",    required: "Y",  crCondition: "",     dataType: "Char",   values: "1,2,3,4", comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
-                                { tag: "44", groupTag: "", name: "Price",      required: "CR", crCondition: "40=2", dataType: "Price",  values: "", comment: "Required for Limit", confidence: "medium", adminVerified: false, clientVerified: false, modified: false },
-                              ],
-                              "8": [
-                                { tag: "6",   groupTag: "", name: "AvgPx",     required: "Y", crCondition: "", dataType: "Price",  values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
-                                { tag: "14",  groupTag: "", name: "CumQty",    required: "Y", crCondition: "", dataType: "Qty",    values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
-                                { tag: "17",  groupTag: "", name: "ExecID",    required: "Y", crCondition: "", dataType: "String", values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
-                                { tag: "39",  groupTag: "", name: "OrdStatus", required: "Y", crCondition: "", dataType: "Char",   values: "0,1,2,4,8", comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
-                                { tag: "150", groupTag: "", name: "ExecType",  required: "Y", crCondition: "", dataType: "Char",   values: "0,F,4,8", comment: "", confidence: "medium", adminVerified: false, clientVerified: false, modified: false },
-                                { tag: "151", groupTag: "", name: "LeavesQty", required: "Y", crCondition: "", dataType: "Qty",    values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
-                              ],
-                              "9": [
-                                { tag: "11",  groupTag: "", name: "ClOrdID",     required: "Y", crCondition: "", dataType: "String", values: "",    comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
-                                { tag: "39",  groupTag: "", name: "OrdStatus",   required: "Y", crCondition: "", dataType: "Char",   values: "8,4", comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
-                                { tag: "102", groupTag: "", name: "CxlRejReason",required: "N", crCondition: "", dataType: "int",    values: "",    comment: "", confidence: "low", adminVerified: false, clientVerified: false, modified: false },
-                              ],
-                              "j": [
-                                { tag: "45",  groupTag: "", name: "RefSeqNum",   required: "N", crCondition: "", dataType: "int",    values: "", comment: "", confidence: "medium", adminVerified: false, clientVerified: false, modified: false },
-                                { tag: "372", groupTag: "", name: "RefMsgType",  required: "Y", crCondition: "", dataType: "String", values: "", comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
-                                { tag: "373", groupTag: "", name: "SessionRejectReason", required: "N", crCondition: "", dataType: "int", values: "", comment: "", confidence: "low", adminVerified: false, clientVerified: false, modified: false },
-                              ],
-                            }
-                            const msgTabs = [
-                              { id: "D", label: "New Order Single (D)" },
-                              { id: "F", label: "Order Cancel Request (F)" },
-                              { id: "G", label: "Order Cancel/Replace (G)" },
-                              { id: "8", label: "Execution Report (8)" },
-                              { id: "9", label: "Order Cancel Reject (9)" },
-                              { id: "j", label: "Business Reject (j)" },
-                            ]
-                            const inputCls = `px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} focus:outline-none focus:border-[#00e5ff]`
-                            return (
-                              <div className="space-y-5">
+                          {tool.id === "convert-spec" && (
+                            <div className="space-y-5">
                                 <p className={textSecondary}>Convert the uploaded FIX spec or log file into a standardized Broadridge-compatible spec format.</p>
 
                                 {/* Conversion Source */}
@@ -7787,7 +7788,7 @@ const tools = [
 
                                       {/* Message type tabs */}
                                       <div className={`flex overflow-x-auto border-b ${borderColor} ${isDarkMode ? "bg-[#0d2137]" : "bg-gray-50"}`}>
-                                        {msgTabs.map((tab) => (
+                                        {CONVERT_SPEC_MSG_TABS.map((tab) => (
                                           <button
                                             key={tab.id}
                                             onClick={() => setStandardizedMsgTypeTab(tab.id)}
@@ -7828,7 +7829,7 @@ const tools = [
                                             </tr>
                                           </thead>
                                           <tbody>
-                                            {(specRows[standardizedMsgTypeTab] || specRows["D"]).map((row, i) => {
+                                            {(CONVERT_SPEC_ROWS[standardizedMsgTypeTab] || CONVERT_SPEC_ROWS["D"]).map((row, i) => {
                                               const confColor = row.confidence === "high" ? "#4caf50" : row.confidence === "medium" ? "#ff9800" : "#f44336"
                                               const isLowConf = row.confidence === "low"
                                               const rowBg = isLowConf ? (isDarkMode ? "bg-[#f44336]/10" : "bg-red-50") : ""
@@ -7841,20 +7842,20 @@ const tools = [
                                                       {row.modified && <Edit3 className="h-3 w-3 text-[#9c27b0]" title="User modified" />}
                                                     </div>
                                                   </td>
-                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.tag}         className={`${inputCls} w-10`} /></td>
-                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.groupTag}    className={`${inputCls} w-12`} /></td>
-                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.name}        className={`${inputCls} w-24`} /></td>
+                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.tag}         className={`px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} focus:outline-none focus:border-[#00e5ff] w-10`} /></td>
+                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.groupTag}    className={`px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} focus:outline-none focus:border-[#00e5ff] w-12`} /></td>
+                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.name}        className={`px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} focus:outline-none focus:border-[#00e5ff] w-24`} /></td>
                                                   <td className="px-2 py-1.5">
-                                                    <select defaultValue={row.required} className={`${inputCls} w-12`} style={{ color: row.required === "Y" ? "#4caf50" : row.required === "CR" ? "#ff9800" : undefined }}>
+                                                    <select defaultValue={row.required} className={`px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} focus:outline-none focus:border-[#00e5ff] w-12`} style={{ color: row.required === "Y" ? "#4caf50" : row.required === "CR" ? "#ff9800" : undefined }}>
                                                       <option value="Y">Y</option>
                                                       <option value="N">N</option>
                                                       <option value="CR">CR</option>
                                                     </select>
                                                   </td>
-                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.crCondition} className={`${inputCls} w-16`} style={{ color: row.crCondition ? "#ff9800" : undefined }} /></td>
-                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.dataType}    className={`${inputCls} w-20`} /></td>
-                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.values}      className={`${inputCls} w-16`} /></td>
-                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.comment}     className={`${inputCls} w-full min-w-[100px]`} /></td>
+                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.crCondition} className={`px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} focus:outline-none focus:border-[#00e5ff] w-16`} style={{ color: row.crCondition ? "#ff9800" : undefined }} /></td>
+                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.dataType}    className={`px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} focus:outline-none focus:border-[#00e5ff] w-20`} /></td>
+                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.values}      className={`px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} focus:outline-none focus:border-[#00e5ff] w-16`} /></td>
+                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.comment}     className={`px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} focus:outline-none focus:border-[#00e5ff] w-full min-w-[100px]`} /></td>
                                                   {/* Verification checkbox */}
                                                   <td className="px-2 py-1.5 text-center">
                                                     <input
@@ -7875,13 +7876,13 @@ const tools = [
                                       <div className={`px-4 py-3 border-t ${borderColor} flex items-center justify-between`}>
                                         <div className="flex items-center gap-4 text-xs">
                                           <span className={textSecondary}>
-                                            <span className="font-semibold text-[#f44336]">{(specRows[standardizedMsgTypeTab] || specRows["D"]).filter((r: any) => r.confidence === "low").length}</span> items need review
+                                            <span className="font-semibold text-[#f44336]">{(CONVERT_SPEC_ROWS[standardizedMsgTypeTab] || CONVERT_SPEC_ROWS["D"]).filter((r: any) => r.confidence === "low").length}</span> items need review
                                           </span>
                                           <span className={textSecondary}>
-                                            <span className="font-semibold text-[#9c27b0]">{(specRows[standardizedMsgTypeTab] || specRows["D"]).filter((r: any) => r.modified).length}</span> user modified
+                                            <span className="font-semibold text-[#9c27b0]">{(CONVERT_SPEC_ROWS[standardizedMsgTypeTab] || CONVERT_SPEC_ROWS["D"]).filter((r: any) => r.modified).length}</span> user modified
                                           </span>
                                           <span className={textSecondary}>
-                                            <span className="font-semibold text-[#4caf50]">{(specRows[standardizedMsgTypeTab] || specRows["D"]).filter((r: any) => isClientPortal ? r.clientVerified : r.adminVerified).length}</span> / {(specRows[standardizedMsgTypeTab] || specRows["D"]).length} verified
+                                            <span className="font-semibold text-[#4caf50]">{(CONVERT_SPEC_ROWS[standardizedMsgTypeTab] || CONVERT_SPEC_ROWS["D"]).filter((r: any) => isClientPortal ? r.clientVerified : r.adminVerified).length}</span> / {(CONVERT_SPEC_ROWS[standardizedMsgTypeTab] || CONVERT_SPEC_ROWS["D"]).length} verified
                                           </span>
                                         </div>
                                         <Button size="sm" className="bg-[#4caf50] text-white hover:bg-[#43a047]">
@@ -7906,9 +7907,8 @@ const tools = [
                                     </Button>
                                   </div>
                                 )}
-                              </div>
-                            )
-                          })()}
+                            </div>
+                          )}
 
                           {/* AI Gap Analysis Tool */}
                           {tool.id === "gap" && (
