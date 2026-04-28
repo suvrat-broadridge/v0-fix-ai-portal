@@ -1729,20 +1729,32 @@ export default function BCometPlatform() {
             { label: "Analysis & Remediation", phase: 6, color: "bg-[#00bcd4]" },
             { label: "Cert Decisioning", phase: 7, color: "bg-[#ffc107]" },
             { label: "Production", phase: 8, color: "bg-[#8bc34a]" },
-          ].map((item) => (
-            <button
-              key={item.phase}
-              onClick={() => { setCurrentScreen("onboarding-cases"); setSelectedPhase(item.phase); setIsAdHocMode(false); }}
-              className={`w-full flex items-center gap-2 px-2 py-1.5 rounded transition-colors text-xs ${
-                selectedPhase === item.phase
-                ? "bg-[#00e5ff]/10 text-[#00e5ff]"
-                : `${textSecondary} hover:bg-[#1e4976]/30`
-              }`}
-            >
-              <span className={`w-2 h-2 rounded-full ${item.color}`}></span>
-              <span className="truncate">{item.label}</span>
-            </button>
-          ))}
+          ].map((item) => {
+            const count = onboardingCases.filter(c => c.stage === item.phase).length
+            return (
+              <button
+                key={item.phase}
+                onClick={() => { setCurrentScreen("onboarding-cases"); setSelectedPhase(item.phase); setIsAdHocMode(false); }}
+                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded transition-colors text-xs ${
+                  selectedPhase === item.phase
+                  ? "bg-[#00e5ff]/10 text-[#00e5ff]"
+                  : `${textSecondary} hover:bg-[#1e4976]/30`
+                }`}
+              >
+                <span className={`w-2 h-2 rounded-full shrink-0 ${item.color}`}></span>
+                <span className="truncate flex-1 text-left">{item.label}</span>
+                {count > 0 && (
+                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ${
+                    selectedPhase === item.phase
+                      ? "bg-[#00e5ff]/20 text-[#00e5ff]"
+                      : "bg-[#1e4976]/50 text-[#90caf9]"
+                  }`}>
+                    {count}
+                  </span>
+                )}
+              </button>
+            )
+          })}
         </div>
       )}
     </div>
@@ -16208,12 +16220,24 @@ const copyToClipboard = () => {
     const stageColors: Record<number, string> = { 1: "#2196f3", 2: "#9c27b0", 3: "#00bcd4", 4: "#ff9800", 5: "#e91e63", 6: "#4caf50", 7: "#00e5ff" }
     
     // Filter cases based on role - IC sees only their assigned cases, Manager sees all
-    const filteredOnboardingCases = isManager 
+    const phaseLabels: Record<number, string> = {
+      1: "Intake & Discovery", 2: "Solution Design", 3: "Connectivity Setup",
+      4: "Cert Planning", 5: "Test Execution", 6: "Analysis & Remediation",
+      7: "Cert Decisioning", 8: "Production"
+    }
+    const phaseColors: Record<number, string> = {
+      1: "#4caf50", 2: "#ff9800", 3: "#9c27b0", 4: "#2196f3",
+      5: "#e91e63", 6: "#00bcd4", 7: "#ffc107", 8: "#8bc34a"
+    }
+    const roleFiltered = isManager 
       ? onboardingCases 
       : onboardingCases.filter(c => c.assignedUser === currentUser?.name)
+    const filteredOnboardingCases = selectedPhase !== null
+      ? roleFiltered.filter(c => c.stage === selectedPhase)
+      : roleFiltered
     
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`fixpilot-layout min-h-screen ${bgPrimary} flex`}>
         <Sidebar />
         <div className="flex-1 overflow-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
@@ -16221,14 +16245,30 @@ const copyToClipboard = () => {
               <div className="flex items-center gap-3">
                 <Briefcase className="h-8 w-8 text-[#00e5ff]" />
                 <div>
-                  <h1 className={`text-2xl font-bold ${textPrimary}`}>
-                    {isManager ? "All Onboarding Cases" : "My Onboarding Cases"}
-                  </h1>
-                  <p className={`text-sm ${textSecondary}`}>
-                    {isManager 
-                      ? "Manage all client onboarding lifecycle from setup to go-live" 
-                      : `Viewing ${filteredOnboardingCases.length} cases assigned to you`}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <h1 className={`text-2xl font-bold ${textPrimary}`}>
+                      {selectedPhase !== null ? phaseLabels[selectedPhase] : (isManager ? "All Onboarding Cases" : "My Onboarding Cases")}
+                    </h1>
+                    {selectedPhase !== null && (
+                      <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ backgroundColor: `${phaseColors[selectedPhase]}20`, color: phaseColors[selectedPhase] }}>
+                        Phase {selectedPhase}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <p className={`text-sm ${textSecondary}`}>
+                      {filteredOnboardingCases.length} case{filteredOnboardingCases.length !== 1 ? "s" : ""}
+                      {selectedPhase !== null ? ` in this phase` : " total"}
+                    </p>
+                    {selectedPhase !== null && (
+                      <button
+                        onClick={() => setSelectedPhase(null)}
+                        className={`text-xs underline ${textSecondary} hover:text-[#00e5ff]`}
+                      >
+                        Clear filter
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
