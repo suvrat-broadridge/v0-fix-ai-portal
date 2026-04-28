@@ -3,7 +3,7 @@
 // B- COMET Platform - FIX Protocol Testing Suite v2
 import React, { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
-import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, ChevronUp, ChevronsUpDown, FileText, Activity, Zap, Check, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, Stamp, Code, ScrollText, Navigation, Sparkles, Minus, Loader, FolderArchive, Sliders, Bot, ExternalLink, GitMerge, FileCode, Presentation, ShoppingCart, Network, Circle } from "lucide-react"
+import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, ChevronUp, ChevronsUpDown, FileText, Activity, Zap, Check, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, Stamp, Code, ScrollText, Navigation, Sparkles, Minus, Loader, FolderArchive, Sliders, Bot, ExternalLink, GitMerge, FileCode, Presentation, ShoppingCart, Network, Circle, Edit3 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -984,7 +984,6 @@ export default function BCometPlatform() {
       tools: [
         { id: "intake", name: "Intake Portal", screen: "intake-portal", icon: FileText, status: "completed" as const },
         { id: "docs", name: "Document Upload", screen: "intake-portal", icon: Upload, status: "completed" as const },
-        { id: "convert-spec", name: "Convert to Standardized Spec", screen: "intake-portal", icon: RefreshCw, status: "available" as const },
         { id: "gap", name: "AI Gap Analysis", screen: "intake-portal", icon: Brain, status: "in-progress" as const },
       ],
     },
@@ -995,6 +994,7 @@ export default function BCometPlatform() {
       icon: Cog,
       color: "#4caf50",
       tools: [
+        { id: "convert-spec", name: "Convert to Standardized Spec", screen: "intake-portal", icon: RefreshCw, status: "available" as const },
         { id: "spec-compare", name: "Spec Compare", screen: "spec-compare", icon: GitCompare, status: "pending" as const },
         { id: "spec-from-log", name: "Create Spec from Log", screen: "spec-from-log", icon: FileSearch, status: "pending" as const },
         { id: "atdl", name: "ATDL Configuration", screen: "atdl-compare", icon: Code, status: "pending" as const },
@@ -7610,46 +7610,46 @@ const tools = [
                           {tool.id === "convert-spec" && (() => {
                             const specRows: Record<string, any[]> = {
                               "D": [
-                                { tag: "11", groupTag: "", name: "ClOrdID",      required: "Y",  crCondition: "",      dataType: "String",       values: "",        comment: "" },
-                                { tag: "21", groupTag: "", name: "HandlInst",    required: "Y",  crCondition: "",      dataType: "Char",         values: "1,2,3",   comment: "" },
-                                { tag: "38", groupTag: "", name: "OrderQty",     required: "CR", crCondition: "152=N", dataType: "Qty",          values: "",        comment: "Required if CashOrderQty not specified" },
-                                { tag: "40", groupTag: "", name: "OrdType",      required: "Y",  crCondition: "",      dataType: "Char",         values: "1,2,3,4,P", comment: "" },
-                                { tag: "44", groupTag: "", name: "Price",        required: "CR", crCondition: "40=2",  dataType: "Price",        values: "",        comment: "Required for Limit orders" },
-                                { tag: "54", groupTag: "", name: "Side",         required: "Y",  crCondition: "",      dataType: "Char",         values: "1,2,5,6", comment: "" },
-                                { tag: "55", groupTag: "", name: "Symbol",       required: "Y",  crCondition: "",      dataType: "String",       values: "",        comment: "" },
-                                { tag: "59", groupTag: "", name: "TimeInForce",  required: "N",  crCondition: "",      dataType: "Char",         values: "0,1,3,4,6", comment: "" },
-                                { tag: "60", groupTag: "", name: "TransactTime", required: "Y",  crCondition: "",      dataType: "UTCTimestamp", values: "",        comment: "" },
-                                { tag: "453", groupTag: "", name: "NoPartyIDs", required: "N",   crCondition: "",      dataType: "NumInGroup",   values: "",        comment: "Repeating group" },
+                                { tag: "11", groupTag: "", name: "ClOrdID",      required: "Y",  crCondition: "",      dataType: "String",       values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+                                { tag: "21", groupTag: "", name: "HandlInst",    required: "Y",  crCondition: "",      dataType: "Char",         values: "1,2,3",   comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+                                { tag: "38", groupTag: "", name: "OrderQty",     required: "CR", crCondition: "152=N", dataType: "Qty",          values: "",        comment: "Required if CashOrderQty not specified", confidence: "medium", adminVerified: false, clientVerified: false, modified: false },
+                                { tag: "40", groupTag: "", name: "OrdType",      required: "Y",  crCondition: "",      dataType: "Char",         values: "1,2,3,4,P", comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
+                                { tag: "44", groupTag: "", name: "Price",        required: "CR", crCondition: "40=2",  dataType: "Price",        values: "",        comment: "Required for Limit orders", confidence: "low", adminVerified: false, clientVerified: false, modified: false },
+                                { tag: "54", groupTag: "", name: "Side",         required: "Y",  crCondition: "",      dataType: "Char",         values: "1,2,5,6", comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
+                                { tag: "55", groupTag: "", name: "Symbol",       required: "Y",  crCondition: "",      dataType: "String",       values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+                                { tag: "59", groupTag: "", name: "TimeInForce",  required: "N",  crCondition: "",      dataType: "Char",         values: "0,1,3,4,6", comment: "", confidence: "medium", adminVerified: false, clientVerified: false, modified: true },
+                                { tag: "60", groupTag: "", name: "TransactTime", required: "Y",  crCondition: "",      dataType: "UTCTimestamp", values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+                                { tag: "453", groupTag: "", name: "NoPartyIDs", required: "N",   crCondition: "",      dataType: "NumInGroup",   values: "",        comment: "Repeating group", confidence: "low", adminVerified: false, clientVerified: false, modified: false },
                               ],
                               "F": [
-                                { tag: "11", groupTag: "", name: "ClOrdID",    required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
-                                { tag: "41", groupTag: "", name: "OrigClOrdID",required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
-                                { tag: "54", groupTag: "", name: "Side",       required: "Y", crCondition: "", dataType: "Char",   values: "1,2,5,6", comment: "" },
-                                { tag: "55", groupTag: "", name: "Symbol",     required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
+                                { tag: "11", groupTag: "", name: "ClOrdID",    required: "Y", crCondition: "", dataType: "String", values: "", comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
+                                { tag: "41", groupTag: "", name: "OrigClOrdID",required: "Y", crCondition: "", dataType: "String", values: "", comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+                                { tag: "54", groupTag: "", name: "Side",       required: "Y", crCondition: "", dataType: "Char",   values: "1,2,5,6", comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
+                                { tag: "55", groupTag: "", name: "Symbol",     required: "Y", crCondition: "", dataType: "String", values: "", comment: "", confidence: "medium", adminVerified: false, clientVerified: false, modified: true },
                               ],
                               "G": [
-                                { tag: "11", groupTag: "", name: "ClOrdID",    required: "Y",  crCondition: "",     dataType: "String", values: "", comment: "" },
-                                { tag: "38", groupTag: "", name: "OrderQty",   required: "CR", crCondition: "40=2", dataType: "Qty",    values: "", comment: "" },
-                                { tag: "40", groupTag: "", name: "OrdType",    required: "Y",  crCondition: "",     dataType: "Char",   values: "1,2,3,4", comment: "" },
-                                { tag: "44", groupTag: "", name: "Price",      required: "CR", crCondition: "40=2", dataType: "Price",  values: "", comment: "Required for Limit" },
+                                { tag: "11", groupTag: "", name: "ClOrdID",    required: "Y",  crCondition: "",     dataType: "String", values: "", comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
+                                { tag: "38", groupTag: "", name: "OrderQty",   required: "CR", crCondition: "40=2", dataType: "Qty",    values: "", comment: "", confidence: "low", adminVerified: false, clientVerified: false, modified: false },
+                                { tag: "40", groupTag: "", name: "OrdType",    required: "Y",  crCondition: "",     dataType: "Char",   values: "1,2,3,4", comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+                                { tag: "44", groupTag: "", name: "Price",      required: "CR", crCondition: "40=2", dataType: "Price",  values: "", comment: "Required for Limit", confidence: "medium", adminVerified: false, clientVerified: false, modified: false },
                               ],
                               "8": [
-                                { tag: "6",   groupTag: "", name: "AvgPx",     required: "Y", crCondition: "", dataType: "Price",  values: "",        comment: "" },
-                                { tag: "14",  groupTag: "", name: "CumQty",    required: "Y", crCondition: "", dataType: "Qty",    values: "",        comment: "" },
-                                { tag: "17",  groupTag: "", name: "ExecID",    required: "Y", crCondition: "", dataType: "String", values: "",        comment: "" },
-                                { tag: "39",  groupTag: "", name: "OrdStatus", required: "Y", crCondition: "", dataType: "Char",   values: "0,1,2,4,8", comment: "" },
-                                { tag: "150", groupTag: "", name: "ExecType",  required: "Y", crCondition: "", dataType: "Char",   values: "0,F,4,8", comment: "" },
-                                { tag: "151", groupTag: "", name: "LeavesQty", required: "Y", crCondition: "", dataType: "Qty",    values: "",        comment: "" },
+                                { tag: "6",   groupTag: "", name: "AvgPx",     required: "Y", crCondition: "", dataType: "Price",  values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
+                                { tag: "14",  groupTag: "", name: "CumQty",    required: "Y", crCondition: "", dataType: "Qty",    values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+                                { tag: "17",  groupTag: "", name: "ExecID",    required: "Y", crCondition: "", dataType: "String", values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+                                { tag: "39",  groupTag: "", name: "OrdStatus", required: "Y", crCondition: "", dataType: "Char",   values: "0,1,2,4,8", comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
+                                { tag: "150", groupTag: "", name: "ExecType",  required: "Y", crCondition: "", dataType: "Char",   values: "0,F,4,8", comment: "", confidence: "medium", adminVerified: false, clientVerified: false, modified: false },
+                                { tag: "151", groupTag: "", name: "LeavesQty", required: "Y", crCondition: "", dataType: "Qty",    values: "",        comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
                               ],
                               "9": [
-                                { tag: "11",  groupTag: "", name: "ClOrdID",     required: "Y", crCondition: "", dataType: "String", values: "",    comment: "" },
-                                { tag: "39",  groupTag: "", name: "OrdStatus",   required: "Y", crCondition: "", dataType: "Char",   values: "8,4", comment: "" },
-                                { tag: "102", groupTag: "", name: "CxlRejReason",required: "N", crCondition: "", dataType: "int",    values: "",    comment: "" },
+                                { tag: "11",  groupTag: "", name: "ClOrdID",     required: "Y", crCondition: "", dataType: "String", values: "",    comment: "", confidence: "high", adminVerified: true, clientVerified: true, modified: false },
+                                { tag: "39",  groupTag: "", name: "OrdStatus",   required: "Y", crCondition: "", dataType: "Char",   values: "8,4", comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+                                { tag: "102", groupTag: "", name: "CxlRejReason",required: "N", crCondition: "", dataType: "int",    values: "",    comment: "", confidence: "low", adminVerified: false, clientVerified: false, modified: false },
                               ],
                               "j": [
-                                { tag: "45",  groupTag: "", name: "RefSeqNum",   required: "N", crCondition: "", dataType: "int",    values: "", comment: "" },
-                                { tag: "372", groupTag: "", name: "RefMsgType",  required: "Y", crCondition: "", dataType: "String", values: "", comment: "" },
-                                { tag: "373", groupTag: "", name: "SessionRejectReason", required: "N", crCondition: "", dataType: "int", values: "", comment: "" },
+                                { tag: "45",  groupTag: "", name: "RefSeqNum",   required: "N", crCondition: "", dataType: "int",    values: "", comment: "", confidence: "medium", adminVerified: false, clientVerified: false, modified: false },
+                                { tag: "372", groupTag: "", name: "RefMsgType",  required: "Y", crCondition: "", dataType: "String", values: "", comment: "", confidence: "high", adminVerified: true, clientVerified: false, modified: false },
+                                { tag: "373", groupTag: "", name: "SessionRejectReason", required: "N", crCondition: "", dataType: "int", values: "", comment: "", confidence: "low", adminVerified: false, clientVerified: false, modified: false },
                               ],
                             }
                             const msgTabs = [
@@ -7802,37 +7802,91 @@ const tools = [
                                         ))}
                                       </div>
 
+                                      {/* Legend */}
+                                      <div className={`px-4 py-2 border-b ${borderColor} flex flex-wrap items-center gap-4 text-[10px] ${textSecondary}`}>
+                                        <span className="font-semibold">Legend:</span>
+                                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#f44336]" /> Low Confidence — needs review</span>
+                                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#ff9800]" /> Medium Confidence</span>
+                                        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#4caf50]" /> High Confidence</span>
+                                        <span className="flex items-center gap-1"><Edit3 className="h-3 w-3 text-[#9c27b0]" /> User Modified</span>
+                                      </div>
+
                                       {/* Editable grid */}
                                       <div className="overflow-auto max-h-96">
                                         <table className="w-full text-xs">
                                           <thead className={`sticky top-0 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"} border-b ${borderColor}`} style={{ backgroundColor: "#1a3a5c" }}>
                                             <tr>
+                                              <th className="px-2 py-2 text-center text-[11px] font-bold text-white uppercase tracking-wide whitespace-nowrap w-8">
+                                                <span title="AI Confidence">AI</span>
+                                              </th>
                                               {["Tag","GroupTag","TagName","Req","CRCondition","DataType","Values","Comment"].map((h) => (
                                                 <th key={h} className="px-3 py-2 text-left text-[11px] font-bold text-white uppercase tracking-wide whitespace-nowrap">{h}</th>
                                               ))}
+                                              <th className="px-2 py-2 text-center text-[11px] font-bold text-white uppercase tracking-wide whitespace-nowrap">
+                                                {isClientPortal ? "Client Verified" : "Admin Verified"}
+                                              </th>
                                             </tr>
                                           </thead>
                                           <tbody>
-                                            {(specRows[standardizedMsgTypeTab] || specRows["D"]).map((row, i) => (
-                                              <tr key={i} className={`border-b ${borderColor} ${isDarkMode ? "hover:bg-[#1e4976]/20" : "hover:bg-gray-50"} transition-colors`}>
-                                                <td className="px-2 py-1.5"><input type="text" defaultValue={row.tag}         className={`${inputCls} w-10`} /></td>
-                                                <td className="px-2 py-1.5"><input type="text" defaultValue={row.groupTag}    className={`${inputCls} w-12`} /></td>
-                                                <td className="px-2 py-1.5"><input type="text" defaultValue={row.name}        className={`${inputCls} w-24`} /></td>
-                                                <td className="px-2 py-1.5">
-                                                  <select defaultValue={row.required} className={`${inputCls} w-12`} style={{ color: row.required === "Y" ? "#4caf50" : row.required === "CR" ? "#ff9800" : undefined }}>
-                                                    <option value="Y">Y</option>
-                                                    <option value="N">N</option>
-                                                    <option value="CR">CR</option>
-                                                  </select>
-                                                </td>
-                                                <td className="px-2 py-1.5"><input type="text" defaultValue={row.crCondition} className={`${inputCls} w-16`} style={{ color: row.crCondition ? "#ff9800" : undefined }} /></td>
-                                                <td className="px-2 py-1.5"><input type="text" defaultValue={row.dataType}    className={`${inputCls} w-20`} /></td>
-                                                <td className="px-2 py-1.5"><input type="text" defaultValue={row.values}      className={`${inputCls} w-16`} /></td>
-                                                <td className="px-2 py-1.5"><input type="text" defaultValue={row.comment}     className={`${inputCls} w-full min-w-[120px]`} /></td>
-                                              </tr>
-                                            ))}
+                                            {(specRows[standardizedMsgTypeTab] || specRows["D"]).map((row, i) => {
+                                              const confColor = row.confidence === "high" ? "#4caf50" : row.confidence === "medium" ? "#ff9800" : "#f44336"
+                                              const isLowConf = row.confidence === "low"
+                                              const rowBg = isLowConf ? (isDarkMode ? "bg-[#f44336]/10" : "bg-red-50") : ""
+                                              return (
+                                                <tr key={i} className={`border-b ${borderColor} ${rowBg} ${isDarkMode ? "hover:bg-[#1e4976]/20" : "hover:bg-gray-50"} transition-colors`}>
+                                                  {/* Confidence indicator */}
+                                                  <td className="px-2 py-1.5 text-center">
+                                                    <div className="flex items-center justify-center gap-1">
+                                                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: confColor }} title={`${row.confidence} confidence`} />
+                                                      {row.modified && <Edit3 className="h-3 w-3 text-[#9c27b0]" title="User modified" />}
+                                                    </div>
+                                                  </td>
+                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.tag}         className={`${inputCls} w-10`} /></td>
+                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.groupTag}    className={`${inputCls} w-12`} /></td>
+                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.name}        className={`${inputCls} w-24`} /></td>
+                                                  <td className="px-2 py-1.5">
+                                                    <select defaultValue={row.required} className={`${inputCls} w-12`} style={{ color: row.required === "Y" ? "#4caf50" : row.required === "CR" ? "#ff9800" : undefined }}>
+                                                      <option value="Y">Y</option>
+                                                      <option value="N">N</option>
+                                                      <option value="CR">CR</option>
+                                                    </select>
+                                                  </td>
+                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.crCondition} className={`${inputCls} w-16`} style={{ color: row.crCondition ? "#ff9800" : undefined }} /></td>
+                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.dataType}    className={`${inputCls} w-20`} /></td>
+                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.values}      className={`${inputCls} w-16`} /></td>
+                                                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.comment}     className={`${inputCls} w-full min-w-[100px]`} /></td>
+                                                  {/* Verification checkbox */}
+                                                  <td className="px-2 py-1.5 text-center">
+                                                    <input
+                                                      type="checkbox"
+                                                      defaultChecked={isClientPortal ? row.clientVerified : row.adminVerified}
+                                                      className="h-4 w-4 rounded border-gray-400 text-[#00e5ff] focus:ring-[#00e5ff] cursor-pointer"
+                                                      title={isClientPortal ? "Mark as client verified" : "Mark as admin verified"}
+                                                    />
+                                                  </td>
+                                                </tr>
+                                              )
+                                            })}
                                           </tbody>
                                         </table>
+                                      </div>
+
+                                      {/* Verification summary footer */}
+                                      <div className={`px-4 py-3 border-t ${borderColor} flex items-center justify-between`}>
+                                        <div className="flex items-center gap-4 text-xs">
+                                          <span className={textSecondary}>
+                                            <span className="font-semibold text-[#f44336]">{(specRows[standardizedMsgTypeTab] || specRows["D"]).filter((r: any) => r.confidence === "low").length}</span> items need review
+                                          </span>
+                                          <span className={textSecondary}>
+                                            <span className="font-semibold text-[#9c27b0]">{(specRows[standardizedMsgTypeTab] || specRows["D"]).filter((r: any) => r.modified).length}</span> user modified
+                                          </span>
+                                          <span className={textSecondary}>
+                                            <span className="font-semibold text-[#4caf50]">{(specRows[standardizedMsgTypeTab] || specRows["D"]).filter((r: any) => isClientPortal ? r.clientVerified : r.adminVerified).length}</span> / {(specRows[standardizedMsgTypeTab] || specRows["D"]).length} verified
+                                          </span>
+                                        </div>
+                                        <Button size="sm" className="bg-[#4caf50] text-white hover:bg-[#43a047]">
+                                          <CheckCircle className="h-3.5 w-3.5 mr-1.5" /> Save & Mark All Verified
+                                        </Button>
                                       </div>
                                     </div>
                                   </>
