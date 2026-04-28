@@ -7041,6 +7041,24 @@ const tools = [
                     <div
                       onDrop={handleFileDrop}
                       onDragOver={(e) => e.preventDefault()}
+                      onClick={() => {
+                        const input = document.createElement("input")
+                        input.type = "file"
+                        input.accept = ".pdf,.xlsx,.docx,.xml,.csv,.txt"
+                        input.multiple = true
+                        input.onchange = (e) => {
+                          const files = (e.target as HTMLInputElement).files
+                          if (files && files.length > 0) {
+                            const newFiles = Array.from(files).map(f => ({
+                              name: f.name,
+                              size: `${(f.size / 1024).toFixed(1)} KB`,
+                              type: f.name.split(".").pop()?.toUpperCase() || "FILE"
+                            }))
+                            setIntakeData(prev => ({ ...prev, uploadedFiles: [...prev.uploadedFiles, ...newFiles] }))
+                          }
+                        }
+                        input.click()
+                      }}
                       className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
                         isDarkMode ? "border-[#1e4976] hover:border-[#00e5ff] hover:bg-[#1e4976]/20" : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
                       }`}
