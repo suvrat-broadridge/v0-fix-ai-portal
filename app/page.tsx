@@ -9442,9 +9442,9 @@ const tools = [
         reasoning: "Knowledge base analysis shows message types 35=K (DontKnowTrade) and 35=H (OrderMassStatusRequest) are optional per FIX 4.4 protocol. Client not supporting 35=DF and 35=L is consistent with equity-only trading workflows seen in 87% of similar onboardings. Recommend tagging as customization with no action required."
       },
       "diff-2": {
-        action: "flag",
-        headline: "Flag for Review",
-        reasoning: "Tags 375 and 943 in 35=D are non-standard custom tags per knowledge base. Tags 111 and 6454 in the admin spec are required for iceberg order support on this venue. Mismatch in 35=8 (tags 5124, 1331) may cause execution report parsing failures. Recommend flagging for engineer review before certification."
+        action: "customization",
+        headline: "Map to Existing Tags (Knowledge Base Match)",
+        reasoning: "In our knowledge base, we have customized similar client specs to map these tags to existing standard tags: Tag 375 → Tag 49 (SenderCompID), Tag 943 → Tag 115 (OnBehalfOfCompID). This mapping was used in 12 previous onboardings with this client segment. Recommend applying this tag mapping as a customization."
       },
       "diff-3": {
         action: "customization",
@@ -9868,7 +9868,6 @@ const tools = [
                 <div className="p-6 space-y-4">
                   {specCompareResults.map((section) => {
                     const ai = aiSuggestions[section.id]
-                    const isAiOpen = aiSuggestionExpanded[section.id]
                     return (
                     <div key={section.id} className={`rounded-lg border ${borderColor} overflow-hidden`}>
                       <div className={`${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"} px-4 py-3 flex items-center justify-between`}>
@@ -9883,24 +9882,11 @@ const tools = [
                               {comparisonFlags[section.id]?.status === "ignore" ? "Ignored" : comparisonFlags[section.id]?.status === "customization" ? "Customization" : "Flagged"}
                             </span>
                           )}
-                          {/* AI Suggestion Button */}
-                          <button
-                            onClick={() => toggleAiSuggestion(section.id)}
-                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium border transition-colors ${
-                              isAiOpen
-                                ? "bg-[#9c27b0]/20 border-[#9c27b0]/50 text-[#ce93d8]"
-                                : "bg-[#9c27b0]/10 border-[#9c27b0]/30 text-[#ce93d8] hover:bg-[#9c27b0]/20"
-                            }`}
-                          >
-                            <Sparkles className="h-3 w-3" />
-                            AI Suggestion
-                            {isAiOpen ? <ChevronUp className="h-3 w-3 ml-0.5" /> : <ChevronDown className="h-3 w-3 ml-0.5" />}
-                          </button>
                         </div>
                       </div>
 
-                      {/* AI Suggestion Panel */}
-                      {isAiOpen && ai && (
+                      {/* AI Suggestion Panel - Always Visible */}
+                      {ai && (
                         <div className={`px-4 py-3 border-b ${borderColor} ${isDarkMode ? "bg-[#9c27b0]/5" : "bg-purple-50"}`}>
                           <div className="flex items-start gap-3">
                             <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[#9c27b0]/20 flex items-center justify-center mt-0.5">
@@ -9913,7 +9899,7 @@ const tools = [
                               <div className="mt-2.5 flex items-center gap-2">
                                 <span className={`text-xs ${textSecondary}`}>Apply suggestion:</span>
                                 <button
-                                  onClick={() => { updateFlag(section.id, ai.action); setAiSuggestionExpanded(prev => ({ ...prev, [section.id]: false })) }}
+                                  onClick={() => updateFlag(section.id, ai.action)}
                                   className={`px-2.5 py-1 rounded text-xs font-medium ${
                                     ai.action === "customization" ? "bg-[#2196f3]/20 text-[#2196f3] hover:bg-[#2196f3]/30" :
                                     ai.action === "flag" ? "bg-[#f44336]/20 text-[#f44336] hover:bg-[#f44336]/30" :
@@ -9925,7 +9911,6 @@ const tools = [
                                 >
                                   {ai.action === "customization" ? "Mark as Customization" : ai.action === "flag" ? "Flag for Review" : "Ignore"}
                                 </button>
-                                <button onClick={() => toggleAiSuggestion(section.id)} className={`text-xs ${textSecondary} hover:${textPrimary} underline`}>Dismiss</button>
                               </div>
                             </div>
                           </div>
@@ -10385,32 +10370,17 @@ const tools = [
   
   {specCompareResults.map((section, i) => {
     const ai = aiSuggestions[section.id]
-    const isAiOpen = aiSuggestionExpanded[section.id]
     const leftLabel = section.title === "Undefined Message Types" || section.title === "Datatype Mismatch" ? "Defined In Client Spec" : section.title === "Unsupported Tags" || section.title === "Unsupported Tag Values" ? "Supported In Client Spec" : "Client Spec"
     const rightLabel = section.title === "Undefined Message Types" || section.title === "Datatype Mismatch" ? "Defined In Admin Spec" : section.title === "Unsupported Tags" || section.title === "Unsupported Tag Values" ? "Supported In Admin Spec" : "Admin Spec"
     return (
     <div key={section.id} className={`border-t ${borderColor} py-4`}>
-      {/* Header row with title and AI button */}
+      {/* Header row with title */}
       <div className="flex items-center justify-between mb-3">
         <h4 className={`font-semibold ${textPrimary}`}>{i + 1}. {section.title}</h4>
-        {ai && (
-          <button
-            onClick={() => toggleAiSuggestion(section.id)}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium border transition-colors ${
-              isAiOpen
-                ? "bg-[#9c27b0]/20 border-[#9c27b0]/50 text-[#ce93d8]"
-                : "bg-[#9c27b0]/10 border-[#9c27b0]/30 text-[#ce93d8] hover:bg-[#9c27b0]/20"
-            }`}
-          >
-            <Sparkles className="h-3 w-3" />
-            AI Suggestion
-            {isAiOpen ? <ChevronUp className="h-3 w-3 ml-0.5" /> : <ChevronDown className="h-3 w-3 ml-0.5" />}
-          </button>
-        )}
       </div>
 
-      {/* AI Suggestion Panel */}
-      {isAiOpen && ai && (
+      {/* AI Suggestion Panel - Always Visible */}
+      {ai && (
         <div className={`mb-3 rounded-lg border ${isDarkMode ? "border-[#9c27b0]/30 bg-[#9c27b0]/5" : "border-purple-200 bg-purple-50"} p-3`}>
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[#9c27b0]/20 flex items-center justify-center mt-0.5">
@@ -10423,7 +10393,7 @@ const tools = [
               <div className="mt-2.5 flex items-center gap-2">
                 <span className={`text-xs ${textSecondary}`}>Apply suggestion:</span>
                 <button
-                  onClick={() => { updateFlag(section.id, ai.action); setAiSuggestionExpanded(prev => ({ ...prev, [section.id]: false })) }}
+                  onClick={() => updateFlag(section.id, ai.action)}
                   className={`px-2.5 py-1 rounded text-xs font-medium border transition-colors ${
                     ai.action === "customization" ? "bg-[#2196f3]/20 text-[#2196f3] hover:bg-[#2196f3]/30 border-[#2196f3]/30" :
                     ai.action === "flag" ? "bg-[#f44336]/20 text-[#f44336] hover:bg-[#f44336]/30 border-[#f44336]/30" :
@@ -10432,7 +10402,6 @@ const tools = [
                 >
                   {ai.action === "customization" ? "Mark as Customization" : ai.action === "flag" ? "Flag for Review" : "Ignore"}
                 </button>
-                <button onClick={() => toggleAiSuggestion(section.id)} className={`text-xs ${textSecondary} underline`}>Dismiss</button>
               </div>
             </div>
           </div>
