@@ -7708,6 +7708,56 @@ const tools = [
                                 </div>
                               </div>
 
+                              {/* ATDL Upload */}
+                              <div className={`rounded-lg border ${borderColor} overflow-hidden`}>
+                                <div className={`px-4 py-2.5 border-b ${borderColor} flex items-center gap-2 ${isDarkMode ? "bg-[#0a1628]/60" : "bg-gray-50"}`}>
+                                  <Layers className="h-4 w-4 text-[#9c27b0]" />
+                                  <span className={`text-sm font-semibold ${textPrimary}`}>ATDL Upload</span>
+                                  <span className={`ml-auto text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-[#9c27b0]/15 text-[#9c27b0]`}>Optional</span>
+                                </div>
+                                <div className="p-4">
+                                  <p className={`text-xs ${textSecondary} mb-3`}>Upload an existing ATDL file for this counterparty to use as a reference or starting point for the configuration.</p>
+                                  <div
+                                    className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center cursor-pointer hover:border-[#9c27b0] hover:bg-[#9c27b0]/5 transition-all`}
+                                    onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-[#9c27b0]", "bg-[#9c27b0]/10") }}
+                                    onDragLeave={(e) => { e.currentTarget.classList.remove("border-[#9c27b0]", "bg-[#9c27b0]/10") }}
+                                    onDrop={(e) => {
+                                      e.preventDefault()
+                                      e.currentTarget.classList.remove("border-[#9c27b0]", "bg-[#9c27b0]/10")
+                                      const files = Array.from(e.dataTransfer.files)
+                                      const newFiles = files.map(f => ({ name: f.name, size: `${(f.size / (1024*1024)).toFixed(2)} MB`, type: "ATDL" }))
+                                      setCaseWorkflowFiles(prev => [...prev, ...newFiles])
+                                    }}
+                                    onClick={() => {
+                                      const input = document.createElement("input")
+                                      input.type = "file"; input.multiple = true; input.accept = ".atdl,.xml"
+                                      input.onchange = (e) => {
+                                        const files = Array.from((e.target as HTMLInputElement).files || [])
+                                        const newFiles = files.map(f => ({ name: f.name, size: `${(f.size / (1024*1024)).toFixed(2)} MB`, type: "ATDL" }))
+                                        setCaseWorkflowFiles(prev => [...prev, ...newFiles])
+                                      }
+                                      input.click()
+                                    }}
+                                  >
+                                    <Layers className={`h-8 w-8 mx-auto mb-2 ${textSecondary}`} />
+                                    <p className={`${textPrimary} font-medium text-sm`}>Drop ATDL file here or click to upload</p>
+                                    <p className={`text-xs ${textSecondary} mt-1`}>Supports .atdl, .xml up to 25MB</p>
+                                  </div>
+                                  {caseWorkflowFiles.filter((f: any) => f.type === "ATDL").length > 0 && (
+                                    <div className={`mt-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded-lg p-3 space-y-2`}>
+                                      {caseWorkflowFiles.filter((f: any) => f.type === "ATDL").map((file: any, idx: number) => (
+                                        <div key={idx} className="flex items-center gap-3">
+                                          <Layers className="h-4 w-4 text-[#9c27b0] shrink-0" />
+                                          <span className={`text-sm ${textPrimary} flex-1`}>{file.name}</span>
+                                          <span className={`text-xs ${textSecondary}`}>{file.size}</span>
+                                          <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
                               {/* Next Step Button */}
                               {actualToolIndex < currentPhase.tools.length - 1 && (
                                 <div className="flex gap-3 pt-4 border-t border-[#1e4976]/30">
