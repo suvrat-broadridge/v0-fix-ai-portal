@@ -1382,7 +1382,7 @@ export default function BCometPlatform() {
     venueProfiles: [] as string[],
     onboardingTracks: [] as string[],
     // Step 3: Dependencies
-    clientSpecStatus: "pending" as "received" | "needs-clarification" | "pending",
+    clientSpecStatus: "pending" as "uploaded" | "needs-clarification" | "pending",
     connectivityEnvironment: "uat" as "uat" | "staging" | "prod",
     certificationWindow: "",
     thirdPartyDeps: "",
@@ -1621,6 +1621,14 @@ export default function BCometPlatform() {
   const [fixAtdlShowResults, setFixAtdlShowResults] = useState(false)
   const [conversionComplete, setConversionComplete] = useState(false)
   const [atdlValidated, setAtdlValidated] = useState(false)
+  const [atdlSpecLoaded, setAtdlSpecLoaded] = useState(false)
+  const [atdlValidating, setAtdlValidating] = useState(false)
+  const [atdlValidationDone, setAtdlValidationDone] = useState(false)
+  const [atdlConverting, setAtdlConverting] = useState(false)
+  const [atdlConversionDone, setAtdlConversionDone] = useState(false)
+  // ATDL Usage progressive reveal state
+  const [atdlUsageStep, setAtdlUsageStep] = useState(1) // 1=select file, 2=show XML, 3=show UI, 4=show message, 5=show validation
+  const [upgradeUsageStep, setUpgradeUsageStep] = useState(1) // 1=select file, 2=show XML, 3=show UI, 4=show message, 5=show validation (for version-upgrade)
   const [atdlUiVisible, setAtdlUiVisible] = useState(false)
   const [atdlFixMessageGenerated, setAtdlFixMessageGenerated] = useState(false)
   const [atdlFixValidationResults, setAtdlFixValidationResults] = useState(false)
@@ -1633,6 +1641,14 @@ export default function BCometPlatform() {
   const [atdlValidationFilter, setAtdlValidationFilter] = useState<"all" | "error" | "warning" | "pass">("all")
   const [atdlDecisions, setAtdlDecisions] = useState<Record<string, string>>({})
   const [atdlRemediationFilter, setAtdlRemediationFilter] = useState<"all" | "open" | "in-progress" | "resolved">("all")
+  
+  // Remediation workflow states
+  const [remedComparisonDone, setRemedComparisonDone] = useState(false)
+  const [remedDecisions, setRemedDecisions] = useState<Record<number, string>>({})
+  const [remedSchemaRun, setRemedSchemaRun] = useState(false)
+  const [remedRemediating, setRemedRemediating] = useState(false)
+  const [remedRemediationDone, setRemedRemediationDone] = useState(false)
+  const [remedUsageStep, setRemedUsageStep] = useState(1)
   
   // File upload state for ATDL workflows
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, { name: string; size: number; type: string; status: "uploading" | "complete" | "error" }>>({})
@@ -7041,24 +7057,6 @@ const tools = [
                     <div
                       onDrop={handleFileDrop}
                       onDragOver={(e) => e.preventDefault()}
-                      onClick={() => {
-                        const input = document.createElement("input")
-                        input.type = "file"
-                        input.accept = ".pdf,.xlsx,.docx,.xml,.csv,.txt"
-                        input.multiple = true
-                        input.onchange = (e) => {
-                          const files = (e.target as HTMLInputElement).files
-                          if (files && files.length > 0) {
-                            const newFiles = Array.from(files).map(f => ({
-                              name: f.name,
-                              size: `${(f.size / 1024).toFixed(1)} KB`,
-                              type: f.name.split(".").pop()?.toUpperCase() || "FILE"
-                            }))
-                            setIntakeData(prev => ({ ...prev, uploadedFiles: [...prev.uploadedFiles, ...newFiles] }))
-                          }
-                        }
-                        input.click()
-                      }}
                       className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
                         isDarkMode ? "border-[#1e4976] hover:border-[#00e5ff] hover:bg-[#1e4976]/20" : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
                       }`}
@@ -8497,11 +8495,11 @@ const tools = [
                               { id: 5, label: "Preview",       icon: Eye,          desc: "Preview and export" },
                             ]
                             const remediationSteps = [
-                              { id: 0, label: "Upload ATDL",   icon: Upload,        desc: "Upload existing ATDL file" },
-                              { id: 1, label: "Validate",      icon: CheckCircle,   desc: "Run validation checks" },
-                              { id: 2, label: "Review Issues", icon: AlertTriangle, desc: "Review identified issues" },
-                              { id: 3, label: "Remediate",     icon: Wrench,        desc: "Apply fixes" },
-                              { id: 4, label: "Re-validate",   icon: RefreshCw,     desc: "Re-validate and export" },
+                              { id: 0, label: "Upload Files",  icon: Upload,        desc: "Upload FIX spec & ATDL file" },
+                              { id: 1, label: "FIX Compare",   icon: GitCompare,    desc: "FIX to ATDL comparison" },
+                              { id: 2, label: "Schema Valid.", icon: CheckCircle,   desc: "Validate against FIXatdl schema" },
+                              { id: 3, label: "Remediate",     icon: Wrench,        desc: "Apply auto-fixes" },
+                              { id: 4, label: "Re-validate",   icon: RefreshCw,     desc: "Preview & send message" },
                             ]
                             const steps = atdlWorkflowType === "conversion" ? conversionSteps
                                         : atdlWorkflowType === "version-upgrade" ? versionUpgradeSteps
@@ -8522,7 +8520,14 @@ const tools = [
                                     return (
                                       <div key={i} className="flex items-center flex-1 last:flex-none">
                                         <button
-                                          onClick={() => setAtdlWizardStep(i)}
+                                          onClick={() => {
+                                          setAtdlWizardStep(i)
+                                          if (i !== 1) setAtdlSpecLoaded(false)
+                                          if (i !== 2) { setAtdlConverting(false); setAtdlConversionDone(false) }
+                                          if (i !== 3) { setAtdlValidating(false); setAtdlValidationDone(false) }
+                                          if (i !== 4) setAtdlUsageStep(1)
+                                          if (i !== 5) setUpgradeUsageStep(1)
+                                        }}
                                           className="flex flex-col items-center gap-1.5 group"
                                         >
                                           <div className={`h-9 w-9 rounded-full flex items-center justify-center border-2 transition-all ${
@@ -8610,101 +8615,93 @@ const tools = [
                                         <p className={`text-xs ${textSecondary}`}>Gate A: Select spec to convert to ATDL</p>
                                       </div>
                                     </div>
-                                    
-                                    {/* Spec Selection */}
-                                    <div className={`${bgCard} border ${borderColor} rounded-lg p-4`}>
-                                      <div className="grid grid-cols-2 gap-4 mb-4">
-                                        <div>
-                                          <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Select Algo Spec File</label>
-                                          <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`}>
-                                            <option>AlgoSuite_Complete_v1.5.xml</option>
-                                            <option>VWAP_Strategies_v2.0.xml</option>
-                                            <option>TWAP_Implementation_v1.2.xml</option>
-                                          </select>
-                                        </div>
-                                        <div>
-                                          <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>FIX Version</label>
-                                          <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`}>
-                                            <option>Equities FIX 4.4 v2.1</option>
-                                            <option>Equities FIX 4.2</option>
-                                            <option>Options FIX 4.4</option>
-                                          </select>
-                                        </div>
-                                      </div>
-                                      <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">
-                                        <Eye className="h-4 w-4 mr-1.5" /> Load Spec Preview
-                                      </Button>
-                                    </div>
 
-                                    {/* Loaded Spec Preview */}
-                                    <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
-                                      <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
-                                        <div className="flex items-center gap-2">
-                                          <CheckCircle className="h-4 w-4 text-[#4caf50]" />
-                                          <span className={`font-medium ${textPrimary}`}>Standardized Algo Spec Loaded</span>
+                                    {/* Load button — always visible */}
+                                    {!atdlSpecLoaded && (
+                                      <div className={`${bgCard} border ${borderColor} rounded-lg p-6 flex flex-col items-center gap-4`}>
+                                        <FileText className={`h-10 w-10 ${textSecondary}`} />
+                                        <div className="text-center">
+                                          <p className={`font-medium ${textPrimary}`}>AlgoSuite_Complete_v1.5.xml</p>
+                                          <p className={`text-xs ${textSecondary} mt-1`}>Standardized Algo Spec — Equities FIX 4.4 v2.1</p>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                          <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>AlgoSuite_Complete_v1.5.xml</span>
-                                          <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>Equities FIX 4.4</span>
-                                        </div>
+                                        <Button
+                                          className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
+                                          onClick={() => setAtdlSpecLoaded(true)}
+                                        >
+                                          <Eye className="h-4 w-4 mr-1.5" /> Load Spec
+                                        </Button>
                                       </div>
-                                      <div className="p-4">
-                                        <p className={`text-xs font-medium ${textSecondary} mb-3`}>Strategies Found in Spec</p>
-                                        <div className="grid grid-cols-3 gap-2">
-                                          {[
-                                            { name: "VWAP", tags: 6, status: "active" },
-                                            { name: "TWAP", tags: 5, status: "active" },
-                                            { name: "POV", tags: 4, status: "active" },
-                                            { name: "IS (Implementation Shortfall)", tags: 7, status: "active" },
-                                            { name: "Iceberg", tags: 4, status: "active" },
-                                            { name: "Sniper", tags: 3, status: "draft" },
-                                          ].map((strat) => (
-                                            <div key={strat.name} className={`${bgSecondary} rounded p-2.5 flex items-center justify-between`}>
-                                              <div>
-                                                <p className={`text-sm font-medium ${textPrimary}`}>{strat.name}</p>
-                                                <p className={`text-xs ${textSecondary}`}>{strat.tags} parameters</p>
-                                              </div>
-                                              <span className={`text-xs px-1.5 py-0.5 rounded ${strat.status === "active" ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>
-                                                {strat.status}
-                                              </span>
-                                            </div>
-                                          ))}
+                                    )}
+
+                                    {/* Spec revealed after Load click */}
+                                    {atdlSpecLoaded && (
+                                      <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                        <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                          <div className="flex items-center gap-2">
+                                            <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                            <span className={`font-medium ${textPrimary}`}>Standardized Algo Spec Loaded</span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>AlgoSuite_Complete_v1.5.xml</span>
+                                            <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>Equities FIX 4.4</span>
+                                          </div>
                                         </div>
-                                      </div>
-                                      <div className={`px-4 py-3 border-t ${borderColor}`}>
-                                        <table className="w-full text-xs">
-                                          <thead>
-                                            <tr className={`border-b ${borderColor}`}>
-                                              <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>FIX Tag</th>
-                                              <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Parameter Name</th>
-                                              <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Type</th>
-                                              <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Strategy</th>
-                                              <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Required</th>
-                                            </tr>
-                                          </thead>
-                                          <tbody>
+                                        <div className="p-4">
+                                          <p className={`text-xs font-medium ${textSecondary} mb-3`}>Strategies Found in Spec</p>
+                                          <div className="grid grid-cols-3 gap-2 mb-4">
                                             {[
-                                              { tag: "847", name: "TargetStrategy", type: "String", strategy: "All", required: "Y" },
-                                              { tag: "7940", name: "StartTime", type: "UTCTimestamp", strategy: "VWAP, TWAP", required: "Y" },
-                                              { tag: "7941", name: "EndTime", type: "UTCTimestamp", strategy: "VWAP, TWAP", required: "Y" },
-                                              { tag: "7942", name: "ParticipationRate", type: "Percentage", strategy: "VWAP, POV", required: "N" },
-                                              { tag: "7943", name: "MinQty", type: "Int", strategy: "All", required: "N" },
-                                              { tag: "7944", name: "MaxFloor", type: "Int", strategy: "Iceberg", required: "CR" },
-                                            ].map((row, i) => (
-                                              <tr key={i} className={`border-b ${borderColor}`}>
-                                                <td className={`px-2 py-2 font-mono text-[#00e5ff]`}>{row.tag}</td>
-                                                <td className={`px-2 py-2 ${textPrimary}`}>{row.name}</td>
-                                                <td className={`px-2 py-2 ${textSecondary}`}>{row.type}</td>
-                                                <td className={`px-2 py-2 ${textSecondary}`}>{row.strategy}</td>
-                                                <td className={`px-2 py-2`}>
-                                                  <span className={`${row.required === "Y" ? "text-[#4caf50]" : row.required === "CR" ? "text-[#ff9800]" : textSecondary}`}>{row.required}</span>
-                                                </td>
-                                              </tr>
+                                              { name: "VWAP", tags: 6, status: "active" },
+                                              { name: "TWAP", tags: 5, status: "active" },
+                                              { name: "POV", tags: 4, status: "active" },
+                                              { name: "IS (Implementation Shortfall)", tags: 7, status: "active" },
+                                              { name: "Iceberg", tags: 4, status: "active" },
+                                              { name: "Sniper", tags: 3, status: "draft" },
+                                            ].map((strat) => (
+                                              <div key={strat.name} className={`${bgSecondary} rounded p-2.5 flex items-center justify-between`}>
+                                                <div>
+                                                  <p className={`text-sm font-medium ${textPrimary}`}>{strat.name}</p>
+                                                  <p className={`text-xs ${textSecondary}`}>{strat.tags} parameters</p>
+                                                </div>
+                                                <span className={`text-xs px-1.5 py-0.5 rounded ${strat.status === "active" ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>
+                                                  {strat.status}
+                                                </span>
+                                              </div>
                                             ))}
-                                          </tbody>
-                                        </table>
+                                          </div>
+                                          <table className="w-full text-xs">
+                                            <thead>
+                                              <tr className={`border-b ${borderColor}`}>
+                                                <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>FIX Tag</th>
+                                                <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Parameter Name</th>
+                                                <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Type</th>
+                                                <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Strategy</th>
+                                                <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Required</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody>
+                                              {[
+                                                { tag: "847", name: "TargetStrategy", type: "String", strategy: "All", required: "Y" },
+                                                { tag: "7940", name: "StartTime", type: "UTCTimestamp", strategy: "VWAP, TWAP", required: "Y" },
+                                                { tag: "7941", name: "EndTime", type: "UTCTimestamp", strategy: "VWAP, TWAP", required: "Y" },
+                                                { tag: "7942", name: "ParticipationRate", type: "Percentage", strategy: "VWAP, POV", required: "N" },
+                                                { tag: "7943", name: "MinQty", type: "Int", strategy: "All", required: "N" },
+                                                { tag: "7944", name: "MaxFloor", type: "Int", strategy: "Iceberg", required: "CR" },
+                                              ].map((row, i) => (
+                                                <tr key={i} className={`border-b ${borderColor}`}>
+                                                  <td className="px-2 py-2 font-mono text-[#00e5ff]">{row.tag}</td>
+                                                  <td className={`px-2 py-2 ${textPrimary}`}>{row.name}</td>
+                                                  <td className={`px-2 py-2 ${textSecondary}`}>{row.type}</td>
+                                                  <td className={`px-2 py-2 ${textSecondary}`}>{row.strategy}</td>
+                                                  <td className="px-2 py-2">
+                                                    <span className={`${row.required === "Y" ? "text-[#4caf50]" : row.required === "CR" ? "text-[#ff9800]" : textSecondary}`}>{row.required}</span>
+                                                  </td>
+                                                </tr>
+                                              ))}
+                                            </tbody>
+                                          </table>
+                                        </div>
                                       </div>
-                                    </div>
+                                    )}
                                   </div>
                                 )}
 
@@ -8718,24 +8715,135 @@ const tools = [
                                         <p className={`text-xs ${textSecondary}`}>Gate B: Structural Compliance</p>
                                       </div>
                                     </div>
-                                    <div className={`${bgCard} border ${borderColor} rounded-lg p-4 space-y-3`}>
-                                      <div className="flex items-center gap-2">
-                                        <Zap className="h-5 w-5 text-[#00e5ff]" />
-                                        <div>
-                                          <p className={`font-medium ${textPrimary}`}>AI-Powered Conversion</p>
-                                          <p className={`text-xs ${textSecondary}`}>Extracting strategies and parameters from FIX spec...</p>
+
+                                    {/* Conversion Progress */}
+                                    {!atdlConversionDone && (
+                                      <div className={`${bgCard} border ${borderColor} rounded-lg p-4 space-y-3`}>
+                                        <div className="flex items-center gap-2">
+                                          <Zap className="h-5 w-5 text-[#00e5ff]" />
+                                          <div>
+                                            <p className={`font-medium ${textPrimary}`}>AI-Powered Conversion</p>
+                                            <p className={`text-xs ${textSecondary}`}>Extracting strategies and parameters from FIX spec...</p>
+                                          </div>
+                                        </div>
+                                        <div className="h-2 bg-[#1e4976]/30 rounded-full overflow-hidden">
+                                          <div className="h-full bg-[#ff9800] rounded-full w-3/4 animate-pulse" />
+                                        </div>
+                                        <div className="space-y-1.5 pt-2">
+                                          <p className="text-sm text-[#4caf50] flex items-center gap-2"><CheckCircle className="h-3.5 w-3.5" /> Parsing PDF structure</p>
+                                          <p className="text-sm text-[#4caf50] flex items-center gap-2"><CheckCircle className="h-3.5 w-3.5" /> Extracting algo definitions</p>
+                                          <p className="text-sm text-[#4caf50] flex items-center gap-2"><CheckCircle className="h-3.5 w-3.5" /> Mapping parameters to ATDL types</p>
+                                          <p className="text-sm text-[#ff9800] flex items-center gap-2"><Loader className="h-3.5 w-3.5 animate-spin" /> Generating ATDL XML</p>
+                                        </div>
+                                        {!atdlConverting && (
+                                          <div className="flex justify-center pt-2">
+                                            <Button
+                                              className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
+                                              onClick={() => {
+                                                setAtdlConverting(true)
+                                                setTimeout(() => {
+                                                  setAtdlConverting(false)
+                                                  setAtdlConversionDone(true)
+                                                }, 2500)
+                                              }}
+                                            >
+                                              <Sparkles className="h-4 w-4 mr-1.5" /> Start Conversion
+                                            </Button>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+
+                                    {/* Converted ATDL XML File — shown after conversion done */}
+                                    {atdlConversionDone && (
+                                      <div className={`${bgCard} border border-[#4caf50]/50 rounded-lg overflow-hidden`}>
+                                        <div className={`px-4 py-3 border-b border-[#4caf50]/30 flex items-center justify-between`}>
+                                          <div className="flex items-center gap-2">
+                                            <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                            <FileText className="h-4 w-4 text-[#00e5ff]" />
+                                            <span className={`text-sm font-medium ${textPrimary}`}>AlgoSuite_Complete_v1.5.atdl</span>
+                                            <span className="text-xs px-2 py-0.5 rounded bg-[#4caf50]/20 text-[#4caf50]">Conversion Complete</span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <Button variant="outline" size="sm" className="text-xs">
+                                              <Copy className="h-3 w-3 mr-1" /> Copy
+                                            </Button>
+                                            <Button variant="outline" size="sm" className="text-xs">
+                                              <Download className="h-3 w-3 mr-1" /> Download
+                                            </Button>
+                                          </div>
+                                        </div>
+                                        <div className={`p-4 overflow-auto max-h-80 font-mono text-xs leading-relaxed ${isDarkMode ? "bg-[#060e1a]" : "bg-gray-950 text-gray-100"}`}>
+                                          <pre className="text-[11px] leading-5">{`<?xml version="1.0" encoding="UTF-8"?>
+<Strategies xmlns="http://www.fixprotocol.org/schema/atdl/1-1_EP" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Strategy name="VWAP" uiRep="VWAP" wireValue="VWAP" version="1" fixMsgType="D">
+    <Parameter name="StartTime" xsi:type="atdl:UTCTimestamp_t" fixTag="7940" use="required">
+      <Description>Algorithm start time</Description>
+    </Parameter>
+    <Parameter name="EndTime" xsi:type="atdl:UTCTimestamp_t" fixTag="7941" use="required">
+      <Description>Algorithm end time</Description>
+    </Parameter>
+    <Parameter name="ParticipationRate" xsi:type="atdl:Percentage_t" fixTag="7942" use="optional" minValue="1" maxValue="100">
+      <Description>Target participation rate (%)</Description>
+    </Parameter>
+    <Parameter name="MinQty" xsi:type="atdl:Int_t" fixTag="7943" use="optional" minValue="0">
+      <Description>Minimum order quantity</Description>
+    </Parameter>
+    <Parameter name="MaxFloor" xsi:type="atdl:Int_t" fixTag="7944" use="optional" minValue="0">
+      <Description>Max display quantity (iceberg)</Description>
+    </Parameter>
+    <Parameter name="DisplayQty" xsi:type="atdl:Int_t" fixTag="7945" use="optional" minValue="0">
+      <Description>Display quantity</Description>
+    </Parameter>
+    <StrategyLayout>
+      <StrategyPanel orientation="HORIZONTAL">
+        <Control ID="c_StartTime" xsi:type="atdl:Clock_t" label="Start Time" parameterRef="StartTime" initValue="09:30:00"/>
+        <Control ID="c_EndTime" xsi:type="atdl:Clock_t" label="End Time" parameterRef="EndTime" initValue="16:00:00"/>
+        <Control ID="c_ParticipationRate" xsi:type="atdl:SingleSpinner_t" label="Participation Rate (%)" parameterRef="ParticipationRate" initValue="15"/>
+        <Control ID="c_MinQty" xsi:type="atdl:SingleSpinner_t" label="Min Quantity" parameterRef="MinQty" initValue="100"/>
+        <Control ID="c_MaxFloor" xsi:type="atdl:SingleSpinner_t" label="Max Floor" parameterRef="MaxFloor" initValue="500"/>
+        <Control ID="c_DisplayQty" xsi:type="atdl:SingleSpinner_t" label="Display Qty" parameterRef="DisplayQty" initValue="200"/>
+      </StrategyPanel>
+    </StrategyLayout>
+  </Strategy>
+  <Strategy name="TWAP" uiRep="TWAP" wireValue="TWAP" version="1" fixMsgType="D">
+    <Parameter name="StartTime" xsi:type="atdl:UTCTimestamp_t" fixTag="7940" use="required">
+      <Description>Algorithm start time</Description>
+    </Parameter>
+    <Parameter name="EndTime" xsi:type="atdl:UTCTimestamp_t" fixTag="7941" use="required">
+      <Description>Algorithm end time</Description>
+    </Parameter>
+    <Parameter name="LimitPrice" xsi:type="atdl:Decimal_t" fixTag="44" use="optional">
+      <Description>Limit price for TWAP execution</Description>
+    </Parameter>
+    <StrategyLayout>
+      <StrategyPanel orientation="HORIZONTAL">
+        <Control ID="c_StartTime" xsi:type="atdl:Clock_t" label="Start Time" parameterRef="StartTime" initValue="09:30:00"/>
+        <Control ID="c_EndTime" xsi:type="atdl:Clock_t" label="End Time" parameterRef="EndTime" initValue="16:00:00"/>
+        <Control ID="c_LimitPrice" xsi:type="atdl:SingleSpinner_t" label="Limit Price" parameterRef="LimitPrice" initValue="150.00"/>
+      </StrategyPanel>
+    </StrategyLayout>
+  </Strategy>
+</Strategies>`}</pre>
+                                        </div>
+                                        <div className={`px-4 py-3 border-t border-[#4caf50]/30 flex items-center justify-between`}>
+                                          <span className={`text-xs ${textSecondary}`}>2 strategies converted • 11 parameters mapped • Ready for validation</span>
                                         </div>
                                       </div>
-                                      <div className="h-2 bg-[#1e4976]/30 rounded-full overflow-hidden">
-                                        <div className="h-full bg-[#ff9800] rounded-full w-3/4 animate-pulse" />
-                                      </div>
-                                      <div className="space-y-1.5 pt-2">
-                                        <p className="text-sm text-[#4caf50] flex items-center gap-2"><CheckCircle className="h-3.5 w-3.5" /> Parsing PDF structure</p>
-                                        <p className="text-sm text-[#4caf50] flex items-center gap-2"><CheckCircle className="h-3.5 w-3.5" /> Extracting algo definitions</p>
-                                        <p className="text-sm text-[#4caf50] flex items-center gap-2"><CheckCircle className="h-3.5 w-3.5" /> Mapping parameters to ATDL types</p>
-                                        <p className="text-sm text-[#ff9800] flex items-center gap-2"><Loader className="h-3.5 w-3.5 animate-spin" /> Generating ATDL XML</p>
-                                      </div>
-                                    </div>
+                                    )}
+
+                                    {/* AI Confidence Matrix — shown after conversion */}
+                                    {atdlConversionDone && (
+                                      <AIConfidenceMatrix
+                                        isDarkMode={isDarkMode}
+                                        bgCard={bgCard}
+                                        borderColor={borderColor}
+                                        textPrimary={textPrimary}
+                                        textSecondary={textSecondary}
+                                        score={91}
+                                        basis="ATDL conversion achieved full strategy coverage. All 11 parameters mapped correctly to FIXatdl 1.1 types with no unmapped required fields."
+                                      />
+                                    )}
                                   </div>
                                 )}
 
@@ -8746,24 +8854,141 @@ const tools = [
                                       <CheckCircle className="h-5 w-5 text-[#00e5ff]" />
                                       <div>
                                         <p className={`font-medium ${textPrimary}`}>Validate</p>
-                                        <p className={`text-xs ${textSecondary}`}>Gate C: Schema Validation</p>
+                                        <p className={`text-xs ${textSecondary}`}>Gate C: Schema Validation — review generated ATDL then validate</p>
                                       </div>
                                     </div>
-                                    <div className={`${bgCard} border ${borderColor} rounded-lg p-4`}>
-                                      <div className="flex items-center justify-between mb-3">
-                                        <p className={`font-medium ${textPrimary}`}>Validation Results</p>
-                                        <span className="text-xs px-2 py-1 rounded-full bg-[#4caf50]/20 text-[#4caf50]">All Passed</span>
+
+                                    {/* Generated ATDL XML viewer */}
+                                    <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                      <div className={`px-4 py-2.5 border-b ${borderColor} flex items-center justify-between`}>
+                                        <div className="flex items-center gap-2">
+                                          <FileText className="h-4 w-4 text-[#00e5ff]" />
+                                          <span className={`text-sm font-medium ${textPrimary}`}>AlgoSuite_Complete_v1.5.atdl</span>
+                                        </div>
+                                        <span className={`text-xs ${textSecondary}`}>Generated ATDL XML</span>
                                       </div>
-                                      <div className="space-y-2">
-                                        <div className="flex items-center justify-between text-sm"><span className={textSecondary}>Schema Compliance</span><span className="text-[#4caf50]">Passed</span></div>
-                                        <div className="flex items-center justify-between text-sm"><span className={textSecondary}>Parameter Validation</span><span className="text-[#4caf50]">Passed</span></div>
-                                        <div className="flex items-center justify-between text-sm"><span className={textSecondary}>Strategy Definitions</span><span className="text-[#4caf50]">Passed</span></div>
+                                      <div className={`p-4 overflow-auto max-h-64 font-mono text-xs leading-relaxed ${isDarkMode ? "bg-[#060e1a]" : "bg-gray-950 text-gray-100"}`}>
+                                        <pre className="text-[11px] leading-5">{`<?xml version="1.0" encoding="UTF-8"?>
+<Strategies xmlns="http://www.fixprotocol.org/schema/atdl/1-1_EP">
+  <Strategy name="VWAP" uiRep="VWAP" wireValue="VWAP" version="1" fixMsgType="D">
+    <Parameter name="StartTime" xsi:type="atdl:UTCTimestamp_t"
+      fixTag="7940" use="required">
+      <Description>Algorithm start time</Description>
+    </Parameter>
+    <Parameter name="EndTime" xsi:type="atdl:UTCTimestamp_t"
+      fixTag="7941" use="required">
+      <Description>Algorithm end time</Description>
+    </Parameter>
+    <Parameter name="ParticipationRate" xsi:type="atdl:Percentage_t"
+      fixTag="7942" use="optional" minValue="1" maxValue="100">
+      <Description>Target participation rate (%)</Description>
+    </Parameter>
+    <Parameter name="MinQty" xsi:type="atdl:Int_t"
+      fixTag="7943" use="optional" minValue="0">
+      <Description>Minimum order quantity</Description>
+    </Parameter>
+    <Parameter name="MaxFloor" xsi:type="atdl:Int_t"
+      fixTag="7944" use="optional" minValue="0">
+      <Description>Max display quantity (iceberg)</Description>
+    </Parameter>
+    <Parameter name="DisplayQty" xsi:type="atdl:Int_t"
+      fixTag="7945" use="optional" minValue="0">
+      <Description>Display quantity</Description>
+    </Parameter>
+    <StrategyLayout>
+      <StrategyPanel orientation="HORIZONTAL">
+        <Control ID="c_StartTime" xsi:type="atdl:Clock_t"
+          label="Start Time" parameterRef="StartTime" initValue="09:30:00"/>
+        <Control ID="c_EndTime" xsi:type="atdl:Clock_t"
+          label="End Time" parameterRef="EndTime" initValue="16:00:00"/>
+        <Control ID="c_ParticipationRate" xsi:type="atdl:SingleSpinner_t"
+          label="Participation Rate (%)" parameterRef="ParticipationRate" initValue="15"/>
+      </StrategyPanel>
+      <StrategyPanel orientation="HORIZONTAL">
+        <Control ID="c_MinQty" xsi:type="atdl:SingleSpinner_t"
+          label="Min Quantity" parameterRef="MinQty" initValue="100"/>
+        <Control ID="c_MaxFloor" xsi:type="atdl:SingleSpinner_t"
+          label="Max Floor" parameterRef="MaxFloor" initValue="500"/>
+        <Control ID="c_DisplayQty" xsi:type="atdl:SingleSpinner_t"
+          label="Display Qty" parameterRef="DisplayQty" initValue="200"/>
+      </StrategyPanel>
+    </StrategyLayout>
+  </Strategy>
+</Strategies>`}</pre>
                                       </div>
                                     </div>
+
+                                    {/* Validate button + animated results */}
+                                    {!atdlValidating && !atdlValidationDone && (
+                                      <div className="flex justify-center">
+                                        <Button
+                                          className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] px-8"
+                                          onClick={() => {
+                                            setAtdlValidating(true)
+                                            setTimeout(() => {
+                                              setAtdlValidating(false)
+                                              setAtdlValidationDone(true)
+                                            }, 2000)
+                                          }}
+                                        >
+                                          <CheckCircle className="h-4 w-4 mr-1.5" /> Validate ATDL
+                                        </Button>
+                                      </div>
+                                    )}
+
+                                    {atdlValidating && (
+                                      <div className={`${bgCard} border ${borderColor} rounded-lg p-5 flex flex-col items-center gap-3`}>
+                                        <Loader className="h-7 w-7 text-[#00e5ff] animate-spin" />
+                                        <p className={`text-sm font-medium ${textPrimary}`}>Validating ATDL schema...</p>
+                                        <div className="w-full h-1.5 rounded-full bg-[#1e4976]/30 overflow-hidden">
+                                          <div className="h-full bg-[#00e5ff] rounded-full animate-pulse w-3/4" />
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {atdlValidationDone && (
+                                      <>
+                                        <div className={`${bgCard} border border-[#4caf50]/30 rounded-lg overflow-hidden`}>
+                                          <div className={`px-4 py-3 border-b border-[#4caf50]/30 flex items-center justify-between`}>
+                                            <p className={`font-semibold ${textPrimary}`}>Validation Results</p>
+                                            <span className="text-xs px-2 py-1 rounded-full bg-[#4caf50]/20 text-[#4caf50] font-medium">All Passed</span>
+                                          </div>
+                                          <div className="divide-y divide-[#4caf50]/10">
+                                            {[
+                                              { label: "XML Schema Compliance", detail: "Conforms to FIXatdl 1.1 schema" },
+                                              { label: "Strategy Definitions", detail: "6 strategies parsed successfully" },
+                                              { label: "Parameter Types", detail: "All types valid against FIX 4.4 spec" },
+                                              { label: "Required Fields", detail: "All mandatory parameters present" },
+                                              { label: "Control Bindings", detail: "All controls bound to parameters" },
+                                              { label: "Value Constraints", detail: "Min/max ranges within spec limits" },
+                                            ].map((check, i) => (
+                                              <div key={i} className="flex items-center justify-between px-4 py-3">
+                                                <div>
+                                                  <p className={`text-sm font-medium ${textPrimary}`}>{check.label}</p>
+                                                  <p className={`text-xs ${textSecondary}`}>{check.detail}</p>
+                                                </div>
+                                                <CheckCircle className="h-5 w-5 text-[#4caf50] shrink-0" />
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </div>
+
+                                        {/* AI Confidence Matrix — shown after validation */}
+                                        <AIConfidenceMatrix
+                                          isDarkMode={isDarkMode}
+                                          bgCard={bgCard}
+                                          borderColor={borderColor}
+                                          textPrimary={textPrimary}
+                                          textSecondary={textSecondary}
+                                          score={94}
+                                          basis="Schema validation passed all 6 checks against FIXatdl 1.1. All parameter types, control bindings, and value constraints conform fully to the FIX 4.4 spec."
+                                        />
+                                      </>
+                                    )}
                                   </div>
                                 )}
 
-                                {/* Step 4: Preview — Full ATDL Usage Flow */}
+                                {/* Step 4: Preview — Full ATDL Usage Flow with Progressive Reveal */}
                                 {atdlWizardStep === 4 && atdlWorkflowType === "conversion" && (
                                   <div className="space-y-4">
                                     <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
@@ -8774,16 +8999,17 @@ const tools = [
                                       </div>
                                     </div>
 
-                                    {/* Section 1: Select ATDL File */}
-                                    <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
-                                      <div className={`px-4 py-3 border-b ${borderColor}`}>
+                                    {/* Section 1: Select ATDL File — always visible */}
+                                    <div className={`${bgCard} border ${atdlUsageStep >= 2 ? "border-[#4caf50]/50" : borderColor} rounded-lg overflow-hidden`}>
+                                      <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
                                         <p className={`font-semibold ${textPrimary}`}>1. Select ATDL File</p>
+                                        {atdlUsageStep >= 2 && <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
                                       </div>
                                       <div className="p-4">
                                         <div className="grid grid-cols-2 gap-4 mb-4">
                                           <div>
                                             <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Select From Admin ATDL Files</label>
-                                            <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`}>
+                                            <select className={`w-full p-2.5 rounded border border-[#00e5ff] ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`}>
                                               <option>AlgoSuite_Complete_v1.5.atdl</option>
                                               <option>VWAP_Strategies_v2.0.atdl</option>
                                               <option>TWAP_Implementation_v1.2.atdl</option>
@@ -8799,151 +9025,202 @@ const tools = [
                                             </select>
                                           </div>
                                         </div>
-                                        <div className="flex justify-end">
-                                          <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">
-                                            <Play className="h-4 w-4 mr-1.5" /> Load Strategy UI
-                                          </Button>
-                                        </div>
+                                        {atdlUsageStep === 1 && (
+                                          <div className="flex justify-end">
+                                            <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setAtdlUsageStep(2)}>
+                                              <FileText className="h-4 w-4 mr-1.5" /> Select
+                                            </Button>
+                                          </div>
+                                        )}
                                       </div>
                                     </div>
 
-                                    {/* Section 2: ATDL UI Representation */}
-                                    <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
-                                      <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
-                                        <p className={`font-semibold ${textPrimary}`}>2. ATDL UI Representation</p>
-                                        <div className="flex items-center gap-2">
-                                          <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>ATDL: AlgoSuite_Complete_v1.5.atdl</span>
-                                          <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>Equities FIX 4.4 v2.1</span>
+                                    {/* Section 2: ATDL XML Preview — after Select */}
+                                    {atdlUsageStep >= 2 && (
+                                      <div className={`${bgCard} border ${atdlUsageStep >= 3 ? "border-[#4caf50]/50" : borderColor} rounded-lg overflow-hidden`}>
+                                        <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                          <p className={`font-semibold ${textPrimary}`}>2. ATDL XML Preview</p>
+                                          {atdlUsageStep >= 3 && <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
                                         </div>
+                                        <div className={`p-4 overflow-auto max-h-48 font-mono text-xs leading-relaxed ${isDarkMode ? "bg-[#060e1a]" : "bg-gray-950 text-gray-100"}`}>
+                                          <pre className="text-[11px] leading-5">{`<?xml version="1.0" encoding="UTF-8"?>
+<Strategies xmlns="http://www.fixprotocol.org/schema/atdl/1-1_EP">
+  <Strategy name="VWAP" uiRep="VWAP" wireValue="VWAP" version="1" fixMsgType="D">
+    <Parameter name="StartTime" xsi:type="atdl:UTCTimestamp_t" fixTag="7940" use="required"/>
+    <Parameter name="EndTime" xsi:type="atdl:UTCTimestamp_t" fixTag="7941" use="required"/>
+    <Parameter name="ParticipationRate" xsi:type="atdl:Percentage_t" fixTag="7942" use="optional"/>
+    <Parameter name="MinQty" xsi:type="atdl:Int_t" fixTag="7943" use="optional"/>
+    <Parameter name="MaxFloor" xsi:type="atdl:Int_t" fixTag="7944" use="optional"/>
+    <Parameter name="DisplayQty" xsi:type="atdl:Int_t" fixTag="7945" use="optional"/>
+    <StrategyLayout>
+      <StrategyPanel orientation="HORIZONTAL">
+        <Control ID="c_StartTime" xsi:type="atdl:Clock_t" label="Start Time" parameterRef="StartTime"/>
+        <Control ID="c_EndTime" xsi:type="atdl:Clock_t" label="End Time" parameterRef="EndTime"/>
+      </StrategyPanel>
+    </StrategyLayout>
+  </Strategy>
+</Strategies>`}</pre>
+                                        </div>
+                                        {atdlUsageStep === 2 && (
+                                          <div className="p-4 flex justify-end">
+                                            <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setAtdlUsageStep(3)}>
+                                              <Play className="h-4 w-4 mr-1.5" /> Load Strategy UI
+                                            </Button>
+                                          </div>
+                                        )}
                                       </div>
-                                      <div className="p-4">
-                                        <div className="flex items-center gap-2 mb-4">
-                                          <span className={`text-lg font-bold ${textPrimary}`}>VWAP</span>
-                                          <span className="text-xs px-2 py-0.5 rounded bg-[#4caf50]/20 text-[#4caf50]">Active</span>
-                                        </div>
-                                        <div className="grid grid-cols-3 gap-4 mb-4">
-                                          <div>
-                                            <label className={`block text-xs ${textSecondary} mb-1.5`}>Start Time</label>
-                                            <input type="text" defaultValue="09:30 AM" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
-                                          </div>
-                                          <div>
-                                            <label className={`block text-xs ${textSecondary} mb-1.5`}>End Time</label>
-                                            <input type="text" defaultValue="04:00 PM" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
-                                          </div>
-                                          <div>
-                                            <label className={`block text-xs ${textSecondary} mb-1.5`}>Participation Rate (%)</label>
-                                            <input type="text" defaultValue="15" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
-                                          </div>
-                                        </div>
-                                        <div className="grid grid-cols-3 gap-4">
-                                          <div>
-                                            <label className={`block text-xs ${textSecondary} mb-1.5`}>Min Quantity</label>
-                                            <input type="text" defaultValue="100" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
-                                          </div>
-                                          <div>
-                                            <label className={`block text-xs ${textSecondary} mb-1.5`}>Max Floor</label>
-                                            <input type="text" defaultValue="500" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
-                                          </div>
-                                          <div>
-                                            <label className={`block text-xs ${textSecondary} mb-1.5`}>Display Qty</label>
-                                            <input type="text" defaultValue="200" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
-                                          </div>
-                                        </div>
-                                        <div className="flex justify-end mt-4">
-                                          <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">
-                                            <Sparkles className="h-4 w-4 mr-1.5" /> Generate FIX Message
-                                          </Button>
-                                        </div>
-                                      </div>
-                                    </div>
+                                    )}
 
-                                    {/* Section 3: Generated FIX Algo Message */}
-                                    <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
-                                      <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
-                                        <p className={`font-semibold ${textPrimary}`}>3. Generated FIX Algo Message</p>
-                                        <div className="flex items-center gap-2">
-                                          <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>ATDL: AlgoSuite_Complete_v1.5.atdl</span>
-                                          <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>Equities FIX 4.4 v2.1</span>
+                                    {/* Section 3: ATDL UI Representation — after Load Strategy UI */}
+                                    {atdlUsageStep >= 3 && (
+                                      <div className={`${bgCard} border ${atdlUsageStep >= 4 ? "border-[#4caf50]/50" : borderColor} rounded-lg overflow-hidden`}>
+                                        <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                          <p className={`font-semibold ${textPrimary}`}>3. ATDL UI Representation</p>
+                                          <div className="flex items-center gap-2">
+                                            <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>ATDL: AlgoSuite_Complete_v1.5.atdl</span>
+                                            <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>Equities FIX 4.4 v2.1</span>
+                                            {atdlUsageStep >= 4 && <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
+                                          </div>
+                                        </div>
+                                        <div className="p-4">
+                                          <div className="flex items-center gap-2 mb-4">
+                                            <span className={`text-lg font-bold ${textPrimary}`}>VWAP</span>
+                                            <span className="text-xs px-2 py-0.5 rounded bg-[#4caf50]/20 text-[#4caf50]">Active</span>
+                                          </div>
+                                          <div className="grid grid-cols-3 gap-4 mb-4">
+                                            <div>
+                                              <label className={`block text-xs ${textSecondary} mb-1.5`}>Start Time</label>
+                                              <input type="text" defaultValue="09:30 AM" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
+                                            </div>
+                                            <div>
+                                              <label className={`block text-xs ${textSecondary} mb-1.5`}>End Time</label>
+                                              <input type="text" defaultValue="04:00 PM" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
+                                            </div>
+                                            <div>
+                                              <label className={`block text-xs ${textSecondary} mb-1.5`}>Participation Rate (%)</label>
+                                              <input type="text" defaultValue="15" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
+                                            </div>
+                                          </div>
+                                          <div className="grid grid-cols-3 gap-4">
+                                            <div>
+                                              <label className={`block text-xs ${textSecondary} mb-1.5`}>Min Quantity</label>
+                                              <input type="text" defaultValue="100" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
+                                            </div>
+                                            <div>
+                                              <label className={`block text-xs ${textSecondary} mb-1.5`}>Max Floor</label>
+                                              <input type="text" defaultValue="500" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
+                                            </div>
+                                            <div>
+                                              <label className={`block text-xs ${textSecondary} mb-1.5`}>Display Qty</label>
+                                              <input type="text" defaultValue="200" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
+                                            </div>
+                                          </div>
+                                          {atdlUsageStep === 3 && (
+                                            <div className="flex justify-end mt-4">
+                                              <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setAtdlUsageStep(4)}>
+                                                <Sparkles className="h-4 w-4 mr-1.5" /> Generate FIX Message
+                                              </Button>
+                                            </div>
+                                          )}
                                         </div>
                                       </div>
-                                      <div className="p-4">
-                                        <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded p-3 font-mono text-xs overflow-x-auto`}>
-                                          <span className={textSecondary}>8=FIX.4.4|9=256|35=D|49=SENDER|56=TARGET|34=1|52=20240815-14:30:00.000| 11=ORDER123|21=1|55=AAPL+1|60=20240815-14:30:00.000|38=10000|40=2|44=150.00| 59=0|</span>
-                                          <span className="text-[#00e5ff]">847=VWAP</span>
-                                          <span className={textSecondary}>|</span>
-                                          <span className="text-[#ff9800]">7940=09:30:00|7941=16:00:00|7942=15|7943=100|7944=500|7945=200</span>
-                                          <span className={textSecondary}>|10=128|</span>
-                                        </div>
-                                        <div className="flex items-center gap-3 mt-3">
-                                          <Button variant="outline" size="sm" className="text-xs">
-                                            <Copy className="h-3 w-3 mr-1" /> Copy Message
-                                          </Button>
-                                          <Button variant="outline" size="sm" className="text-xs">
-                                            <Download className="h-3 w-3 mr-1" /> Download
-                                          </Button>
-                                        </div>
-                                        <div className="flex justify-end mt-3">
-                                          <Button className="bg-[#9c27b0] hover:bg-[#7b1fa2] text-white">
-                                            <Sparkles className="h-4 w-4 mr-1.5" /> Validate Against FIX Spec
-                                          </Button>
-                                        </div>
-                                      </div>
-                                    </div>
+                                    )}
 
-                                    {/* Section 4: FIX Spec Validation Results */}
-                                    <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
-                                      <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
-                                        <div className="flex items-center gap-2">
-                                          <p className={`font-semibold ${textPrimary}`}>4. FIX Spec Validation Results</p>
-                                          <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>ATDL: AlgoSuite_Complete_v1.5.atdl</span>
-                                          <span className={`text-xs ${textSecondary}`}>Against:</span>
-                                          <select className={`text-xs px-2 py-1 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
-                                            <option>Equities FIX 4.4 v2.1</option>
-                                          </select>
+                                    {/* Section 4: Generated FIX Algo Message — after Generate */}
+                                    {atdlUsageStep >= 4 && (
+                                      <div className={`${bgCard} border ${atdlUsageStep >= 5 ? "border-[#4caf50]/50" : borderColor} rounded-lg overflow-hidden`}>
+                                        <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                          <p className={`font-semibold ${textPrimary}`}>4. Generated FIX Algo Message</p>
+                                          <div className="flex items-center gap-2">
+                                            <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>ATDL: AlgoSuite_Complete_v1.5.atdl</span>
+                                            <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>Equities FIX 4.4 v2.1</span>
+                                            {atdlUsageStep >= 5 && <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
+                                          </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                          <span className="text-xs px-2 py-1 rounded bg-[#4caf50]/20 text-[#4caf50]">4 Matches</span>
-                                          <span className="text-xs px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336]">3 Mismatches</span>
+                                        <div className="p-4">
+                                          <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded p-3 font-mono text-xs overflow-x-auto`}>
+                                            <span className={textSecondary}>8=FIX.4.4|9=256|35=D|49=SENDER|56=TARGET|34=1|52=20240815-14:30:00.000| 11=ORDER123|21=1|55=AAPL+1|60=20240815-14:30:00.000|38=10000|40=2|44=150.00| 59=0|</span>
+                                            <span className="text-[#00e5ff]">847=VWAP</span>
+                                            <span className={textSecondary}>|</span>
+                                            <span className="text-[#ff9800]">7940=09:30:00|7941=16:00:00|7942=15|7943=100|7944=500|7945=200</span>
+                                            <span className={textSecondary}>|10=128|</span>
+                                          </div>
+                                          <div className="flex items-center gap-3 mt-3">
+                                            <Button variant="outline" size="sm" className="text-xs">
+                                              <Copy className="h-3 w-3 mr-1" /> Copy Message
+                                            </Button>
+                                            <Button variant="outline" size="sm" className="text-xs">
+                                              <Download className="h-3 w-3 mr-1" /> Download
+                                            </Button>
+                                          </div>
+                                          {atdlUsageStep === 4 && (
+                                            <div className="flex justify-end mt-3">
+                                              <Button className="bg-[#9c27b0] hover:bg-[#7b1fa2] text-white" onClick={() => setAtdlUsageStep(5)}>
+                                                <Sparkles className="h-4 w-4 mr-1.5" /> Validate Against FIX Spec
+                                              </Button>
+                                            </div>
+                                          )}
                                         </div>
                                       </div>
-                                      <div className="overflow-auto">
-                                        <table className="w-full text-xs">
-                                          <thead className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
-                                            <tr className={`border-b ${borderColor}`}>
-                                              <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>FIX Tag</th>
-                                              <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Name</th>
-                                              <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>ATDL Value</th>
-                                              <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>FIX Spec Value</th>
-                                              <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Status</th>
-                                            </tr>
-                                          </thead>
-                                          <tbody>
-                                            {[
-                                              { tag: "847", name: "TargetStrategy", atdlValue: "VWAP", specValue: "VWAP", status: "match" },
-                                              { tag: "7940", name: "StartTime", atdlValue: "UTCTimestamp", specValue: "UTCTimestamp", status: "match" },
-                                              { tag: "7941", name: "EndTime", atdlValue: "UTCTimestamp", specValue: "UTCTimestamp", status: "match" },
-                                              { tag: "7942", name: "ParticipationRate", atdlValue: "Percentage (0-100)", specValue: "Decimal (0-1)", status: "mismatch" },
-                                              { tag: "7943", name: "MinQty", atdlValue: "Int", specValue: "Qty", status: "mismatch" },
-                                              { tag: "7944", name: "MaxFloor", atdlValue: "Int", specValue: "Int", status: "match" },
-                                              { tag: "7945", name: "DisplayQty", atdlValue: "Int", specValue: "Qty", status: "mismatch" },
-                                            ].map((row, i) => (
-                                              <tr key={i} className={`border-b ${borderColor}`}>
-                                                <td className={`px-4 py-3 font-mono ${textPrimary}`}>{row.tag}</td>
-                                                <td className={`px-4 py-3 ${textPrimary}`}>{row.name}</td>
-                                                <td className={`px-4 py-3 ${textSecondary}`}>{row.atdlValue}</td>
-                                                <td className={`px-4 py-3 ${row.status === "mismatch" ? "text-[#f44336]" : textSecondary}`}>{row.specValue}</td>
-                                                <td className="px-4 py-3">
-                                                  <span className={`flex items-center gap-1 text-xs ${row.status === "match" ? "text-[#4caf50]" : "text-[#f44336]"}`}>
-                                                    {row.status === "match" ? <CheckCircle className="h-3 w-3" /> : <AlertCircle className="h-3 w-3" />}
-                                                    {row.status === "match" ? "Match" : "Mismatch"}
-                                                  </span>
-                                                </td>
+                                    )}
+
+                                    {/* Section 5: FIX Spec Validation Results — after Validate */}
+                                    {atdlUsageStep >= 5 && (
+                                      <div className={`${bgCard} border border-[#4caf50]/50 rounded-lg overflow-hidden`}>
+                                        <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                          <div className="flex items-center gap-2">
+                                            <p className={`font-semibold ${textPrimary}`}>5. FIX Spec Validation Results</p>
+                                            <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>ATDL: AlgoSuite_Complete_v1.5.atdl</span>
+                                            <span className={`text-xs ${textSecondary}`}>Against:</span>
+                                            <select className={`text-xs px-2 py-1 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
+                                              <option>Equities FIX 4.4 v2.1</option>
+                                            </select>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-xs px-2 py-1 rounded bg-[#4caf50]/20 text-[#4caf50]">4 Matches</span>
+                                            <span className="text-xs px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336]">3 Mismatches</span>
+                                            <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                          </div>
+                                        </div>
+                                        <div className="overflow-auto">
+                                          <table className="w-full text-xs">
+                                            <thead className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                                              <tr className={`border-b ${borderColor}`}>
+                                                <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>FIX Tag</th>
+                                                <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Name</th>
+                                                <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>ATDL Value</th>
+                                                <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>FIX Spec Value</th>
+                                                <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Status</th>
                                               </tr>
-                                            ))}
-                                          </tbody>
-                                        </table>
+                                            </thead>
+                                            <tbody>
+                                              {[
+                                                { tag: "847", name: "TargetStrategy", atdlValue: "VWAP", specValue: "VWAP", status: "match" },
+                                                { tag: "7940", name: "StartTime", atdlValue: "UTCTimestamp", specValue: "UTCTimestamp", status: "match" },
+                                                { tag: "7941", name: "EndTime", atdlValue: "UTCTimestamp", specValue: "UTCTimestamp", status: "match" },
+                                                { tag: "7942", name: "ParticipationRate", atdlValue: "Percentage (0-100)", specValue: "Decimal (0-1)", status: "mismatch" },
+                                                { tag: "7943", name: "MinQty", atdlValue: "Int", specValue: "Qty", status: "mismatch" },
+                                                { tag: "7944", name: "MaxFloor", atdlValue: "Int", specValue: "Int", status: "match" },
+                                                { tag: "7945", name: "DisplayQty", atdlValue: "Int", specValue: "Qty", status: "mismatch" },
+                                              ].map((row, i) => (
+                                                <tr key={i} className={`border-b ${borderColor}`}>
+                                                  <td className={`px-4 py-3 font-mono ${textPrimary}`}>{row.tag}</td>
+                                                  <td className={`px-4 py-3 ${textPrimary}`}>{row.name}</td>
+                                                  <td className={`px-4 py-3 ${textSecondary}`}>{row.atdlValue}</td>
+                                                  <td className={`px-4 py-3 ${row.status === "mismatch" ? "text-[#f44336]" : textSecondary}`}>{row.specValue}</td>
+                                                  <td className="px-4 py-3">
+                                                    <span className={`flex items-center gap-1 text-xs ${row.status === "match" ? "text-[#4caf50]" : "text-[#f44336]"}`}>
+                                                      {row.status === "match" ? <CheckCircle className="h-3 w-3" /> : <AlertCircle className="h-3 w-3" />}
+                                                      {row.status === "match" ? "Match" : "Mismatch"}
+                                                    </span>
+                                                  </td>
+                                                </tr>
+                                              ))}
+                                            </tbody>
+                                          </table>
+                                        </div>
                                       </div>
-                                    </div>
+                                    )}
                                   </div>
                                 )}
 
@@ -8967,22 +9244,1097 @@ const tools = [
                                   </div>
                                 )}
 
-                                {/* Generic step content for version-upgrade and remediation workflows */}
-                                {atdlWizardStep > 0 && atdlWorkflowType !== "conversion" && atdlWizardStep < steps.length - 1 && (
-                                  <div className="space-y-4">
-                                    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
-                                      {(() => { const Icon = steps[atdlWizardStep]?.icon || Upload; return <Icon className="h-5 w-5 text-[#00e5ff]" /> })()}
-                                      <div>
-                                        <p className={`font-medium ${textPrimary}`}>{steps[atdlWizardStep]?.label}</p>
-                                        <p className={`text-xs ${textSecondary}`}>{steps[atdlWizardStep]?.desc}</p>
+                                {/* Version-upgrade Step 0: Select FIX Spec Versions */}
+                                {atdlWorkflowType === "version-upgrade" && atdlWizardStep === 0 && (() => {
+                                  const specOptions = [
+                                    { asset: "Equities",     protocol: "FIX 4.2",     name: "EQ_FIX42_v1.2.xml" },
+                                    { asset: "Equities",     protocol: "FIX 4.4",     name: "EQ_FIX44_v2.1.xml" },
+                                    { asset: "Options",      protocol: "FIX 4.4",     name: "OPT_FIX44_v2.0.xml" },
+                                    { asset: "Futures",      protocol: "FIX 4.4",     name: "FUT_FIX44_v1.1.xml" },
+                                    { asset: "Futures",      protocol: "FIX 5.0 SP2", name: "FUT_FIX50SP2_v2.0.xml" },
+                                    { asset: "Fixed Income", protocol: "FIX 4.4",     name: "FI_FIX44_v1.2.xml" },
+                                    { asset: "FX",           protocol: "FIX 5.0 SP2", name: "FX_FIX50SP2_v1.1.xml" },
+                                  ]
+                                  return (
+                                    <div className="space-y-4">
+                                      <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
+                                        <Upload className="h-5 w-5 text-[#00e5ff]" />
+                                        <div>
+                                          <p className={`font-medium ${textPrimary}`}>Select Algo FIX Spec Versions</p>
+                                          <p className={`text-xs ${textSecondary}`}>Choose the old and new FIX spec versions to compare</p>
+                                        </div>
+                                      </div>
+                                      <div className="grid grid-cols-2 gap-5">
+                                        {(["upgrade-old-fix", "upgrade-new-fix"] as const).map((fileKey, col) => (
+                                          <div key={fileKey} className="space-y-2">
+                                            <p className={`text-xs font-semibold uppercase tracking-wider ${textSecondary}`}>{col === 0 ? "Old Version" : "New Version"}</p>
+                                            <div className={`rounded-lg border ${(uploadedFiles[fileKey] as any)?.status === "complete" ? "border-[#00e5ff]/50" : borderColor} overflow-hidden`}>
+                                              {/* Selected display header */}
+                                              {(uploadedFiles[fileKey] as any)?.status === "complete" ? (
+                                                <div className={`px-4 py-3 flex items-center gap-2 border-b ${borderColor} ${isDarkMode ? "bg-[#00e5ff]/10" : "bg-[#00e5ff]/5"}`}>
+                                                  <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                                  <div className="flex-1 min-w-0">
+                                                    <p className={`text-sm font-medium ${textPrimary} truncate`}>{(uploadedFiles[fileKey] as any).name}</p>
+                                                  </div>
+                                                  <button onClick={() => setUploadedFiles(prev => { const n = { ...prev }; delete (n as any)[fileKey]; return n })} className={`text-xs ${textSecondary} hover:text-[#f44336]`}>Change</button>
+                                                </div>
+                                              ) : (
+                                                <div className={`px-4 py-5 flex flex-col items-center gap-2 ${isDarkMode ? "bg-[#0a1628]/50" : "bg-gray-50"}`}>
+                                                  <Upload className={`h-7 w-7 ${textSecondary}`} />
+                                                  <p className={`text-sm font-medium ${textPrimary}`}>Select A File</p>
+                                                  <p className={`text-xs ${textSecondary}`}>Click to browse</p>
+                                                </div>
+                                              )}
+                                              {/* File list */}
+                                              {specOptions.map((spec, i) => {
+                                                const key = `${spec.asset}-${spec.protocol}`
+                                                const isSelected = (uploadedFiles[fileKey] as any)?.key === key
+                                                return (
+                                                  <button key={i}
+                                                    onClick={() => setUploadedFiles(prev => ({ ...prev, [fileKey]: { name: spec.name, size: 0, type: ".xml", status: "complete", key } as any }))}
+                                                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors border-t ${borderColor} ${isSelected ? isDarkMode ? "bg-[#00e5ff]/10 border-l-2 border-l-[#00e5ff]" : "bg-[#00e5ff]/5 border-l-2 border-l-[#00e5ff]" : isDarkMode ? "hover:bg-[#1e4976]/30" : "hover:bg-gray-50"}`}
+                                                  >
+                                                    <FileText className={`h-3.5 w-3.5 shrink-0 ${isSelected ? "text-[#00e5ff]" : textSecondary}`} />
+                                                    <div className="flex-1 min-w-0">
+                                                      <p className={`text-xs font-medium truncate ${textPrimary}`}>{spec.name}</p>
+                                                      <p className={`text-xs ${textSecondary}`}>{spec.asset} · {spec.protocol}</p>
+                                                    </div>
+                                                    {isSelected && <CheckCircle className="h-3.5 w-3.5 text-[#00e5ff] shrink-0" />}
+                                                  </button>
+                                                )
+                                              })}
+                                            </div>
+                                          </div>
+                                        ))}
                                       </div>
                                     </div>
-                                    <div className={`${bgCard} border ${borderColor} rounded-lg p-4 text-center`}>
-                                      <p className={`text-sm ${textSecondary}`}>Complete this step to proceed.</p>
-                                      <Button className="mt-3 bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">
-                                        Mark Step Complete
-                                      </Button>
+                                  )
+                                })()}
+
+                                {/* Version-upgrade Step 1: Select Corresponding ATDLs */}
+                                {atdlWorkflowType === "version-upgrade" && atdlWizardStep === 1 && (() => {
+                                  // Only Equities ATDLs
+                                  const atdlOptions = [
+                                    { asset: "Equities", protocol: "FIX 4.2",     name: "EQ_FIX42_AlgoSuite.atdl",     specName: "EQ_FIX42_v1.2.xml" },
+                                    { asset: "Equities", protocol: "FIX 4.4",     name: "EQ_FIX44_AlgoSuite.atdl",     specName: "EQ_FIX44_v2.1.xml" },
+                                  ]
+                                  const oldFix = (uploadedFiles["upgrade-old-fix"] as any)?.key
+                                  const newFix = (uploadedFiles["upgrade-new-fix"] as any)?.key
+
+                                  // Handler to auto-select corresponding FIX spec when ATDL is selected
+                                  const handleAtdlSelect = (fileKey: string, atdl: typeof atdlOptions[0]) => {
+                                    const key = `${atdl.asset}-${atdl.protocol}`
+                                    const fixKey = fileKey === "upgrade-old-atdl" ? "upgrade-old-fix" : "upgrade-new-fix"
+                                    setUploadedFiles(prev => ({
+                                      ...prev,
+                                      [fileKey]: { name: atdl.name, size: 0, type: ".atdl", status: "complete", key } as any,
+                                      [fixKey]: { name: atdl.specName, size: 0, type: ".xml", status: "complete", key } as any,
+                                    }))
+                                  }
+
+                                  return (
+                                    <div className="space-y-4">
+                                      <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
+                                        <FileText className="h-5 w-5 text-[#9c27b0]" />
+                                        <div>
+                                          <p className={`font-medium ${textPrimary}`}>Select Corresponding ATDLs</p>
+                                          <p className={`text-xs ${textSecondary}`}>Choose the ATDL file — the corresponding FIX spec version will be auto-selected</p>
+                                        </div>
+                                      </div>
+
+                                      {/* Context strip — show selected FIX specs (auto-populated) */}
+                                      {(oldFix || newFix) && (
+                                        <div className="grid grid-cols-2 gap-5">
+                                          {(["upgrade-old-fix", "upgrade-new-fix"] as const).map((fk, col) => (
+                                            <div key={fk} className={`flex items-center gap-2 px-3 py-2 rounded ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"}`}>
+                                              <FileText className={`h-3.5 w-3.5 shrink-0 text-[#00e5ff]`} />
+                                              <div className="min-w-0">
+                                                <p className={`text-xs ${textSecondary} uppercase tracking-wider`}>{col === 0 ? "Old FIX Spec" : "New FIX Spec"}</p>
+                                                <p className={`text-xs font-medium ${textPrimary} truncate`}>{(uploadedFiles[fk] as any)?.name ?? "Auto-selected with ATDL"}</p>
+                                              </div>
+                                              {(uploadedFiles[fk] as any)?.name && <CheckCircle className="h-3.5 w-3.5 text-[#4caf50] shrink-0" />}
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+
+                                      <div className="grid grid-cols-2 gap-5">
+                                        {(["upgrade-old-atdl", "upgrade-new-atdl"] as const).map((fileKey, col) => (
+                                          <div key={fileKey} className="space-y-2">
+                                            <p className={`text-xs font-semibold uppercase tracking-wider ${textSecondary}`}>{col === 0 ? "Old ATDL" : "New ATDL"}</p>
+                                            <div className={`rounded-lg border ${(uploadedFiles[fileKey] as any)?.status === "complete" ? "border-[#9c27b0]/50" : borderColor} overflow-hidden`}>
+                                              {(uploadedFiles[fileKey] as any)?.status === "complete" ? (
+                                                <div className={`px-4 py-3 flex items-center gap-2 border-b ${borderColor} ${isDarkMode ? "bg-[#9c27b0]/10" : "bg-[#9c27b0]/5"}`}>
+                                                  <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                                  <div className="flex-1 min-w-0">
+                                                    <p className={`text-sm font-medium ${textPrimary} truncate`}>{(uploadedFiles[fileKey] as any).name}</p>
+                                                  </div>
+                                                  <button onClick={() => {
+                                                    const fixKey = fileKey === "upgrade-old-atdl" ? "upgrade-old-fix" : "upgrade-new-fix"
+                                                    setUploadedFiles(prev => { const n = { ...prev }; delete (n as any)[fileKey]; delete (n as any)[fixKey]; return n })
+                                                  }} className={`text-xs ${textSecondary} hover:text-[#f44336]`}>Change</button>
+                                                </div>
+                                              ) : (
+                                                <div className={`px-4 py-5 flex flex-col items-center gap-2 ${isDarkMode ? "bg-[#0a1628]/50" : "bg-gray-50"}`}>
+                                                  <Upload className={`h-7 w-7 ${textSecondary}`} />
+                                                  <p className={`text-sm font-medium ${textPrimary}`}>Select A File</p>
+                                                  <p className={`text-xs ${textSecondary}`}>Click to browse</p>
+                                                </div>
+                                              )}
+                                              {atdlOptions.map((atdl, i) => {
+                                                const key = `${atdl.asset}-${atdl.protocol}`
+                                                const isSelected = (uploadedFiles[fileKey] as any)?.key === key
+                                                return (
+                                                  <button key={i}
+                                                    onClick={() => handleAtdlSelect(fileKey, atdl)}
+                                                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors border-t ${borderColor} ${isSelected ? isDarkMode ? "bg-[#9c27b0]/10 border-l-2 border-l-[#9c27b0]" : "bg-[#9c27b0]/5 border-l-2 border-l-[#9c27b0]" : isDarkMode ? "hover:bg-[#1e4976]/30" : "hover:bg-gray-50"}`}
+                                                  >
+                                                    <Layers className={`h-3.5 w-3.5 shrink-0 ${isSelected ? "text-[#9c27b0]" : textSecondary}`} />
+                                                    <div className="flex-1 min-w-0">
+                                                      <p className={`text-xs font-medium truncate ${textPrimary}`}>{atdl.name}</p>
+                                                      <p className={`text-xs ${textSecondary}`}>{atdl.asset} · {atdl.protocol}</p>
+                                                    </div>
+                                                    {isSelected && <CheckCircle className="h-3.5 w-3.5 text-[#9c27b0] shrink-0" />}
+                                                  </button>
+                                                )
+                                              })}
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
                                     </div>
+                                  )
+                                })()}
+
+                                {/* Version-upgrade Step 2: Compare FIX Specs */}
+                                {atdlWorkflowType === "version-upgrade" && atdlWizardStep === 2 && (
+                                  <div className="space-y-4">
+                                    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
+                                      <GitCompare className="h-5 w-5 text-[#00e5ff]" />
+                                      <div>
+                                        <p className={`font-medium ${textPrimary}`}>Compare FIX Spec Versions</p>
+                                        <p className={`text-xs ${textSecondary}`}>Side-by-side comparison of old and new FIX spec differences</p>
+                                      </div>
+                                    </div>
+
+                                    {/* Selected files context */}
+                                    <div className="grid grid-cols-2 gap-5">
+                                      <div className={`flex items-center gap-2 px-3 py-2 rounded ${isDarkMode ? "bg-[#f44336]/10 border border-[#f44336]/30" : "bg-red-50 border border-red-200"}`}>
+                                        <FileText className="h-3.5 w-3.5 text-[#f44336]" />
+                                        <div className="min-w-0">
+                                          <p className="text-xs text-[#f44336] uppercase tracking-wider font-medium">Old FIX Spec</p>
+                                          <p className={`text-xs font-medium ${textPrimary} truncate`}>{(uploadedFiles["upgrade-old-fix"] as any)?.name ?? "Not selected"}</p>
+                                        </div>
+                                      </div>
+                                      <div className={`flex items-center gap-2 px-3 py-2 rounded ${isDarkMode ? "bg-[#4caf50]/10 border border-[#4caf50]/30" : "bg-green-50 border border-green-200"}`}>
+                                        <FileText className="h-3.5 w-3.5 text-[#4caf50]" />
+                                        <div className="min-w-0">
+                                          <p className="text-xs text-[#4caf50] uppercase tracking-wider font-medium">New FIX Spec</p>
+                                          <p className={`text-xs font-medium ${textPrimary} truncate`}>{(uploadedFiles["upgrade-new-fix"] as any)?.name ?? "Not selected"}</p>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* Comparison Results */}
+                                    <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                      <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                        <p className={`font-semibold ${textPrimary}`}>FIX Spec Comparison Results</p>
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-xs px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336]">3 Removed</span>
+                                          <span className="text-xs px-2 py-1 rounded bg-[#4caf50]/20 text-[#4caf50]">5 Added</span>
+                                          <span className="text-xs px-2 py-1 rounded bg-[#ff9800]/20 text-[#ff9800]">2 Modified</span>
+                                        </div>
+                                      </div>
+                                      <div className="divide-y divide-gray-700/30">
+                                        {[
+                                          { type: "added", tag: "7946", name: "AggressiveMode", desc: "New parameter for aggressive execution" },
+                                          { type: "added", tag: "7947", name: "PassiveOnly", desc: "Restrict to passive fills only" },
+                                          { type: "added", tag: "7948", name: "DarkPoolOnly", desc: "Route only to dark pools" },
+                                          { type: "modified", tag: "7942", name: "ParticipationRate", desc: "Changed from Int to Percentage type" },
+                                          { type: "modified", tag: "7943", name: "MinQty", desc: "Added minValue constraint" },
+                                          { type: "removed", tag: "7950", name: "LegacyFlag", desc: "Deprecated in FIX 4.4" },
+                                          { type: "added", tag: "7949", name: "AuctionParticipation", desc: "Enable auction participation" },
+                                          { type: "removed", tag: "7951", name: "OldRoutingCode", desc: "Replaced by new routing logic" },
+                                          { type: "added", tag: "7952", name: "SliceInterval", desc: "Time interval between order slices" },
+                                          { type: "removed", tag: "7953", name: "DeprecatedUrgency", desc: "Superseded by new urgency enum" },
+                                        ].map((diff, i) => (
+                                          <div key={i} className={`flex items-center gap-4 px-4 py-3 ${diff.type === "added" ? isDarkMode ? "bg-[#4caf50]/5" : "bg-green-50/50" : diff.type === "removed" ? isDarkMode ? "bg-[#f44336]/5" : "bg-red-50/50" : isDarkMode ? "bg-[#ff9800]/5" : "bg-orange-50/50"}`}>
+                                            <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${diff.type === "added" ? "bg-[#4caf50]/20 text-[#4caf50]" : diff.type === "removed" ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>
+                                              {diff.type === "added" ? "+" : diff.type === "removed" ? "-" : "~"}
+                                            </span>
+                                            <span className={`font-mono text-xs ${textSecondary} w-12`}>{diff.tag}</span>
+                                            <span className={`text-sm font-medium ${textPrimary} w-40`}>{diff.name}</span>
+                                            <span className={`text-xs ${textSecondary} flex-1`}>{diff.desc}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Version-upgrade Step 3: Compare ATDLs */}
+                                {atdlWorkflowType === "version-upgrade" && atdlWizardStep === 3 && (
+                                  <div className="space-y-4">
+                                    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#9c27b0]/20" : "bg-purple-50"}`}>
+                                      <Layers className="h-5 w-5 text-[#9c27b0]" />
+                                      <div>
+                                        <p className={`font-medium ${textPrimary}`}>Compare ATDL Versions</p>
+                                        <p className={`text-xs ${textSecondary}`}>Side-by-side comparison of old and new ATDL differences</p>
+                                      </div>
+                                    </div>
+
+                                    {/* Selected files context */}
+                                    <div className="grid grid-cols-2 gap-5">
+                                      <div className={`flex items-center gap-2 px-3 py-2 rounded ${isDarkMode ? "bg-[#f44336]/10 border border-[#f44336]/30" : "bg-red-50 border border-red-200"}`}>
+                                        <Layers className="h-3.5 w-3.5 text-[#f44336]" />
+                                        <div className="min-w-0">
+                                          <p className="text-xs text-[#f44336] uppercase tracking-wider font-medium">Old ATDL</p>
+                                          <p className={`text-xs font-medium ${textPrimary} truncate`}>{(uploadedFiles["upgrade-old-atdl"] as any)?.name ?? "Not selected"}</p>
+                                        </div>
+                                      </div>
+                                      <div className={`flex items-center gap-2 px-3 py-2 rounded ${isDarkMode ? "bg-[#4caf50]/10 border border-[#4caf50]/30" : "bg-green-50 border border-green-200"}`}>
+                                        <Layers className="h-3.5 w-3.5 text-[#4caf50]" />
+                                        <div className="min-w-0">
+                                          <p className="text-xs text-[#4caf50] uppercase tracking-wider font-medium">New ATDL</p>
+                                          <p className={`text-xs font-medium ${textPrimary} truncate`}>{(uploadedFiles["upgrade-new-atdl"] as any)?.name ?? "Not selected"}</p>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* ATDL Comparison Results */}
+                                    <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                      <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                        <p className={`font-semibold ${textPrimary}`}>ATDL Comparison Results</p>
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-xs px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336]">2 Removed</span>
+                                          <span className="text-xs px-2 py-1 rounded bg-[#4caf50]/20 text-[#4caf50]">4 Added</span>
+                                          <span className="text-xs px-2 py-1 rounded bg-[#ff9800]/20 text-[#ff9800]">3 Modified</span>
+                                        </div>
+                                      </div>
+                                      <div className="divide-y divide-gray-700/30">
+                                        {[
+                                          { type: "added", category: "Strategy", name: "POV", desc: "New Percentage of Volume strategy added" },
+                                          { type: "added", category: "Parameter", name: "AggressiveMode", desc: "Boolean control for VWAP strategy" },
+                                          { type: "modified", category: "Control", name: "ParticipationRate", desc: "Changed from Spinner to Slider control" },
+                                          { type: "modified", category: "Validation", name: "MinQty", desc: "Added minValue=1 constraint" },
+                                          { type: "added", category: "Parameter", name: "DarkPoolOnly", desc: "Checkbox control for dark pool routing" },
+                                          { type: "removed", category: "Strategy", name: "LegacyVWAP", desc: "Deprecated strategy removed" },
+                                          { type: "modified", category: "Layout", name: "TWAP Panel", desc: "Reorganized control arrangement" },
+                                          { type: "added", category: "Parameter", name: "SliceInterval", desc: "Time picker for slice intervals" },
+                                          { type: "removed", category: "Control", name: "OldUrgencyDropdown", desc: "Replaced with new enum values" },
+                                        ].map((diff, i) => (
+                                          <div key={i} className={`flex items-center gap-4 px-4 py-3 ${diff.type === "added" ? isDarkMode ? "bg-[#4caf50]/5" : "bg-green-50/50" : diff.type === "removed" ? isDarkMode ? "bg-[#f44336]/5" : "bg-red-50/50" : isDarkMode ? "bg-[#ff9800]/5" : "bg-orange-50/50"}`}>
+                                            <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${diff.type === "added" ? "bg-[#4caf50]/20 text-[#4caf50]" : diff.type === "removed" ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>
+                                              {diff.type === "added" ? "+" : diff.type === "removed" ? "-" : "~"}
+                                            </span>
+                                            <span className={`text-xs px-2 py-0.5 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary} w-20 text-center`}>{diff.category}</span>
+                                            <span className={`text-sm font-medium ${textPrimary} w-40`}>{diff.name}</span>
+                                            <span className={`text-xs ${textSecondary} flex-1`}>{diff.desc}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Version-upgrade Step 4: Validate */}
+                                {atdlWorkflowType === "version-upgrade" && atdlWizardStep === 4 && (
+                                  <div className="space-y-4">
+                                    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#4caf50]/20" : "bg-green-50"}`}>
+                                      <CheckCircle className="h-5 w-5 text-[#4caf50]" />
+                                      <div>
+                                        <p className={`font-medium ${textPrimary}`}>Validate Upgrade Compatibility</p>
+                                        <p className={`text-xs ${textSecondary}`}>Ensure new versions are backward compatible and meet requirements</p>
+                                      </div>
+                                    </div>
+
+                                    {/* Validation Results */}
+                                    <div className={`${bgCard} border border-[#4caf50]/30 rounded-lg overflow-hidden`}>
+                                      <div className={`px-4 py-3 border-b border-[#4caf50]/30 flex items-center justify-between`}>
+                                        <p className={`font-semibold ${textPrimary}`}>Upgrade Validation Results</p>
+                                        <span className="text-xs px-2 py-1 rounded-full bg-[#4caf50]/20 text-[#4caf50] font-medium">All Checks Passed</span>
+                                      </div>
+                                      <div className="divide-y divide-[#4caf50]/10">
+                                        {[
+                                          { label: "Schema Compatibility", detail: "New ATDL conforms to FIXatdl 1.1 schema" },
+                                          { label: "Backward Compatibility", detail: "All existing parameters preserved in new version" },
+                                          { label: "Parameter Type Consistency", detail: "No breaking type changes detected" },
+                                          { label: "Required Field Coverage", detail: "All mandatory parameters present in both versions" },
+                                          { label: "Control Binding Validity", detail: "All UI controls properly bound to parameters" },
+                                          { label: "FIX Tag Alignment", detail: "New ATDL tags match new FIX spec definitions" },
+                                          { label: "Enum Value Compatibility", detail: "Enum expansions are additive only" },
+                                        ].map((check, i) => (
+                                          <div key={i} className="flex items-center justify-between px-4 py-3">
+                                            <div>
+                                              <p className={`text-sm font-medium ${textPrimary}`}>{check.label}</p>
+                                              <p className={`text-xs ${textSecondary}`}>{check.detail}</p>
+                                            </div>
+                                            <CheckCircle className="h-5 w-5 text-[#4caf50] shrink-0" />
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+
+                                    {/* AI Confidence Matrix */}
+                                    <AIConfidenceMatrix
+                                      isDarkMode={isDarkMode}
+                                      bgCard={bgCard}
+                                      borderColor={borderColor}
+                                      textPrimary={textPrimary}
+                                      textSecondary={textSecondary}
+                                      score={96}
+                                      basis="Version upgrade validation passed all 7 compatibility checks. The new ATDL fully aligns with the upgraded FIX spec with no breaking changes detected."
+                                    />
+                                  </div>
+                                )}
+
+                                {/* Version-upgrade Step 5: Preview — Full ATDL Usage Flow with Progressive Reveal */}
+                                {atdlWorkflowType === "version-upgrade" && atdlWizardStep === 5 && (
+                                  <div className="space-y-4">
+                                    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
+                                      <Eye className="h-5 w-5 text-[#00e5ff]" />
+                                      <div>
+                                        <p className={`font-medium ${textPrimary}`}>Preview Upgraded ATDL</p>
+                                        <p className={`text-xs ${textSecondary}`}>Select the upgraded ATDL, view strategy UI, generate FIX messages, and validate</p>
+                                      </div>
+                                    </div>
+
+                                    {/* Section 1: Select ATDL File — always visible */}
+                                    <div className={`${bgCard} border ${upgradeUsageStep >= 2 ? "border-[#4caf50]/50" : borderColor} rounded-lg overflow-hidden`}>
+                                      <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                        <p className={`font-semibold ${textPrimary}`}>1. Select Upgraded ATDL File</p>
+                                        {upgradeUsageStep >= 2 && <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
+                                      </div>
+                                      <div className="p-4">
+                                        <div className="grid grid-cols-2 gap-4 mb-4">
+                                          <div>
+                                            <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Select Upgraded ATDL</label>
+                                            <select className={`w-full p-2.5 rounded border border-[#00e5ff] ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`}>
+                                              <option>{(uploadedFiles["upgrade-new-atdl"] as any)?.name || "EQ_FIX44_AlgoSuite.atdl"}</option>
+                                            </select>
+                                          </div>
+                                          <div>
+                                            <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Select Strategy</label>
+                                            <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`}>
+                                              <option>VWAP - Volume Weighted Average Price</option>
+                                              <option>TWAP - Time Weighted Average Price</option>
+                                              <option>POV - Percentage of Volume</option>
+                                            </select>
+                                          </div>
+                                        </div>
+                                        {upgradeUsageStep === 1 && (
+                                          <div className="flex justify-end">
+                                            <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setUpgradeUsageStep(2)}>
+                                              <FileText className="h-4 w-4 mr-1.5" /> Load ATDL
+                                            </Button>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    {/* Section 2: ATDL XML Preview — after Select */}
+                                    {upgradeUsageStep >= 2 && (
+                                      <div className={`${bgCard} border ${upgradeUsageStep >= 3 ? "border-[#4caf50]/50" : borderColor} rounded-lg overflow-hidden`}>
+                                        <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                          <p className={`font-semibold ${textPrimary}`}>2. Upgraded ATDL XML Preview</p>
+                                          {upgradeUsageStep >= 3 && <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
+                                        </div>
+                                        <div className={`p-4 overflow-auto max-h-48 font-mono text-xs leading-relaxed ${isDarkMode ? "bg-[#060e1a]" : "bg-gray-950 text-gray-100"}`}>
+                                          <pre className="text-[11px] leading-5">{`<?xml version="1.0" encoding="UTF-8"?>
+<Strategies xmlns="http://www.fixprotocol.org/schema/atdl/1-1_EP">
+  <Strategy name="VWAP" uiRep="VWAP" wireValue="VWAP" version="2" fixMsgType="D">
+    <Parameter name="StartTime" xsi:type="atdl:UTCTimestamp_t" fixTag="7940" use="required"/>
+    <Parameter name="EndTime" xsi:type="atdl:UTCTimestamp_t" fixTag="7941" use="required"/>
+    <Parameter name="ParticipationRate" xsi:type="atdl:Percentage_t" fixTag="7942" use="optional"/>
+    <Parameter name="MinQty" xsi:type="atdl:Int_t" fixTag="7943" use="optional" minValue="1"/>
+    <Parameter name="AggressiveMode" xsi:type="atdl:Boolean_t" fixTag="7946" use="optional"/>
+    <Parameter name="DarkPoolOnly" xsi:type="atdl:Boolean_t" fixTag="7948" use="optional"/>
+    <StrategyLayout>
+      <StrategyPanel orientation="HORIZONTAL">
+        <Control ID="c_StartTime" xsi:type="atdl:Clock_t" label="Start Time" parameterRef="StartTime"/>
+        <Control ID="c_EndTime" xsi:type="atdl:Clock_t" label="End Time" parameterRef="EndTime"/>
+        <Control ID="c_AggressiveMode" xsi:type="atdl:CheckBox_t" label="Aggressive Mode" parameterRef="AggressiveMode"/>
+      </StrategyPanel>
+    </StrategyLayout>
+  </Strategy>
+</Strategies>`}</pre>
+                                        </div>
+                                        {upgradeUsageStep === 2 && (
+                                          <div className="p-4 flex justify-end">
+                                            <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setUpgradeUsageStep(3)}>
+                                              <Play className="h-4 w-4 mr-1.5" /> Load Strategy UI
+                                            </Button>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+
+                                    {/* Section 3: ATDL UI Representation — after Load Strategy UI */}
+                                    {upgradeUsageStep >= 3 && (
+                                      <div className={`${bgCard} border ${upgradeUsageStep >= 4 ? "border-[#4caf50]/50" : borderColor} rounded-lg overflow-hidden`}>
+                                        <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                          <p className={`font-semibold ${textPrimary}`}>3. ATDL UI Representation</p>
+                                          <div className="flex items-center gap-2">
+                                            <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>ATDL: {(uploadedFiles["upgrade-new-atdl"] as any)?.name || "EQ_FIX44_AlgoSuite.atdl"}</span>
+                                            <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>Equities FIX 4.4</span>
+                                            {upgradeUsageStep >= 4 && <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
+                                          </div>
+                                        </div>
+                                        <div className="p-4">
+                                          <div className="flex items-center gap-2 mb-4">
+                                            <span className={`text-lg font-bold ${textPrimary}`}>VWAP</span>
+                                            <span className="text-xs px-2 py-0.5 rounded bg-[#4caf50]/20 text-[#4caf50]">v2 - Upgraded</span>
+                                          </div>
+                                          <div className="grid grid-cols-3 gap-4 mb-4">
+                                            <div>
+                                              <label className={`block text-xs ${textSecondary} mb-1.5`}>Start Time</label>
+                                              <input type="text" defaultValue="09:30 AM" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
+                                            </div>
+                                            <div>
+                                              <label className={`block text-xs ${textSecondary} mb-1.5`}>End Time</label>
+                                              <input type="text" defaultValue="04:00 PM" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
+                                            </div>
+                                            <div>
+                                              <label className={`block text-xs ${textSecondary} mb-1.5`}>Participation Rate (%)</label>
+                                              <input type="text" defaultValue="15" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
+                                            </div>
+                                          </div>
+                                          <div className="grid grid-cols-3 gap-4 mb-4">
+                                            <div>
+                                              <label className={`block text-xs ${textSecondary} mb-1.5`}>Min Quantity</label>
+                                              <input type="text" defaultValue="100" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
+                                            </div>
+                                            <div className="flex items-center gap-2 pt-5">
+                                              <input type="checkbox" id="aggressiveMode" className="h-4 w-4 rounded border-gray-300" />
+                                              <label htmlFor="aggressiveMode" className={`text-sm ${textPrimary}`}>Aggressive Mode</label>
+                                              <span className="text-xs px-1.5 py-0.5 rounded bg-[#4caf50]/20 text-[#4caf50]">New</span>
+                                            </div>
+                                            <div className="flex items-center gap-2 pt-5">
+                                              <input type="checkbox" id="darkPoolOnly" className="h-4 w-4 rounded border-gray-300" />
+                                              <label htmlFor="darkPoolOnly" className={`text-sm ${textPrimary}`}>Dark Pool Only</label>
+                                              <span className="text-xs px-1.5 py-0.5 rounded bg-[#4caf50]/20 text-[#4caf50]">New</span>
+                                            </div>
+                                          </div>
+                                          {upgradeUsageStep === 3 && (
+                                            <div className="flex justify-end mt-4">
+                                              <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setUpgradeUsageStep(4)}>
+                                                <Sparkles className="h-4 w-4 mr-1.5" /> Generate FIX Message
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Section 4: Generated FIX Algo Message — after Generate */}
+                                    {upgradeUsageStep >= 4 && (
+                                      <div className={`${bgCard} border ${upgradeUsageStep >= 5 ? "border-[#4caf50]/50" : borderColor} rounded-lg overflow-hidden`}>
+                                        <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                          <p className={`font-semibold ${textPrimary}`}>4. Generated FIX Algo Message</p>
+                                          <div className="flex items-center gap-2">
+                                            <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>ATDL: {(uploadedFiles["upgrade-new-atdl"] as any)?.name || "EQ_FIX44_AlgoSuite.atdl"}</span>
+                                            <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>Equities FIX 4.4</span>
+                                            {upgradeUsageStep >= 5 && <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
+                                          </div>
+                                        </div>
+                                        <div className="p-4">
+                                          <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded p-3 font-mono text-xs overflow-x-auto`}>
+                                            <span className={textSecondary}>8=FIX.4.4|9=280|35=D|49=SENDER|56=TARGET|34=1|52=20240815-14:30:00.000| 11=ORDER123|21=1|55=AAPL|60=20240815-14:30:00.000|38=10000|40=2|44=150.00| 59=0|</span>
+                                            <span className="text-[#00e5ff]">847=VWAP</span>
+                                            <span className={textSecondary}>|</span>
+                                            <span className="text-[#ff9800]">7940=09:30:00|7941=16:00:00|7942=15|7943=100</span>
+                                            <span className={textSecondary}>|</span>
+                                            <span className="text-[#4caf50]">7946=N|7948=N</span>
+                                            <span className={textSecondary}>|10=128|</span>
+                                          </div>
+                                          <div className="flex items-center gap-2 mt-2">
+                                            <span className="text-xs px-1.5 py-0.5 rounded bg-[#4caf50]/20 text-[#4caf50]">New tags: 7946, 7948</span>
+                                          </div>
+                                          <div className="flex items-center gap-3 mt-3">
+                                            <Button variant="outline" size="sm" className="text-xs">
+                                              <Copy className="h-3 w-3 mr-1" /> Copy Message
+                                            </Button>
+                                            <Button variant="outline" size="sm" className="text-xs">
+                                              <Download className="h-3 w-3 mr-1" /> Download
+                                            </Button>
+                                          </div>
+                                          {upgradeUsageStep === 4 && (
+                                            <div className="flex justify-end mt-3">
+                                              <Button className="bg-[#9c27b0] hover:bg-[#7b1fa2] text-white" onClick={() => setUpgradeUsageStep(5)}>
+                                                <Sparkles className="h-4 w-4 mr-1.5" /> Validate Against New FIX Spec
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Section 5: FIX Spec Validation Results — after Validate */}
+                                    {upgradeUsageStep >= 5 && (
+                                      <>
+                                        <div className={`${bgCard} border border-[#4caf50]/50 rounded-lg overflow-hidden`}>
+                                          <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                            <div className="flex items-center gap-2">
+                                              <p className={`font-semibold ${textPrimary}`}>5. FIX Spec Validation Results</p>
+                                              <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>ATDL: {(uploadedFiles["upgrade-new-atdl"] as any)?.name || "EQ_FIX44_AlgoSuite.atdl"}</span>
+                                              <span className={`text-xs ${textSecondary}`}>Against:</span>
+                                              <select className={`text-xs px-2 py-1 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
+                                                <option>Equities FIX 4.4 v2.1</option>
+                                              </select>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                              <span className="text-xs px-2 py-1 rounded bg-[#4caf50]/20 text-[#4caf50]">6 Matches</span>
+                                              <span className="text-xs px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336]">0 Mismatches</span>
+                                              <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                            </div>
+                                          </div>
+                                          <div className="overflow-auto">
+                                            <table className="w-full text-xs">
+                                              <thead className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                                                <tr className={`border-b ${borderColor}`}>
+                                                  <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>FIX Tag</th>
+                                                  <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Name</th>
+                                                  <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>ATDL Value</th>
+                                                  <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>FIX Spec Value</th>
+                                                  <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Status</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody>
+                                                {[
+                                                  { tag: "847", name: "TargetStrategy", atdlValue: "VWAP", specValue: "VWAP", status: "match" },
+                                                  { tag: "7940", name: "StartTime", atdlValue: "UTCTimestamp", specValue: "UTCTimestamp", status: "match" },
+                                                  { tag: "7941", name: "EndTime", atdlValue: "UTCTimestamp", specValue: "UTCTimestamp", status: "match" },
+                                                  { tag: "7942", name: "ParticipationRate", atdlValue: "Percentage", specValue: "Percentage", status: "match" },
+                                                  { tag: "7943", name: "MinQty", atdlValue: "Int (minValue=1)", specValue: "Int (minValue=1)", status: "match", isNew: false },
+                                                  { tag: "7946", name: "AggressiveMode", atdlValue: "Boolean", specValue: "Boolean", status: "match", isNew: true },
+                                                  { tag: "7948", name: "DarkPoolOnly", atdlValue: "Boolean", specValue: "Boolean", status: "match", isNew: true },
+                                                ].map((row, i) => (
+                                                  <tr key={i} className={`border-b ${borderColor}`}>
+                                                    <td className={`px-4 py-3 font-mono ${textPrimary}`}>
+                                                      {row.tag}
+                                                      {(row as any).isNew && <span className="ml-1.5 text-xs px-1 py-0.5 rounded bg-[#4caf50]/20 text-[#4caf50]">New</span>}
+                                                    </td>
+                                                    <td className={`px-4 py-3 ${textPrimary}`}>{row.name}</td>
+                                                    <td className={`px-4 py-3 ${textSecondary}`}>{row.atdlValue}</td>
+                                                    <td className={`px-4 py-3 ${textSecondary}`}>{row.specValue}</td>
+                                                    <td className="px-4 py-3">
+                                                      <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded ${row.status === "match" ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#f44336]/20 text-[#f44336]"}`}>
+                                                        {row.status === "match" ? <CheckCircle className="h-3 w-3" /> : <AlertCircle className="h-3 w-3" />}
+                                                        {row.status === "match" ? "Match" : "Mismatch"}
+                                                      </span>
+                                                    </td>
+                                                  </tr>
+                                                ))}
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                        </div>
+
+                                        {/* AI Confidence Matrix */}
+                                        <AIConfidenceMatrix
+                                          isDarkMode={isDarkMode}
+                                          bgCard={bgCard}
+                                          borderColor={borderColor}
+                                          textPrimary={textPrimary}
+                                          textSecondary={textSecondary}
+                                          score={98}
+                                          basis="Upgraded ATDL validated successfully against the new FIX 4.4 spec. All 7 parameters including 2 new fields (AggressiveMode, DarkPoolOnly) match spec definitions with full type compatibility."
+                                        />
+                                      </>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* Remediation Step 0: Upload FIX Spec + ATDL */}
+                                {atdlWorkflowType === "remediation" && atdlWizardStep === 0 && (() => {
+                                  const rFixSpecs = [
+                                    { asset: "Equities", protocol: "FIX 4.2", name: "EQ_FIX42_v1.2.xml" },
+                                    { asset: "Equities", protocol: "FIX 4.4", name: "EQ_FIX44_v2.1.xml" },
+                                    { asset: "Options",  protocol: "FIX 4.4", name: "OPT_FIX44_v2.0.xml" },
+                                    { asset: "Futures",  protocol: "FIX 4.4", name: "FUT_FIX44_v1.1.xml" },
+                                    { asset: "Fixed Income", protocol: "FIX 4.4", name: "FI_FIX44_v1.2.xml" },
+                                  ]
+                                  const rAtdlFiles = [
+                                    { asset: "Equities", protocol: "FIX 4.2", name: "EQ_FIX42_AlgoSuite.atdl" },
+                                    { asset: "Equities", protocol: "FIX 4.4", name: "EQ_FIX44_AlgoSuite.atdl" },
+                                    { asset: "Options",  protocol: "FIX 4.4", name: "OPT_FIX44_AlgoSuite.atdl" },
+                                    { asset: "Futures",  protocol: "FIX 4.4", name: "FUT_FIX44_AlgoSuite.atdl" },
+                                    { asset: "Fixed Income", protocol: "FIX 4.4", name: "FI_FIX44_AlgoSuite.atdl" },
+                                  ]
+                                  return (
+                                    <div className="space-y-4">
+                                      <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#ff9800]/10" : "bg-orange-50"}`}>
+                                        <Upload className="h-5 w-5 text-[#ff9800]" />
+                                        <div>
+                                          <p className={`font-medium ${textPrimary}`}>Choose Files</p>
+                                          <p className={`text-xs ${textSecondary}`}>Select your FIX specification (algo section) and the ATDL file to validate against it</p>
+                                        </div>
+                                      </div>
+                                      <div className="grid grid-cols-2 gap-5">
+                                        {([
+                                          { fileKey: "remed-fix-spec", label: "FIX Specification (Algo Section)", opts: rFixSpecs, accent: "#00e5ff" },
+                                          { fileKey: "remed-atdl",     label: "ATDL File",                        opts: rAtdlFiles, accent: "#ff9800" },
+                                        ] as const).map(({ fileKey, label, opts, accent }) => (
+                                          <div key={fileKey} className="space-y-2">
+                                            <p className={`text-xs font-semibold uppercase tracking-wider ${textSecondary}`}>{label}</p>
+                                            <div className={`rounded-lg border ${(uploadedFiles[fileKey] as any)?.status === "complete" ? "border-[#4caf50]/50" : borderColor} overflow-hidden`}>
+                                              {(uploadedFiles[fileKey] as any)?.status === "complete" ? (
+                                                <div className="px-4 py-3 flex items-center gap-2 border-b" style={{ borderBottomColor: `${accent}30`, background: `${accent}10` }}>
+                                                  <CheckCircle className="h-4 w-4 text-[#4caf50] shrink-0" />
+                                                  <p className={`text-sm font-medium ${textPrimary} flex-1 truncate`}>{(uploadedFiles[fileKey] as any).name}</p>
+                                                  <button onClick={() => setUploadedFiles(p => { const n = { ...p }; delete (n as any)[fileKey]; return n })} className={`text-xs ${textSecondary} hover:text-[#f44336]`}>Change</button>
+                                                </div>
+                                              ) : (
+                                                <div className={`px-4 py-5 flex flex-col items-center gap-2 ${isDarkMode ? "bg-[#0a1628]/50" : "bg-gray-50"}`}>
+                                                  <Upload className={`h-7 w-7 ${textSecondary}`} />
+                                                  <p className={`text-sm font-medium ${textPrimary}`}>Select A File</p>
+                                                  <p className={`text-xs ${textSecondary}`}>Click to browse</p>
+                                                </div>
+                                              )}
+                                              {opts.map((opt, i) => {
+                                                const k = `${opt.asset}-${opt.protocol}`
+                                                const isSel = (uploadedFiles[fileKey] as any)?.key === k
+                                                return (
+                                                  <button key={i}
+                                                    onClick={() => setUploadedFiles(p => ({ ...p, [fileKey]: { name: opt.name, size: 0, type: ".xml", status: "complete", key: k } as any }))}
+                                                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors border-t ${borderColor} ${isSel ? isDarkMode ? "bg-[#1e4976]/60" : "bg-blue-50" : isDarkMode ? "hover:bg-[#1e4976]/30" : "hover:bg-gray-50"}`}
+                                                    style={isSel ? { borderLeft: `2px solid ${accent}` } : {}}
+                                                  >
+                                                    <FileText className="h-3.5 w-3.5 shrink-0" style={{ color: isSel ? accent : undefined }} />
+                                                    <div className="flex-1 min-w-0">
+                                                      <p className={`text-xs font-medium truncate ${textPrimary}`}>{opt.name}</p>
+                                                      <p className={`text-xs ${textSecondary}`}>{opt.asset} · {opt.protocol}</p>
+                                                    </div>
+                                                    {isSel && <CheckCircle className="h-3.5 w-3.5 shrink-0" style={{ color: accent }} />}
+                                                  </button>
+                                                )
+                                              })}
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                      {(uploadedFiles["remed-fix-spec"] as any)?.status === "complete" && (uploadedFiles["remed-atdl"] as any)?.status === "complete" && (
+                                        <div className="flex justify-center pt-2">
+                                          <Button className="bg-[#ff9800] text-[#0a1628] hover:bg-[#e65100]" onClick={() => setAtdlWizardStep(1)}>
+                                            <Play className="h-4 w-4 mr-1.5" /> Perform Comparison
+                                          </Button>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )
+                                })()}
+
+                                {/* Remediation Step 1: FIX to ATDL Comparison */}
+                                {atdlWorkflowType === "remediation" && atdlWizardStep === 1 && (
+                                  <div className="space-y-4">
+                                    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#ff9800]/10" : "bg-orange-50"}`}>
+                                      <GitCompare className="h-5 w-5 text-[#ff9800]" />
+                                      <div>
+                                        <p className={`font-medium ${textPrimary}`}>FIX to ATDL Comparison Results</p>
+                                        <p className={`text-xs ${textSecondary}`}>Compare FIX specification algo section with the ATDL file</p>
+                                      </div>
+                                      <div className="ml-auto flex items-center gap-1.5 text-xs shrink-0">
+                                        <FileText className="h-3.5 w-3.5 text-[#00e5ff]" />
+                                        <span className={textSecondary}>Base Spec: <span className="text-[#00e5ff] font-medium">{(uploadedFiles["remed-fix-spec"] as any)?.name ?? "EQ_FIX44_v2.1.xml"}</span></span>
+                                      </div>
+                                    </div>
+                                    {!remedComparisonDone ? (
+                                      <div className="flex justify-center">
+                                        <Button className="bg-[#ff9800] text-[#0a1628] hover:bg-[#e65100]" onClick={() => setRemedComparisonDone(true)}>
+                                          <Play className="h-4 w-4 mr-1.5" /> Perform Comparison
+                                        </Button>
+                                      </div>
+                                    ) : (() => {
+                                      const issues = [
+                                        { id: 0, sev: "High",   title: "Missing Strategies in ATDL",  fixDetail: "Strategies: VWAP, TWAP, POV, IS, MOC",    atdlDetail: "Strategies: VWAP, TWAP defined (POV, IS, MOC missing)" },
+                                        { id: 1, sev: "High",   title: "Parameter Mapping Issues",     fixDetail: "Tag 847 (TargetStrategy) = VWAP",          atdlDetail: "strategy/@name = 'VWAP' (Correct mapping)" },
+                                        { id: 2, sev: "Medium", title: "Missing Parameters",           fixDetail: "Tag 7940 (StartTime), Tag 7941 (EndTime)", atdlDetail: "StartTime defined, EndTime missing" },
+                                        { id: 3, sev: "Medium", title: "Control Type Mismatches",      fixDetail: "MinQty: Spinner (min=100)",                atdlDetail: "MinQty: TextField (no validation)" },
+                                        { id: 4, sev: "Low",    title: "Datatype Inconsistencies",     fixDetail: "Tag 7942 (ParticipationRate): Percentage", atdlDetail: "ParticipationRate: Decimal (0-1 range)" },
+                                      ]
+                                      const sevClr = (s: string) => s === "High" ? "#f44336" : s === "Medium" ? "#ff9800" : "#4caf50"
+                                      return (
+                                        <>
+                                          <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                              {["High","Medium","Low"].map(s => (
+                                                <span key={s} className="text-xs px-2 py-1 rounded" style={{ background: `${sevClr(s)}20`, color: sevClr(s) }}>
+                                                  {issues.filter(i => i.sev === s).length} {s}
+                                                </span>
+                                              ))}
+                                            </div>
+                                            <span className={`text-xs ${textSecondary}`}>{Object.keys(remedDecisions).length} of {issues.length} decisions made</span>
+                                          </div>
+                                          <div className="space-y-3">
+                                            {issues.map(issue => {
+                                              const clr = sevClr(issue.sev)
+                                              const dec = remedDecisions[issue.id]
+                                              return (
+                                                <div key={issue.id} className="rounded-lg border overflow-hidden" style={{ borderColor: `${clr}40` }}>
+                                                  <div className="flex items-center gap-3 px-4 py-3" style={{ background: `${clr}08` }}>
+                                                    <span className="text-xs font-bold px-2 py-0.5 rounded" style={{ background: `${clr}30`, color: clr }}>{issue.sev}</span>
+                                                    <span className={`text-sm font-semibold ${textPrimary}`}>{issue.title}</span>
+                                                    {dec && <span className="ml-auto text-xs px-2 py-0.5 rounded bg-[#4caf50]/20 text-[#4caf50]">{dec}</span>}
+                                                  </div>
+                                                  <div className="grid grid-cols-2">
+                                                    <div className={`px-4 py-3 ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50/60"}`} style={{ borderTop: `1px solid ${clr}20` }}>
+                                                      <p className="text-xs text-[#00e5ff] font-medium mb-1">FIX Specification</p>
+                                                      <p className={`text-xs ${textPrimary}`}>{issue.fixDetail}</p>
+                                                    </div>
+                                                    <div className={`px-4 py-3 border-l ${isDarkMode ? "bg-[#0a1628]/20" : "bg-white/60"}`} style={{ borderTop: `1px solid ${clr}20`, borderLeftColor: `${clr}20` }}>
+                                                      <p className="text-xs text-[#ff9800] font-medium mb-1">ATDL Definition</p>
+                                                      <p className={`text-xs ${textPrimary}`}>{issue.atdlDetail}</p>
+                                                    </div>
+                                                  </div>
+                                                  <div className="flex items-center gap-2 px-4 py-2.5" style={{ borderTop: `1px solid ${clr}20` }}>
+                                                    <span className={`text-xs ${textSecondary} mr-1`}>Decision:</span>
+                                                    {["Accept","Override","Defer","Reject"].map(d => (
+                                                      <button key={d}
+                                                        onClick={() => setRemedDecisions(p => ({ ...p, [issue.id]: d }))}
+                                                        className={`text-xs px-3 py-1 rounded border transition-colors ${dec === d ? "bg-[#00e5ff] text-[#0a1628] border-[#00e5ff]" : `${borderColor} ${textSecondary} hover:border-[#00e5ff]/50`}`}
+                                                      >{d}</button>
+                                                    ))}
+                                                    <button className={`ml-auto text-xs px-3 py-1 rounded border ${borderColor} ${textSecondary} hover:border-[#9c27b0]/50`}>Promote to Rule</button>
+                                                  </div>
+                                                </div>
+                                              )
+                                            })}
+                                          </div>
+                                        </>
+                                      )
+                                    })()}
+                                  </div>
+                                )}
+
+                                {/* Remediation Step 2: Schema Validation */}
+                                {atdlWorkflowType === "remediation" && atdlWizardStep === 2 && (
+                                  <div className="space-y-4">
+                                    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
+                                      <CheckCircle className="h-5 w-5 text-[#00e5ff]" />
+                                      <div>
+                                        <p className={`font-medium ${textPrimary}`}>Schema Validation</p>
+                                        <p className={`text-xs ${textSecondary}`}>Validate ATDL structural compliance against FIXatdl 1.1 schema</p>
+                                      </div>
+                                    </div>
+                                    {!remedSchemaRun ? (
+                                      <div className={`${bgCard} border ${borderColor} rounded-lg p-6 text-center`}>
+                                        <CheckCircle className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
+                                        <p className={`text-sm ${textSecondary} mb-4`}>Run schema validation to check FIXatdl 1.1 compliance</p>
+                                        <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setRemedSchemaRun(true)}>
+                                          <Sparkles className="h-4 w-4 mr-1.5" /> Run Schema Validation
+                                        </Button>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                          <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                            <p className={`font-semibold ${textPrimary}`}>Validation Results</p>
+                                            <div className="flex items-center gap-2">
+                                              <span className="text-xs px-2 py-1 rounded bg-[#4caf50]/20 text-[#4caf50]">4 Pass</span>
+                                              <span className="text-xs px-2 py-1 rounded bg-[#ff9800]/20 text-[#ff9800]">2 Warnings</span>
+                                              <span className="text-xs px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336]">3 Errors</span>
+                                            </div>
+                                          </div>
+                                          <div className="divide-y divide-gray-700/20">
+                                            {[
+                                              { rule: "Schema Compliance",     status: "error",   msg: "Missing required 'wireValue' on 3 parameters" },
+                                              { rule: "Strategy Definitions",  status: "pass",    msg: "All strategies have valid structure" },
+                                              { rule: "Parameter Types",       status: "warning", msg: "2 deprecated type declarations detected" },
+                                              { rule: "UI Control Mappings",   status: "error",   msg: "Invalid control type 'CustomSlider'" },
+                                              { rule: "Validation Rules",      status: "pass",    msg: "All validation rules well-formed" },
+                                              { rule: "Edit Rules",            status: "warning", msg: "Circular reference in edit rule" },
+                                              { rule: "Wire Value Format",     status: "error",   msg: "Wire values contain invalid characters" },
+                                              { rule: "Namespace Declaration", status: "pass",    msg: "Namespace conforms to FIXatdl 1.1" },
+                                              { rule: "Required Attributes",   status: "pass",    msg: "All required attributes present" },
+                                            ].map((r, i) => (
+                                              <div key={i} className={`flex items-center gap-3 px-4 py-3 ${r.status === "error" ? "bg-[#f44336]/5" : r.status === "warning" ? "bg-[#ff9800]/5" : ""}`}>
+                                                {r.status === "pass"    && <CheckCircle   className="h-4 w-4 text-[#4caf50] shrink-0" />}
+                                                {r.status === "warning" && <AlertTriangle className="h-4 w-4 text-[#ff9800] shrink-0" />}
+                                                {r.status === "error"   && <AlertCircle   className="h-4 w-4 text-[#f44336] shrink-0" />}
+                                                <span className={`text-sm font-medium flex-1 ${textPrimary}`}>{r.rule}</span>
+                                                <span className={`text-xs ${textSecondary}`}>{r.msg}</span>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </div>
+                                        <AIConfidenceMatrix isDarkMode={isDarkMode} bgCard={bgCard} borderColor={borderColor} textPrimary={textPrimary} textSecondary={textSecondary} score={62} basis="Schema validation detected 3 critical errors and 2 warnings. Errors block deployment — proceed to remediation to apply auto-fixes before re-validation." />
+                                      </>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* Remediation Step 3: Remediate */}
+                                {atdlWorkflowType === "remediation" && atdlWizardStep === 3 && (
+                                  <div className="space-y-4">
+                                    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#ff9800]/10" : "bg-orange-50"}`}>
+                                      <Wrench className="h-5 w-5 text-[#ff9800]" />
+                                      <div>
+                                        <p className={`font-medium ${textPrimary}`}>Remediate Issues</p>
+                                        <p className={`text-xs ${textSecondary}`}>Apply auto-fixes to critical errors before re-validation</p>
+                                      </div>
+                                    </div>
+                                    {!remedRemediating && !remedRemediationDone && (
+                                      <div className={`${bgCard} border border-[#ff9800]/30 rounded-lg p-5 space-y-3`}>
+                                        {[
+                                          { issue: "Missing wireValue on ParticipationRate", sev: "Error",   autoFix: true },
+                                          { issue: "Missing wireValue on StartTime",          sev: "Error",   autoFix: true },
+                                          { issue: "Invalid control type 'CustomSlider'",     sev: "Error",   autoFix: true },
+                                          { issue: "Deprecated Qty_t type",                   sev: "Warning", autoFix: true },
+                                          { issue: "Circular edit rule reference",             sev: "Warning", autoFix: false },
+                                        ].map((item, i) => (
+                                          <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${item.sev === "Error" ? "border-[#f44336]/30 bg-[#f44336]/5" : "border-[#ff9800]/30 bg-[#ff9800]/5"}`}>
+                                            <span className={`text-xs font-bold px-2 py-0.5 rounded ${item.sev === "Error" ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>{item.sev}</span>
+                                            <span className={`text-sm flex-1 ${textPrimary}`}>{item.issue}</span>
+                                            <span className={`text-xs ${item.autoFix ? "text-[#4caf50]" : "text-[#ff9800]"}`}>{item.autoFix ? "Auto-fixable" : "Manual"}</span>
+                                          </div>
+                                        ))}
+                                        <Button className="w-full bg-[#4caf50] text-white hover:bg-[#388e3c]"
+                                          onClick={() => { setRemedRemediating(true); setTimeout(() => { setRemedRemediating(false); setRemedRemediationDone(true) }, 2000) }}>
+                                          <Wrench className="h-4 w-4 mr-1.5" /> Apply All Auto-Fixes
+                                        </Button>
+                                      </div>
+                                    )}
+                                    {remedRemediating && (
+                                      <div className={`${bgCard} border border-[#2196f3]/40 rounded-lg p-5`}>
+                                        <div className="flex items-center gap-3 mb-3">
+                                          <Loader className="h-5 w-5 text-[#2196f3] animate-spin" />
+                                          <p className={`font-medium ${textPrimary}`}>Applying fixes...</p>
+                                        </div>
+                                        <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"} overflow-hidden`}>
+                                          <div className="h-full bg-[#2196f3] rounded-full animate-pulse" style={{ width: "70%" }} />
+                                        </div>
+                                      </div>
+                                    )}
+                                    {remedRemediationDone && (
+                                      <div className="space-y-3">
+                                        <div className={`${bgCard} border border-[#4caf50]/40 rounded-lg p-4 flex items-center gap-3`}>
+                                          <CheckCircle className="h-5 w-5 text-[#4caf50]" />
+                                          <div><p className={`font-medium ${textPrimary}`}>4 of 5 issues auto-fixed</p><p className={`text-xs ${textSecondary}`}>1 warning requires manual review</p></div>
+                                        </div>
+                                        {[
+                                          { issue: "Missing wireValue on ParticipationRate", status: "fixed" },
+                                          { issue: "Missing wireValue on StartTime",          status: "fixed" },
+                                          { issue: "Invalid control type 'CustomSlider'",     status: "fixed" },
+                                          { issue: "Deprecated Qty_t type",                   status: "fixed" },
+                                          { issue: "Circular edit rule reference",             status: "pending" },
+                                        ].map((item, i) => (
+                                          <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${borderColor} ${item.status === "fixed" ? "bg-[#4caf50]/5" : "bg-[#ff9800]/5"}`}>
+                                            {item.status === "fixed" ? <CheckCircle className="h-4 w-4 text-[#4caf50]" /> : <Clock className="h-4 w-4 text-[#ff9800]" />}
+                                            <span className={`text-sm flex-1 ${textPrimary}`}>{item.issue}</span>
+                                            <span className={`text-xs px-2 py-0.5 rounded ${item.status === "fixed" ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>{item.status === "fixed" ? "Fixed" : "Needs review"}</span>
+                                          </div>
+                                        ))}
+                                        <div className="border-2 border-[#ff9800]/30 rounded-lg p-4">
+                                          <p className={`text-sm font-semibold ${textPrimary} mb-1`}>Manual Review Required</p>
+                                          <p className={`text-xs ${textSecondary} mb-3`}>Circular edit rule reference — review the rule logic:</p>
+                                          <div className={`px-3 py-2 rounded font-mono text-xs ${isDarkMode ? "bg-[#0a1628]" : "bg-white"} border ${borderColor}`}>
+                                            {'<EditRuleRef ref="Rule_A" /><EditRuleRef ref="Rule_B" /><EditRuleRef ref="Rule_A" />'}
+                                          </div>
+                                          <Button size="sm" variant="outline" className="mt-2"><Eye className="h-3.5 w-3.5 mr-1.5" /> Review in Detail</Button>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* Remediation Step 4: Re-validate + Preview */}
+                                {atdlWorkflowType === "remediation" && atdlWizardStep === 4 && (
+                                  <div className="space-y-4">
+                                    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#4caf50]/10" : "bg-green-50"}`}>
+                                      <RefreshCw className="h-5 w-5 text-[#4caf50]" />
+                                      <div>
+                                        <p className={`font-medium ${textPrimary}`}>Re-validate {"&"} Preview</p>
+                                        <p className={`text-xs ${textSecondary}`}>Confirm fixes resolved all issues, then preview and send the remediated ATDL</p>
+                                      </div>
+                                    </div>
+                                    {/* 1. Select file */}
+                                    <div className={`${bgCard} border ${remedUsageStep >= 2 ? "border-[#4caf50]/50" : borderColor} rounded-lg overflow-hidden`}>
+                                      <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                        <p className={`font-semibold ${textPrimary}`}>1. Select Remediated ATDL</p>
+                                        {remedUsageStep >= 2 && <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
+                                      </div>
+                                      <div className="p-4">
+                                        <div className="grid grid-cols-2 gap-4 mb-4">
+                                          <div>
+                                            <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Remediated ATDL File</label>
+                                            <select className={`w-full p-2.5 rounded border border-[#4caf50] ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`}>
+                                              <option>{(uploadedFiles["remed-atdl"] as any)?.name ?? "EQ_FIX44_AlgoSuite_fixed.atdl"}</option>
+                                            </select>
+                                          </div>
+                                          <div>
+                                            <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Select Strategy</label>
+                                            <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`}>
+                                              <option>VWAP - Volume Weighted Average Price</option>
+                                              <option>TWAP - Time Weighted Average Price</option>
+                                            </select>
+                                          </div>
+                                        </div>
+                                        {remedUsageStep === 1 && (
+                                          <div className="flex justify-end">
+                                            <Button className="bg-[#4caf50] hover:bg-[#388e3c] text-white" onClick={() => setRemedUsageStep(2)}>
+                                              <FileText className="h-4 w-4 mr-1.5" /> Load ATDL
+                                            </Button>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                    {/* 2. XML */}
+                                    {remedUsageStep >= 2 && (
+                                      <div className={`${bgCard} border ${remedUsageStep >= 3 ? "border-[#4caf50]/50" : borderColor} rounded-lg overflow-hidden`}>
+                                        <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                          <p className={`font-semibold ${textPrimary}`}>2. Remediated ATDL XML</p>
+                                          {remedUsageStep >= 3 && <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
+                                        </div>
+                                        <div className={`p-4 overflow-auto max-h-48 font-mono text-xs ${isDarkMode ? "bg-[#060e1a]" : "bg-gray-900 text-gray-100"}`}>
+                                          <pre className="text-[11px] leading-5">{`<?xml version="1.0" encoding="UTF-8"?>
+<Strategies xmlns="http://www.fixprotocol.org/schema/atdl/1-1_EP">
+  <Strategy name="VWAP" uiRep="VWAP" wireValue="VWAP" version="1" fixMsgType="D">
+    <Parameter name="StartTime" xsi:type="atdl:UTCTimestamp_t" fixTag="7940" use="required"/>
+    <Parameter name="EndTime" xsi:type="atdl:UTCTimestamp_t" fixTag="7941" use="required"/>
+    <Parameter name="ParticipationRate" xsi:type="atdl:Percentage_t" fixTag="7942" use="optional" wireValue="7942"/>
+    <Parameter name="MinQty" xsi:type="atdl:Int_t" fixTag="7943" use="optional" minValue="0"/>
+    <StrategyLayout>
+      <StrategyPanel orientation="HORIZONTAL">
+        <Control ID="c_StartTime" xsi:type="atdl:Clock_t" label="Start Time" parameterRef="StartTime"/>
+        <Control ID="c_EndTime" xsi:type="atdl:Clock_t" label="End Time" parameterRef="EndTime"/>
+        <Control ID="c_ParticipationRate" xsi:type="atdl:SingleSpinner_t" label="Participation Rate (%)" parameterRef="ParticipationRate"/>
+        <Control ID="c_MinQty" xsi:type="atdl:SingleSpinner_t" label="Min Qty" parameterRef="MinQty"/>
+      </StrategyPanel>
+    </StrategyLayout>
+  </Strategy>
+</Strategies>`}</pre>
+                                        </div>
+                                        {remedUsageStep === 2 && (
+                                          <div className="p-4 flex justify-end">
+                                            <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setRemedUsageStep(3)}>
+                                              <Play className="h-4 w-4 mr-1.5" /> Load Strategy UI
+                                            </Button>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+                                    {/* 3. UI */}
+                                    {remedUsageStep >= 3 && (
+                                      <div className={`${bgCard} border ${remedUsageStep >= 4 ? "border-[#4caf50]/50" : borderColor} rounded-lg overflow-hidden`}>
+                                        <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                          <p className={`font-semibold ${textPrimary}`}>3. ATDL UI Representation</p>
+                                          <div className="flex items-center gap-2">
+                                            <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>{(uploadedFiles["remed-atdl"] as any)?.name ?? "EQ_FIX44_AlgoSuite_fixed.atdl"}</span>
+                                            {remedUsageStep >= 4 && <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
+                                          </div>
+                                        </div>
+                                        <div className="p-4">
+                                          <div className="flex items-center gap-2 mb-4">
+                                            <span className={`text-lg font-bold ${textPrimary}`}>VWAP</span>
+                                            <span className="text-xs px-2 py-0.5 rounded bg-[#4caf50]/20 text-[#4caf50]">Remediated</span>
+                                          </div>
+                                          <div className="grid grid-cols-2 gap-4 mb-4">
+                                            {[
+                                              { lbl: "Start Time", val: "09:30 AM" },
+                                              { lbl: "End Time", val: "04:00 PM" },
+                                              { lbl: "Participation Rate (%)", val: "15" },
+                                              { lbl: "Min Quantity", val: "100" },
+                                            ].map(f => (
+                                              <div key={f.lbl}>
+                                                <label className={`block text-xs ${textSecondary} mb-1.5`}>{f.lbl}</label>
+                                                <input type="text" defaultValue={f.val} className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
+                                              </div>
+                                            ))}
+                                          </div>
+                                          {remedUsageStep === 3 && (
+                                            <div className="flex justify-end">
+                                              <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setRemedUsageStep(4)}>
+                                                <Sparkles className="h-4 w-4 mr-1.5" /> Generate FIX Message
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+                                    {/* 4. FIX Message */}
+                                    {remedUsageStep >= 4 && (
+                                      <div className={`${bgCard} border ${remedUsageStep >= 5 ? "border-[#4caf50]/50" : borderColor} rounded-lg overflow-hidden`}>
+                                        <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                          <p className={`font-semibold ${textPrimary}`}>4. Generated FIX Algo Message</p>
+                                          {remedUsageStep >= 5 && <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
+                                        </div>
+                                        <div className="p-4">
+                                          <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded p-3 font-mono text-xs overflow-x-auto`}>
+                                            <span className={textSecondary}>8=FIX.4.4|9=245|35=D|49=SENDER|56=TARGET|34=1|52=20240815-14:30:00.000|11=ORDER456|21=1|55=MSFT|38=5000|40=2|44=320.00|59=0|</span>
+                                            <span className="text-[#00e5ff]">847=VWAP</span>
+                                            <span className={textSecondary}>|</span>
+                                            <span className="text-[#ff9800]">7940=09:30:00|7941=16:00:00|7942=15|7943=100</span>
+                                            <span className={textSecondary}>|10=091|</span>
+                                          </div>
+                                          <div className="flex items-center gap-3 mt-3">
+                                            <Button variant="outline" size="sm" className="text-xs"><Copy className="h-3 w-3 mr-1" /> Copy</Button>
+                                            <Button variant="outline" size="sm" className="text-xs"><Download className="h-3 w-3 mr-1" /> Download</Button>
+                                          </div>
+                                          {remedUsageStep === 4 && (
+                                            <div className="flex justify-end mt-3">
+                                              <Button className="bg-[#9c27b0] hover:bg-[#7b1fa2] text-white" onClick={() => setRemedUsageStep(5)}>
+                                                <Sparkles className="h-4 w-4 mr-1.5" /> Validate Against FIX Spec
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+                                    {/* 5. Validation Table */}
+                                    {remedUsageStep >= 5 && (
+                                      <>
+                                        <div className={`${bgCard} border border-[#4caf50]/50 rounded-lg overflow-hidden`}>
+                                          <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                            <p className={`font-semibold ${textPrimary}`}>5. FIX Spec Validation Results</p>
+                                            <div className="flex items-center gap-2">
+                                              <span className="text-xs px-2 py-1 rounded bg-[#4caf50]/20 text-[#4caf50]">5 Matches</span>
+                                              <span className="text-xs px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336]">0 Mismatches</span>
+                                              <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                            </div>
+                                          </div>
+                                          <table className="w-full text-xs">
+                                            <thead className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                                              <tr className={`border-b ${borderColor}`}>
+                                                {["FIX Tag","Name","ATDL Value","FIX Spec Value","Status"].map(h => (
+                                                  <th key={h} className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>{h}</th>
+                                                ))}
+                                              </tr>
+                                            </thead>
+                                            <tbody>
+                                              {[
+                                                { tag:"847",  name:"TargetStrategy",   atdl:"VWAP",            spec:"VWAP",            fixed:false },
+                                                { tag:"7940", name:"StartTime",         atdl:"UTCTimestamp",    spec:"UTCTimestamp",    fixed:false },
+                                                { tag:"7941", name:"EndTime",           atdl:"UTCTimestamp",    spec:"UTCTimestamp",    fixed:false },
+                                                { tag:"7942", name:"ParticipationRate", atdl:"Percentage+wire", spec:"Percentage+wire", fixed:true },
+                                                { tag:"7943", name:"MinQty",            atdl:"Int (Spinner)",   spec:"Int (Spinner)",   fixed:true },
+                                              ].map((row, i) => (
+                                                <tr key={i} className={`border-b ${borderColor}`}>
+                                                  <td className={`px-4 py-3 font-mono ${textPrimary}`}>
+                                                    {row.tag}{row.fixed && <span className="ml-1.5 text-xs px-1 py-0.5 rounded bg-[#4caf50]/20 text-[#4caf50]">Fixed</span>}
+                                                  </td>
+                                                  <td className={`px-4 py-3 ${textPrimary}`}>{row.name}</td>
+                                                  <td className={`px-4 py-3 ${textSecondary}`}>{row.atdl}</td>
+                                                  <td className={`px-4 py-3 ${textSecondary}`}>{row.spec}</td>
+                                                  <td className="px-4 py-3">
+                                                    <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-[#4caf50]/20 text-[#4caf50]">
+                                                      <CheckCircle className="h-3 w-3" /> Match
+                                                    </span>
+                                                  </td>
+                                                </tr>
+                                              ))}
+                                            </tbody>
+                                          </table>
+                                          <div className="flex items-center justify-between px-4 py-3 border-t border-[#4caf50]/20">
+                                            <div className="flex gap-2">
+                                              <Button variant="outline" size="sm" className="text-xs"><Download className="h-3 w-3 mr-1" /> Download Report</Button>
+                                              <Button variant="outline" size="sm" className="text-xs">Email Results</Button>
+                                            </div>
+                                            <Button size="sm" className="text-xs bg-[#9c27b0] hover:bg-[#7b1fa2] text-white">Remediation Queue</Button>
+                                          </div>
+                                        </div>
+                                        <AIConfidenceMatrix isDarkMode={isDarkMode} bgCard={bgCard} borderColor={borderColor} textPrimary={textPrimary} textSecondary={textSecondary} score={97} basis="Remediation successful — all 5 parameters now match FIX 4.4 spec. Both auto-fixed fields (ParticipationRate wireValue, MinQty control type) validated correctly post-remediation." />
+                                      </>
+                                    )}
                                   </div>
                                 )}
 
@@ -9566,8 +10918,98 @@ const tools = [
                             </div>
                           )}
 
+                          {/* Spec Compare Tool — embedded inline */}
+                          {tool.id === "spec-compare" && (
+                            <div className="space-y-4">
+                              <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#00e5ff]/20" : "bg-cyan-50"}`}>
+                                <GitCompare className="h-5 w-5 text-[#00e5ff]" />
+                                <div>
+                                  <p className={`font-medium ${textPrimary}`}>Spec Comparison</p>
+                                  <p className={`text-xs ${textSecondary}`}>Compare client and admin FIX specifications side-by-side</p>
+                                </div>
+                              </div>
+
+                              {/* Client & Admin Spec Selection */}
+                              <div className={`${bgCard} border ${borderColor} rounded-lg p-4`}>
+                                <div className="grid grid-cols-2 gap-4 mb-4">
+                                  <div>
+                                    <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Client Spec</label>
+                                    <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`}>
+                                      <option>Summit Financial - Fixed Income (FIX 4.4)</option>
+                                      <option>Nexus Trading - Equities (FIX 4.4)</option>
+                                    </select>
+                                    <p className={`text-xs ${textSecondary} mt-1`}>Version: client_eq_v1.2 (Current)</p>
+                                  </div>
+                                  <div>
+                                    <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Admin Spec</label>
+                                    <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`}>
+                                      <option>Fixed Income - FIX 4.4</option>
+                                      <option>Equities - FIX 4.4 v2.1</option>
+                                    </select>
+                                    <p className={`text-xs ${textSecondary} mt-1`}>Version: Fixed Income FIX 4.4 v2.1 (Current)</p>
+                                  </div>
+                                </div>
+                                <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] w-full">
+                                  <Sparkles className="h-4 w-4 mr-1.5" /> Load Standardized Specs
+                                </Button>
+                              </div>
+
+                              {/* Spec Comparison Results */}
+                              <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                <div className={`px-4 py-3 border-b ${borderColor}`}>
+                                  <p className={`font-semibold ${textPrimary}`}>Comparing: Fixed Income - FIX 4.4</p>
+                                </div>
+                                <div className="overflow-auto max-h-96">
+                                  <table className="w-full text-xs">
+                                    <thead className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                                      <tr className={`border-b ${borderColor}`}>
+                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary} w-1/3`}>Difference Type</th>
+                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary} w-1/3`}>Client Spec</th>
+                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary} w-1/3`}>Admin Spec</th>
+                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Status</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {[
+                                        { type: "Undefined Message Types", client: "35=K, 35=H Undefined", admin: "—", status: "customization" },
+                                        { type: "Unsupported Tags", client: "Tags 375, 943 in 35=D", admin: "Tags 111, 6454", status: "customization" },
+                                        { type: "Unsupported Values", client: "123=4, 7, 9", admin: "123=12, 55, 78", status: "flag" },
+                                        { type: "Datatype Mismatch", client: "Tag 46 is String", admin: "Tag 46 is Char", status: "flag" },
+                                      ].map((row, i) => (
+                                        <tr key={i} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
+                                          <td className={`px-4 py-2 ${textPrimary} font-medium`}>{row.type}</td>
+                                          <td className={`px-4 py-2 ${textSecondary}`}>{row.client}</td>
+                                          <td className={`px-4 py-2 ${textSecondary}`}>{row.admin}</td>
+                                          <td className="px-4 py-2">
+                                            <span className={`text-xs px-2 py-1 rounded font-medium ${
+                                              row.status === "flag" ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ff9800]/20 text-[#ff9800]"
+                                            }`}>
+                                              {row.status}
+                                            </span>
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                                <div className={`px-4 py-3 border-t ${borderColor} flex items-center justify-between`}>
+                                  <span className={`text-xs ${textSecondary}`}>4 differences found • 3 Customizations • 1 Flag for Review</span>
+                                  <Button variant="outline" size="sm">
+                                    <Eye className="h-3 w-3 mr-1" /> Show All Specs
+                                  </Button>
+                                </div>
+                              </div>
+
+                              {actualToolIndex < currentPhase.tools.length - 1 && (
+                                <div className="flex pt-4 border-t border-[#1e4976]/30">
+                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
                           {/* Generic fallback for other tools */}
-                          {!["intake", "docs", "gap", "spec-from-log", "atdl", "test-plan", "test-cases", "checklist", "session-tests", "app-tests", "evidence", "log-analysis", "failure-analysis", "root-cause", "defects", "eval", "report", "signoff", "convert-spec"].includes(tool.id) && (
+                          {!["intake", "docs", "gap", "spec-from-log", "atdl", "test-plan", "test-cases", "checklist", "session-tests", "app-tests", "evidence", "log-analysis", "failure-analysis", "root-cause", "defects", "eval", "report", "signoff", "convert-spec", "spec-compare"].includes(tool.id) && (
                             <div className="space-y-4">
                               <p className={textSecondary}>This tool is available for use. Click below to open the full interface.</p>
                               <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} mb-4`}>
@@ -12795,11 +14237,11 @@ const tools = [
     ]
     
     const remediationSteps = [
-      { id: 0, label: "Upload ATDL",     icon: Upload,       desc: "Upload existing ATDL file" },
-      { id: 1, label: "Validate",        icon: CheckCircle,  desc: "Run validation checks" },
-      { id: 2, label: "Review Issues",   icon: AlertTriangle, desc: "Review identified issues" },
-      { id: 3, label: "Remediate",       icon: Wrench,       desc: "Apply fixes to issues" },
-      { id: 4, label: "Re-validate",     icon: RefreshCw,    desc: "Re-validate and export" },
+      { id: 0, label: "Upload Files",   icon: Upload,        desc: "Upload FIX spec & ATDL file" },
+      { id: 1, label: "FIX Compare",    icon: GitCompare,    desc: "FIX spec to ATDL comparison" },
+      { id: 2, label: "Schema Valid.",  icon: CheckCircle,   desc: "Validate against FIXatdl schema" },
+      { id: 3, label: "Remediate",      icon: Wrench,        desc: "Apply auto-fixes to errors" },
+      { id: 4, label: "Preview & Send", icon: RefreshCw,     desc: "Re-validate, preview and send" },
     ]
     
     const steps = atdlWorkflowType === "conversion" ? conversionSteps :
@@ -13336,193 +14778,513 @@ const tools = [
       ),
     }
 
+    const rFixSpecs = [
+      { asset: "Equities",     protocol: "FIX 4.2",     name: "EQ_FIX42_v1.2.xml" },
+      { asset: "Equities",     protocol: "FIX 4.4",     name: "EQ_FIX44_v2.1.xml" },
+      { asset: "Options",      protocol: "FIX 4.4",     name: "OPT_FIX44_v2.0.xml" },
+      { asset: "Futures",      protocol: "FIX 4.4",     name: "FUT_FIX44_v1.1.xml" },
+      { asset: "Futures",      protocol: "FIX 5.0 SP2", name: "FUT_FIX50SP2_v2.0.xml" },
+      { asset: "Fixed Income", protocol: "FIX 4.4",     name: "FI_FIX44_v1.2.xml" },
+      { asset: "FX",           protocol: "FIX 5.0 SP2", name: "FX_FIX50SP2_v1.1.xml" },
+    ]
+    const rAtdlFiles = [
+      { asset: "Equities",     protocol: "FIX 4.2",     name: "EQ_FIX42_AlgoSuite.atdl" },
+      { asset: "Equities",     protocol: "FIX 4.4",     name: "EQ_FIX44_AlgoSuite.atdl" },
+      { asset: "Options",      protocol: "FIX 4.4",     name: "OPT_FIX44_AlgoSuite.atdl" },
+      { asset: "Futures",      protocol: "FIX 4.4",     name: "FUT_FIX44_AlgoSuite.atdl" },
+      { asset: "Futures",      protocol: "FIX 5.0 SP2", name: "FUT_FIX50SP2_AlgoSuite.atdl" },
+      { asset: "Fixed Income", protocol: "FIX 4.4",     name: "FI_FIX44_AlgoSuite.atdl" },
+      { asset: "FX",           protocol: "FIX 5.0 SP2", name: "FX_FIX50SP2_AlgoSuite.atdl" },
+    ]
+    const remedCompIssues = [
+      { id: 0, sev: "High",   title: "Missing Strategies in ATDL",  fixDetail: "Strategies: VWAP, TWAP, POV, IS, MOC",    atdlDetail: "Strategies: VWAP, TWAP defined (POV, IS, MOC missing)" },
+      { id: 1, sev: "High",   title: "Parameter Mapping Issues",     fixDetail: "Tag 847 (TargetStrategy) = VWAP",          atdlDetail: "strategy/@name = 'VWAP' (Correct mapping)" },
+      { id: 2, sev: "Medium", title: "Missing Parameters",           fixDetail: "Tag 7940 (StartTime), Tag 7941 (EndTime)", atdlDetail: "StartTime defined, EndTime missing" },
+      { id: 3, sev: "Medium", title: "Control Type Mismatches",      fixDetail: "MinQty: Spinner (min=100)",                atdlDetail: "MinQty: TextField (no validation)" },
+      { id: 4, sev: "Low",    title: "Datatype Inconsistencies",     fixDetail: "Tag 7942 (ParticipationRate): Percentage", atdlDetail: "ParticipationRate: Decimal (0-1 range)" },
+    ]
+    const remedSevClr = (s: string) => s === "High" ? "#f44336" : s === "Medium" ? "#ff9800" : "#4caf50"
+
     const remediationStepContent: Record<number, React.ReactNode> = {
+      // Step 0 — Upload FIX Spec + ATDL
       0: (
         <div className="space-y-5">
           {workflowTabSelector}
           <div className={`border-t ${borderColor}`} />
-          <div>
-            <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Select ATDL File to Validate</label>
-            <div className={`rounded-lg border ${borderColor} overflow-hidden`}>
-              {[
-                { asset: "Equities",     protocol: "FIX 4.2",     name: "EQ_FIX42_AlgoSuite.atdl" },
-                { asset: "Equities",     protocol: "FIX 4.4",     name: "EQ_FIX44_AlgoSuite.atdl" },
-                { asset: "Options",      protocol: "FIX 4.4",     name: "OPT_FIX44_AlgoSuite.atdl" },
-                { asset: "Futures",      protocol: "FIX 4.4",     name: "FUT_FIX44_AlgoSuite.atdl" },
-                { asset: "Futures",      protocol: "FIX 5.0 SP2", name: "FUT_FIX50SP2_AlgoSuite.atdl" },
-                { asset: "Fixed Income", protocol: "FIX 4.4",     name: "FI_FIX44_AlgoSuite.atdl" },
-                { asset: "FX",           protocol: "FIX 5.0 SP2", name: "FX_FIX50SP2_AlgoSuite.atdl" },
-              ].map((atdl, i) => {
-                const key = `${atdl.asset}-${atdl.protocol}`
-                const isSelected = (uploadedFiles["remediation-atdl"] as any)?.key === key
-                return (
-                  <button key={i}
-                    onClick={() => setUploadedFiles(prev => ({ ...prev, "remediation-atdl": { name: atdl.name, size: 0, type: ".atdl", status: "complete", key } as any }))}
-                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors border-b last:border-b-0 ${borderColor} ${
-                      isSelected
-                        ? isDarkMode ? "bg-[#ff9800]/10 border-l-2 border-l-[#ff9800]" : "bg-[#ff9800]/5 border-l-2 border-l-[#ff9800]"
-                        : isDarkMode ? "hover:bg-[#1e4976]/30" : "hover:bg-gray-50"
-                    }`}
-                  >
-                    <Layers className={`h-4 w-4 flex-shrink-0 ${isSelected ? "text-[#ff9800]" : textSecondary}`} />
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium truncate ${textPrimary}`}>{atdl.name}</p>
-                      <p className={`text-xs ${textSecondary}`}>{atdl.asset} · {atdl.protocol}</p>
-                    </div>
-                    {isSelected && <CheckCircle className="h-4 w-4 text-[#ff9800] flex-shrink-0" />}
-                  </button>
-                )
-              })}
-            </div>
-            {(uploadedFiles["remediation-atdl"] as any)?.status === "complete" && (
-              <p className="text-xs text-[#4caf50] mt-1.5 flex items-center gap-1">
-                <CheckCircle className="h-3 w-3" /> Selected: {uploadedFiles["remediation-atdl"].name}
-              </p>
-            )}
-          </div>
-        </div>
-      ),
-      1: (
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="px-2 py-1 rounded text-xs bg-[#4caf50]/20 text-[#4caf50]">4 Pass</span>
-            <span className="px-2 py-1 rounded text-xs bg-[#ff9800]/20 text-[#ff9800]">2 Warnings</span>
-            <span className="px-2 py-1 rounded text-xs bg-[#f44336]/20 text-[#f44336]">3 Errors</span>
-          </div>
-          {[
-            { rule: "Schema Validation", status: "error", msg: "Missing required 'wireValue' on 3 parameters" },
-            { rule: "Strategy Definitions", status: "pass", msg: "All strategies have valid structure" },
-            { rule: "Parameter Types", status: "warning", msg: "2 deprecated type declarations" },
-            { rule: "UI Control Mappings", status: "error", msg: "Invalid control type 'CustomSlider'" },
-            { rule: "Validation Rules", status: "pass", msg: "All validation rules well-formed" },
-            { rule: "Edit Rules", status: "warning", msg: "Circular reference in edit rule" },
-            { rule: "Wire Value Format", status: "error", msg: "Wire values contain invalid characters" },
-          ].map((r, i) => (
-            <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${
-              r.status === "error" ? "border-[#f44336]/40 bg-[#f44336]/5" :
-              r.status === "warning" ? "border-[#ff9800]/30 bg-[#ff9800]/5" :
-              `${borderColor} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`
-            }`}>
-              {r.status === "pass" && <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
-              {r.status === "warning" && <AlertTriangle className="h-4 w-4 text-[#ff9800]" />}
-              {r.status === "error" && <AlertCircle className="h-4 w-4 text-[#f44336]" />}
-              <span className={`text-sm font-medium flex-1 ${textPrimary}`}>{r.rule}</span>
-              <span className={`text-xs ${textSecondary}`}>{r.msg}</span>
-            </div>
-          ))}
-        </div>
-      ),
-      2: (
-        <div className="space-y-3">
-          <p className={`text-sm ${textSecondary} mb-4`}>Review each issue and decide how to handle it:</p>
-          {[
-            { issue: "Missing wireValue on ParticipationRate", severity: "Error", suggestion: "Add wireValue='7942'", autoFix: true, impact: "Critical - prevents deployment" },
-            { issue: "Missing wireValue on StartTime", severity: "Error", suggestion: "Add wireValue='7940'", autoFix: true, impact: "Critical - prevents deployment" },
-            { issue: "Invalid control type 'CustomSlider'", severity: "Error", suggestion: "Replace with 'SingleSpinner'", autoFix: true, impact: "Critical - breaks UI rendering" },
-            { issue: "Deprecated Qty_t type", severity: "Warning", suggestion: "Update to Int_t", autoFix: true, impact: "Medium - may cause compatibility issues" },
-            { issue: "Circular edit rule reference", severity: "Warning", suggestion: "Manual review required", autoFix: false, impact: "High - requires validation logic check" },
-          ].map((issue, i) => (
-            <div key={i} className={`border rounded-lg overflow-hidden transition-all ${
-              issue.severity === "Error" ? "border-[#f44336]/40 hover:border-[#f44336]/60" : "border-[#ff9800]/40 hover:border-[#ff9800]/60"
-            }`}>
-              <div className={`flex items-center gap-3 px-4 py-3 ${
-                issue.severity === "Error" ? isDarkMode ? "bg-[#f44336]/5" : "bg-[#f44336]/5" : isDarkMode ? "bg-[#ff9800]/5" : "bg-[#ff9800]/5"
-              }`}>
-                <span className={`text-xs font-bold px-2 py-0.5 rounded ${
-                  issue.severity === "Error" ? "bg-[#f44336]/30 text-[#f44336]" : "bg-[#ff9800]/30 text-[#ff9800]"
-                }`}>{issue.severity}</span>
-                <span className={`text-sm font-medium flex-1 ${textPrimary}`}>{issue.issue}</span>
-                {issue.autoFix && <Button size="sm" className="bg-[#4caf50] text-white hover:bg-[#4caf50]/80">
-                  <Wrench className="h-3 w-3 mr-1" /> Auto-Fix
-                </Button>}
-                {!issue.autoFix && <Button size="sm" variant="outline">Manual Review</Button>}
+          <p className={`text-sm ${textSecondary}`}>Select the FIX specification (algo section) and the ATDL file to validate against it.</p>
+          <div className="grid grid-cols-2 gap-6">
+            {/* FIX Spec column */}
+            <div>
+              <p className={`text-xs font-semibold uppercase tracking-wider ${textSecondary} mb-2`}>FIX Specification (Algo Section)</p>
+              <div className={`rounded-lg border ${(uploadedFiles["remediation-fix-spec"] as any)?.status === "complete" ? "border-[#4caf50]/50" : borderColor} overflow-hidden`}>
+                {(uploadedFiles["remediation-fix-spec"] as any)?.status === "complete" && (
+                  <div className="px-4 py-3 flex items-center gap-2 border-b" style={{ borderBottomColor: "#00e5ff30", background: "#00e5ff10" }}>
+                    <CheckCircle className="h-4 w-4 text-[#4caf50] flex-shrink-0" />
+                    <p className={`text-sm font-medium ${textPrimary} flex-1 truncate`}>{(uploadedFiles["remediation-fix-spec"] as any).name}</p>
+                    <button onClick={() => setUploadedFiles(p => { const n = { ...p }; delete (n as any)["remediation-fix-spec"]; return n })} className={`text-xs ${textSecondary} hover:text-[#f44336]`}>Change</button>
+                  </div>
+                )}
+                {rFixSpecs.map((opt, i) => {
+                  const k = `${opt.asset}-${opt.protocol}`
+                  const isSel = (uploadedFiles["remediation-fix-spec"] as any)?.key === k
+                  return (
+                    <button key={i}
+                      onClick={() => setUploadedFiles(p => ({ ...p, "remediation-fix-spec": { name: opt.name, size: 0, type: ".xml", status: "complete", key: k } as any }))}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors border-b last:border-b-0 ${borderColor} ${
+                        isSel ? isDarkMode ? "bg-[#1e4976]/60" : "bg-blue-50" : isDarkMode ? "hover:bg-[#1e4976]/30" : "hover:bg-gray-50"
+                      }`}
+                      style={isSel ? { borderLeft: "2px solid #00e5ff" } : {}}
+                    >
+                      <FileText className="h-3.5 w-3.5 flex-shrink-0" style={{ color: isSel ? "#00e5ff" : undefined }} />
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-xs font-medium truncate ${textPrimary}`}>{opt.name}</p>
+                        <p className={`text-xs ${textSecondary}`}>{opt.asset} · {opt.protocol}</p>
+                      </div>
+                      {isSel && <CheckCircle className="h-3.5 w-3.5 flex-shrink-0 text-[#00e5ff]" />}
+                    </button>
+                  )
+                })}
               </div>
-              <div className={`px-4 py-3 border-t ${issue.severity === "Error" ? "border-[#f44336]/20" : "border-[#ff9800]/20"} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-white/40"}`}>
-                <div className="grid grid-cols-3 gap-3 text-xs">
-                  <div>
-                    <p className={textSecondary}>Suggested Fix</p>
-                    <p className="font-mono mt-1">{issue.suggestion}</p>
+            </div>
+            {/* ATDL column */}
+            <div>
+              <p className={`text-xs font-semibold uppercase tracking-wider ${textSecondary} mb-2`}>ATDL File</p>
+              <div className={`rounded-lg border ${(uploadedFiles["remediation-atdl"] as any)?.status === "complete" ? "border-[#4caf50]/50" : borderColor} overflow-hidden`}>
+                {(uploadedFiles["remediation-atdl"] as any)?.status === "complete" && (
+                  <div className="px-4 py-3 flex items-center gap-2 border-b" style={{ borderBottomColor: "#ff980030", background: "#ff980010" }}>
+                    <CheckCircle className="h-4 w-4 text-[#4caf50] flex-shrink-0" />
+                    <p className={`text-sm font-medium ${textPrimary} flex-1 truncate`}>{(uploadedFiles["remediation-atdl"] as any).name}</p>
+                    <button onClick={() => setUploadedFiles(p => { const n = { ...p }; delete (n as any)["remediation-atdl"]; return n })} className={`text-xs ${textSecondary} hover:text-[#f44336]`}>Change</button>
                   </div>
-                  <div>
-                    <p className={textSecondary}>Impact</p>
-                    <p className={`mt-1 ${issue.severity === "Error" ? "text-[#f44336]" : "text-[#ff9800]"}`}>{issue.impact}</p>
-                  </div>
-                  <div>
-                    <p className={textSecondary}>Status</p>
-                    <p className={`mt-1 px-2 py-0.5 rounded inline-block text-xs ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"}`}>Pending</p>
+                )}
+                {rAtdlFiles.map((opt, i) => {
+                  const k = `${opt.asset}-${opt.protocol}`
+                  const isSel = (uploadedFiles["remediation-atdl"] as any)?.key === k
+                  return (
+                    <button key={i}
+                      onClick={() => setUploadedFiles(p => ({ ...p, "remediation-atdl": { name: opt.name, size: 0, type: ".xml", status: "complete", key: k } as any }))}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors border-b last:border-b-0 ${borderColor} ${
+                        isSel ? isDarkMode ? "bg-[#1e4976]/60" : "bg-blue-50" : isDarkMode ? "hover:bg-[#1e4976]/30" : "hover:bg-gray-50"
+                      }`}
+                      style={isSel ? { borderLeft: "2px solid #ff9800" } : {}}
+                    >
+                      <Layers className="h-3.5 w-3.5 flex-shrink-0" style={{ color: isSel ? "#ff9800" : undefined }} />
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-xs font-medium truncate ${textPrimary}`}>{opt.name}</p>
+                        <p className={`text-xs ${textSecondary}`}>{opt.asset} · {opt.protocol}</p>
+                      </div>
+                      {isSel && <CheckCircle className="h-3.5 w-3.5 flex-shrink-0 text-[#ff9800]" />}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      ),
+
+      // Step 1 — FIX to ATDL Comparison
+      1: (
+        <div className="space-y-4">
+          <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#ff9800]/10" : "bg-orange-50"}`}>
+            <GitCompare className="h-5 w-5 text-[#ff9800]" />
+            <div className="flex-1">
+              <p className={`font-medium ${textPrimary}`}>FIX to ATDL Comparison Results</p>
+              <p className={`text-xs ${textSecondary}`}>Compare FIX specification algo section with the ATDL file</p>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs">
+              <FileText className="h-3.5 w-3.5 text-[#00e5ff]" />
+              <span className={textSecondary}>Base Spec: <span className="text-[#00e5ff] font-medium">{(uploadedFiles["remediation-fix-spec"] as any)?.name ?? "EQ_FIX44_v2.1.xml"}</span></span>
+            </div>
+          </div>
+          {!remedComparisonDone ? (
+            <div className="flex justify-center py-4">
+              <Button className="bg-[#ff9800] text-[#0a1628] hover:bg-[#e65100]" onClick={() => setRemedComparisonDone(true)}>
+                <Play className="h-4 w-4 mr-2" /> Perform Comparison
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {(["High","Medium","Low"] as const).map(s => (
+                    <span key={s} className="text-xs px-2 py-1 rounded" style={{ background: `${remedSevClr(s)}20`, color: remedSevClr(s) }}>
+                      {remedCompIssues.filter(i => i.sev === s).length} {s}
+                    </span>
+                  ))}
+                </div>
+                <span className={`text-xs ${textSecondary}`}>{Object.keys(remedDecisions).length} of {remedCompIssues.length} decisions made</span>
+              </div>
+              <div className="space-y-3">
+                {remedCompIssues.map(issue => {
+                  const clr = remedSevClr(issue.sev)
+                  const dec = remedDecisions[issue.id]
+                  return (
+                    <div key={issue.id} className="rounded-lg border overflow-hidden" style={{ borderColor: `${clr}40` }}>
+                      <div className="flex items-center gap-3 px-4 py-3" style={{ background: `${clr}08` }}>
+                        <span className="text-xs font-bold px-2 py-0.5 rounded" style={{ background: `${clr}30`, color: clr }}>{issue.sev}</span>
+                        <span className={`text-sm font-semibold ${textPrimary}`}>{issue.title}</span>
+                        {dec && <span className="ml-auto text-xs px-2 py-0.5 rounded bg-[#4caf50]/20 text-[#4caf50]">{dec}</span>}
+                      </div>
+                      <div className="grid grid-cols-2">
+                        <div className={`px-4 py-3 ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50/60"}`} style={{ borderTop: `1px solid ${clr}20` }}>
+                          <p className="text-xs text-[#00e5ff] font-medium mb-1">FIX Specification</p>
+                          <p className={`text-xs ${textPrimary}`}>{issue.fixDetail}</p>
+                        </div>
+                        <div className={`px-4 py-3 border-l ${isDarkMode ? "bg-[#0a1628]/20" : "bg-white/60"}`} style={{ borderTop: `1px solid ${clr}20`, borderLeftColor: `${clr}20` }}>
+                          <p className="text-xs text-[#ff9800] font-medium mb-1">ATDL Definition</p>
+                          <p className={`text-xs ${textPrimary}`}>{issue.atdlDetail}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 px-4 py-2.5" style={{ borderTop: `1px solid ${clr}20` }}>
+                        <span className={`text-xs ${textSecondary} mr-1`}>Decision:</span>
+                        {(["Accept","Override","Defer","Reject"] as const).map(d => (
+                          <button key={d}
+                            onClick={() => setRemedDecisions(p => ({ ...p, [issue.id]: d }))}
+                            className={`text-xs px-3 py-1 rounded border transition-colors ${dec === d ? "bg-[#00e5ff] text-[#0a1628] border-[#00e5ff]" : `${borderColor} ${textSecondary} hover:border-[#00e5ff]/50`}`}
+                          >{d}</button>
+                        ))}
+                        <button className={`ml-auto text-xs px-3 py-1 rounded border ${borderColor} ${textSecondary} hover:border-[#9c27b0]/50`}>Promote to Rule</button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+              <div className={`flex items-center justify-between px-4 py-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="text-xs"><Download className="h-3 w-3 mr-1" /> Download Report</Button>
+                  <Button variant="outline" size="sm" className="text-xs">Email Results</Button>
+                </div>
+                <Button size="sm" className="text-xs bg-[#9c27b0] hover:bg-[#7b1fa2] text-white">Remediation Queue</Button>
+              </div>
+            </>
+          )}
+        </div>
+      ),
+
+      // Step 2 — Schema Validation
+      2: (
+        <div className="space-y-4">
+          {!remedSchemaRun ? (
+            <div className={`${isDarkMode ? "bg-[#0a1628]/60" : "bg-gray-50"} border ${borderColor} rounded-lg p-8 text-center`}>
+              <CheckCircle className={`h-12 w-12 mx-auto mb-3 ${textSecondary}`} />
+              <p className={`font-medium ${textPrimary} mb-1`}>Run Schema Validation</p>
+              <p className={`text-sm ${textSecondary} mb-5`}>Validate ATDL structural compliance against the FIXatdl 1.1 schema</p>
+              <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setRemedSchemaRun(true)}>
+                <Sparkles className="h-4 w-4 mr-2" /> Run Schema Validation
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div className={`${isDarkMode ? "bg-[#0a1628]/60" : "bg-white"} border ${borderColor} rounded-lg overflow-hidden`}>
+                <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                  <p className={`font-semibold ${textPrimary}`}>Validation Results</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs px-2 py-1 rounded bg-[#4caf50]/20 text-[#4caf50]">4 Pass</span>
+                    <span className="text-xs px-2 py-1 rounded bg-[#ff9800]/20 text-[#ff9800]">2 Warnings</span>
+                    <span className="text-xs px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336]">3 Errors</span>
                   </div>
                 </div>
+                <div className="divide-y divide-gray-700/20">
+                  {[
+                    { rule: "Schema Compliance",     status: "error",   msg: "Missing required 'wireValue' on 3 parameters" },
+                    { rule: "Strategy Definitions",  status: "pass",    msg: "All strategies have valid structure" },
+                    { rule: "Parameter Types",       status: "warning", msg: "2 deprecated type declarations detected" },
+                    { rule: "UI Control Mappings",   status: "error",   msg: "Invalid control type 'CustomSlider'" },
+                    { rule: "Validation Rules",      status: "pass",    msg: "All validation rules well-formed" },
+                    { rule: "Edit Rules",            status: "warning", msg: "Circular reference in edit rule" },
+                    { rule: "Wire Value Format",     status: "error",   msg: "Wire values contain invalid characters" },
+                    { rule: "Namespace Declaration", status: "pass",    msg: "Namespace conforms to FIXatdl 1.1" },
+                    { rule: "Required Attributes",   status: "pass",    msg: "All required attributes present" },
+                  ].map((r, i) => (
+                    <div key={i} className={`flex items-center gap-3 px-4 py-3 ${r.status === "error" ? "bg-[#f44336]/5" : r.status === "warning" ? "bg-[#ff9800]/5" : ""}`}>
+                      {r.status === "pass"    && <CheckCircle   className="h-4 w-4 text-[#4caf50] flex-shrink-0" />}
+                      {r.status === "warning" && <AlertTriangle className="h-4 w-4 text-[#ff9800] flex-shrink-0" />}
+                      {r.status === "error"   && <AlertCircle   className="h-4 w-4 text-[#f44336] flex-shrink-0" />}
+                      <span className={`text-sm font-medium flex-1 ${textPrimary}`}>{r.rule}</span>
+                      <span className={`text-xs ${textSecondary}`}>{r.msg}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+              <AIConfidenceMatrix isDarkMode={isDarkMode} bgCard={bgCard} borderColor={borderColor} textPrimary={textPrimary} textSecondary={textSecondary} score={62} basis="Schema validation detected 3 critical errors and 2 warnings. Errors block deployment — proceed to remediation to apply auto-fixes." />
+            </>
+          )}
         </div>
       ),
+
+      // Step 3 — Remediate
       3: (
         <div className="space-y-4">
-          <div className={`p-4 rounded-lg border border-[#2196f3]/40 bg-[#2196f3]/10`}>
-            <div className="flex items-center gap-3 mb-3">
-              <Wrench className="h-6 w-6 text-[#2196f3]" />
-              <div>
-                <p className="text-[#2196f3] font-semibold">Applying Fixes...</p>
-                <p className={`text-sm ${textSecondary}`}>4 of 5 issues have been automatically fixed. 1 requires manual review.</p>
+          {!remedRemediating && !remedRemediationDone && (
+            <div className={`border border-[#ff9800]/30 rounded-lg p-5 space-y-3`}>
+              <p className={`text-sm font-medium ${textPrimary} mb-1`}>Issues to resolve before re-validation:</p>
+              {[
+                { issue: "Missing wireValue on ParticipationRate", sev: "Error",   autoFix: true },
+                { issue: "Missing wireValue on StartTime",          sev: "Error",   autoFix: true },
+                { issue: "Invalid control type 'CustomSlider'",     sev: "Error",   autoFix: true },
+                { issue: "Deprecated Qty_t type",                   sev: "Warning", autoFix: true },
+                { issue: "Circular edit rule reference",             sev: "Warning", autoFix: false },
+              ].map((item, i) => (
+                <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${item.sev === "Error" ? "border-[#f44336]/30 bg-[#f44336]/5" : "border-[#ff9800]/30 bg-[#ff9800]/5"}`}>
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded flex-shrink-0 ${item.sev === "Error" ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>{item.sev}</span>
+                  <span className={`text-sm flex-1 ${textPrimary}`}>{item.issue}</span>
+                  <span className={`text-xs flex-shrink-0 ${item.autoFix ? "text-[#4caf50]" : "text-[#ff9800]"}`}>{item.autoFix ? "Auto-fixable" : "Manual"}</span>
+                </div>
+              ))}
+              <Button className="w-full bg-[#4caf50] text-white hover:bg-[#388e3c] mt-2"
+                onClick={() => { setRemedRemediating(true); setTimeout(() => { setRemedRemediating(false); setRemedRemediationDone(true) }, 2000) }}>
+                <Wrench className="h-4 w-4 mr-2" /> Apply All Auto-Fixes
+              </Button>
+            </div>
+          )}
+          {remedRemediating && (
+            <div className={`border border-[#2196f3]/40 rounded-lg p-5`}>
+              <div className="flex items-center gap-3 mb-3">
+                <Loader className="h-5 w-5 text-[#2196f3] animate-spin" />
+                <p className={`font-medium ${textPrimary}`}>Applying fixes...</p>
+              </div>
+              <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"} overflow-hidden`}>
+                <div className="h-full bg-[#2196f3] rounded-full animate-pulse" style={{ width: "70%" }} />
               </div>
             </div>
-            <div className={`h-2 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"} overflow-hidden`}>
-              <div className="h-full bg-[#2196f3] rounded-full transition-all" style={{ width: "80%" }} />
-            </div>
-          </div>
-
-          {/* Fix Progress */}
-          <div className="space-y-2">
-            {[
-              { issue: "Missing wireValue on ParticipationRate", status: "fixed", time: "0.2s" },
-              { issue: "Missing wireValue on StartTime", status: "fixed", time: "0.2s" },
-              { issue: "Invalid control type 'CustomSlider'", status: "fixed", time: "0.3s" },
-              { issue: "Deprecated Qty_t type", status: "fixed", time: "0.1s" },
-              { issue: "Circular edit rule reference", status: "pending", time: "needs review" },
-            ].map((item, i) => (
-              <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${borderColor} ${item.status === "fixed" ? "bg-[#4caf50]/5" : "bg-[#ff9800]/5"}`}>
-                {item.status === "fixed" ? (
-                  <CheckCircle className="h-4 w-4 text-[#4caf50]" />
-                ) : (
-                  <Clock className="h-4 w-4 text-[#ff9800]" />
-                )}
-                <span className={`text-sm flex-1 ${textPrimary}`}>{item.issue}</span>
-                <span className={`text-xs px-2 py-0.5 rounded ${
-                  item.status === "fixed" ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#ff9800]/20 text-[#ff9800]"
-                }`}>{item.status === "fixed" ? `Fixed (${item.time})` : `${item.time}`}</span>
+          )}
+          {remedRemediationDone && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 p-4 rounded-lg border border-[#4caf50]/40 bg-[#4caf50]/10">
+                <CheckCircle className="h-5 w-5 text-[#4caf50]" />
+                <div>
+                  <p className={`font-medium ${textPrimary}`}>4 of 5 issues auto-fixed</p>
+                  <p className={`text-xs ${textSecondary}`}>1 warning requires manual review</p>
+                </div>
               </div>
-            ))}
-          </div>
-
-          {/* Manual Review Panel */}
-          <div className={`border-2 border-[#ff9800]/30 rounded-lg p-4 ${isDarkMode ? "bg-[#ff9800]/5" : "bg-[#ff9800]/5"}`}>
-            <p className={`text-sm font-semibold ${textPrimary} mb-2`}>Manual Review Required</p>
-            <p className={`text-xs ${textSecondary} mb-3`}>Circular edit rule reference detected. Please review the rule logic:</p>
-            <div className={`px-3 py-2 rounded font-mono text-xs ${isDarkMode ? "bg-[#0a1628]" : "bg-white"} border ${borderColor}`}>
-              &lt;EditRuleRef ref="Rule_A" /&gt;&lt;EditRuleRef ref="Rule_B" /&gt;&lt;EditRuleRef ref="Rule_A" /&gt;
+              {[
+                { issue: "Missing wireValue on ParticipationRate", status: "fixed" },
+                { issue: "Missing wireValue on StartTime",          status: "fixed" },
+                { issue: "Invalid control type 'CustomSlider'",     status: "fixed" },
+                { issue: "Deprecated Qty_t type",                   status: "fixed" },
+                { issue: "Circular edit rule reference",             status: "pending" },
+              ].map((item, i) => (
+                <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${borderColor} ${item.status === "fixed" ? "bg-[#4caf50]/5" : "bg-[#ff9800]/5"}`}>
+                  {item.status === "fixed" ? <CheckCircle className="h-4 w-4 text-[#4caf50]" /> : <Clock className="h-4 w-4 text-[#ff9800]" />}
+                  <span className={`text-sm flex-1 ${textPrimary}`}>{item.issue}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded ${item.status === "fixed" ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>
+                    {item.status === "fixed" ? "Fixed" : "Needs review"}
+                  </span>
+                </div>
+              ))}
+              <div className="border-2 border-[#ff9800]/30 rounded-lg p-4">
+                <p className={`text-sm font-semibold ${textPrimary} mb-1`}>Manual Review Required</p>
+                <p className={`text-xs ${textSecondary} mb-3`}>Circular edit rule reference — review the rule logic:</p>
+                <div className={`px-3 py-2 rounded font-mono text-xs ${isDarkMode ? "bg-[#0a1628]" : "bg-white"} border ${borderColor}`}>
+                  {'<EditRuleRef ref="Rule_A" /><EditRuleRef ref="Rule_B" /><EditRuleRef ref="Rule_A" />'}
+                </div>
+                <Button size="sm" variant="outline" className="mt-2">
+                  <Eye className="h-3.5 w-3.5 mr-1.5" /> Review in Detail
+                </Button>
+              </div>
             </div>
-            <Button size="sm" className="mt-2 w-full">
-              <Eye className="h-4 w-4 mr-2" /> Review in Detail
-            </Button>
-          </div>
+          )}
         </div>
       ),
+
+      // Step 4 — Re-validate, Preview & Send
       4: (
         <div className="space-y-4">
-          <div className={`p-4 rounded-lg border border-[#4caf50]/40 bg-[#4caf50]/10`}>
-            <div className="flex items-center gap-3">
-              <CheckCircle className="h-6 w-6 text-[#4caf50]" />
-              <div>
-                <p className="text-[#4caf50] font-semibold">ATDL Remediated Successfully</p>
-                <p className={`text-sm ${textSecondary}`}>All critical issues fixed. 1 warning requires manual review.</p>
+          {/* 1: Select file */}
+          <div className={`border ${remedUsageStep >= 2 ? "border-[#4caf50]/50" : borderColor} rounded-lg overflow-hidden`}>
+            <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}>
+              <p className={`font-semibold ${textPrimary}`}>1. Select Remediated ATDL</p>
+              {remedUsageStep >= 2 && <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
+            </div>
+            <div className="p-4">
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Remediated ATDL File</label>
+                  <select className={`w-full p-2.5 rounded border border-[#4caf50] ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`}>
+                    <option>{(uploadedFiles["remediation-atdl"] as any)?.name ?? "EQ_FIX44_AlgoSuite_fixed.atdl"}</option>
+                  </select>
+                </div>
+                <div>
+                  <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Select Strategy</label>
+                  <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`}>
+                    <option>VWAP - Volume Weighted Average Price</option>
+                    <option>TWAP - Time Weighted Average Price</option>
+                  </select>
+                </div>
               </div>
+              {remedUsageStep === 1 && (
+                <div className="flex justify-end">
+                  <Button className="bg-[#4caf50] hover:bg-[#388e3c] text-white" onClick={() => setRemedUsageStep(2)}>
+                    <FileText className="h-4 w-4 mr-2" /> Load ATDL
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Button className="bg-[#00e5ff] text-[#0a1628]"><Download className="h-4 w-4 mr-2" /> Download Fixed ATDL</Button>
-            <Button variant="outline"><Eye className="h-4 w-4 mr-2" /> Preview Changes</Button>
-          </div>
+
+          {/* 2: ATDL XML */}
+          {remedUsageStep >= 2 && (
+            <div className={`border ${remedUsageStep >= 3 ? "border-[#4caf50]/50" : borderColor} rounded-lg overflow-hidden`}>
+              <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}>
+                <p className={`font-semibold ${textPrimary}`}>2. Remediated ATDL XML</p>
+                {remedUsageStep >= 3 && <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
+              </div>
+              <div className={`p-4 overflow-auto max-h-48 font-mono text-xs leading-5 ${isDarkMode ? "bg-[#060e1a] text-slate-300" : "bg-gray-900 text-gray-100"}`}>
+                <pre className="text-[11px]">{`<?xml version="1.0" encoding="UTF-8"?>
+<Strategies xmlns="http://www.fixprotocol.org/schema/atdl/1-1_EP">
+  <Strategy name="VWAP" uiRep="VWAP" wireValue="VWAP" version="1" fixMsgType="D">
+    <Parameter name="StartTime" xsi:type="atdl:UTCTimestamp_t" fixTag="7940" use="required"/>
+    <Parameter name="EndTime" xsi:type="atdl:UTCTimestamp_t" fixTag="7941" use="required"/>
+    <Parameter name="ParticipationRate" xsi:type="atdl:Percentage_t" fixTag="7942" use="optional" wireValue="7942"/>
+    <Parameter name="MinQty" xsi:type="atdl:Int_t" fixTag="7943" use="optional" minValue="0"/>
+    <StrategyLayout>
+      <StrategyPanel orientation="HORIZONTAL">
+        <Control ID="c_StartTime" xsi:type="atdl:Clock_t" label="Start Time" parameterRef="StartTime"/>
+        <Control ID="c_EndTime" xsi:type="atdl:Clock_t" label="End Time" parameterRef="EndTime"/>
+        <Control ID="c_ParticipationRate" xsi:type="atdl:SingleSpinner_t" label="Participation Rate (%)" parameterRef="ParticipationRate"/>
+        <Control ID="c_MinQty" xsi:type="atdl:SingleSpinner_t" label="Min Qty" parameterRef="MinQty"/>
+      </StrategyPanel>
+    </StrategyLayout>
+  </Strategy>
+</Strategies>`}</pre>
+              </div>
+              {remedUsageStep === 2 && (
+                <div className="p-4 flex justify-end border-t" style={{ borderTopColor: "inherit" }}>
+                  <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setRemedUsageStep(3)}>
+                    <Play className="h-4 w-4 mr-2" /> Load Strategy UI
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 3: Strategy UI */}
+          {remedUsageStep >= 3 && (
+            <div className={`border ${remedUsageStep >= 4 ? "border-[#4caf50]/50" : borderColor} rounded-lg overflow-hidden`}>
+              <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}>
+                <p className={`font-semibold ${textPrimary}`}>3. ATDL UI Representation</p>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>
+                    {(uploadedFiles["remediation-atdl"] as any)?.name ?? "EQ_FIX44_AlgoSuite_fixed.atdl"}
+                  </span>
+                  {remedUsageStep >= 4 && <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
+                </div>
+              </div>
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className={`text-lg font-bold ${textPrimary}`}>VWAP</span>
+                  <span className="text-xs px-2 py-0.5 rounded bg-[#4caf50]/20 text-[#4caf50]">Remediated</span>
+                </div>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  {[
+                    { lbl: "Start Time",            val: "09:30 AM" },
+                    { lbl: "End Time",               val: "04:00 PM" },
+                    { lbl: "Participation Rate (%)", val: "15" },
+                    { lbl: "Min Quantity",           val: "100" },
+                  ].map(f => (
+                    <div key={f.lbl}>
+                      <label className={`block text-xs font-medium ${textSecondary} mb-1.5`}>{f.lbl}</label>
+                      <input type="text" defaultValue={f.val} className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
+                    </div>
+                  ))}
+                </div>
+                {remedUsageStep === 3 && (
+                  <div className="flex justify-end">
+                    <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setRemedUsageStep(4)}>
+                      <Sparkles className="h-4 w-4 mr-2" /> Generate FIX Message
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* 4: Generated FIX Message */}
+          {remedUsageStep >= 4 && (
+            <div className={`border ${remedUsageStep >= 5 ? "border-[#4caf50]/50" : borderColor} rounded-lg overflow-hidden`}>
+              <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}>
+                <p className={`font-semibold ${textPrimary}`}>4. Generated FIX Algo Message</p>
+                {remedUsageStep >= 5 && <CheckCircle className="h-4 w-4 text-[#4caf50]" />}
+              </div>
+              <div className="p-4">
+                <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded p-3 font-mono text-xs overflow-x-auto`}>
+                  <span className={textSecondary}>8=FIX.4.4|9=245|35=D|49=SENDER|56=TARGET|34=1|52=20240815-14:30:00|11=ORDER001|55=MSFT|38=5000|40=2|44=320.00|59=0|</span>
+                  <span className="text-[#00e5ff]">847=VWAP</span>
+                  <span className={textSecondary}>|</span>
+                  <span className="text-[#ff9800]">7940=09:30:00|7941=16:00:00|7942=15|7943=100</span>
+                  <span className={textSecondary}>|10=091|</span>
+                </div>
+                <div className="flex items-center gap-3 mt-3">
+                  <Button variant="outline" size="sm" className="text-xs"><Copy className="h-3 w-3 mr-1" /> Copy</Button>
+                  <Button variant="outline" size="sm" className="text-xs"><Download className="h-3 w-3 mr-1" /> Download</Button>
+                </div>
+                {remedUsageStep === 4 && (
+                  <div className="flex justify-end mt-3">
+                    <Button className="bg-[#9c27b0] hover:bg-[#7b1fa2] text-white" onClick={() => setRemedUsageStep(5)}>
+                      <Sparkles className="h-4 w-4 mr-2" /> Validate Against FIX Spec
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* 5: FIX Spec Validation Results */}
+          {remedUsageStep >= 5 && (
+            <>
+              <div className="border border-[#4caf50]/50 rounded-lg overflow-hidden">
+                <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between ${isDarkMode ? "bg-[#0a1628]/40" : "bg-gray-50"}`}>
+                  <p className={`font-semibold ${textPrimary}`}>5. FIX Spec Validation Results</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs px-2 py-1 rounded bg-[#4caf50]/20 text-[#4caf50]">5 Matches</span>
+                    <span className="text-xs px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336]">0 Mismatches</span>
+                    <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                  </div>
+                </div>
+                <table className="w-full text-xs">
+                  <thead className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                    <tr className={`border-b ${borderColor}`}>
+                      {["FIX Tag","Name","ATDL Value","FIX Spec Value","Status"].map(h => (
+                        <th key={h} className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { tag:"847",  name:"TargetStrategy",   atdl:"VWAP",            spec:"VWAP",            fixed:false },
+                      { tag:"7940", name:"StartTime",         atdl:"UTCTimestamp",    spec:"UTCTimestamp",    fixed:false },
+                      { tag:"7941", name:"EndTime",           atdl:"UTCTimestamp",    spec:"UTCTimestamp",    fixed:false },
+                      { tag:"7942", name:"ParticipationRate", atdl:"Percentage+wire", spec:"Percentage+wire", fixed:true },
+                      { tag:"7943", name:"MinQty",            atdl:"Int (Spinner)",   spec:"Int (Spinner)",   fixed:true },
+                    ].map((row, i) => (
+                      <tr key={i} className={`border-b ${borderColor}`}>
+                        <td className={`px-4 py-3 font-mono ${textPrimary}`}>
+                          {row.tag}{row.fixed && <span className="ml-1.5 text-xs px-1 py-0.5 rounded bg-[#4caf50]/20 text-[#4caf50]">Fixed</span>}
+                        </td>
+                        <td className={`px-4 py-3 ${textPrimary}`}>{row.name}</td>
+                        <td className={`px-4 py-3 ${textSecondary}`}>{row.atdl}</td>
+                        <td className={`px-4 py-3 ${textSecondary}`}>{row.spec}</td>
+                        <td className="px-4 py-3">
+                          <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-[#4caf50]/20 text-[#4caf50]">
+                            <CheckCircle className="h-3 w-3" /> Match
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <div className={`flex items-center justify-between px-4 py-3 border-t ${borderColor}`}>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" className="text-xs"><Download className="h-3 w-3 mr-1" /> Download Report</Button>
+                    <Button variant="outline" size="sm" className="text-xs">Email Results</Button>
+                  </div>
+                  <Button size="sm" className="text-xs bg-[#9c27b0] hover:bg-[#7b1fa2] text-white">Remediation Queue</Button>
+                </div>
+              </div>
+              <AIConfidenceMatrix isDarkMode={isDarkMode} bgCard={bgCard} borderColor={borderColor} textPrimary={textPrimary} textSecondary={textSecondary} score={97} basis="Remediation successful — all 5 parameters now match FIX 4.4 spec. Both auto-fixed fields (ParticipationRate wireValue, MinQty control type) validated correctly post-remediation." />
+            </>
+          )}
         </div>
       ),
     }
@@ -16707,7 +18469,7 @@ const copyToClipboard = () => {
               </div>
             )}
 
-            {/* ═════════════════��════���═════════���══════════��═══════════
+            {/* ═════════════════��════���═════════������═════════��═══════════
                 STEP 2: CORRELATION RESULTS
             ═════════════���════════════════════════════════��════════ */}
             {certReportStep === "results" && (
@@ -18234,7 +19996,7 @@ const copyToClipboard = () => {
                         onChange={(e) => setCreateCaseData({...createCaseData, clientSpecStatus: e.target.value as any})}
                         className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "bg-white border-gray-300"}`}
                       >
-                        <option value="received">Received</option>
+                        <option value="uploaded">Uploaded</option>
                         <option value="needs-clarification">Needs Clarification</option>
                         <option value="pending">Pending</option>
                       </select>
@@ -20946,23 +22708,7 @@ ValidateFieldsHaveValues=Y`}
             <div className="space-y-4">
               <Card className={`${bgCard} border ${borderColor} p-6`}>
                 <h3 className={`text-lg font-bold mb-4 ${textPrimary}`}>Upload Documents</h3>
-                <div 
-                  className={`border-2 border-dashed ${borderColor} rounded p-8 text-center cursor-pointer hover:border-[#00e5ff] hover:bg-[#00e5ff]/5 transition`}
-                  onClick={() => {
-                    const input = document.createElement("input")
-                    input.type = "file"
-                    input.accept = ".pdf,.xlsx,.docx,.xml,.csv,.txt"
-                    input.multiple = true
-                    input.onchange = (e) => {
-                      const files = (e.target as HTMLInputElement).files
-                      if (files && files.length > 0) {
-                        // Simulate adding files to queue (demo only)
-                        console.log("[v0] Files selected:", Array.from(files).map(f => f.name))
-                      }
-                    }
-                    input.click()
-                  }}
-                >
+                <div className={`border-2 border-dashed ${borderColor} rounded p-8 text-center cursor-pointer hover:bg-opacity-50 transition`}>
                   <Upload className="h-8 w-8 mx-auto mb-2 text-[#00e5ff]" />
                   <p className={textPrimary}>Drop files here or click to upload</p>
                   <p className={`text-xs ${textSecondary}`}>PDF, XLSX, DOCX, XML, CSV, TXT supported</p>
