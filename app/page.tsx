@@ -8534,28 +8534,110 @@ const tools = [
                                   </div>
                                 )}
 
-                                {/* Step 1: Upload FIX Spec */}
+                                {/* Step 1: Load Standardized Algo Spec */}
                                 {atdlWizardStep === 1 && atdlWorkflowType === "conversion" && (
                                   <div className="space-y-4">
                                     <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
-                                      <Upload className="h-5 w-5 text-[#00e5ff]" />
+                                      <FileText className="h-5 w-5 text-[#00e5ff]" />
                                       <div>
-                                        <p className={`font-medium ${textPrimary}`}>Upload FIX Spec</p>
-                                        <p className={`text-xs ${textSecondary}`}>Gate A: Inputs Locked</p>
+                                        <p className={`font-medium ${textPrimary}`}>Load Standardized Algo Spec</p>
+                                        <p className={`text-xs ${textSecondary}`}>Gate A: Select spec to convert to ATDL</p>
                                       </div>
                                     </div>
-                                    <div 
-                                      className={`border-2 border-dashed ${borderColor} rounded-lg p-8 text-center cursor-pointer hover:border-[#00e5ff] transition-all`}
-                                      onClick={() => {
-                                        const input = document.createElement("input")
-                                        input.type = "file"
-                                        input.accept = ".pdf,.xml,.txt"
-                                        input.click()
-                                      }}
-                                    >
-                                      <Upload className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                                      <p className={`font-medium ${textPrimary}`}>Drop FIX specification here or click to upload</p>
-                                      <p className={`text-sm ${textSecondary} mt-1`}>Supports PDF, XML, TXT up to 50MB</p>
+                                    
+                                    {/* Spec Selection */}
+                                    <div className={`${bgCard} border ${borderColor} rounded-lg p-4`}>
+                                      <div className="grid grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                          <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Select Algo Spec File</label>
+                                          <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`}>
+                                            <option>AlgoSuite_Complete_v1.5.xml</option>
+                                            <option>VWAP_Strategies_v2.0.xml</option>
+                                            <option>TWAP_Implementation_v1.2.xml</option>
+                                          </select>
+                                        </div>
+                                        <div>
+                                          <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>FIX Version</label>
+                                          <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`}>
+                                            <option>Equities FIX 4.4 v2.1</option>
+                                            <option>Equities FIX 4.2</option>
+                                            <option>Options FIX 4.4</option>
+                                          </select>
+                                        </div>
+                                      </div>
+                                      <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">
+                                        <Eye className="h-4 w-4 mr-1.5" /> Load Spec Preview
+                                      </Button>
+                                    </div>
+
+                                    {/* Loaded Spec Preview */}
+                                    <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                      <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                        <div className="flex items-center gap-2">
+                                          <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                          <span className={`font-medium ${textPrimary}`}>Standardized Algo Spec Loaded</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>AlgoSuite_Complete_v1.5.xml</span>
+                                          <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>Equities FIX 4.4</span>
+                                        </div>
+                                      </div>
+                                      <div className="p-4">
+                                        <p className={`text-xs font-medium ${textSecondary} mb-3`}>Strategies Found in Spec</p>
+                                        <div className="grid grid-cols-3 gap-2">
+                                          {[
+                                            { name: "VWAP", tags: 6, status: "active" },
+                                            { name: "TWAP", tags: 5, status: "active" },
+                                            { name: "POV", tags: 4, status: "active" },
+                                            { name: "IS (Implementation Shortfall)", tags: 7, status: "active" },
+                                            { name: "Iceberg", tags: 4, status: "active" },
+                                            { name: "Sniper", tags: 3, status: "draft" },
+                                          ].map((strat) => (
+                                            <div key={strat.name} className={`${bgSecondary} rounded p-2.5 flex items-center justify-between`}>
+                                              <div>
+                                                <p className={`text-sm font-medium ${textPrimary}`}>{strat.name}</p>
+                                                <p className={`text-xs ${textSecondary}`}>{strat.tags} parameters</p>
+                                              </div>
+                                              <span className={`text-xs px-1.5 py-0.5 rounded ${strat.status === "active" ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>
+                                                {strat.status}
+                                              </span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                      <div className={`px-4 py-3 border-t ${borderColor}`}>
+                                        <table className="w-full text-xs">
+                                          <thead>
+                                            <tr className={`border-b ${borderColor}`}>
+                                              <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>FIX Tag</th>
+                                              <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Parameter Name</th>
+                                              <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Type</th>
+                                              <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Strategy</th>
+                                              <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Required</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody>
+                                            {[
+                                              { tag: "847", name: "TargetStrategy", type: "String", strategy: "All", required: "Y" },
+                                              { tag: "7940", name: "StartTime", type: "UTCTimestamp", strategy: "VWAP, TWAP", required: "Y" },
+                                              { tag: "7941", name: "EndTime", type: "UTCTimestamp", strategy: "VWAP, TWAP", required: "Y" },
+                                              { tag: "7942", name: "ParticipationRate", type: "Percentage", strategy: "VWAP, POV", required: "N" },
+                                              { tag: "7943", name: "MinQty", type: "Int", strategy: "All", required: "N" },
+                                              { tag: "7944", name: "MaxFloor", type: "Int", strategy: "Iceberg", required: "CR" },
+                                            ].map((row, i) => (
+                                              <tr key={i} className={`border-b ${borderColor}`}>
+                                                <td className={`px-2 py-2 font-mono text-[#00e5ff]`}>{row.tag}</td>
+                                                <td className={`px-2 py-2 ${textPrimary}`}>{row.name}</td>
+                                                <td className={`px-2 py-2 ${textSecondary}`}>{row.type}</td>
+                                                <td className={`px-2 py-2 ${textSecondary}`}>{row.strategy}</td>
+                                                <td className={`px-2 py-2`}>
+                                                  <span className={`${row.required === "Y" ? "text-[#4caf50]" : row.required === "CR" ? "text-[#ff9800]" : textSecondary}`}>{row.required}</span>
+                                                </td>
+                                              </tr>
+                                            ))}
+                                          </tbody>
+                                        </table>
+                                      </div>
                                     </div>
                                   </div>
                                 )}
@@ -8615,23 +8697,185 @@ const tools = [
                                   </div>
                                 )}
 
-                                {/* Step 4: Preview */}
+                                {/* Step 4: Preview — Full ATDL Usage Flow */}
                                 {atdlWizardStep === 4 && atdlWorkflowType === "conversion" && (
                                   <div className="space-y-4">
                                     <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
                                       <Eye className="h-5 w-5 text-[#00e5ff]" />
                                       <div>
-                                        <p className={`font-medium ${textPrimary}`}>Preview</p>
-                                        <p className={`text-xs ${textSecondary}`}>Gate D: Visual Review</p>
+                                        <p className={`font-medium ${textPrimary}`}>ATDL Usage</p>
+                                        <p className={`text-xs ${textSecondary}`}>Select from uploaded ATDLs, view strategy UI, generate FIX messages, and validate</p>
                                       </div>
                                     </div>
-                                    <div className={`${bgCard} border ${borderColor} rounded-lg p-4`}>
-                                      <p className={`text-sm font-medium ${textPrimary} mb-2`}>Strategy UI Preview</p>
-                                      <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded p-3 space-y-2`}>
-                                        <div className="flex items-center gap-2"><span className={`text-xs ${textSecondary} w-20`}>Strategy:</span><span className={`text-sm ${textPrimary}`}>VWAP</span></div>
-                                        <div className="flex items-center gap-2"><span className={`text-xs ${textSecondary} w-20`}>Start Time:</span><input type="time" className={`text-sm px-2 py-1 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`} defaultValue="09:30" /></div>
-                                        <div className="flex items-center gap-2"><span className={`text-xs ${textSecondary} w-20`}>End Time:</span><input type="time" className={`text-sm px-2 py-1 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`} defaultValue="16:00" /></div>
-                                        <div className="flex items-center gap-2"><span className={`text-xs ${textSecondary} w-20`}>Participation:</span><input type="number" className={`text-sm px-2 py-1 rounded border ${borderColor} w-16 ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`} defaultValue="15" /><span className={`text-xs ${textSecondary}`}>%</span></div>
+
+                                    {/* Section 1: Select ATDL File */}
+                                    <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                      <div className={`px-4 py-3 border-b ${borderColor}`}>
+                                        <p className={`font-semibold ${textPrimary}`}>1. Select ATDL File</p>
+                                      </div>
+                                      <div className="p-4">
+                                        <div className="grid grid-cols-2 gap-4 mb-4">
+                                          <div>
+                                            <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Select From Admin ATDL Files</label>
+                                            <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`}>
+                                              <option>AlgoSuite_Complete_v1.5.atdl</option>
+                                              <option>VWAP_Strategies_v2.0.atdl</option>
+                                              <option>TWAP_Implementation_v1.2.atdl</option>
+                                            </select>
+                                          </div>
+                                          <div>
+                                            <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Select Strategy</label>
+                                            <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`}>
+                                              <option>VWAP - Volume Weighted Average Price</option>
+                                              <option>TWAP - Time Weighted Average Price</option>
+                                              <option>POV - Percentage of Volume</option>
+                                              <option>IS - Implementation Shortfall</option>
+                                            </select>
+                                          </div>
+                                        </div>
+                                        <div className="flex justify-end">
+                                          <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">
+                                            <Play className="h-4 w-4 mr-1.5" /> Load Strategy UI
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* Section 2: ATDL UI Representation */}
+                                    <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                      <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                        <p className={`font-semibold ${textPrimary}`}>2. ATDL UI Representation</p>
+                                        <div className="flex items-center gap-2">
+                                          <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>ATDL: AlgoSuite_Complete_v1.5.atdl</span>
+                                          <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>Equities FIX 4.4 v2.1</span>
+                                        </div>
+                                      </div>
+                                      <div className="p-4">
+                                        <div className="flex items-center gap-2 mb-4">
+                                          <span className={`text-lg font-bold ${textPrimary}`}>VWAP</span>
+                                          <span className="text-xs px-2 py-0.5 rounded bg-[#4caf50]/20 text-[#4caf50]">Active</span>
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-4 mb-4">
+                                          <div>
+                                            <label className={`block text-xs ${textSecondary} mb-1.5`}>Start Time</label>
+                                            <input type="text" defaultValue="09:30 AM" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
+                                          </div>
+                                          <div>
+                                            <label className={`block text-xs ${textSecondary} mb-1.5`}>End Time</label>
+                                            <input type="text" defaultValue="04:00 PM" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
+                                          </div>
+                                          <div>
+                                            <label className={`block text-xs ${textSecondary} mb-1.5`}>Participation Rate (%)</label>
+                                            <input type="text" defaultValue="15" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
+                                          </div>
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-4">
+                                          <div>
+                                            <label className={`block text-xs ${textSecondary} mb-1.5`}>Min Quantity</label>
+                                            <input type="text" defaultValue="100" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
+                                          </div>
+                                          <div>
+                                            <label className={`block text-xs ${textSecondary} mb-1.5`}>Max Floor</label>
+                                            <input type="text" defaultValue="500" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
+                                          </div>
+                                          <div>
+                                            <label className={`block text-xs ${textSecondary} mb-1.5`}>Display Qty</label>
+                                            <input type="text" defaultValue="200" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
+                                          </div>
+                                        </div>
+                                        <div className="flex justify-end mt-4">
+                                          <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">
+                                            <Sparkles className="h-4 w-4 mr-1.5" /> Generate FIX Message
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* Section 3: Generated FIX Algo Message */}
+                                    <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                      <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                        <p className={`font-semibold ${textPrimary}`}>3. Generated FIX Algo Message</p>
+                                        <div className="flex items-center gap-2">
+                                          <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>ATDL: AlgoSuite_Complete_v1.5.atdl</span>
+                                          <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>Equities FIX 4.4 v2.1</span>
+                                        </div>
+                                      </div>
+                                      <div className="p-4">
+                                        <div className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded p-3 font-mono text-xs overflow-x-auto`}>
+                                          <span className={textSecondary}>8=FIX.4.4|9=256|35=D|49=SENDER|56=TARGET|34=1|52=20240815-14:30:00.000| 11=ORDER123|21=1|55=AAPL+1|60=20240815-14:30:00.000|38=10000|40=2|44=150.00| 59=0|</span>
+                                          <span className="text-[#00e5ff]">847=VWAP</span>
+                                          <span className={textSecondary}>|</span>
+                                          <span className="text-[#ff9800]">7940=09:30:00|7941=16:00:00|7942=15|7943=100|7944=500|7945=200</span>
+                                          <span className={textSecondary}>|10=128|</span>
+                                        </div>
+                                        <div className="flex items-center gap-3 mt-3">
+                                          <Button variant="outline" size="sm" className="text-xs">
+                                            <Copy className="h-3 w-3 mr-1" /> Copy Message
+                                          </Button>
+                                          <Button variant="outline" size="sm" className="text-xs">
+                                            <Download className="h-3 w-3 mr-1" /> Download
+                                          </Button>
+                                        </div>
+                                        <div className="flex justify-end mt-3">
+                                          <Button className="bg-[#9c27b0] hover:bg-[#7b1fa2] text-white">
+                                            <Sparkles className="h-4 w-4 mr-1.5" /> Validate Against FIX Spec
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* Section 4: FIX Spec Validation Results */}
+                                    <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                      <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                        <div className="flex items-center gap-2">
+                                          <p className={`font-semibold ${textPrimary}`}>4. FIX Spec Validation Results</p>
+                                          <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-100"} ${textSecondary}`}>ATDL: AlgoSuite_Complete_v1.5.atdl</span>
+                                          <span className={`text-xs ${textSecondary}`}>Against:</span>
+                                          <select className={`text-xs px-2 py-1 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
+                                            <option>Equities FIX 4.4 v2.1</option>
+                                          </select>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-xs px-2 py-1 rounded bg-[#4caf50]/20 text-[#4caf50]">4 Matches</span>
+                                          <span className="text-xs px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336]">3 Mismatches</span>
+                                        </div>
+                                      </div>
+                                      <div className="overflow-auto">
+                                        <table className="w-full text-xs">
+                                          <thead className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                                            <tr className={`border-b ${borderColor}`}>
+                                              <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>FIX Tag</th>
+                                              <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Name</th>
+                                              <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>ATDL Value</th>
+                                              <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>FIX Spec Value</th>
+                                              <th className={`px-4 py-3 text-left font-semibold ${textPrimary}`}>Status</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody>
+                                            {[
+                                              { tag: "847", name: "TargetStrategy", atdlValue: "VWAP", specValue: "VWAP", status: "match" },
+                                              { tag: "7940", name: "StartTime", atdlValue: "UTCTimestamp", specValue: "UTCTimestamp", status: "match" },
+                                              { tag: "7941", name: "EndTime", atdlValue: "UTCTimestamp", specValue: "UTCTimestamp", status: "match" },
+                                              { tag: "7942", name: "ParticipationRate", atdlValue: "Percentage (0-100)", specValue: "Decimal (0-1)", status: "mismatch" },
+                                              { tag: "7943", name: "MinQty", atdlValue: "Int", specValue: "Qty", status: "mismatch" },
+                                              { tag: "7944", name: "MaxFloor", atdlValue: "Int", specValue: "Int", status: "match" },
+                                              { tag: "7945", name: "DisplayQty", atdlValue: "Int", specValue: "Qty", status: "mismatch" },
+                                            ].map((row, i) => (
+                                              <tr key={i} className={`border-b ${borderColor}`}>
+                                                <td className={`px-4 py-3 font-mono ${textPrimary}`}>{row.tag}</td>
+                                                <td className={`px-4 py-3 ${textPrimary}`}>{row.name}</td>
+                                                <td className={`px-4 py-3 ${textSecondary}`}>{row.atdlValue}</td>
+                                                <td className={`px-4 py-3 ${row.status === "mismatch" ? "text-[#f44336]" : textSecondary}`}>{row.specValue}</td>
+                                                <td className="px-4 py-3">
+                                                  <span className={`flex items-center gap-1 text-xs ${row.status === "match" ? "text-[#4caf50]" : "text-[#f44336]"}`}>
+                                                    {row.status === "match" ? <CheckCircle className="h-3 w-3" /> : <AlertCircle className="h-3 w-3" />}
+                                                    {row.status === "match" ? "Match" : "Mismatch"}
+                                                  </span>
+                                                </td>
+                                              </tr>
+                                            ))}
+                                          </tbody>
+                                        </table>
                                       </div>
                                     </div>
                                   </div>
