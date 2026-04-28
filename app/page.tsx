@@ -904,6 +904,7 @@ export default function BCometPlatform() {
   }
   const [showLogResults, setShowLogResults] = useState(false)
   const [comparisonFlags, setComparisonFlags] = useState<Record<string, { status: "ignore" | "customization" | "flag" | null; note: string }>>({})
+  const [aiSuggestionExpanded, setAiSuggestionExpanded] = useState<Record<string, boolean>>({})
   const [logAnalysisFlags, setLogAnalysisFlags] = useState<Record<string, { status: "ignore" | "customization" | "flag" | null; note: string }>>({})
   const [showScenarioResults, setShowScenarioResults] = useState(false)
   const [showTestCaseResults, setShowTestCaseResults] = useState(false)
@@ -9430,6 +9431,33 @@ const tools = [
       setComparisonFlags(prev => ({ ...prev, [id]: { ...prev[id], note, status: prev[id]?.status || null } }))
     }
 
+    const toggleAiSuggestion = (id: string) => {
+      setAiSuggestionExpanded(prev => ({ ...prev, [id]: !prev[id] }))
+    }
+
+    const aiSuggestions: Record<string, { action: "ignore" | "customization" | "flag"; headline: string; reasoning: string }> = {
+      "diff-1": {
+        action: "customization",
+        headline: "Mark as Client Customization",
+        reasoning: "Knowledge base analysis shows message types 35=K (DontKnowTrade) and 35=H (OrderMassStatusRequest) are optional per FIX 4.4 protocol. Client not supporting 35=DF and 35=L is consistent with equity-only trading workflows seen in 87% of similar onboardings. Recommend tagging as customization with no action required."
+      },
+      "diff-2": {
+        action: "flag",
+        headline: "Flag for Review",
+        reasoning: "Tags 375 and 943 in 35=D are non-standard custom tags per knowledge base. Tags 111 and 6454 in the admin spec are required for iceberg order support on this venue. Mismatch in 35=8 (tags 5124, 1331) may cause execution report parsing failures. Recommend flagging for engineer review before certification."
+      },
+      "diff-3": {
+        action: "customization",
+        headline: "Mark as Client Customization",
+        reasoning: "Knowledge base shows tag 123 value differences are typical for client-side TIF encoding variations. Tag 56 values 'gh' appear to be a typo or non-standard encoding — likely benign. 78% of similar client onboardings with this pattern were resolved as customizations. Recommend documenting and proceeding."
+      },
+      "diff-4": {
+        action: "flag",
+        headline: "Flag — Datatype Mismatch is High Risk",
+        reasoning: "Tag 46 (FairValue) defined as String in client spec but knowledge base requires Char for this venue. Tag 98 (EncryptMethod) as Char is correct per FIX standard. Sending a String where Char is expected will cause session-level reject (35=j) at the gateway. This must be resolved before test execution."
+      },
+    }
+
     // Get phase context info for tool screens
     const currentPhaseInfo = casePhases.find(p => p.num === currentCasePhase)
     const currentToolInfo = currentPhaseInfo?.tools[currentToolIndex]
@@ -9838,7 +9866,10 @@ const tools = [
                 </div>
                 
                 <div className="p-6 space-y-4">
-                  {specCompareResults.map((section) => (
+                  {specCompareResults.map((section) => {
+                    const ai = aiSuggestions[section.id]
+                    const isAiOpen = aiSuggestionExpanded[section.id]
+                    return (
                     <div key={section.id} className={`rounded-lg border ${borderColor} overflow-hidden`}>
                       <div className={`${isDarkMode ? "bg-[#1e4976]/30" : "bg-[#f1f5f9]"} px-4 py-3 flex items-center justify-between`}>
                         <h4 className={`font-semibold ${textPrimary}`}>{section.title}</h4>
@@ -9852,8 +9883,55 @@ const tools = [
                               {comparisonFlags[section.id]?.status === "ignore" ? "Ignored" : comparisonFlags[section.id]?.status === "customization" ? "Customization" : "Flagged"}
                             </span>
                           )}
+                          {/* AI Suggestion Button */}
+                          <button
+                            onClick={() => toggleAiSuggestion(section.id)}
+                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium border transition-colors ${
+                              isAiOpen
+                                ? "bg-[#9c27b0]/20 border-[#9c27b0]/50 text-[#ce93d8]"
+                                : "bg-[#9c27b0]/10 border-[#9c27b0]/30 text-[#ce93d8] hover:bg-[#9c27b0]/20"
+                            }`}
+                          >
+                            <Sparkles className="h-3 w-3" />
+                            AI Suggestion
+                            {isAiOpen ? <ChevronUp className="h-3 w-3 ml-0.5" /> : <ChevronDown className="h-3 w-3 ml-0.5" />}
+                          </button>
                         </div>
                       </div>
+
+                      {/* AI Suggestion Panel */}
+                      {isAiOpen && ai && (
+                        <div className={`px-4 py-3 border-b ${borderColor} ${isDarkMode ? "bg-[#9c27b0]/5" : "bg-purple-50"}`}>
+                          <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[#9c27b0]/20 flex items-center justify-center mt-0.5">
+                              <Sparkles className="h-3.5 w-3.5 text-[#ce93d8]" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-xs font-semibold text-[#ce93d8] mb-0.5`}>Comparing to knowledge base...</p>
+                              <p className={`text-sm font-semibold ${textPrimary} mb-1`}>{ai.headline}</p>
+                              <p className={`text-xs leading-relaxed ${textSecondary}`}>{ai.reasoning}</p>
+                              <div className="mt-2.5 flex items-center gap-2">
+                                <span className={`text-xs ${textSecondary}`}>Apply suggestion:</span>
+                                <button
+                                  onClick={() => { updateFlag(section.id, ai.action); setAiSuggestionExpanded(prev => ({ ...prev, [section.id]: false })) }}
+                                  className={`px-2.5 py-1 rounded text-xs font-medium ${
+                                    ai.action === "customization" ? "bg-[#2196f3]/20 text-[#2196f3] hover:bg-[#2196f3]/30" :
+                                    ai.action === "flag" ? "bg-[#f44336]/20 text-[#f44336] hover:bg-[#f44336]/30" :
+                                    "bg-gray-500/20 text-gray-400 hover:bg-gray-500/30"
+                                  } transition-colors border ${
+                                    ai.action === "customization" ? "border-[#2196f3]/30" :
+                                    ai.action === "flag" ? "border-[#f44336]/30" : "border-gray-500/30"
+                                  }`}
+                                >
+                                  {ai.action === "customization" ? "Mark as Customization" : ai.action === "flag" ? "Flag for Review" : "Ignore"}
+                                </button>
+                                <button onClick={() => toggleAiSuggestion(section.id)} className={`text-xs ${textSecondary} hover:${textPrimary} underline`}>Dismiss</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       <div className="grid grid-cols-2 divide-x divide-[#1e4976]/30">
                         <div className={`p-4 ${isDarkMode ? "bg-[#0a1628]" : "bg-white"}`}>
                           <p className={`text-xs font-medium mb-2 ${textSecondary}`}>Client Spec</p>
@@ -9873,7 +9951,8 @@ const tools = [
                         <Input placeholder="Add note..." value={comparisonFlags[section.id]?.note || ""} onChange={(e) => updateNote(section.id, e.target.value)} className={`flex-1 max-w-xs text-sm ${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`} />
                       </div>
                     </div>
-                  ))}
+                    )
+                  })}
                 </div>
                 
                 <div className={`px-6 py-4 border-t ${borderColor} flex justify-between items-center`}>
@@ -10304,61 +10383,96 @@ const tools = [
               <Card className={`${bgCard} p-6 border ${borderColor}`}>
 <h2 className={`text-xl font-bold mb-6 ${textPrimary}`}>Comparison Results</h2>
   
-  {specCompareResults.map((section, i) => (
-  <div key={section.id} className={`border-t ${borderColor} py-4`}>
-  <h4 className={`font-semibold mb-3 ${textPrimary}`}>{i + 1}. {section.title}</h4>
-  <div className="grid grid-cols-12 gap-4 mb-2">
-  <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff] text-sm`}>{section.title === "Undefined Message Types" || section.title === "Datatype Mismatch" ? "Defined In Client Spec" : section.title === "Unsupported Tags" || section.title === "Unsupported Tag Values" ? "Supported In Client Spec" : "Client Spec"}</h3></div>
-  <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff] text-sm`}>{section.title === "Undefined Message Types" || section.title === "Datatype Mismatch" ? "Defined In Admin Spec" : section.title === "Unsupported Tags" || section.title === "Unsupported Tag Values" ? "Supported In Admin Spec" : "Admin Spec"}</h3></div>
-  <div className="col-span-2"><h3 className={`font-bold text-[#00e5ff] text-sm`}>Action</h3></div>
-  </div>
-  <div className="grid grid-cols-12 gap-4">
-                      <div className={`col-span-5 p-3 rounded ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"}`}>
-                        <pre className={`text-sm whitespace-pre-wrap ${textSecondary}`}>{section.left}</pre>
-                      </div>
-                      <div className={`col-span-5 p-3 rounded ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"}`}>
-                        <pre className={`text-sm whitespace-pre-wrap ${textSecondary}`}>{section.right}</pre>
-                      </div>
-                      <div className="col-span-2 space-y-2">
-                        <div className="flex flex-col gap-1">
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <input 
-                              type="checkbox" 
-                              checked={comparisonFlags[section.id]?.status === "ignore"}
-                              onChange={() => updateFlag(section.id, comparisonFlags[section.id]?.status === "ignore" ? null : "ignore")}
-                              className="rounded"
-                            />
-                            <span className={`text-xs ${textSecondary}`}>Ignore</span>
-                          </label>
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <input 
-                              type="checkbox" 
-                              checked={comparisonFlags[section.id]?.status === "customization"}
-                              onChange={() => updateFlag(section.id, comparisonFlags[section.id]?.status === "customization" ? null : "customization")}
-                              className="rounded"
-                            />
-                            <span className={`text-xs ${textSecondary}`}>Customization</span>
-                          </label>
-                          <label className="flex items-center gap-2 cursor-pointer">
-                            <input 
-                              type="checkbox" 
-                              checked={comparisonFlags[section.id]?.status === "flag"}
-                              onChange={() => updateFlag(section.id, comparisonFlags[section.id]?.status === "flag" ? null : "flag")}
-                              className="rounded"
-                            />
-                            <span className={`text-xs ${textSecondary}`}>Flag</span>
-                          </label>
-                        </div>
-<Input
-  placeholder="Add note..."
-  value={comparisonFlags[section.id]?.note || ""}
-  onChange={(e) => updateNote(section.id, e.target.value)}
-  className={`h-7 text-xs ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-gray-300" : "text-gray-600"}`}
-  />
-                      </div>
-                    </div>
-                  </div>
-                ))}
+  {specCompareResults.map((section, i) => {
+    const ai = aiSuggestions[section.id]
+    const isAiOpen = aiSuggestionExpanded[section.id]
+    const leftLabel = section.title === "Undefined Message Types" || section.title === "Datatype Mismatch" ? "Defined In Client Spec" : section.title === "Unsupported Tags" || section.title === "Unsupported Tag Values" ? "Supported In Client Spec" : "Client Spec"
+    const rightLabel = section.title === "Undefined Message Types" || section.title === "Datatype Mismatch" ? "Defined In Admin Spec" : section.title === "Unsupported Tags" || section.title === "Unsupported Tag Values" ? "Supported In Admin Spec" : "Admin Spec"
+    return (
+    <div key={section.id} className={`border-t ${borderColor} py-4`}>
+      {/* Header row with title and AI button */}
+      <div className="flex items-center justify-between mb-3">
+        <h4 className={`font-semibold ${textPrimary}`}>{i + 1}. {section.title}</h4>
+        {ai && (
+          <button
+            onClick={() => toggleAiSuggestion(section.id)}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium border transition-colors ${
+              isAiOpen
+                ? "bg-[#9c27b0]/20 border-[#9c27b0]/50 text-[#ce93d8]"
+                : "bg-[#9c27b0]/10 border-[#9c27b0]/30 text-[#ce93d8] hover:bg-[#9c27b0]/20"
+            }`}
+          >
+            <Sparkles className="h-3 w-3" />
+            AI Suggestion
+            {isAiOpen ? <ChevronUp className="h-3 w-3 ml-0.5" /> : <ChevronDown className="h-3 w-3 ml-0.5" />}
+          </button>
+        )}
+      </div>
+
+      {/* AI Suggestion Panel */}
+      {isAiOpen && ai && (
+        <div className={`mb-3 rounded-lg border ${isDarkMode ? "border-[#9c27b0]/30 bg-[#9c27b0]/5" : "border-purple-200 bg-purple-50"} p-3`}>
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[#9c27b0]/20 flex items-center justify-center mt-0.5">
+              <Sparkles className="h-3.5 w-3.5 text-[#ce93d8]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-[#ce93d8] mb-0.5">Comparing to knowledge base...</p>
+              <p className={`text-sm font-semibold ${textPrimary} mb-1`}>{ai.headline}</p>
+              <p className={`text-xs leading-relaxed ${textSecondary}`}>{ai.reasoning}</p>
+              <div className="mt-2.5 flex items-center gap-2">
+                <span className={`text-xs ${textSecondary}`}>Apply suggestion:</span>
+                <button
+                  onClick={() => { updateFlag(section.id, ai.action); setAiSuggestionExpanded(prev => ({ ...prev, [section.id]: false })) }}
+                  className={`px-2.5 py-1 rounded text-xs font-medium border transition-colors ${
+                    ai.action === "customization" ? "bg-[#2196f3]/20 text-[#2196f3] hover:bg-[#2196f3]/30 border-[#2196f3]/30" :
+                    ai.action === "flag" ? "bg-[#f44336]/20 text-[#f44336] hover:bg-[#f44336]/30 border-[#f44336]/30" :
+                    "bg-gray-500/20 text-gray-400 hover:bg-gray-500/30 border-gray-500/30"
+                  }`}
+                >
+                  {ai.action === "customization" ? "Mark as Customization" : ai.action === "flag" ? "Flag for Review" : "Ignore"}
+                </button>
+                <button onClick={() => toggleAiSuggestion(section.id)} className={`text-xs ${textSecondary} underline`}>Dismiss</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-12 gap-4 mb-2">
+        <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff] text-sm`}>{leftLabel}</h3></div>
+        <div className="col-span-5"><h3 className={`font-bold text-[#00e5ff] text-sm`}>{rightLabel}</h3></div>
+        <div className="col-span-2"><h3 className={`font-bold text-[#00e5ff] text-sm`}>Action</h3></div>
+      </div>
+      <div className="grid grid-cols-12 gap-4">
+        <div className={`col-span-5 p-3 rounded ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"}`}>
+          <pre className={`text-sm whitespace-pre-wrap ${textSecondary}`}>{section.left}</pre>
+        </div>
+        <div className={`col-span-5 p-3 rounded ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f1f5f9]"}`}>
+          <pre className={`text-sm whitespace-pre-wrap ${textSecondary}`}>{section.right}</pre>
+        </div>
+        <div className="col-span-2 space-y-2">
+          <div className="flex flex-col gap-1">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={comparisonFlags[section.id]?.status === "ignore"} onChange={() => updateFlag(section.id, comparisonFlags[section.id]?.status === "ignore" ? null : "ignore")} className="rounded" />
+              <span className={`text-xs ${textSecondary}`}>Ignore</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={comparisonFlags[section.id]?.status === "customization"} onChange={() => updateFlag(section.id, comparisonFlags[section.id]?.status === "customization" ? null : "customization")} className="rounded" />
+              <span className={`text-xs ${textSecondary}`}>Customization</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={comparisonFlags[section.id]?.status === "flag"} onChange={() => updateFlag(section.id, comparisonFlags[section.id]?.status === "flag" ? null : "flag")} className="rounded" />
+              <span className={`text-xs ${textSecondary}`}>Flag</span>
+            </label>
+          </div>
+          <Input placeholder="Add note..." value={comparisonFlags[section.id]?.note || ""} onChange={(e) => updateNote(section.id, e.target.value)} className={`h-7 text-xs ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-gray-300" : "text-gray-600"}`} />
+        </div>
+      </div>
+    </div>
+    )
+  })}
+
 
 {/* Actions and Navigation */}
   <div className={`mt-6 pt-4 border-t ${borderColor} flex justify-between items-center`}>
