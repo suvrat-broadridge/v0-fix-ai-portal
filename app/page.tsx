@@ -1040,7 +1040,6 @@ export default function BCometPlatform() {
       tools: [
         { id: "intake", name: "Intake Portal", screen: "intake-portal", icon: FileText, status: "completed" as const },
         { id: "docs", name: "Document Upload", screen: "intake-portal", icon: Upload, status: "completed" as const },
-        { id: "gap", name: "AI Gap Analysis", screen: "intake-portal", icon: Brain, status: "in-progress" as const },
       ],
     },
     {
@@ -7975,69 +7974,6 @@ const tools = [
                             </div>
                           )}
 
-                          {/* AI Gap Analysis Tool */}
-                          {tool.id === "gap" && (
-                            <div className="space-y-4">
-                              <p className={textSecondary}>AI-powered analysis of FIX spec gaps and compatibility issues.</p>
-                              <div className={`${bgSecondary} p-4 rounded-lg`}>
-                                <div className="flex items-center gap-3 mb-4">
-                                  <Brain className="h-6 w-6 text-[#9c27b0]" />
-                                  <span className={`font-medium ${textPrimary}`}>AI Analysis in Progress...</span>
-                                </div>
-                                <div className="space-y-2">
-                                  <div className="flex items-center justify-between">
-                                    <span className={`text-sm ${textSecondary}`}>Parsing FIX Spec</span>
-                                    <CheckCircle className="h-4 w-4 text-[#4caf50]" />
-                                  </div>
-                                  <div className="flex items-center justify-between">
-                                    <span className={`text-sm ${textSecondary}`}>Comparing with Admin Spec</span>
-                                    <CheckCircle className="h-4 w-4 text-[#4caf50]" />
-                                  </div>
-                                  <div className="flex items-center justify-between">
-                                    <span className={`text-sm ${textSecondary}`}>Identifying Gaps</span>
-                                    <Loader className="h-4 w-4 text-[#ff9800] animate-spin" />
-                                  </div>
-                                  <div className="flex items-center justify-between">
-                                    <span className={`text-sm ${textSecondary}`}>Generating Recommendations</span>
-                                    <Circle className="h-4 w-4 text-gray-500" />
-                                  </div>
-                                </div>
-                              </div>
-                              <div className={`border ${borderColor} rounded-lg p-4`}>
-                                <p className={`text-sm font-medium ${textPrimary} mb-2`}>Preliminary Findings</p>
-                                <div className="space-y-2">
-                                  <div className="flex items-center gap-2">
-                                    <AlertTriangle className="h-4 w-4 text-[#ff9800]" />
-                                    <span className={`text-sm ${textSecondary}`}>3 message types undefined</span>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <AlertCircle className="h-4 w-4 text-[#f44336]" />
-                                    <span className={`text-sm ${textSecondary}`}>5 required tags missing</span>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <CheckCircle className="h-4 w-4 text-[#4caf50]" />
-                                    <span className={`text-sm ${textSecondary}`}>142 tags compatible</span>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Next Step Button */}
-                              {actualToolIndex < currentPhase.tools.length - 1 && (
-                                <div className="flex gap-3 pt-4 border-t border-[#1e4976]/30">
-                                  <Button
-                                    onClick={() => {
-                                      setCurrentToolIndex(actualToolIndex + 1)
-                                      setSelectedToolId(currentPhase.tools[actualToolIndex + 1].id)
-                                    }}
-                                    className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto"
-                                  >
-                                    Next Step <ChevronRight className="h-4 w-4 ml-1" />
-                                  </Button>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                          
                           {/* Create Spec from Log File Tool */}
                           {tool.id === "spec-from-log" && (() => {
                             const specLogMsgTabs = [
