@@ -7886,7 +7886,7 @@ const tools = [
                                           </span>
                                         </div>
                                         <Button size="sm" className="bg-[#4caf50] text-white hover:bg-[#43a047]">
-                                          <CheckCircle className="h-3.5 w-3.5 mr-1.5" /> Save & Mark All Verified
+                                          <CheckCircle className="h-3.5 w-3.5 mr-1.5" /> Mark {selectedRole === "client" ? "Client" : "Admin"} Verified
                                         </Button>
                                       </div>
                                     </div>
