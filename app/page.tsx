@@ -8247,6 +8247,154 @@ const tools = [
                                 </div>
                               )}
 
+                              {/* Coverage Matrix - shows % of admin spec covered by logs */}
+                              {generatedSpecFromLog && !isGeneratingSpec && (
+                                <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                  <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                    <div className="flex items-center gap-2">
+                                      <BarChart3 className="h-5 w-5 text-[#2196f3]" />
+                                      <div>
+                                        <h4 className={`font-semibold ${textPrimary}`}>Admin Spec Coverage Matrix</h4>
+                                        <p className={`text-xs ${textSecondary}`}>Percentage of admin spec tags/values covered by log file data</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="p-4">
+                                    <div className="grid grid-cols-5 gap-3">
+                                      {[
+                                        { msgType: "35=D", label: "New Order Single", covered: 9, total: 13, pct: 69 },
+                                        { msgType: "35=8", label: "Execution Report", covered: 7, total: 11, pct: 64 },
+                                        { msgType: "35=F", label: "Cancel Request", covered: 6, total: 7, pct: 86 },
+                                        { msgType: "35=G", label: "Cancel/Replace", covered: 8, total: 12, pct: 67 },
+                                        { msgType: "35=9", label: "Cancel Reject", covered: 5, total: 6, pct: 83 },
+                                      ].map((item) => (
+                                        <div key={item.msgType} className={`${bgSecondary} rounded-lg p-3 text-center`}>
+                                          <p className={`text-xs font-mono ${textSecondary} mb-1`}>{item.msgType}</p>
+                                          <div className="relative w-16 h-16 mx-auto mb-2">
+                                            <svg className="w-16 h-16 transform -rotate-90">
+                                              <circle cx="32" cy="32" r="28" stroke={isDarkMode ? "#1e4976" : "#e2e8f0"} strokeWidth="6" fill="none" />
+                                              <circle cx="32" cy="32" r="28" stroke={item.pct >= 80 ? "#4caf50" : item.pct >= 60 ? "#ff9800" : "#f44336"} strokeWidth="6" fill="none" strokeDasharray={`${item.pct * 1.76} 176`} strokeLinecap="round" />
+                                            </svg>
+                                            <span className={`absolute inset-0 flex items-center justify-center text-lg font-bold ${item.pct >= 80 ? "text-[#4caf50]" : item.pct >= 60 ? "text-[#ff9800]" : "text-[#f44336]"}`}>{item.pct}%</span>
+                                          </div>
+                                          <p className={`text-xs font-medium ${textPrimary} truncate`}>{item.label}</p>
+                                          <p className={`text-xs ${textSecondary}`}>{item.covered}/{item.total} tags</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                    <div className={`mt-4 pt-3 border-t ${borderColor} flex items-center justify-between`}>
+                                      <div className="flex items-center gap-4">
+                                        <div className="flex items-center gap-1.5">
+                                          <div className="w-3 h-3 rounded-full bg-[#4caf50]" />
+                                          <span className={`text-xs ${textSecondary}`}>Good (80%+)</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                          <div className="w-3 h-3 rounded-full bg-[#ff9800]" />
+                                          <span className={`text-xs ${textSecondary}`}>Partial (60-79%)</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                          <div className="w-3 h-3 rounded-full bg-[#f44336]" />
+                                          <span className={`text-xs ${textSecondary}`}>Low (&lt;60%)</span>
+                                        </div>
+                                      </div>
+                                      <div className={`text-sm font-semibold ${textPrimary}`}>
+                                        Overall: <span className="text-[#ff9800]">74%</span> coverage
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Missing Tags/Values Table - shows what's in admin spec but not in logs */}
+                              {generatedSpecFromLog && !isGeneratingSpec && (
+                                <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                  <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                    <div className="flex items-center gap-2">
+                                      <AlertTriangle className="h-5 w-5 text-[#ff9800]" />
+                                      <div>
+                                        <h4 className={`font-semibold ${textPrimary}`}>Missing from Logs (In Admin Spec)</h4>
+                                        <p className={`text-xs ${textSecondary}`}>Tags and values defined in admin spec but not found in log file samples</p>
+                                      </div>
+                                    </div>
+                                    <span className={`px-2 py-1 rounded text-xs font-medium bg-[#ff9800]/20 text-[#ff9800]`}>13 gaps found</span>
+                                  </div>
+                                  
+                                  {/* Message Type Tabs for Gaps */}
+                                  <div className={`px-4 py-2 border-b ${borderColor} flex gap-1 overflow-x-auto`}>
+                                    {specLogMsgTabs.map(tab => (
+                                      <button
+                                        key={tab.id}
+                                        onClick={() => setStandardizedMsgTypeTab(tab.id)}
+                                        className={`px-3 py-1.5 rounded text-xs font-medium whitespace-nowrap transition-colors ${
+                                          standardizedMsgTypeTab === tab.id
+                                            ? "bg-[#ff9800] text-[#0a1628]"
+                                            : `${textSecondary} hover:bg-[#1e4976]/30`
+                                        }`}
+                                      >
+                                        {tab.label}
+                                      </button>
+                                    ))}
+                                  </div>
+
+                                  {/* Missing Tags Table */}
+                                  <div className="overflow-auto max-h-64">
+                                    <table className="w-full text-xs">
+                                      <thead className={`sticky top-0 ${isDarkMode ? "bg-[#0a1628]" : "bg-[#f8fafc]"}`}>
+                                        <tr className={`border-b ${borderColor}`}>
+                                          <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Tag</th>
+                                          <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>TagName</th>
+                                          <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Req in Admin</th>
+                                          <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Missing Values</th>
+                                          <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Impact</th>
+                                          <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Recommendation</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {(standardizedMsgTypeTab === "D" ? [
+                                          { tag: "111", name: "MaxFloor", required: "N", missingValues: "—", impact: "Low", recommendation: "Optional iceberg order support" },
+                                          { tag: "453", name: "NoPartyIDs", required: "Y", missingValues: "—", impact: "High", recommendation: "Required repeating group — verify with client" },
+                                          { tag: "448", name: "PartyID", required: "Y", missingValues: "—", impact: "High", recommendation: "Part of NoPartyIDs group" },
+                                          { tag: "40", name: "OrdType", required: "Y", missingValues: "K, P", impact: "Medium", recommendation: "Pegged order types not in logs" },
+                                        ] : standardizedMsgTypeTab === "8" ? [
+                                          { tag: "31", name: "LastPx", required: "CR", missingValues: "—", impact: "High", recommendation: "Required on fills — may indicate no fill data in logs" },
+                                          { tag: "32", name: "LastQty", required: "CR", missingValues: "—", impact: "High", recommendation: "Required on fills — verify sample completeness" },
+                                          { tag: "39", name: "OrdStatus", required: "Y", missingValues: "C", impact: "Low", recommendation: "Expired status not in logs" },
+                                          { tag: "150", name: "ExecType", required: "Y", missingValues: "C", impact: "Low", recommendation: "Expired exec type not in logs" },
+                                        ] : standardizedMsgTypeTab === "F" ? [
+                                          { tag: "41", name: "OrigClOrdID", required: "CR", missingValues: "—", impact: "Medium", recommendation: "Verify cancel-on-replace scenarios" },
+                                        ] : standardizedMsgTypeTab === "G" ? [
+                                          { tag: "99", name: "StopPx", required: "CR", missingValues: "—", impact: "Medium", recommendation: "Stop order support not in logs" },
+                                          { tag: "110", name: "MinQty", required: "N", missingValues: "—", impact: "Low", recommendation: "Minimum quantity not used" },
+                                          { tag: "111", name: "MaxFloor", required: "N", missingValues: "—", impact: "Low", recommendation: "Iceberg orders not in logs" },
+                                          { tag: "54", name: "Side", required: "Y", missingValues: "5, 6", impact: "Medium", recommendation: "Short sell variations not in logs" },
+                                        ] : [
+                                          { tag: "102", name: "CxlRejReason", required: "N", missingValues: "4, 5, 6", impact: "Low", recommendation: "Additional reject reasons not in logs" },
+                                        ]).map((row, i) => (
+                                          <tr key={i} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
+                                            <td className={`px-3 py-2 font-mono text-[#ff9800]`}>{row.tag}</td>
+                                            <td className={`px-3 py-2 ${textPrimary} font-medium`}>{row.name}</td>
+                                            <td className="px-3 py-2">
+                                              <span className={`font-medium ${row.required === "Y" ? "text-[#4caf50]" : row.required === "CR" ? "text-[#ff9800]" : textSecondary}`}>
+                                                {row.required}
+                                              </span>
+                                            </td>
+                                            <td className={`px-3 py-2 font-mono ${textSecondary}`}>{row.missingValues}</td>
+                                            <td className="px-3 py-2">
+                                              <span className={`px-1.5 py-0.5 rounded text-xs ${
+                                                row.impact === "High" ? "bg-[#f44336]/20 text-[#f44336]" :
+                                                row.impact === "Medium" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                                                "bg-gray-500/20 text-gray-400"
+                                              }`}>{row.impact}</span>
+                                            </td>
+                                            <td className={`px-3 py-2 text-xs ${textSecondary}`}>{row.recommendation}</td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                              )}
+
                               {/* Next Step Button */}
                               {actualToolIndex < currentPhase.tools.length - 1 && (
                                 <div className="flex pt-4 border-t border-[#1e4976]/30">
