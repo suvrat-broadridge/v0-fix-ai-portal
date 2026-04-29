@@ -3,7 +3,7 @@
 // B- COMET Platform - FIX Protocol Testing Suite v2
 import React, { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
-import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, ChevronUp, ChevronsUpDown, FileText, Activity, Zap, Check, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, Stamp, Code, ScrollText, Navigation, Sparkles, Minus, Loader, FolderArchive, Sliders, Bot, ExternalLink, GitMerge, FileCode, Presentation, ShoppingCart, Network, Circle, Edit3, FileSpreadsheet } from "lucide-react"
+import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, ChevronUp, ChevronsUpDown, FileText, Activity, Zap, Check, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, ClipboardList, Stamp, Code, ScrollText, Navigation, Sparkles, Minus, Loader, FolderArchive, Sliders, Bot, ExternalLink, GitMerge, FileCode, Presentation, ShoppingCart, Network, Circle, Edit3, FileSpreadsheet } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -1148,7 +1148,7 @@ export default function BCometPlatform() {
     }
     return false
   })
-  const [aiAgentMode, setAiAgentMode] = useState<"general" | "spec-compare" | "log-analysis" | "test-gen" | "certification" | "atdl">("general")
+  const [aiAgentMode, setAiAgentMode] = useState<"general" | "intake" | "design" | "connectivity" | "planning" | "testing" | "analysis" | "decisioning" | "golive">("general")
   const [aiChatInput, setAiChatInput] = useState("")
   const [aiWorkflowMode, setAiWorkflowMode] = useState(false)
   const [aiWorkflowStep, setAiWorkflowStep] = useState(0)
@@ -1987,6 +1987,7 @@ export default function BCometPlatform() {
         name: newClient.name,
         jira: newClient.jira,
         accountManager: newClient.accountManager,
+        assignedUser: "Unassigned",
         assetClasses: newClient.assetClasses.map(ac => ({
           name: ac,
           specCompare: "not-started",
@@ -1996,7 +1997,8 @@ export default function BCometPlatform() {
           certification: "not-started",
           config: "not-started",
           alerts: 0,
-        }))
+        })),
+        onboardingCases: []
       }
       setClients([...clients, client])
       setNewClient({ name: "", jira: "", accountManager: "", assetClasses: [] })
@@ -2690,7 +2692,7 @@ export default function BCometPlatform() {
     setTimeout(() => {
       let response = ""
       let actions: Array<{id: string, type: "navigate" | "create" | "upload" | "execute" | "configure", label: string, target?: string, data?: any}> = []
-      const agent = aiAgents[aiAgentMode]
+      const agent = aiAgents[aiAgentMode as keyof typeof aiAgents] || aiAgents.general
       
       // Navigation commands - immediate execution
       if (userMsg.includes("go to") || userMsg.includes("take me") || userMsg.includes("open") || userMsg.includes("navigate to") || userMsg.includes("show me")) {
@@ -3317,7 +3319,7 @@ export default function BCometPlatform() {
                         Phase {activePlanetTools! + 1}: {activePlanet.name}
                       </p>
                     </div>
-                    {activePlanet.tools.map((tool, ti) => (
+                    {activePlanet.steps.map((tool, ti) => (
                       <div key={ti} className="flex items-center gap-2 py-1">
                         <div className={`w-1.5 h-1.5 rounded-full ${visitedPlanets.includes(activePlanetTools!) ? "bg-[#4caf50]" : "bg-gray-400"}`} />
                         <span className={`text-xs ${isDarkMode ? "text-[#cbd5e1]" : "text-[#334155]"}`}>{tool}</span>
@@ -4172,27 +4174,8 @@ export default function BCometPlatform() {
                   Try It Now <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
               )}
-                                </div>
-                              </div>
-
-                              {/* Next Step Button */}
-                              {actualToolIndex < currentPhase.steps.length - 1 && (
-                                <div className="flex gap-3 pt-4 border-t border-[#1e4976]/30">
-                                  <Button
-                                    onClick={() => {
-                                      setCurrentToolIndex(actualToolIndex + 1)
-                                      setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id)
-                                    }}
-                                    className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto"
-                                  >
-                                    Next Step <ChevronRight className="h-4 w-4 ml-1" />
-                                  </Button>
-                                </div>
-                              )}
-                            </div>
-                          )}
-    </div>
-  </section>
+            </div>
+          </section>
 
   {/* Platform Capabilities Section */}
   <section className="py-20">
@@ -11054,7 +11037,7 @@ const tools = [
                   {/* Step indicator bar */}
                   <div className={`flex items-center gap-2 mb-6 p-3 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
                     <span className={`text-sm font-medium ${textSecondary}`}>Steps:</span>
-                    {currentPhaseWithDynamicStatus.tools.map((tool, idx) => (
+                    {currentPhaseWithDynamicStatus.steps.map((tool, idx) => (
                       <button
                         key={tool.id}
                         onClick={() => { setCurrentToolIndex(idx); setSelectedToolId(tool.id); }}
@@ -11078,7 +11061,7 @@ const tools = [
 
                   <h2 className={`text-lg font-semibold ${textPrimary} mb-4`}>Available Tools & Actions</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {currentPhaseWithDynamicStatus.tools.map((tool, idx) => {
+                    {currentPhaseWithDynamicStatus.steps.map((tool, idx) => {
                       const ToolIcon = tool.icon
                       const isCurrentStep = idx === currentToolIndex
                       return (
@@ -11159,7 +11142,7 @@ const tools = [
                   <div className={`mt-8 ${bgSecondary} border ${borderColor} rounded-lg p-6`}>
                     <h3 className={`font-semibold ${textPrimary} mb-4`}>Phase Completion Requirements</h3>
                     <div className="space-y-3">
-                    {currentPhaseWithDynamicStatus.tools.map((tool, idx) => (
+                    {currentPhaseWithDynamicStatus.steps.map((tool, idx) => (
                         <li key={tool.id} className={`flex items-center gap-2 text-sm ${tool.status === "completed" ? "line-through text-gray-500" : textPrimary}`}>
                           {tool.status === "completed" ? (
                             <CheckCircle className="h-4 w-4 text-[#4caf50]" />
@@ -11202,7 +11185,7 @@ const tools = [
                   </h3>
                   <p className={`text-xs ${textSecondary} mt-0.5`}>
                     {showForceCompleteDialog === "step"
-                      ? `Marking "${currentPhase?.tools[forceCompleteTargetToolIndex]?.name}" as complete without finishing all requirements.`
+                      ? `Marking "${currentPhase?.steps[forceCompleteTargetToolIndex]?.name}" as complete without finishing all requirements.`
                       : `Forcing Phase ${currentCasePhase} (${currentPhase?.name}) to complete and advancing to Phase ${currentCasePhase + 1}.`}
                   </p>
                 </div>
@@ -11383,9 +11366,9 @@ const tools = [
 
     // Get phase context info for tool screens
     const currentPhaseInfo = casePhases.find(p => p.num === currentCasePhase)
-    const currentToolInfo = currentPhaseInfo?.tools[currentToolIndex]
-    const nextToolInfo = currentPhaseInfo?.tools[currentToolIndex + 1]
-    const isLastToolInPhase = currentToolIndex >= (currentPhaseInfo?.tools.length || 1) - 1
+    const currentToolInfo = currentPhaseInfo?.steps[currentToolIndex]
+    const nextToolInfo = currentPhaseInfo?.steps[currentToolIndex + 1]
+    const isLastToolInPhase = currentToolIndex >= (currentPhaseInfo?.steps.length || 1) - 1
 
     // Client-specific flow: When coming from Dashboard -> Client -> Compare
     if (!isAdHocMode && selectedClient && selectedAssetClass) {
@@ -11407,7 +11390,7 @@ const tools = [
                     <ChevronRight className={`h-4 w-4 ${textSecondary}`} />
                     <div className="flex items-center gap-2">
                       <span className={`text-xs font-bold px-2 py-1 rounded bg-[#ff9800]/20 text-[#ff9800]`}>
-                        Step {currentToolIndex + 1}/{currentPhaseInfo.tools.length}
+                        Step {currentToolIndex + 1}/{currentPhaseInfo.steps.length}
                       </span>
                       <span className={`text-sm font-medium ${textPrimary}`}>Spec Comparison</span>
                     </div>
@@ -11881,8 +11864,8 @@ const tools = [
     // Ad-hoc Mode: Tools -> Spec Compare (select any specs)
     // Get phase context for tools opened from case workflow
     const adHocPhaseInfo = casePhases.find(p => p.num === currentCasePhase)
-    const adHocNextToolInfo = adHocPhaseInfo?.tools[currentToolIndex + 1]
-    const adHocIsLastToolInPhase = currentToolIndex >= (adHocPhaseInfo?.tools.length || 1) - 1
+    const adHocNextToolInfo = adHocPhaseInfo?.steps[currentToolIndex + 1]
+    const adHocIsLastToolInPhase = currentToolIndex >= (adHocPhaseInfo?.steps.length || 1) - 1
     
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
@@ -11903,7 +11886,7 @@ const tools = [
                   <ChevronRight className={`h-4 w-4 ${textSecondary}`} />
                   <div className="flex items-center gap-2">
                     <span className={`text-xs font-bold px-2 py-1 rounded bg-[#ff9800]/20 text-[#ff9800]`}>
-                      Step {currentToolIndex + 1}/{adHocPhaseInfo.tools.length}
+                      Step {currentToolIndex + 1}/{adHocPhaseInfo.steps.length}
                     </span>
                     <span className={`text-sm font-medium ${textPrimary}`}>Spec Comparison</span>
                   </div>
@@ -12402,8 +12385,8 @@ const tools = [
     
     // Get phase context info for log-analysis
     const logPhaseInfo = casePhases.find(p => p.num === currentCasePhase)
-    const logNextToolInfo = logPhaseInfo?.tools[currentToolIndex + 1]
-    const logIsLastToolInPhase = currentToolIndex >= (logPhaseInfo?.tools.length || 1) - 1
+    const logNextToolInfo = logPhaseInfo?.steps[currentToolIndex + 1]
+    const logIsLastToolInPhase = currentToolIndex >= (logPhaseInfo?.steps.length || 1) - 1
     
     return (
       <div className={`min-h-screen ${bgPrimary} flex`}>
@@ -12423,7 +12406,7 @@ const tools = [
                   <ChevronRight className={`h-4 w-4 ${textSecondary}`} />
                   <div className="flex items-center gap-2">
                     <span className={`text-xs font-bold px-2 py-1 rounded bg-[#ff9800]/20 text-[#ff9800]`}>
-                      Step {currentToolIndex + 1}/{logPhaseInfo.tools.length}
+                      Step {currentToolIndex + 1}/{logPhaseInfo.steps.length}
                     </span>
                     <span className={`text-sm font-medium ${textPrimary}`}>Log Analysis</span>
                   </div>
