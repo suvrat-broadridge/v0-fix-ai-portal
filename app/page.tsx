@@ -4176,25 +4176,9 @@ export default function BCometPlatform() {
               )}
             </div>
           </section>
-
-  {/* Platform Capabilities Section */}
-  <section className="py-20">
-    <div className="max-w-7xl mx-auto px-6">
-      <h2 className={`text-3xl font-bold text-center mb-12 ${textPrimary}`}>Platform Capabilities</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {features.map((feature, i) => (
-          <Card key={i} className={`${bgCard} p-6 border ${borderColor} hover:border-[#00e5ff]/50 transition-colors`}>
-            <feature.icon className="h-10 w-10 mb-4 text-[#00e5ff]" />
-            <h3 className={`text-lg font-bold mb-2 ${textPrimary}`}>{feature.title}</h3>
-            <p className={`text-sm ${textSecondary}`}>{feature.desc}</p>
-          </Card>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  {/* Contact Panel Modal */}
-  {showContactPanel && (
+        </>
+      )
+    }
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
       <Card className={`${bgCard} p-8 border ${borderColor} w-full max-w-lg mx-4 relative`}>
         <button 
@@ -4410,10 +4394,11 @@ export default function BCometPlatform() {
       </Card>
     </div>
   )}
-  </div>
-  )
+        </section>
+      </>
+    )
   }
-  
+
   // Role Selection Screen
   if (currentScreen === "role-select") {
     return (
