@@ -783,7 +783,7 @@ function TestPlanGeneratorTool({
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "workflow-overview" | "intake-portal" | "dashboard" | "clients" | "client-detail" | "case-workflow" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "onboarding-case-detail" | "approvals" | "evidence-vault" | "prod-config" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case" | "presentation" | "client-cert-report">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "workflow-overview" | "intake-portal" | "dashboard" | "clients" | "client-detail" | "case-workflow" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "onboarding-case-detail" | "approvals" | "evidence-vault" | "prod-config" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case" | "presentation" | "client-cert-report" | "phase-cases" | "atdl-workbench">("home")
   const [settingsTab, setSettingsTab] = useState<"profile" | "notifications" | "security" | "integrations" | "appearance" | "api-keys">("profile")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [isManager, setIsManager] = useState(false)
@@ -1038,7 +1038,7 @@ export default function BCometPlatform() {
       icon: ClipboardCheck,
       color: "#00e5ff",
       steps: [
-        { id: "intake", name: "Intake Portal", screen: "intake-portal", icon: FileText, status: "completed" as const },
+        { id: "intake", name: "Intake Portal", screen: "intake-portal", icon: FileText, status: "completed" as "completed" | "in-progress" | "available" | "pending" | "blocked" },
         { id: "docs", name: "Document Upload", screen: "intake-portal", icon: Upload, status: "completed" as const },
       ],
     },
@@ -3361,9 +3361,10 @@ export default function BCometPlatform() {
         <section className="relative max-w-7xl mx-auto px-6 py-20">
           <p className={textPrimary}>Welcome to B-COMET</p>
         </section>
-      )
-    }
-    }
+      </div>
+    )
+  }
+
   if (currentScreen === "role-select") {
     return (
       <div className={`min-h-screen ${bgPrimary} flex items-center justify-center`}>
@@ -5129,7 +5130,7 @@ const clientProgressData = [
   variant="outline" 
   size="sm" 
   className="flex-1"
-  onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.version); setShowSpecResults(false); setCurrentScreen("spec-compare"); setIsAdHocMode(false); }}
+  onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.protocol); setShowSpecResults(false); setCurrentScreen("spec-compare"); setIsAdHocMode(false); }}
   disabled={!version.clientSpec}
   >
   <GitCompare className="h-3 w-3 mr-1" /> Compare
@@ -5138,7 +5139,7 @@ const clientProgressData = [
   variant="outline" 
   size="sm" 
   className="flex-1"
-  onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.version); setCurrentScreen("log-analysis"); setIsAdHocMode(false); }}
+  onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.protocol); setCurrentScreen("log-analysis"); setIsAdHocMode(false); }}
   >
   <FileSearch className="h-3 w-3 mr-1" /> Analyze
   </Button>
@@ -5146,7 +5147,7 @@ const clientProgressData = [
   variant="outline" 
   size="sm" 
   className="flex-1"
-  onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.version); setCurrentScreen("atdl-validate"); setIsAdHocMode(false); }}
+  onClick={() => { setSelectedAssetClass(asset.name); setSelectedFixVersion(version.protocol); setCurrentScreen("atdl-validate"); setIsAdHocMode(false); }}
   >
   <Cog className="h-3 w-3 mr-1" /> ATDL
   </Button>
@@ -5859,21 +5860,6 @@ const tools = [
                         ))}
                                 </div>
                               </div>
-
-                              {/* Next Step Button */}
-                              {actualToolIndex < currentPhase.steps.length - 1 && (
-                                <div className="flex gap-3 pt-4 border-t border-[#1e4976]/30">
-                                  <Button
-                                    onClick={() => {
-                                      setCurrentToolIndex(actualToolIndex + 1)
-                                      setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id)
-                                    }}
-                                    className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto"
-                                  >
-                                    Next Step <ChevronRight className="h-4 w-4 ml-1" />
-                                  </Button>
-                                </div>
-                              )}
                             </div>
                           )}
 
@@ -6885,7 +6871,7 @@ const tools = [
                                                   <td className="px-2 py-1.5 text-center">
                                                     <div className="flex items-center justify-center gap-1">
                                                       <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: confColor }} title={`${row.confidence} confidence`} />
-                                                      {row.modified && <Edit3 className="h-3 w-3 text-[#9c27b0]" title="User modified" />}
+                                                      {row.modified && <span title="User modified"><Edit3 className="h-3 w-3 text-[#9c27b0]" /></span>}
                                                     </div>
                                                   </td>
                                                   <td className="px-2 py-1.5"><input type="text" defaultValue={row.tag}         className={`px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} focus:outline-none focus:border-[#00e5ff] w-10`} /></td>
@@ -17198,7 +17184,7 @@ const copyToClipboard = () => {
 
             {/* ═══════════════════════════════════════════════════════
                 STEP 1: UPLOAD
-            ═══════════════════════════════════════════════════════ */}
+            ════════════════��══════════════════════════════════════ */}
             {certReportStep === "upload" && (
               <div className="space-y-6">
                 {/* Upload Cards */}
