@@ -783,7 +783,7 @@ function TestPlanGeneratorTool({
 
 export default function BCometPlatform() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "workflow-overview" | "intake-portal" | "dashboard" | "clients" | "client-detail" | "case-workflow" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "onboarding-case-detail" | "approvals" | "evidence-vault" | "prod-config" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case" | "presentation" | "client-cert-report" | "phase-cases" | "atdl-workbench">("home")
+  const [currentScreen, setCurrentScreen] = useState<"home" | "role-select" | "login" | "workflow-overview" | "intake-portal" | "dashboard" | "clients" | "client-detail" | "case-workflow" | "asset-tools" | "spec-compare" | "spec-compare-overview" | "log-analysis" | "scenario-creation" | "test-case-gen" | "certification-gen" | "settings" | "admin-specs" | "client-specs" | "client-log-files" | "fix-msg-creator" | "atdl-compare" | "fix-atdl-compare" | "fix-to-atdl" | "atdl-validate" | "atdl-ui-repr" | "session-config" | "field-mapping" | "test-results" | "go-live" | "reports" | "onboarding-cases" | "onboarding-case-detail" | "approvals" | "evidence-vault" | "prod-config" | "rule-library" | "ai-review-queue" | "sla-analytics" | "run-history" | "admin-governance" | "create-case" | "presentation" | "client-cert-report" | "phase-cases" | "atdl-workbench" | "atdl-guided-choices" | "atdl-flow-select" | "atdl-remediation" | "atdl-wizard" | "analysis-remediation" | "cert-planning" | "cert-decisioning" | "connectivity-setup" | "connectivity-test" | "counterparty-profile" | "document-ingestion" | "fix-dictionary" | "gap-analysis" | "go-live-manager" | "post-go-live" | "signoff-module" | "test-execution">("home")
   const [settingsTab, setSettingsTab] = useState<"profile" | "notifications" | "security" | "integrations" | "appearance" | "api-keys">("profile")
   const [selectedRole, setSelectedRole] = useState<"admin" | "client" | null>(null)
   const [isManager, setIsManager] = useState(false)
@@ -13031,7 +13031,7 @@ const tools = [
                   <p className={`text-sm ${textSecondary}`}>Choose a workflow to get started</p>
                 </div>
               </div>
-              <Button variant="outline" onClick={() => setCurrentScreen("atdl-workbench" as ScreenType)}>
+              <Button variant="outline" onClick={() => setCurrentScreen("atdl-workbench")}>
                 <ArrowLeft className="h-4 w-4 mr-2" /> Back to Workbench
               </Button>
             </div>
@@ -13054,7 +13054,7 @@ const tools = [
                       onClick={() => {
                         setAtdlWorkflowType(wf.id as any)
                         setAtdlWizardStep(0)
-                        setCurrentScreen("atdl-wizard" as ScreenType)
+                        setCurrentScreen("atdl-wizard")
                       }}
                     >
                       {/* Accent top border */}
