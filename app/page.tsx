@@ -3358,9 +3358,240 @@ export default function BCometPlatform() {
           </div>
         </header>
 
-        <section className="relative max-w-7xl mx-auto px-6 py-20">
-          <p className={textPrimary}>Welcome to B-COMET</p>
+        {/* Hero Section */}
+        <section className="relative max-w-7xl mx-auto px-6 py-20 text-center">
+          <h1 className={`text-5xl md:text-6xl font-bold mb-6 ${textPrimary}`}>
+            Welcome to <span className="text-[#00e5ff]">B-COMET</span>
+          </h1>
+          <p className={`text-xl md:text-2xl mb-8 max-w-3xl mx-auto ${textSecondary}`}>
+            The comprehensive FIX Protocol Testing & Certification Platform for seamless client onboarding and connectivity validation
+          </p>
+          <div className="flex flex-wrap justify-center gap-4 mb-16">
+            <Button 
+              onClick={() => setShowDemoForm(true)}
+              className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 px-8 py-3 text-lg font-semibold"
+            >
+              Try for Free
+            </Button>
+            <Button 
+              onClick={() => setShowContactPanel(true)}
+              variant="outline"
+              className="border-[#00e5ff] text-[#00e5ff] hover:bg-[#00e5ff]/10 px-8 py-3 text-lg font-semibold"
+            >
+              Request Demo
+            </Button>
+          </div>
         </section>
+
+        {/* Platform Capabilities Section */}
+        <section className="py-20">
+          <div className="max-w-7xl mx-auto px-6">
+            <h2 className={`text-3xl font-bold text-center mb-12 ${textPrimary}`}>Platform Capabilities</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {features.map((feature, i) => (
+                <Card key={i} className={`${bgCard} p-6 border ${borderColor} hover:border-[#00e5ff]/50 transition-colors`}>
+                  <feature.icon className="h-10 w-10 mb-4 text-[#00e5ff]" />
+                  <h3 className={`text-lg font-bold mb-2 ${textPrimary}`}>{feature.title}</h3>
+                  <p className={`text-sm ${textSecondary}`}>{feature.desc}</p>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Contact Panel Modal */}
+        {showContactPanel && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+            <Card className={`${bgCard} p-8 border ${borderColor} w-full max-w-lg mx-4 relative`}>
+              <button 
+                onClick={() => setShowContactPanel(false)}
+                className={`absolute top-4 right-4 p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}
+              >
+                <X className="h-5 w-5" />
+              </button>
+              
+              <h2 className={`text-2xl font-bold mb-2 ${textPrimary}`}>Get Started with B-COMET</h2>
+              <p className={`${textSecondary} mb-6`}>Contact our team to learn more about B-COMET platform</p>
+              
+              <div className="space-y-4">
+                {[
+                  { name: "Suvrat Dandekar", email: "Suvrat.Dandekar@admin.com" },
+                  { name: "Kirk Kvist", email: "Kirk.Kvist@admin.com" },
+                  { name: "Adishree Sane", email: "Adishree.Sane@admin.com" },
+                ].map((person) => (
+                  <div 
+                    key={person.email}
+                    className={`flex items-center justify-between p-4 rounded-lg border ${borderColor} hover:border-[#00e5ff] hover:bg-[#00e5ff]/5 transition-colors`}
+                  >
+                    <div>
+                      <p className={`font-semibold ${textPrimary}`}>{person.name}</p>
+                      <a 
+                        href={`mailto:${person.email}`}
+                        className="text-[#00e5ff] hover:underline text-sm"
+                      >
+                        {person.email}
+                      </a>
+                    </div>
+                    <a 
+                      href={`mailto:${person.email}?subject=B-COMET Platform Inquiry`}
+                      className="px-4 py-2 bg-[#00e5ff] text-[#0a1628] rounded-lg hover:bg-[#00e5ff]/80 font-medium text-sm"
+                    >
+                      Contact
+                    </a>
+                  </div>
+                ))}
+              </div>
+              
+              <div className={`mt-6 pt-6 border-t ${borderColor}`}>
+                <button 
+                  onClick={() => { setShowContactPanel(false); setShowDemoForm(true); }}
+                  className={`w-full py-3 rounded-lg border ${borderColor} ${textPrimary} hover:border-[#00e5ff] hover:bg-[#00e5ff]/5 transition-colors font-medium`}
+                >
+                  Or Request a Demo Instead
+                </button>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* Request Demo Modal */}
+        {showDemoForm && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto py-8">
+            <Card className={`${bgCard} p-8 border ${borderColor} w-full max-w-2xl mx-4 relative`}>
+              <button 
+                onClick={() => setShowDemoForm(false)}
+                className={`absolute top-4 right-4 p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}
+              >
+                <X className="h-5 w-5" />
+              </button>
+              
+              <h2 className={`text-2xl font-bold mb-2 ${textPrimary}`}>Request a Demo</h2>
+              <p className={`${textSecondary} mb-6`}>Tell us about your organization and requirements</p>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={`block text-sm font-medium mb-1 ${textPrimary}`}>Name *</label>
+                  <Input 
+                    value={demoFormData.name}
+                    onChange={(e) => setDemoFormData({ ...demoFormData, name: e.target.value })}
+                    className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`}
+                    placeholder="Your name"
+                  />
+                </div>
+                <div>
+                  <label className={`block text-sm font-medium mb-1 ${textPrimary}`}>Email *</label>
+                  <Input 
+                    type="email"
+                    value={demoFormData.email}
+                    onChange={(e) => setDemoFormData({ ...demoFormData, email: e.target.value })}
+                    className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`}
+                    placeholder="your.email@company.com"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className={`block text-sm font-medium mb-1 ${textPrimary}`}>Company *</label>
+                  <Input 
+                    value={demoFormData.company}
+                    onChange={(e) => setDemoFormData({ ...demoFormData, company: e.target.value })}
+                    className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : ""}`}
+                    placeholder="Your company name"
+                  />
+                </div>
+                
+                <div className="col-span-2">
+                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Interested in:</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      "Configuration", "Monitoring", "Evaluation", "Tracking", "All of the above"
+                    ].map((func) => (
+                      <label 
+                        key={func}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer transition-colors text-sm ${
+                          demoFormData.functionality.includes(func) 
+                            ? "border-[#00e5ff] bg-[#00e5ff]/10 text-[#00e5ff]"
+                            : `${borderColor} ${textSecondary} hover:border-[#00e5ff]/50`
+                        }`}
+                      >
+                        <input 
+                          type="checkbox" 
+                          value={func}
+                          checked={demoFormData.functionality.includes(func)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setDemoFormData({ ...demoFormData, functionality: [...demoFormData.functionality, func] })
+                            } else {
+                              setDemoFormData({ ...demoFormData, functionality: demoFormData.functionality.filter(f => f !== func) })
+                            }
+                          }}
+                          className="sr-only"
+                        />
+                        <span>{func}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="col-span-2">
+                  <label className={`block text-sm font-medium mb-2 ${textPrimary}`}>Hosting Preference</label>
+                  <div className="flex gap-4">
+                    {[
+                      { value: "hosted", label: "Hosted by Admin", desc: "We manage everything" },
+                      { value: "self", label: "Self-Hosted", desc: "On your infrastructure" },
+                      { value: "undecided", label: "Not Sure Yet", desc: "Discuss options" },
+                    ].map((option) => (
+                      <label 
+                        key={option.value}
+                        className={`flex-1 p-3 rounded-lg border cursor-pointer transition-colors ${
+                          demoFormData.hostingPreference === option.value 
+                            ? "border-[#00e5ff] bg-[#00e5ff]/10"
+                            : `${borderColor} hover:border-[#00e5ff]/50`
+                        }`}
+                      >
+                        <input 
+                          type="radio" 
+                          name="hosting" 
+                          value={option.value}
+                          checked={demoFormData.hostingPreference === option.value}
+                          onChange={(e) => setDemoFormData({ ...demoFormData, hostingPreference: e.target.value })}
+                          className="sr-only"
+                        />
+                        <p className={`font-medium ${demoFormData.hostingPreference === option.value ? "text-[#00e5ff]" : textPrimary}`}>{option.label}</p>
+                        <p className={`text-xs ${textSecondary}`}>{option.desc}</p>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="col-span-2">
+                  <label className={`block text-sm font-medium mb-1 ${textPrimary}`}>Additional Message</label>
+                  <textarea 
+                    value={demoFormData.message}
+                    onChange={(e) => setDemoFormData({ ...demoFormData, message: e.target.value })}
+                    className={`w-full p-3 rounded-lg border ${isDarkMode ? "bg-[#0a1628] border-[#1e4976] text-white" : "border-[#e2e8f0]"} resize-none`}
+                    rows={3}
+                    placeholder="Tell us more about your requirements..."
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-4 mt-6">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowDemoForm(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={() => { alert("Demo request submitted! Our team will contact you shortly."); setShowDemoForm(false); }}
+                  className="flex-1 bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80"
+                >
+                  Submit Request
+                </Button>
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
     )
   }
@@ -18663,13 +18894,13 @@ const copyToClipboard = () => {
     const customTagCount = 15 // Mock
     const multiAssetComplexity = createCaseData.assetClasses.length
     const timelinePressure = 20 // Mock days
-    const regulatoryReqs = "standard"
+    const regulatoryReqs: "strict" | "standard" | "none" = "standard"
     
     const riskFactors = {
       customTags: customTagCount > 50 ? "High" : customTagCount > 10 ? "Medium" : "Low",
       multiAsset: multiAssetComplexity >= 4 ? "High" : multiAssetComplexity >= 2 ? "Medium" : "Low",
       timeline: timelinePressure < 15 ? "High" : timelinePressure < 30 ? "Medium" : "Low",
-      regulatory: regulatoryReqs === "strict" ? "High" : regulatoryReqs === "standard" ? "Medium" : "Low",
+      regulatory: "Medium", // Based on standard regulatory requirements
     }
     
     // Readiness score calculation
@@ -22364,3 +22595,4 @@ ValidateFieldsHaveValues=Y`}
     </div>
   )
 }
+
