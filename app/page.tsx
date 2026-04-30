@@ -3595,209 +3595,867 @@ export default function BCometPlatform() {
           </div>
         )}
 
-        {/* Interactive Walkthrough Demo - Step-by-step onboarding case */}
+        {/* Interactive Walkthrough Demo - Step-by-step onboarding case with actual screens */}
         {showWalkthrough && (() => {
-          const walkthroughSteps = [
-            { phase: 1, step: "intro", title: "Welcome to B-COMET Demo", subtitle: "Interactive Onboarding Walkthrough", color: "#00e5ff", icon: Rocket, 
-              content: "Follow along as we onboard a new client - Morgan Stanley - through the complete FIX Protocol certification process.", 
-              detail: "This demo walks through all 8 phases of the B-COMET platform, showing the actual steps and AI-powered tools used in production." },
-            { phase: 1, step: 1, title: "Phase 1: Intake Portal", subtitle: "Intake & Discovery", color: "#00e5ff", icon: ClipboardCheck,
-              content: "Client submits onboarding request with basic information and requirements.",
-              detail: "Morgan Stanley submits a request for FIX 4.4 connectivity for Equities trading with 15 order types needed." },
-            { phase: 1, step: 2, title: "Phase 1: Document Upload", subtitle: "Intake & Discovery", color: "#00e5ff", icon: Upload,
-              content: "Upload FIX specification documents for AI analysis.",
-              detail: "Client uploads their FIX specification PDF. AI extracts 847 fields, 23 message types, and identifies 12 custom tags." },
-            { phase: 2, step: 1, title: "Phase 2: Convert to Standardized Spec", subtitle: "Solution Design & Configuration", color: "#4caf50", icon: RefreshCw,
-              content: "AI converts uploaded specs to standardized format for comparison.",
-              detail: "The uploaded PDF is converted to B-COMET's standard JSON schema, enabling automated comparison and validation." },
-            { phase: 2, step: 2, title: "Phase 2: Spec Compare", subtitle: "Solution Design & Configuration", color: "#4caf50", icon: GitCompare,
-              content: "Compare client spec against Admin's baseline specification.",
-              detail: "AI identifies 23 field differences, 5 missing required fields, and 8 custom field mappings needed." },
-            { phase: 2, step: 3, title: "Phase 2: Create Spec from Log", subtitle: "Solution Design & Configuration", color: "#4caf50", icon: FileSearch,
-              content: "Generate specification from existing FIX message logs.",
-              detail: "Historical logs analyzed to reverse-engineer the actual message patterns and field usage." },
-            { phase: 2, step: 4, title: "Phase 2: ATDL Configuration", subtitle: "Solution Design & Configuration", color: "#4caf50", icon: Code,
-              content: "Configure Algorithmic Trading Definition Language parameters.",
-              detail: "ATDL strategies configured for VWAP, TWAP, and Iceberg order types with custom parameters." },
-            { phase: 2, step: 5, title: "Phase 2: Session Config", subtitle: "Solution Design & Configuration", color: "#4caf50", icon: Server,
-              content: "Configure FIX session parameters and connection settings.",
-              detail: "Session config generated: SenderCompID=MORGANSTANLEY, TargetCompID=ADMIN, HeartBtInt=30, ResetOnLogon=Y" },
-            { phase: 2, step: 6, title: "Phase 2: Field Mapping", subtitle: "Solution Design & Configuration", color: "#4caf50", icon: Link2,
-              content: "Map client-specific fields to Admin's standard fields.",
-              detail: "12 custom tags mapped: Tag 9001 -> ExecBroker, Tag 9002 -> ClientRef, Tag 9003 -> DeskID..." },
-            { phase: 3, step: 1, title: "Phase 3: Network Provisioning", subtitle: "Connectivity Setup", color: "#2196f3", icon: Globe,
-              content: "Provision network connectivity and firewall rules.",
-              detail: "VPN tunnel established. Ports 9878 (Primary) and 9879 (Secondary) opened for FIX traffic." },
-            { phase: 3, step: 2, title: "Phase 3: Connectivity Test", subtitle: "Connectivity Setup", color: "#2196f3", icon: Zap,
-              content: "Test network connectivity and latency.",
-              detail: "Ping test: 2.3ms latency. TCP handshake successful. TLS 1.3 negotiated." },
-            { phase: 3, step: 3, title: "Phase 3: Session Validation", subtitle: "Connectivity Setup", color: "#2196f3", icon: CheckCircle,
-              content: "Validate FIX session establishment and heartbeat.",
-              detail: "Logon successful. Heartbeat exchange verified. Sequence numbers synced: 1/1" },
-            { phase: 4, step: 1, title: "Phase 4: Test Plan Generator", subtitle: "Certification Planning", color: "#ff9800", icon: FileText,
-              content: "AI generates comprehensive test plan based on requirements.",
-              detail: "Generated 156 test cases covering: Session (23), Order Entry (45), Execution (38), Cancel/Replace (28), Rejects (22)" },
-            { phase: 4, step: 2, title: "Phase 4: Test Case Creator", subtitle: "Certification Planning", color: "#ff9800", icon: TestTube,
-              content: "Create and customize individual test cases.",
-              detail: "Custom test cases added for VWAP slicing behavior and partial fill handling." },
-            { phase: 4, step: 3, title: "Phase 4: Readiness Checklist", subtitle: "Certification Planning", color: "#ff9800", icon: ClipboardCheck,
-              content: "Pre-certification readiness verification.",
-              detail: "Checklist: Config validated, Connectivity confirmed, Test data ready, Stakeholders notified." },
-            { phase: 5, step: 1, title: "Phase 5: Session Tests", subtitle: "Test Execution", color: "#9c27b0", icon: Server,
-              content: "Execute FIX session-level tests.",
-              detail: "23/23 session tests passed: Logon, Logout, Heartbeat, TestRequest, ResendRequest, SequenceReset" },
-            { phase: 5, step: 2, title: "Phase 5: Application Tests", subtitle: "Test Execution", color: "#9c27b0", icon: Activity,
-              content: "Execute application-level message tests.",
-              detail: "Running 133 application tests... 128 Passed, 3 Failed, 2 Pending" },
-            { phase: 5, step: 3, title: "Phase 5: Evidence Capture", subtitle: "Test Execution", color: "#9c27b0", icon: FolderArchive,
-              content: "Capture test evidence and artifacts.",
-              detail: "Evidence vault populated: 156 test results, 892 FIX messages, 23 screenshots captured." },
-            { phase: 5, step: 4, title: "Phase 5: Log Analysis", subtitle: "Test Execution", color: "#9c27b0", icon: FileSearch,
-              content: "Analyze FIX message logs for issues.",
-              detail: "AI analyzed 892 messages. Identified 3 sequence gaps and 2 malformed tags." },
-            { phase: 6, step: 1, title: "Phase 6: Failure Analysis", subtitle: "Analysis & Remediation", color: "#f44336", icon: AlertTriangle,
-              content: "Analyze test failures and identify root causes.",
-              detail: "3 failures identified: TC-045 (Tag 40 invalid value), TC-089 (Missing ClOrdID), TC-112 (Timeout)" },
-            { phase: 6, step: 2, title: "Phase 6: AI Root Cause", subtitle: "Analysis & Remediation", color: "#f44336", icon: Brain,
-              content: "AI-powered root cause analysis.",
-              detail: "AI diagnosis: TC-045 caused by OrdType enum mismatch. Recommended fix: Update field mapping for Tag 40." },
-            { phase: 6, step: 3, title: "Phase 6: Defect Tracking", subtitle: "Analysis & Remediation", color: "#f44336", icon: AlertCircle,
-              content: "Track defects and remediation progress.",
-              detail: "3 defects created, assigned to Morgan Stanley. 2 fixed and retested. 1 pending client response." },
-            { phase: 7, step: 1, title: "Phase 7: Completion Evaluation", subtitle: "Certification Decisioning", color: "#2196f3", icon: CheckSquare,
-              content: "Evaluate certification completion criteria.",
-              detail: "Pass rate: 98.7% (154/156 tests). All critical paths passed. Ready for certification." },
-            { phase: 7, step: 2, title: "Phase 7: Certification Report", subtitle: "Certification Decisioning", color: "#2196f3", icon: Award,
-              content: "Generate formal certification report.",
-              detail: "Certification report generated: 42-page PDF with executive summary, test results, and recommendations." },
-            { phase: 7, step: 3, title: "Phase 7: Signoff Collection", subtitle: "Certification Decisioning", color: "#2196f3", icon: Stamp,
-              content: "Collect formal signoffs from stakeholders.",
-              detail: "Signoffs collected: Morgan Stanley (John Smith), Admin QA (Jane Doe), Admin Compliance (Bob Wilson)" },
-            { phase: 8, step: 1, title: "Phase 8: Production Config", subtitle: "Production Enablement", color: "#4caf50", icon: Server,
-              content: "Generate production configuration package.",
-              detail: "Production config package generated: QuickFIX config, Session settings, Field mappings, ATDL definitions" },
-            { phase: 8, step: 2, title: "Phase 8: Go-Live Checklist", subtitle: "Production Enablement", color: "#4caf50", icon: Rocket,
-              content: "Final go-live verification checklist.",
-              detail: "Go-live checklist complete: Production credentials issued, DNS configured, Monitoring enabled" },
-            { phase: 8, step: 3, title: "Phase 8: Hypercare Monitor", subtitle: "Production Enablement", color: "#4caf50", icon: Activity,
-              content: "Post-go-live monitoring and support.",
-              detail: "Hypercare active: 24/7 monitoring for 2 weeks. 0 incidents. 99.99% uptime achieved." },
-            { phase: 8, step: "complete", title: "Certification Complete!", subtitle: "Morgan Stanley Onboarded", color: "#4caf50", icon: Award,
-              content: "Morgan Stanley has been successfully certified for FIX 4.4 Equities trading.",
-              detail: "Total time: 12 days. 156 tests executed. 98.7% pass rate. Client is now live in production!" }
-          ]
-          const currentStep = walkthroughSteps[walkthroughStep]
-          const progress = ((walkthroughStep + 1) / walkthroughSteps.length) * 100
-          const StepIcon = currentStep.icon
-
-          return (
-            <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-              <Card className={`${bgCard} p-0 border ${borderColor} w-full max-w-3xl mx-4 relative overflow-hidden`}>
-                {/* Progress bar */}
-                <div className="h-1 bg-[#1e4976]">
-                  <div 
-                    className="h-full transition-all duration-500 ease-out"
-                    style={{ width: `${progress}%`, backgroundColor: currentStep.color }}
-                  />
+          const currentStep = walkthroughStep
+          const phaseColors = ["#00e5ff", "#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#f44336", "#2196f3", "#4caf50"]
+          
+          // Demo screen components for each step
+          const DemoScreens: Record<number, React.ReactNode> = {
+            // Intro
+            0: (
+              <div className="text-center py-8">
+                <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#00e5ff] to-[#4caf50] flex items-center justify-center">
+                  <Rocket className="h-12 w-12 text-white" />
                 </div>
-
-                {/* Header */}
-                <div className="p-6 pb-4 border-b border-[#1e4976]/50">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div 
-                        className="w-14 h-14 rounded-xl flex items-center justify-center"
-                        style={{ backgroundColor: `${currentStep.color}20` }}
-                      >
-                        <StepIcon className="h-7 w-7" style={{ color: currentStep.color }} />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span 
-                            className="text-xs font-bold px-2 py-0.5 rounded"
-                            style={{ backgroundColor: `${currentStep.color}30`, color: currentStep.color }}
-                          >
-                            {currentStep.step === "intro" ? "START" : currentStep.step === "complete" ? "DONE" : `Step ${walkthroughStep}/${walkthroughSteps.length - 2}`}
-                          </span>
-                          <span className={`text-xs ${textSecondary}`}>{currentStep.subtitle}</span>
-                        </div>
-                        <h2 className={`text-xl font-bold ${textPrimary}`}>{currentStep.title}</h2>
-                      </div>
+                <h3 className={`text-2xl font-bold mb-3 ${textPrimary}`}>Welcome to B-COMET Demo</h3>
+                <p className={`${textSecondary} mb-6 max-w-md mx-auto`}>
+                  Follow along as we onboard <span className="text-[#00e5ff] font-semibold">Morgan Stanley</span> through the complete FIX Protocol certification process.
+                </p>
+                <div className="flex justify-center gap-3 flex-wrap">
+                  {["FIX 4.4", "Equities", "15 Order Types", "8 Phases"].map((tag) => (
+                    <span key={tag} className="px-3 py-1.5 rounded-full bg-[#1e4976] text-[#00e5ff] text-sm font-medium">{tag}</span>
+                  ))}
+                </div>
+              </div>
+            ),
+            // Phase 1: Intake Portal
+            1: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <ClipboardCheck className="h-4 w-4 text-[#00e5ff]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>New Onboarding Request</span>
+                </div>
+                <div className="p-4 space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className={`text-xs ${textSecondary} block mb-1`}>Client Name</label>
+                      <div className={`px-3 py-2 rounded-lg bg-[#0a1628] border ${borderColor} ${textPrimary} text-sm`}>Morgan Stanley</div>
                     </div>
-                    <button 
-                      onClick={() => setShowWalkthrough(false)}
-                      className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}
-                    >
-                      <X className="h-5 w-5" />
-                    </button>
+                    <div>
+                      <label className={`text-xs ${textSecondary} block mb-1`}>FIX Version</label>
+                      <div className={`px-3 py-2 rounded-lg bg-[#0a1628] border ${borderColor} ${textPrimary} text-sm`}>FIX 4.4</div>
+                    </div>
+                    <div>
+                      <label className={`text-xs ${textSecondary} block mb-1`}>Asset Class</label>
+                      <div className={`px-3 py-2 rounded-lg bg-[#0a1628] border ${borderColor} ${textPrimary} text-sm`}>Equities</div>
+                    </div>
+                    <div>
+                      <label className={`text-xs ${textSecondary} block mb-1`}>Order Types</label>
+                      <div className={`px-3 py-2 rounded-lg bg-[#0a1628] border ${borderColor} ${textPrimary} text-sm`}>15 types</div>
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <div className="px-4 py-2 rounded-lg bg-[#00e5ff] text-[#0a1628] text-sm font-medium">Submit Request</div>
                   </div>
                 </div>
-
-                {/* Content */}
-                <div className="p-6">
-                  <p className={`text-lg mb-4 ${textPrimary}`}>{currentStep.content}</p>
-                  <div 
-                    className={`p-4 rounded-xl border ${borderColor} ${bgSecondary}`}
-                    style={{ borderLeftWidth: 4, borderLeftColor: currentStep.color }}
-                  >
-                    <p className={`text-sm ${textSecondary}`}>{currentStep.detail}</p>
+              </div>
+            ),
+            // Phase 1: Document Upload
+            2: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <Upload className="h-4 w-4 text-[#00e5ff]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Document Upload</span>
+                </div>
+                <div className="p-4">
+                  <div className={`border-2 border-dashed ${borderColor} rounded-xl p-6 text-center mb-4`}>
+                    <FileText className="h-10 w-10 mx-auto mb-3 text-[#00e5ff]" />
+                    <p className={`${textSecondary} text-sm`}>Morgan_Stanley_FIX_Spec_v2.pdf</p>
+                    <p className="text-[#4caf50] text-xs mt-1">Uploaded successfully</p>
                   </div>
-
-                  {/* Phase progress indicator */}
-                  <div className="mt-6 flex items-center justify-center gap-2">
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((phase) => (
-                      <div 
-                        key={phase}
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-all ${
-                          currentStep.phase === phase 
-                            ? "scale-110" 
-                            : currentStep.phase > phase 
-                              ? "opacity-100" 
-                              : "opacity-30"
-                        }`}
-                        style={{ 
-                          backgroundColor: currentStep.phase >= phase 
-                            ? `${["#00e5ff", "#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#f44336", "#2196f3", "#4caf50"][phase - 1]}30`
-                            : "#1e4976",
-                          color: currentStep.phase >= phase 
-                            ? ["#00e5ff", "#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#f44336", "#2196f3", "#4caf50"][phase - 1]
-                            : "#4a5568"
-                        }}
-                      >
-                        {currentStep.phase > phase ? <Check className="h-4 w-4" /> : phase}
+                  <div className={`${bgSecondary} rounded-lg p-3 space-y-2`}>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className={textSecondary}>Fields Extracted:</span>
+                      <span className="text-[#00e5ff] font-mono">847</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className={textSecondary}>Message Types:</span>
+                      <span className="text-[#00e5ff] font-mono">23</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className={textSecondary}>Custom Tags:</span>
+                      <span className="text-[#ff9800] font-mono">12</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ),
+            // Phase 2: Convert to Standardized Spec
+            3: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <RefreshCw className="h-4 w-4 text-[#4caf50]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Spec Conversion</span>
+                </div>
+                <div className="p-4">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className={`flex-1 p-3 rounded-lg ${bgSecondary} text-center`}>
+                      <FileText className="h-6 w-6 mx-auto mb-1 text-[#ff9800]" />
+                      <p className={`text-xs ${textSecondary}`}>PDF Spec</p>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <RefreshCw className="h-5 w-5 text-[#4caf50] animate-spin" />
+                      <ChevronRight className="h-4 w-4 text-[#4caf50]" />
+                    </div>
+                    <div className={`flex-1 p-3 rounded-lg ${bgSecondary} text-center`}>
+                      <Code className="h-6 w-6 mx-auto mb-1 text-[#4caf50]" />
+                      <p className={`text-xs ${textSecondary}`}>JSON Schema</p>
+                    </div>
+                  </div>
+                  <div className={`${bgSecondary} rounded-lg p-3 font-mono text-xs overflow-hidden`}>
+                    <pre className="text-[#4caf50]">{`{
+  "version": "FIX.4.4",
+  "messages": 23,
+  "fields": 847,
+  "components": 12
+}`}</pre>
+                  </div>
+                </div>
+              </div>
+            ),
+            // Phase 2: Spec Compare
+            4: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <GitCompare className="h-4 w-4 text-[#4caf50]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Spec Comparison Results</span>
+                </div>
+                <div className="p-4 space-y-3">
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className={`p-3 rounded-lg ${bgSecondary} text-center`}>
+                      <p className="text-2xl font-bold text-[#ff9800]">23</p>
+                      <p className={`text-xs ${textSecondary}`}>Differences</p>
+                    </div>
+                    <div className={`p-3 rounded-lg ${bgSecondary} text-center`}>
+                      <p className="text-2xl font-bold text-[#f44336]">5</p>
+                      <p className={`text-xs ${textSecondary}`}>Missing Fields</p>
+                    </div>
+                    <div className={`p-3 rounded-lg ${bgSecondary} text-center`}>
+                      <p className="text-2xl font-bold text-[#2196f3]">8</p>
+                      <p className={`text-xs ${textSecondary}`}>Custom Mappings</p>
+                    </div>
+                  </div>
+                  <div className={`${bgSecondary} rounded-lg p-3 space-y-2`}>
+                    {[
+                      { field: "Tag 40 (OrdType)", status: "Different enum values", color: "#ff9800" },
+                      { field: "Tag 9001 (Custom)", status: "Needs mapping", color: "#2196f3" },
+                      { field: "Tag 115 (OnBehalfOf)", status: "Missing in client", color: "#f44336" },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center justify-between text-sm">
+                        <span className={textPrimary}>{item.field}</span>
+                        <span style={{ color: item.color }} className="text-xs">{item.status}</span>
                       </div>
                     ))}
                   </div>
                 </div>
+              </div>
+            ),
+            // Phase 2: Create Spec from Log
+            5: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <FileSearch className="h-4 w-4 text-[#4caf50]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Log Analysis</span>
+                </div>
+                <div className="p-4">
+                  <div className={`${bgSecondary} rounded-lg p-3 font-mono text-xs mb-3 max-h-32 overflow-y-auto`}>
+                    <p className="text-[#4caf50]">8=FIX.4.4|9=148|35=D|49=MORGANSTANLEY</p>
+                    <p className="text-[#4caf50]">|56=ADMIN|34=1|52=20240115-09:30:00</p>
+                    <p className="text-[#4caf50]">|11=ORD001|55=AAPL|54=1|38=1000|40=2</p>
+                    <p className="text-[#2196f3]">Analyzing 2,847 historical messages...</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className={`p-3 rounded-lg ${bgSecondary}`}>
+                      <p className={`text-xs ${textSecondary} mb-1`}>Patterns Found</p>
+                      <p className="text-lg font-bold text-[#4caf50]">156</p>
+                    </div>
+                    <div className={`p-3 rounded-lg ${bgSecondary}`}>
+                      <p className={`text-xs ${textSecondary} mb-1`}>Field Usage</p>
+                      <p className="text-lg font-bold text-[#00e5ff]">98.2%</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ),
+            // Phase 2: ATDL Config
+            6: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <Code className="h-4 w-4 text-[#4caf50]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>ATDL Configuration</span>
+                </div>
+                <div className="p-4 space-y-3">
+                  {[
+                    { name: "VWAP", params: "StartTime, EndTime, MaxParticipation", status: "Configured" },
+                    { name: "TWAP", params: "Duration, Interval, Urgency", status: "Configured" },
+                    { name: "Iceberg", params: "DisplayQty, RefreshRate", status: "Configured" },
+                  ].map((algo, i) => (
+                    <div key={i} className={`p-3 rounded-lg ${bgSecondary} flex items-center justify-between`}>
+                      <div>
+                        <p className={`font-medium ${textPrimary}`}>{algo.name}</p>
+                        <p className={`text-xs ${textSecondary}`}>{algo.params}</p>
+                      </div>
+                      <span className="text-xs px-2 py-1 rounded-full bg-[#4caf50]/20 text-[#4caf50]">{algo.status}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ),
+            // Phase 2: Session Config
+            7: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <Server className="h-4 w-4 text-[#4caf50]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>FIX Session Configuration</span>
+                </div>
+                <div className="p-4">
+                  <div className={`${bgSecondary} rounded-lg p-3 font-mono text-xs space-y-1`}>
+                    <p><span className="text-[#00e5ff]">SenderCompID</span>=<span className="text-[#4caf50]">MORGANSTANLEY</span></p>
+                    <p><span className="text-[#00e5ff]">TargetCompID</span>=<span className="text-[#4caf50]">ADMIN</span></p>
+                    <p><span className="text-[#00e5ff]">HeartBtInt</span>=<span className="text-[#ff9800]">30</span></p>
+                    <p><span className="text-[#00e5ff]">ResetOnLogon</span>=<span className="text-[#4caf50]">Y</span></p>
+                    <p><span className="text-[#00e5ff]">SocketConnectPort</span>=<span className="text-[#ff9800]">9878</span></p>
+                    <p><span className="text-[#00e5ff]">SSLEnable</span>=<span className="text-[#4caf50]">Y</span></p>
+                  </div>
+                </div>
+              </div>
+            ),
+            // Phase 2: Field Mapping
+            8: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <Link2 className="h-4 w-4 text-[#4caf50]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Field Mapping</span>
+                </div>
+                <div className="p-4 space-y-2">
+                  {[
+                    { from: "Tag 9001", to: "ExecBroker", arrow: true },
+                    { from: "Tag 9002", to: "ClientRef", arrow: true },
+                    { from: "Tag 9003", to: "DeskID", arrow: true },
+                    { from: "Tag 9004", to: "Strategy", arrow: true },
+                  ].map((map, i) => (
+                    <div key={i} className={`flex items-center gap-3 p-2 rounded-lg ${bgSecondary}`}>
+                      <span className="text-[#ff9800] font-mono text-sm w-20">{map.from}</span>
+                      <ChevronRight className="h-4 w-4 text-[#4caf50]" />
+                      <span className="text-[#4caf50] font-mono text-sm">{map.to}</span>
+                    </div>
+                  ))}
+                  <p className={`text-xs ${textSecondary} text-center mt-2`}>12 custom fields mapped</p>
+                </div>
+              </div>
+            ),
+            // Phase 3: Network Provisioning
+            9: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-[#2196f3]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Network Setup</span>
+                </div>
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={`p-3 rounded-lg ${bgSecondary} text-center`}>
+                      <Building className="h-6 w-6 mx-auto mb-1 text-[#00e5ff]" />
+                      <p className={`text-xs ${textSecondary}`}>Morgan Stanley</p>
+                    </div>
+                    <div className="flex-1 mx-4 relative">
+                      <div className="h-0.5 bg-[#2196f3]" />
+                      <Wifi className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-5 w-5 text-[#2196f3] bg-[#0a1628] p-0.5" />
+                    </div>
+                    <div className={`p-3 rounded-lg ${bgSecondary} text-center`}>
+                      <Server className="h-6 w-6 mx-auto mb-1 text-[#4caf50]" />
+                      <p className={`text-xs ${textSecondary}`}>Admin</p>
+                    </div>
+                  </div>
+                  <div className={`${bgSecondary} rounded-lg p-3 space-y-2`}>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                      <span className={`text-sm ${textPrimary}`}>VPN Tunnel: Established</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                      <span className={`text-sm ${textPrimary}`}>Port 9878: Open</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                      <span className={`text-sm ${textPrimary}`}>TLS 1.3: Configured</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ),
+            // Phase 3: Connectivity Test
+            10: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-[#2196f3]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Connectivity Test</span>
+                </div>
+                <div className="p-4 space-y-3">
+                  {[
+                    { test: "TCP Handshake", result: "Success", time: "1.2ms", status: "pass" },
+                    { test: "TLS Negotiation", result: "TLS 1.3", time: "4.5ms", status: "pass" },
+                    { test: "Network Latency", result: "2.3ms", time: "-", status: "pass" },
+                  ].map((test, i) => (
+                    <div key={i} className={`flex items-center justify-between p-3 rounded-lg ${bgSecondary}`}>
+                      <div className="flex items-center gap-3">
+                        <CheckCircle className="h-5 w-5 text-[#4caf50]" />
+                        <span className={textPrimary}>{test.test}</span>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[#4caf50] text-sm font-medium">{test.result}</p>
+                        {test.time !== "-" && <p className={`text-xs ${textSecondary}`}>{test.time}</p>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ),
+            // Phase 3: Session Validation
+            11: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-[#2196f3]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Session Validation</span>
+                </div>
+                <div className="p-4">
+                  <div className={`${bgSecondary} rounded-lg p-3 font-mono text-xs mb-3`}>
+                    <p className="text-[#4caf50]">&gt; Sending Logon (35=A)...</p>
+                    <p className="text-[#2196f3]">&lt; Received Logon ACK</p>
+                    <p className="text-[#4caf50]">&gt; Heartbeat sent (35=0)</p>
+                    <p className="text-[#2196f3]">&lt; Heartbeat received</p>
+                    <p className="text-[#ff9800]">Session established!</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className={`p-3 rounded-lg ${bgSecondary} text-center`}>
+                      <p className={`text-xs ${textSecondary}`}>Outgoing Seq</p>
+                      <p className="text-xl font-mono text-[#4caf50]">1</p>
+                    </div>
+                    <div className={`p-3 rounded-lg ${bgSecondary} text-center`}>
+                      <p className={`text-xs ${textSecondary}`}>Incoming Seq</p>
+                      <p className="text-xl font-mono text-[#2196f3]">1</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ),
+            // Phase 4: Test Plan Generator
+            12: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-[#ff9800]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>AI-Generated Test Plan</span>
+                </div>
+                <div className="p-4 space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { category: "Session Tests", count: 23, color: "#00e5ff" },
+                      { category: "Order Entry", count: 45, color: "#4caf50" },
+                      { category: "Execution", count: 38, color: "#2196f3" },
+                      { category: "Cancel/Replace", count: 28, color: "#ff9800" },
+                      { category: "Rejects", count: 22, color: "#f44336" },
+                    ].map((cat, i) => (
+                      <div key={i} className={`p-3 rounded-lg ${bgSecondary} flex items-center justify-between`}>
+                        <span className={textSecondary}>{cat.category}</span>
+                        <span style={{ color: cat.color }} className="font-bold">{cat.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className={`p-3 rounded-lg border ${borderColor} flex items-center justify-between`}>
+                    <span className={textPrimary}>Total Test Cases</span>
+                    <span className="text-2xl font-bold text-[#ff9800]">156</span>
+                  </div>
+                </div>
+              </div>
+            ),
+            // Phase 4: Test Case Creator
+            13: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <TestTube className="h-4 w-4 text-[#ff9800]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Test Cases</span>
+                </div>
+                <div className="p-4 space-y-2">
+                  {[
+                    { id: "TC-001", name: "New Order Single - Market", status: "Ready" },
+                    { id: "TC-045", name: "VWAP Slicing Behavior", status: "Custom" },
+                    { id: "TC-089", name: "Partial Fill Handling", status: "Custom" },
+                    { id: "TC-112", name: "Cancel Request Timeout", status: "Ready" },
+                  ].map((tc, i) => (
+                    <div key={i} className={`p-3 rounded-lg ${bgSecondary} flex items-center justify-between`}>
+                      <div>
+                        <span className="text-[#00e5ff] font-mono text-sm">{tc.id}</span>
+                        <p className={`${textPrimary} text-sm`}>{tc.name}</p>
+                      </div>
+                      <span className={`text-xs px-2 py-1 rounded-full ${tc.status === "Custom" ? "bg-[#ff9800]/20 text-[#ff9800]" : "bg-[#4caf50]/20 text-[#4caf50]"}`}>{tc.status}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ),
+            // Phase 4: Readiness Checklist
+            14: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <ClipboardCheck className="h-4 w-4 text-[#ff9800]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Readiness Checklist</span>
+                </div>
+                <div className="p-4 space-y-2">
+                  {[
+                    { item: "Configuration validated", checked: true },
+                    { item: "Connectivity confirmed", checked: true },
+                    { item: "Test data prepared", checked: true },
+                    { item: "Stakeholders notified", checked: true },
+                    { item: "Environment ready", checked: true },
+                  ].map((check, i) => (
+                    <div key={i} className={`flex items-center gap-3 p-2 rounded-lg ${bgSecondary}`}>
+                      <div className={`w-5 h-5 rounded flex items-center justify-center ${check.checked ? "bg-[#4caf50]" : `border ${borderColor}`}`}>
+                        {check.checked && <Check className="h-3 w-3 text-white" />}
+                      </div>
+                      <span className={textPrimary}>{check.item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ),
+            // Phase 5: Session Tests
+            15: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <Server className="h-4 w-4 text-[#9c27b0]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Session Test Execution</span>
+                </div>
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className={textSecondary}>Progress</span>
+                    <span className="text-[#4caf50] font-bold">23/23 Passed</span>
+                  </div>
+                  <div className="h-3 rounded-full bg-[#1e4976] mb-4">
+                    <div className="h-full rounded-full bg-[#4caf50]" style={{ width: "100%" }} />
+                  </div>
+                  <div className="space-y-2">
+                    {["Logon", "Logout", "Heartbeat", "TestRequest", "ResendRequest", "SequenceReset"].map((test, i) => (
+                      <div key={i} className={`flex items-center justify-between p-2 rounded-lg ${bgSecondary}`}>
+                        <span className={textPrimary}>{test}</span>
+                        <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ),
+            // Phase 5: Application Tests
+            16: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-[#9c27b0]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Application Tests</span>
+                </div>
+                <div className="p-4">
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className={`p-3 rounded-lg ${bgSecondary} text-center`}>
+                      <p className="text-2xl font-bold text-[#4caf50]">128</p>
+                      <p className={`text-xs ${textSecondary}`}>Passed</p>
+                    </div>
+                    <div className={`p-3 rounded-lg ${bgSecondary} text-center`}>
+                      <p className="text-2xl font-bold text-[#f44336]">3</p>
+                      <p className={`text-xs ${textSecondary}`}>Failed</p>
+                    </div>
+                    <div className={`p-3 rounded-lg ${bgSecondary} text-center`}>
+                      <p className="text-2xl font-bold text-[#ff9800]">2</p>
+                      <p className={`text-xs ${textSecondary}`}>Pending</p>
+                    </div>
+                  </div>
+                  <div className="h-3 rounded-full bg-[#1e4976] overflow-hidden flex">
+                    <div className="h-full bg-[#4caf50]" style={{ width: "96.2%" }} />
+                    <div className="h-full bg-[#f44336]" style={{ width: "2.3%" }} />
+                    <div className="h-full bg-[#ff9800]" style={{ width: "1.5%" }} />
+                  </div>
+                </div>
+              </div>
+            ),
+            // Phase 5: Evidence Capture
+            17: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <FolderArchive className="h-4 w-4 text-[#9c27b0]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Evidence Vault</span>
+                </div>
+                <div className="p-4 space-y-3">
+                  {[
+                    { type: "Test Results", count: 156, icon: FileText },
+                    { type: "FIX Messages", count: 892, icon: MessageSquare },
+                    { type: "Screenshots", count: 23, icon: Image },
+                  ].map((item, i) => (
+                    <div key={i} className={`flex items-center justify-between p-3 rounded-lg ${bgSecondary}`}>
+                      <div className="flex items-center gap-3">
+                        <item.icon className="h-5 w-5 text-[#9c27b0]" />
+                        <span className={textPrimary}>{item.type}</span>
+                      </div>
+                      <span className="font-bold text-[#00e5ff]">{item.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ),
+            // Phase 5: Log Analysis
+            18: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <FileSearch className="h-4 w-4 text-[#9c27b0]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>AI Log Analysis</span>
+                </div>
+                <div className="p-4">
+                  <div className={`${bgSecondary} rounded-lg p-3 mb-3`}>
+                    <p className={`text-sm ${textSecondary} mb-2`}>892 messages analyzed</p>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-[#ff9800]" />
+                        <span className={textPrimary}>3 sequence gaps detected</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <AlertCircle className="h-4 w-4 text-[#f44336]" />
+                        <span className={textPrimary}>2 malformed tags found</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ),
+            // Phase 6: Failure Analysis
+            19: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-[#f44336]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Failed Tests</span>
+                </div>
+                <div className="p-4 space-y-2">
+                  {[
+                    { id: "TC-045", error: "Tag 40 invalid value", severity: "High" },
+                    { id: "TC-089", error: "Missing ClOrdID", severity: "Medium" },
+                    { id: "TC-112", error: "Response timeout", severity: "Low" },
+                  ].map((fail, i) => (
+                    <div key={i} className={`p-3 rounded-lg ${bgSecondary} border-l-4 border-[#f44336]`}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[#00e5ff] font-mono text-sm">{fail.id}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${fail.severity === "High" ? "bg-[#f44336]/20 text-[#f44336]" : fail.severity === "Medium" ? "bg-[#ff9800]/20 text-[#ff9800]" : "bg-[#2196f3]/20 text-[#2196f3]"}`}>{fail.severity}</span>
+                      </div>
+                      <p className={`text-sm ${textSecondary}`}>{fail.error}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ),
+            // Phase 6: AI Root Cause
+            20: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <Brain className="h-4 w-4 text-[#f44336]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>AI Root Cause Analysis</span>
+                </div>
+                <div className="p-4">
+                  <div className={`p-4 rounded-lg ${bgSecondary} border-l-4 border-[#f44336] mb-3`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Sparkles className="h-4 w-4 text-[#00e5ff]" />
+                      <span className={`font-medium ${textPrimary}`}>AI Diagnosis for TC-045</span>
+                    </div>
+                    <p className={`text-sm ${textSecondary} mb-3`}>OrdType enum mismatch detected. Client sending value "3" but Admin expects "C" for Stop Limit orders.</p>
+                    <div className={`p-2 rounded-lg bg-[#0a1628] border ${borderColor}`}>
+                      <p className="text-xs text-[#4caf50]">Recommended Fix: Update field mapping for Tag 40 to translate enum values.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ),
+            // Phase 6: Defect Tracking
+            21: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 text-[#f44336]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Defect Tracking</span>
+                </div>
+                <div className="p-4 space-y-2">
+                  {[
+                    { id: "DEF-001", status: "Fixed", assignee: "Morgan Stanley" },
+                    { id: "DEF-002", status: "Fixed", assignee: "Morgan Stanley" },
+                    { id: "DEF-003", status: "Pending", assignee: "Morgan Stanley" },
+                  ].map((def, i) => (
+                    <div key={i} className={`flex items-center justify-between p-3 rounded-lg ${bgSecondary}`}>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#00e5ff] font-mono text-sm">{def.id}</span>
+                        <span className={textSecondary}>{def.assignee}</span>
+                      </div>
+                      <span className={`text-xs px-2 py-1 rounded-full ${def.status === "Fixed" ? "bg-[#4caf50]/20 text-[#4caf50]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>{def.status}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ),
+            // Phase 7: Completion Evaluation
+            22: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <CheckSquare className="h-4 w-4 text-[#2196f3]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Certification Evaluation</span>
+                </div>
+                <div className="p-4">
+                  <div className="text-center mb-4">
+                    <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-[#4caf50]/20 mb-2">
+                      <span className="text-3xl font-bold text-[#4caf50]">98.7%</span>
+                    </div>
+                    <p className={textSecondary}>Pass Rate</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className={`p-3 rounded-lg ${bgSecondary} text-center`}>
+                      <p className="text-xl font-bold text-[#4caf50]">154</p>
+                      <p className={`text-xs ${textSecondary}`}>Passed</p>
+                    </div>
+                    <div className={`p-3 rounded-lg ${bgSecondary} text-center`}>
+                      <p className="text-xl font-bold text-[#f44336]">2</p>
+                      <p className={`text-xs ${textSecondary}`}>Failed</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ),
+            // Phase 7: Certification Report
+            23: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <Award className="h-4 w-4 text-[#2196f3]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Certification Report</span>
+                </div>
+                <div className="p-4">
+                  <div className={`p-4 rounded-lg ${bgSecondary} border ${borderColor} text-center`}>
+                    <FileText className="h-12 w-12 mx-auto mb-3 text-[#2196f3]" />
+                    <p className={`font-medium ${textPrimary} mb-1`}>Morgan_Stanley_Certification_Report.pdf</p>
+                    <p className={`text-sm ${textSecondary} mb-3`}>42 pages | Generated today</p>
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#2196f3] text-white text-sm">
+                      <Download className="h-4 w-4" />
+                      Download Report
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ),
+            // Phase 7: Signoff Collection
+            24: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <Stamp className="h-4 w-4 text-[#2196f3]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Signoff Collection</span>
+                </div>
+                <div className="p-4 space-y-2">
+                  {[
+                    { name: "John Smith", role: "Morgan Stanley", signed: true },
+                    { name: "Jane Doe", role: "Admin QA", signed: true },
+                    { name: "Bob Wilson", role: "Admin Compliance", signed: true },
+                  ].map((sig, i) => (
+                    <div key={i} className={`flex items-center justify-between p-3 rounded-lg ${bgSecondary}`}>
+                      <div>
+                        <p className={textPrimary}>{sig.name}</p>
+                        <p className={`text-xs ${textSecondary}`}>{sig.role}</p>
+                      </div>
+                      <div className="flex items-center gap-2 text-[#4caf50]">
+                        <CheckCircle className="h-5 w-5" />
+                        <span className="text-sm">Signed</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ),
+            // Phase 8: Production Config
+            25: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <Server className="h-4 w-4 text-[#4caf50]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Production Config Package</span>
+                </div>
+                <div className="p-4 space-y-2">
+                  {[
+                    { file: "quickfix-prod.cfg", size: "2.4 KB" },
+                    { file: "session-settings.xml", size: "1.8 KB" },
+                    { file: "field-mappings.json", size: "4.2 KB" },
+                    { file: "atdl-strategies.xml", size: "3.1 KB" },
+                  ].map((file, i) => (
+                    <div key={i} className={`flex items-center justify-between p-3 rounded-lg ${bgSecondary}`}>
+                      <div className="flex items-center gap-3">
+                        <FileText className="h-4 w-4 text-[#4caf50]" />
+                        <span className={textPrimary}>{file.file}</span>
+                      </div>
+                      <span className={`text-xs ${textSecondary}`}>{file.size}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ),
+            // Phase 8: Go-Live Checklist
+            26: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <Rocket className="h-4 w-4 text-[#4caf50]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Go-Live Checklist</span>
+                </div>
+                <div className="p-4 space-y-2">
+                  {[
+                    "Production credentials issued",
+                    "DNS records configured",
+                    "Monitoring dashboards enabled",
+                    "Alerting rules configured",
+                    "Support team notified",
+                  ].map((item, i) => (
+                    <div key={i} className={`flex items-center gap-3 p-2 rounded-lg ${bgSecondary}`}>
+                      <div className="w-5 h-5 rounded flex items-center justify-center bg-[#4caf50]">
+                        <Check className="h-3 w-3 text-white" />
+                      </div>
+                      <span className={textPrimary}>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ),
+            // Phase 8: Hypercare Monitor
+            27: (
+              <div className={`rounded-xl border ${borderColor} overflow-hidden`}>
+                <div className="bg-[#1e4976]/50 px-4 py-2 border-b border-[#1e4976] flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-[#4caf50]" />
+                  <span className={`text-sm font-medium ${textPrimary}`}>Hypercare Monitoring</span>
+                </div>
+                <div className="p-4">
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className={`p-3 rounded-lg ${bgSecondary} text-center`}>
+                      <p className="text-xl font-bold text-[#4caf50]">99.99%</p>
+                      <p className={`text-xs ${textSecondary}`}>Uptime</p>
+                    </div>
+                    <div className={`p-3 rounded-lg ${bgSecondary} text-center`}>
+                      <p className="text-xl font-bold text-[#00e5ff]">0</p>
+                      <p className={`text-xs ${textSecondary}`}>Incidents</p>
+                    </div>
+                    <div className={`p-3 rounded-lg ${bgSecondary} text-center`}>
+                      <p className="text-xl font-bold text-[#ff9800]">14</p>
+                      <p className={`text-xs ${textSecondary}`}>Days Left</p>
+                    </div>
+                  </div>
+                  <div className={`p-3 rounded-lg ${bgSecondary} flex items-center gap-3`}>
+                    <div className="w-3 h-3 rounded-full bg-[#4caf50] animate-pulse" />
+                    <span className={textPrimary}>24/7 Monitoring Active</span>
+                  </div>
+                </div>
+              </div>
+            ),
+            // Complete
+            28: (
+              <div className="text-center py-8">
+                <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-[#4caf50] to-[#00e5ff] flex items-center justify-center">
+                  <Award className="h-12 w-12 text-white" />
+                </div>
+                <h3 className={`text-2xl font-bold mb-3 ${textPrimary}`}>Certification Complete!</h3>
+                <p className={`${textSecondary} mb-6`}>
+                  <span className="text-[#00e5ff] font-semibold">Morgan Stanley</span> is now certified for FIX 4.4 Equities trading
+                </p>
+                <div className="flex justify-center gap-6">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-[#4caf50]">12</p>
+                    <p className={`text-xs ${textSecondary}`}>Days</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-[#00e5ff]">156</p>
+                    <p className={`text-xs ${textSecondary}`}>Tests</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-[#ff9800]">98.7%</p>
+                    <p className={`text-xs ${textSecondary}`}>Pass Rate</p>
+                  </div>
+                </div>
+              </div>
+            ),
+          }
+
+          const stepInfo = [
+            { phase: 1, title: "Welcome", subtitle: "Start Demo" },
+            { phase: 1, title: "Intake Portal", subtitle: "Phase 1" },
+            { phase: 1, title: "Document Upload", subtitle: "Phase 1" },
+            { phase: 2, title: "Convert Spec", subtitle: "Phase 2" },
+            { phase: 2, title: "Spec Compare", subtitle: "Phase 2" },
+            { phase: 2, title: "Spec from Log", subtitle: "Phase 2" },
+            { phase: 2, title: "ATDL Config", subtitle: "Phase 2" },
+            { phase: 2, title: "Session Config", subtitle: "Phase 2" },
+            { phase: 2, title: "Field Mapping", subtitle: "Phase 2" },
+            { phase: 3, title: "Network Setup", subtitle: "Phase 3" },
+            { phase: 3, title: "Connectivity Test", subtitle: "Phase 3" },
+            { phase: 3, title: "Session Validation", subtitle: "Phase 3" },
+            { phase: 4, title: "Test Plan", subtitle: "Phase 4" },
+            { phase: 4, title: "Test Cases", subtitle: "Phase 4" },
+            { phase: 4, title: "Readiness", subtitle: "Phase 4" },
+            { phase: 5, title: "Session Tests", subtitle: "Phase 5" },
+            { phase: 5, title: "App Tests", subtitle: "Phase 5" },
+            { phase: 5, title: "Evidence", subtitle: "Phase 5" },
+            { phase: 5, title: "Log Analysis", subtitle: "Phase 5" },
+            { phase: 6, title: "Failures", subtitle: "Phase 6" },
+            { phase: 6, title: "AI Root Cause", subtitle: "Phase 6" },
+            { phase: 6, title: "Defects", subtitle: "Phase 6" },
+            { phase: 7, title: "Evaluation", subtitle: "Phase 7" },
+            { phase: 7, title: "Report", subtitle: "Phase 7" },
+            { phase: 7, title: "Signoffs", subtitle: "Phase 7" },
+            { phase: 8, title: "Prod Config", subtitle: "Phase 8" },
+            { phase: 8, title: "Go-Live", subtitle: "Phase 8" },
+            { phase: 8, title: "Hypercare", subtitle: "Phase 8" },
+            { phase: 8, title: "Complete!", subtitle: "Done" },
+          ]
+          
+          const info = stepInfo[currentStep]
+          const progress = ((currentStep + 1) / stepInfo.length) * 100
+          const phaseColor = phaseColors[info.phase - 1]
+
+          return (
+            <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <Card className={`${bgCard} p-0 border ${borderColor} w-full max-w-4xl relative overflow-hidden`}>
+                {/* Progress bar */}
+                <div className="h-1.5 bg-[#1e4976]">
+                  <div className="h-full transition-all duration-500 ease-out" style={{ width: `${progress}%`, backgroundColor: phaseColor }} />
+                </div>
+
+                {/* Header */}
+                <div className="px-6 py-4 border-b border-[#1e4976]/50 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="px-3 py-1 rounded-lg text-sm font-bold" style={{ backgroundColor: `${phaseColor}30`, color: phaseColor }}>
+                      {info.subtitle}
+                    </div>
+                    <h2 className={`text-xl font-bold ${textPrimary}`}>{info.title}</h2>
+                  </div>
+                  <button onClick={() => setShowWalkthrough(false)} className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}>
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+
+                {/* Demo Screen Content */}
+                <div className="p-6 min-h-[350px]">
+                  {DemoScreens[currentStep]}
+                </div>
+
+                {/* Phase indicator */}
+                <div className="px-6 py-3 border-t border-[#1e4976]/30 flex items-center justify-center gap-2">
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((phase) => (
+                    <div key={phase} className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-all ${info.phase === phase ? "scale-110 ring-2 ring-offset-2 ring-offset-[#0a1628]" : ""}`}
+                      style={{ backgroundColor: info.phase >= phase ? `${phaseColors[phase - 1]}30` : "#1e4976", color: info.phase >= phase ? phaseColors[phase - 1] : "#4a5568", ringColor: phaseColors[phase - 1] }}>
+                      {info.phase > phase ? <Check className="h-4 w-4" /> : phase}
+                    </div>
+                  ))}
+                </div>
 
                 {/* Footer with navigation */}
-                <div className="p-6 pt-4 border-t border-[#1e4976]/50 flex items-center justify-between">
-                  <Button 
-                    variant="outline"
-                    onClick={() => setWalkthroughStep(Math.max(0, walkthroughStep - 1))}
-                    disabled={walkthroughStep === 0}
-                    className={`${walkthroughStep === 0 ? "opacity-50" : ""}`}
-                  >
+                <div className="px-6 py-4 border-t border-[#1e4976]/50 flex items-center justify-between">
+                  <Button variant="outline" onClick={() => setWalkthroughStep(Math.max(0, currentStep - 1))} disabled={currentStep === 0} className={currentStep === 0 ? "opacity-50" : ""}>
                     <ChevronLeft className="h-4 w-4 mr-1" /> Previous
                   </Button>
-                  
-                  <span className={`text-sm ${textSecondary}`}>
-                    {walkthroughStep + 1} of {walkthroughSteps.length}
-                  </span>
-
-                  {walkthroughStep < walkthroughSteps.length - 1 ? (
-                    <Button 
-                      onClick={() => setWalkthroughStep(walkthroughStep + 1)}
-                      style={{ backgroundColor: currentStep.color }}
-                      className="text-[#0a1628] hover:opacity-90"
-                    >
+                  <span className={`text-sm ${textSecondary}`}>{currentStep + 1} of {stepInfo.length}</span>
+                  {currentStep < stepInfo.length - 1 ? (
+                    <Button onClick={() => setWalkthroughStep(currentStep + 1)} style={{ backgroundColor: phaseColor }} className="text-[#0a1628] hover:opacity-90">
                       Next <ChevronRight className="h-4 w-4 ml-1" />
                     </Button>
                   ) : (
-                    <Button 
-                      onClick={() => { setShowWalkthrough(false); setCurrentScreen("role-select"); }}
-                      className="bg-[#4caf50] text-white hover:bg-[#4caf50]/90"
-                    >
+                    <Button onClick={() => { setShowWalkthrough(false); setCurrentScreen("role-select"); }} className="bg-[#4caf50] text-white hover:bg-[#4caf50]/90">
                       Get Started <Rocket className="h-4 w-4 ml-1" />
                     </Button>
                   )}
@@ -17978,7 +18636,7 @@ const copyToClipboard = () => {
               </div>
             )}
 
-            {/* ══════════════════════════════════════��══════════════��═
+            {/* ═════════════════════════════���════════��══════════════��═
                 STEP 3: GATEWAY DELTA ANALYSIS
             ═════════════════════════════════════════════���═════════ */}
             {certReportStep === "delta" && (
@@ -18089,7 +18747,7 @@ const copyToClipboard = () => {
 
             {/* ═════════════════════════════════════════════���═════════
                 STEP 4: GENERATE CLIENT REPORT
-            ═══════════════════��═══════════════════════════════════ */}
+            ═══════════════════��═══��═══════════════════════════════ */}
             {certReportStep === "generate" && (
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-6">
