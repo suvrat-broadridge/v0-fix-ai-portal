@@ -1193,6 +1193,7 @@ export default function BCometPlatform() {
   const [showContactPanel, setShowContactPanel] = useState(false)
   const [showDemoForm, setShowDemoForm] = useState(false)
   const [showWalkthrough, setShowWalkthrough] = useState(false)
+  const [showQuickDemo, setShowQuickDemo] = useState(false)
   const [walkthroughStep, setWalkthroughStep] = useState(0)
 
   // Comet follows circular orbit, visiting each planet sequentially
@@ -1201,7 +1202,7 @@ export default function BCometPlatform() {
   useEffect(() => {
     if (currentScreen !== "home") return
     // Pause animation when any welcome-screen panel is open
-    if (showContactPanel || showDemoForm || showWalkthrough) return
+    if (showContactPanel || showDemoForm || showWalkthrough || showQuickDemo) return
     const STEP = 0.5 // degrees per tick
     const TICK = 40  // ms per tick
     const EXIT_ANGLE = 400 // continue past 360 to exit off-screen
@@ -1240,7 +1241,7 @@ export default function BCometPlatform() {
       })
     }, TICK)
     return () => clearInterval(id)
-  }, [currentScreen, activePlanetTools, showContactPanel, showDemoForm, showWalkthrough])
+  }, [currentScreen, activePlanetTools, showContactPanel, showDemoForm, showWalkthrough, showQuickDemo])
   const [isLoading, setIsLoading] = useState(false)
   // Session configuration state
   const [sessionConfigs, setSessionConfigs] = useState<Record<string, {host: string, port: string, senderCompId: string, targetCompId: string, protocol: string, ssl: boolean, heartbeat: number, connected: boolean, lastTested: string | null}>>({
@@ -3077,7 +3078,7 @@ export default function BCometPlatform() {
       <div className={`min-h-screen ${bgPrimary} transition-colors overflow-hidden`}>
         {/* Full-page solar system background — SVG decorative layer */}
         {/* Dims and freezes when any panel is open */}
-        <div className={`transition-opacity duration-700 ${showContactPanel || showDemoForm || showWalkthrough ? "opacity-15 pointer-events-none" : "opacity-100"}`}>
+        <div className={`transition-opacity duration-700 ${showContactPanel || showDemoForm || showWalkthrough || showQuickDemo ? "opacity-15 pointer-events-none" : "opacity-100"}`}>
         {(() => {
           // All radii in % units (viewBox 0 0 100 100)
           // Sun position centered, planets spread via angle offset to fill north/northeast
@@ -3368,10 +3369,11 @@ export default function BCometPlatform() {
           </p>
           <div className="flex flex-wrap justify-center gap-4 mb-16">
             <Button 
-              onClick={() => setShowDemoForm(true)}
+              onClick={() => setShowQuickDemo(true)}
               className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 px-8 py-3 text-lg font-semibold"
             >
-              Try for Free
+              <Play className="h-5 w-5 mr-2" />
+              Interactive Quick Demo
             </Button>
             <Button 
               onClick={() => setShowContactPanel(true)}
@@ -3587,6 +3589,210 @@ export default function BCometPlatform() {
                   className="flex-1 bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80"
                 >
                   Submit Request
+                </Button>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* Interactive Quick Demo Modal - Platform Overview */}
+        {showQuickDemo && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto py-8">
+            <Card className={`${bgCard} p-8 border ${borderColor} w-full max-w-5xl mx-4 relative max-h-[90vh] overflow-y-auto`}>
+              <button 
+                onClick={() => setShowQuickDemo(false)}
+                className={`absolute top-4 right-4 p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 z-10`}
+              >
+                <X className="h-5 w-5" />
+              </button>
+              
+              <div className="text-center mb-8">
+                <h2 className={`text-3xl font-bold mb-2 ${textPrimary}`}>B-COMET Platform Overview</h2>
+                <p className={`${textSecondary}`}>8-Phase End-to-End FIX Protocol Certification Workflow</p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Phase 1 */}
+                <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#00e5ff]/50 transition-colors`}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#00e5ff20" }}>
+                      <ClipboardCheck className="h-5 w-5 text-[#00e5ff]" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold text-[#00e5ff]">Phase 1</span>
+                      <h3 className={`font-semibold ${textPrimary}`}>Intake & Discovery</h3>
+                    </div>
+                  </div>
+                  <ul className={`text-sm ${textSecondary} space-y-2`}>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#00e5ff]" />Create onboarding request</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#00e5ff]" />AI document analysis</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#00e5ff]" />Gap analysis</li>
+                  </ul>
+                </div>
+
+                {/* Phase 2 */}
+                <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#4caf50]/50 transition-colors`}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#4caf5020" }}>
+                      <Cog className="h-5 w-5 text-[#4caf50]" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold text-[#4caf50]">Phase 2</span>
+                      <h3 className={`font-semibold ${textPrimary}`}>Solution Design & Configuration</h3>
+                    </div>
+                  </div>
+                  <ul className={`text-sm ${textSecondary} space-y-2`}>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Build counterparty profile</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Generate FIX session config</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Generate FIX dictionary</li>
+                  </ul>
+                </div>
+
+                {/* Phase 3 */}
+                <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#2196f3]/50 transition-colors`}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#2196f320" }}>
+                      <Wifi className="h-5 w-5 text-[#2196f3]" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold text-[#2196f3]">Phase 3</span>
+                      <h3 className={`font-semibold ${textPrimary}`}>Connectivity Setup</h3>
+                    </div>
+                  </div>
+                  <ul className={`text-sm ${textSecondary} space-y-2`}>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Provision network</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Connectivity smoke test</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Session readiness validation</li>
+                  </ul>
+                </div>
+
+                {/* Phase 4 */}
+                <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#ff9800]/50 transition-colors`}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#ff980020" }}>
+                      <Target className="h-5 w-5 text-[#ff9800]" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold text-[#ff9800]">Phase 4</span>
+                      <h3 className={`font-semibold ${textPrimary}`}>Certification Planning</h3>
+                    </div>
+                  </div>
+                  <ul className={`text-sm ${textSecondary} space-y-2`}>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#ff9800]" />Generate cert test plan</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#ff9800]" />Create test cases</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#ff9800]" />Share readiness checklist</li>
+                  </ul>
+                </div>
+
+                {/* Phase 5 */}
+                <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#9c27b0]/50 transition-colors`}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#9c27b020" }}>
+                      <Play className="h-5 w-5 text-[#9c27b0]" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold text-[#9c27b0]">Phase 5</span>
+                      <h3 className={`font-semibold ${textPrimary}`}>Test Execution</h3>
+                    </div>
+                  </div>
+                  <ul className={`text-sm ${textSecondary} space-y-2`}>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#9c27b0]" />Session-level tests</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#9c27b0]" />Application-level tests</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#9c27b0]" />Capture evidence</li>
+                  </ul>
+                </div>
+
+                {/* Phase 6 */}
+                <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#f44336]/50 transition-colors`}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#f4433620" }}>
+                      <Brain className="h-5 w-5 text-[#f44336]" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold text-[#f44336]">Phase 6</span>
+                      <h3 className={`font-semibold ${textPrimary}`}>Analysis & Remediation</h3>
+                    </div>
+                  </div>
+                  <ul className={`text-sm ${textSecondary} space-y-2`}>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#f44336]" />Auto-evaluate results</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#f44336]" />AI root cause analysis</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#f44336]" />Defect creation & retest</li>
+                  </ul>
+                </div>
+
+                {/* Phase 7 */}
+                <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#2196f3]/50 transition-colors`}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#2196f320" }}>
+                      <Award className="h-5 w-5 text-[#2196f3]" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold text-[#2196f3]">Phase 7</span>
+                      <h3 className={`font-semibold ${textPrimary}`}>Certification Decisioning</h3>
+                    </div>
+                  </div>
+                  <ul className={`text-sm ${textSecondary} space-y-2`}>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Evaluate completion</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Generate cert report</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Collect formal signoffs</li>
+                  </ul>
+                </div>
+
+                {/* Phase 8 */}
+                <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#4caf50]/50 transition-colors`}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#4caf5020" }}>
+                      <Rocket className="h-5 w-5 text-[#4caf50]" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold text-[#4caf50]">Phase 8</span>
+                      <h3 className={`font-semibold ${textPrimary}`}>Production Enablement</h3>
+                    </div>
+                  </div>
+                  <ul className={`text-sm ${textSecondary} space-y-2`}>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Generate prod config pack</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Prod smoke test</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Go-live & hypercare</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* AI Capabilities Section */}
+              <div className={`mt-8 p-6 rounded-xl border ${borderColor} ${bgSecondary}`}>
+                <h3 className={`text-lg font-semibold mb-4 ${textPrimary} flex items-center gap-2`}>
+                  <Sparkles className="h-5 w-5 text-[#00e5ff]" />
+                  AI-Powered Capabilities
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {[
+                    "Document Extraction",
+                    "Gap Detection",
+                    "Config Recommendation",
+                    "Test Generation",
+                    "Failure Diagnosis",
+                    "Conversational Assistant"
+                  ].map((cap) => (
+                    <div key={cap} className={`px-3 py-2 rounded-lg border ${borderColor} ${textSecondary} text-sm flex items-center gap-2`}>
+                      <Check className="h-4 w-4 text-[#00e5ff]" />
+                      {cap}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-center gap-4 mt-8">
+                <Button 
+                  onClick={() => { setShowQuickDemo(false); setCurrentScreen("role-select"); }}
+                  className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 px-8"
+                >
+                  Get Started
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => { setShowQuickDemo(false); setShowContactPanel(true); }}
+                  className="border-[#00e5ff] text-[#00e5ff] hover:bg-[#00e5ff]/10 px-8"
+                >
+                  Contact Us
                 </Button>
               </div>
             </Card>
@@ -22595,4 +22801,5 @@ ValidateFieldsHaveValues=Y`}
     </div>
   )
 }
+
 
