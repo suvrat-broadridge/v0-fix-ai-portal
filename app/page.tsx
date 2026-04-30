@@ -3624,9 +3624,9 @@ export default function BCometPlatform() {
                     </div>
                   </div>
                   <ul className={`text-sm ${textSecondary} space-y-2`}>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#00e5ff]" />Create onboarding request</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#00e5ff]" />AI document analysis</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#00e5ff]" />Gap analysis</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#00e5ff]" />Gather client requirements</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#00e5ff]" />Upload FIX specifications</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#00e5ff]" />Initial assessment</li>
                   </ul>
                 </div>
 
@@ -3642,9 +3642,9 @@ export default function BCometPlatform() {
                     </div>
                   </div>
                   <ul className={`text-sm ${textSecondary} space-y-2`}>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Build counterparty profile</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Generate FIX session config</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Generate FIX dictionary</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Configure field mappings</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Set business rules</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Configure ATDL parameters</li>
                   </ul>
                 </div>
 
@@ -3660,9 +3660,9 @@ export default function BCometPlatform() {
                     </div>
                   </div>
                   <ul className={`text-sm ${textSecondary} space-y-2`}>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Provision network</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Connectivity smoke test</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Session readiness validation</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Configure session parameters</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Verify network routes</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Heartbeat testing</li>
                   </ul>
                 </div>
 
@@ -3678,9 +3678,9 @@ export default function BCometPlatform() {
                     </div>
                   </div>
                   <ul className={`text-sm ${textSecondary} space-y-2`}>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#ff9800]" />Generate cert test plan</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#ff9800]" />Create test cases</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#ff9800]" />Share readiness checklist</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#ff9800]" />Generate test plan</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#ff9800]" />Define acceptance criteria</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#ff9800]" />Coverage analysis</li>
                   </ul>
                 </div>
 
@@ -3696,9 +3696,9 @@ export default function BCometPlatform() {
                     </div>
                   </div>
                   <ul className={`text-sm ${textSecondary} space-y-2`}>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#9c27b0]" />Session-level tests</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#9c27b0]" />Application-level tests</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#9c27b0]" />Capture evidence</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#9c27b0]" />Run automated test suite</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#9c27b0]" />Capture test results</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#9c27b0]" />Log collection</li>
                   </ul>
                 </div>
 
@@ -3714,9 +3714,9 @@ export default function BCometPlatform() {
                     </div>
                   </div>
                   <ul className={`text-sm ${textSecondary} space-y-2`}>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#f44336]" />Auto-evaluate results</li>
                     <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#f44336]" />AI root cause analysis</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#f44336]" />Defect creation & retest</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#f44336]" />Identify configuration gaps</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#f44336]" />Retest and validation</li>
                   </ul>
                 </div>
 
@@ -3732,8 +3732,8 @@ export default function BCometPlatform() {
                     </div>
                   </div>
                   <ul className={`text-sm ${textSecondary} space-y-2`}>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Evaluate completion</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Generate cert report</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Evaluate compliance</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Generate certification report</li>
                     <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Collect formal signoffs</li>
                   </ul>
                 </div>
@@ -3750,8 +3750,8 @@ export default function BCometPlatform() {
                     </div>
                   </div>
                   <ul className={`text-sm ${textSecondary} space-y-2`}>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Generate prod config pack</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Prod smoke test</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Generate production config</li>
+                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Production smoke testing</li>
                     <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Go-live & hypercare</li>
                   </ul>
                 </div>
