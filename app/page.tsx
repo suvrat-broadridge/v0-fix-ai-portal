@@ -3369,7 +3369,7 @@ export default function BCometPlatform() {
           </p>
           <div className="flex flex-wrap justify-center gap-4 mb-16">
             <Button 
-              onClick={() => setShowQuickDemo(true)}
+              onClick={() => { setShowWalkthrough(true); setWalkthroughStep(0); }}
               className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 px-8 py-3 text-lg font-semibold"
             >
               <Play className="h-5 w-5 mr-2" />
@@ -3595,320 +3595,217 @@ export default function BCometPlatform() {
           </div>
         )}
 
-        {/* Interactive Quick Demo Modal - Platform Overview */}
-        {showQuickDemo && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto py-8">
-            <Card className={`${bgCard} p-8 border ${borderColor} w-full max-w-5xl mx-4 relative max-h-[90vh] overflow-y-auto`}>
-              <button 
-                onClick={() => setShowQuickDemo(false)}
-                className={`absolute top-4 right-4 p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30 z-10`}
-              >
-                <X className="h-5 w-5" />
-              </button>
-              
-              <div className="text-center mb-8">
-                <h2 className={`text-3xl font-bold mb-2 ${textPrimary}`}>B-COMET Platform Overview</h2>
-                <p className={`${textSecondary}`}>8-Phase End-to-End FIX Protocol Certification Workflow</p>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Phase 1 - Intake & Discovery */}
-                <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#00e5ff]/50 transition-colors`}>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#00e5ff20" }}>
-                      <ClipboardCheck className="h-5 w-5 text-[#00e5ff]" />
+        {/* Interactive Walkthrough Demo - Step-by-step onboarding case */}
+        {showWalkthrough && (() => {
+          const walkthroughSteps = [
+            { phase: 1, step: "intro", title: "Welcome to B-COMET Demo", subtitle: "Interactive Onboarding Walkthrough", color: "#00e5ff", icon: Rocket, 
+              content: "Follow along as we onboard a new client - Morgan Stanley - through the complete FIX Protocol certification process.", 
+              detail: "This demo walks through all 8 phases of the B-COMET platform, showing the actual steps and AI-powered tools used in production." },
+            { phase: 1, step: 1, title: "Phase 1: Intake Portal", subtitle: "Intake & Discovery", color: "#00e5ff", icon: ClipboardCheck,
+              content: "Client submits onboarding request with basic information and requirements.",
+              detail: "Morgan Stanley submits a request for FIX 4.4 connectivity for Equities trading with 15 order types needed." },
+            { phase: 1, step: 2, title: "Phase 1: Document Upload", subtitle: "Intake & Discovery", color: "#00e5ff", icon: Upload,
+              content: "Upload FIX specification documents for AI analysis.",
+              detail: "Client uploads their FIX specification PDF. AI extracts 847 fields, 23 message types, and identifies 12 custom tags." },
+            { phase: 2, step: 1, title: "Phase 2: Convert to Standardized Spec", subtitle: "Solution Design & Configuration", color: "#4caf50", icon: RefreshCw,
+              content: "AI converts uploaded specs to standardized format for comparison.",
+              detail: "The uploaded PDF is converted to B-COMET's standard JSON schema, enabling automated comparison and validation." },
+            { phase: 2, step: 2, title: "Phase 2: Spec Compare", subtitle: "Solution Design & Configuration", color: "#4caf50", icon: GitCompare,
+              content: "Compare client spec against Admin's baseline specification.",
+              detail: "AI identifies 23 field differences, 5 missing required fields, and 8 custom field mappings needed." },
+            { phase: 2, step: 3, title: "Phase 2: Create Spec from Log", subtitle: "Solution Design & Configuration", color: "#4caf50", icon: FileSearch,
+              content: "Generate specification from existing FIX message logs.",
+              detail: "Historical logs analyzed to reverse-engineer the actual message patterns and field usage." },
+            { phase: 2, step: 4, title: "Phase 2: ATDL Configuration", subtitle: "Solution Design & Configuration", color: "#4caf50", icon: Code,
+              content: "Configure Algorithmic Trading Definition Language parameters.",
+              detail: "ATDL strategies configured for VWAP, TWAP, and Iceberg order types with custom parameters." },
+            { phase: 2, step: 5, title: "Phase 2: Session Config", subtitle: "Solution Design & Configuration", color: "#4caf50", icon: Server,
+              content: "Configure FIX session parameters and connection settings.",
+              detail: "Session config generated: SenderCompID=MORGANSTANLEY, TargetCompID=ADMIN, HeartBtInt=30, ResetOnLogon=Y" },
+            { phase: 2, step: 6, title: "Phase 2: Field Mapping", subtitle: "Solution Design & Configuration", color: "#4caf50", icon: Link2,
+              content: "Map client-specific fields to Admin's standard fields.",
+              detail: "12 custom tags mapped: Tag 9001 -> ExecBroker, Tag 9002 -> ClientRef, Tag 9003 -> DeskID..." },
+            { phase: 3, step: 1, title: "Phase 3: Network Provisioning", subtitle: "Connectivity Setup", color: "#2196f3", icon: Globe,
+              content: "Provision network connectivity and firewall rules.",
+              detail: "VPN tunnel established. Ports 9878 (Primary) and 9879 (Secondary) opened for FIX traffic." },
+            { phase: 3, step: 2, title: "Phase 3: Connectivity Test", subtitle: "Connectivity Setup", color: "#2196f3", icon: Zap,
+              content: "Test network connectivity and latency.",
+              detail: "Ping test: 2.3ms latency. TCP handshake successful. TLS 1.3 negotiated." },
+            { phase: 3, step: 3, title: "Phase 3: Session Validation", subtitle: "Connectivity Setup", color: "#2196f3", icon: CheckCircle,
+              content: "Validate FIX session establishment and heartbeat.",
+              detail: "Logon successful. Heartbeat exchange verified. Sequence numbers synced: 1/1" },
+            { phase: 4, step: 1, title: "Phase 4: Test Plan Generator", subtitle: "Certification Planning", color: "#ff9800", icon: FileText,
+              content: "AI generates comprehensive test plan based on requirements.",
+              detail: "Generated 156 test cases covering: Session (23), Order Entry (45), Execution (38), Cancel/Replace (28), Rejects (22)" },
+            { phase: 4, step: 2, title: "Phase 4: Test Case Creator", subtitle: "Certification Planning", color: "#ff9800", icon: TestTube,
+              content: "Create and customize individual test cases.",
+              detail: "Custom test cases added for VWAP slicing behavior and partial fill handling." },
+            { phase: 4, step: 3, title: "Phase 4: Readiness Checklist", subtitle: "Certification Planning", color: "#ff9800", icon: ClipboardCheck,
+              content: "Pre-certification readiness verification.",
+              detail: "Checklist: Config validated, Connectivity confirmed, Test data ready, Stakeholders notified." },
+            { phase: 5, step: 1, title: "Phase 5: Session Tests", subtitle: "Test Execution", color: "#9c27b0", icon: Server,
+              content: "Execute FIX session-level tests.",
+              detail: "23/23 session tests passed: Logon, Logout, Heartbeat, TestRequest, ResendRequest, SequenceReset" },
+            { phase: 5, step: 2, title: "Phase 5: Application Tests", subtitle: "Test Execution", color: "#9c27b0", icon: Activity,
+              content: "Execute application-level message tests.",
+              detail: "Running 133 application tests... 128 Passed, 3 Failed, 2 Pending" },
+            { phase: 5, step: 3, title: "Phase 5: Evidence Capture", subtitle: "Test Execution", color: "#9c27b0", icon: FolderArchive,
+              content: "Capture test evidence and artifacts.",
+              detail: "Evidence vault populated: 156 test results, 892 FIX messages, 23 screenshots captured." },
+            { phase: 5, step: 4, title: "Phase 5: Log Analysis", subtitle: "Test Execution", color: "#9c27b0", icon: FileSearch,
+              content: "Analyze FIX message logs for issues.",
+              detail: "AI analyzed 892 messages. Identified 3 sequence gaps and 2 malformed tags." },
+            { phase: 6, step: 1, title: "Phase 6: Failure Analysis", subtitle: "Analysis & Remediation", color: "#f44336", icon: AlertTriangle,
+              content: "Analyze test failures and identify root causes.",
+              detail: "3 failures identified: TC-045 (Tag 40 invalid value), TC-089 (Missing ClOrdID), TC-112 (Timeout)" },
+            { phase: 6, step: 2, title: "Phase 6: AI Root Cause", subtitle: "Analysis & Remediation", color: "#f44336", icon: Brain,
+              content: "AI-powered root cause analysis.",
+              detail: "AI diagnosis: TC-045 caused by OrdType enum mismatch. Recommended fix: Update field mapping for Tag 40." },
+            { phase: 6, step: 3, title: "Phase 6: Defect Tracking", subtitle: "Analysis & Remediation", color: "#f44336", icon: AlertCircle,
+              content: "Track defects and remediation progress.",
+              detail: "3 defects created, assigned to Morgan Stanley. 2 fixed and retested. 1 pending client response." },
+            { phase: 7, step: 1, title: "Phase 7: Completion Evaluation", subtitle: "Certification Decisioning", color: "#2196f3", icon: CheckSquare,
+              content: "Evaluate certification completion criteria.",
+              detail: "Pass rate: 98.7% (154/156 tests). All critical paths passed. Ready for certification." },
+            { phase: 7, step: 2, title: "Phase 7: Certification Report", subtitle: "Certification Decisioning", color: "#2196f3", icon: Award,
+              content: "Generate formal certification report.",
+              detail: "Certification report generated: 42-page PDF with executive summary, test results, and recommendations." },
+            { phase: 7, step: 3, title: "Phase 7: Signoff Collection", subtitle: "Certification Decisioning", color: "#2196f3", icon: Stamp,
+              content: "Collect formal signoffs from stakeholders.",
+              detail: "Signoffs collected: Morgan Stanley (John Smith), Admin QA (Jane Doe), Admin Compliance (Bob Wilson)" },
+            { phase: 8, step: 1, title: "Phase 8: Production Config", subtitle: "Production Enablement", color: "#4caf50", icon: Server,
+              content: "Generate production configuration package.",
+              detail: "Production config package generated: QuickFIX config, Session settings, Field mappings, ATDL definitions" },
+            { phase: 8, step: 2, title: "Phase 8: Go-Live Checklist", subtitle: "Production Enablement", color: "#4caf50", icon: Rocket,
+              content: "Final go-live verification checklist.",
+              detail: "Go-live checklist complete: Production credentials issued, DNS configured, Monitoring enabled" },
+            { phase: 8, step: 3, title: "Phase 8: Hypercare Monitor", subtitle: "Production Enablement", color: "#4caf50", icon: Activity,
+              content: "Post-go-live monitoring and support.",
+              detail: "Hypercare active: 24/7 monitoring for 2 weeks. 0 incidents. 99.99% uptime achieved." },
+            { phase: 8, step: "complete", title: "Certification Complete!", subtitle: "Morgan Stanley Onboarded", color: "#4caf50", icon: Award,
+              content: "Morgan Stanley has been successfully certified for FIX 4.4 Equities trading.",
+              detail: "Total time: 12 days. 156 tests executed. 98.7% pass rate. Client is now live in production!" }
+          ]
+          const currentStep = walkthroughSteps[walkthroughStep]
+          const progress = ((walkthroughStep + 1) / walkthroughSteps.length) * 100
+          const StepIcon = currentStep.icon
+
+          return (
+            <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+              <Card className={`${bgCard} p-0 border ${borderColor} w-full max-w-3xl mx-4 relative overflow-hidden`}>
+                {/* Progress bar */}
+                <div className="h-1 bg-[#1e4976]">
+                  <div 
+                    className="h-full transition-all duration-500 ease-out"
+                    style={{ width: `${progress}%`, backgroundColor: currentStep.color }}
+                  />
+                </div>
+
+                {/* Header */}
+                <div className="p-6 pb-4 border-b border-[#1e4976]/50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div 
+                        className="w-14 h-14 rounded-xl flex items-center justify-center"
+                        style={{ backgroundColor: `${currentStep.color}20` }}
+                      >
+                        <StepIcon className="h-7 w-7" style={{ color: currentStep.color }} />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span 
+                            className="text-xs font-bold px-2 py-0.5 rounded"
+                            style={{ backgroundColor: `${currentStep.color}30`, color: currentStep.color }}
+                          >
+                            {currentStep.step === "intro" ? "START" : currentStep.step === "complete" ? "DONE" : `Step ${walkthroughStep}/${walkthroughSteps.length - 2}`}
+                          </span>
+                          <span className={`text-xs ${textSecondary}`}>{currentStep.subtitle}</span>
+                        </div>
+                        <h2 className={`text-xl font-bold ${textPrimary}`}>{currentStep.title}</h2>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-xs font-bold text-[#00e5ff]">Phase 1</span>
-                      <h3 className={`font-semibold ${textPrimary}`}>Intake & Discovery</h3>
-                    </div>
-                  </div>
-                  <div className={`text-sm ${textSecondary} space-y-2`}>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#00e5ff] bg-[#00e5ff]/20 px-2 py-0.5 rounded">Step 1</span>
-                      <FileText className="h-3.5 w-3.5 text-[#00e5ff]" />
-                      <span>Intake Portal</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#00e5ff] bg-[#00e5ff]/20 px-2 py-0.5 rounded">Step 2</span>
-                      <Upload className="h-3.5 w-3.5 text-[#00e5ff]" />
-                      <span>Document Upload</span>
-                    </div>
+                    <button 
+                      onClick={() => setShowWalkthrough(false)}
+                      className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
                   </div>
                 </div>
 
-                {/* Phase 2 - Solution Design & Configuration */}
-                <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#4caf50]/50 transition-colors`}>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#4caf5020" }}>
-                      <Cog className="h-5 w-5 text-[#4caf50]" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-[#4caf50]">Phase 2</span>
-                      <h3 className={`font-semibold ${textPrimary}`}>Solution Design & Configuration</h3>
-                    </div>
+                {/* Content */}
+                <div className="p-6">
+                  <p className={`text-lg mb-4 ${textPrimary}`}>{currentStep.content}</p>
+                  <div 
+                    className={`p-4 rounded-xl border ${borderColor} ${bgSecondary}`}
+                    style={{ borderLeftWidth: 4, borderLeftColor: currentStep.color }}
+                  >
+                    <p className={`text-sm ${textSecondary}`}>{currentStep.detail}</p>
                   </div>
-                  <div className={`text-sm ${textSecondary} space-y-2`}>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#4caf50] bg-[#4caf50]/20 px-2 py-0.5 rounded">Step 1</span>
-                      <RefreshCw className="h-3.5 w-3.5 text-[#4caf50]" />
-                      <span>Convert to Standardized Spec</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#4caf50] bg-[#4caf50]/20 px-2 py-0.5 rounded">Step 2</span>
-                      <GitCompare className="h-3.5 w-3.5 text-[#4caf50]" />
-                      <span>Spec Compare</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#4caf50] bg-[#4caf50]/20 px-2 py-0.5 rounded">Step 3</span>
-                      <FileSearch className="h-3.5 w-3.5 text-[#4caf50]" />
-                      <span>Create Spec from Log</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#4caf50] bg-[#4caf50]/20 px-2 py-0.5 rounded">Step 4</span>
-                      <Code className="h-3.5 w-3.5 text-[#4caf50]" />
-                      <span>ATDL Configuration</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#4caf50] bg-[#4caf50]/20 px-2 py-0.5 rounded">Step 5</span>
-                      <Server className="h-3.5 w-3.5 text-[#4caf50]" />
-                      <span>Session Config</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#4caf50] bg-[#4caf50]/20 px-2 py-0.5 rounded">Step 6</span>
-                      <Link2 className="h-3.5 w-3.5 text-[#4caf50]" />
-                      <span>Field Mapping</span>
-                    </div>
+
+                  {/* Phase progress indicator */}
+                  <div className="mt-6 flex items-center justify-center gap-2">
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((phase) => (
+                      <div 
+                        key={phase}
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-all ${
+                          currentStep.phase === phase 
+                            ? "scale-110" 
+                            : currentStep.phase > phase 
+                              ? "opacity-100" 
+                              : "opacity-30"
+                        }`}
+                        style={{ 
+                          backgroundColor: currentStep.phase >= phase 
+                            ? `${["#00e5ff", "#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#f44336", "#2196f3", "#4caf50"][phase - 1]}30`
+                            : "#1e4976",
+                          color: currentStep.phase >= phase 
+                            ? ["#00e5ff", "#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#f44336", "#2196f3", "#4caf50"][phase - 1]
+                            : "#4a5568"
+                        }}
+                      >
+                        {currentStep.phase > phase ? <Check className="h-4 w-4" /> : phase}
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                {/* Phase 3 - Connectivity Setup */}
-                <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#2196f3]/50 transition-colors`}>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#2196f320" }}>
-                      <Wifi className="h-5 w-5 text-[#2196f3]" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-[#2196f3]">Phase 3</span>
-                      <h3 className={`font-semibold ${textPrimary}`}>Connectivity Setup</h3>
-                    </div>
-                  </div>
-                  <div className={`text-sm ${textSecondary} space-y-2`}>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#2196f3] bg-[#2196f3]/20 px-2 py-0.5 rounded">Step 1</span>
-                      <Globe className="h-3.5 w-3.5 text-[#2196f3]" />
-                      <span>Network Provisioning</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#2196f3] bg-[#2196f3]/20 px-2 py-0.5 rounded">Step 2</span>
-                      <Zap className="h-3.5 w-3.5 text-[#2196f3]" />
-                      <span>Connectivity Test</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#2196f3] bg-[#2196f3]/20 px-2 py-0.5 rounded">Step 3</span>
-                      <CheckCircle className="h-3.5 w-3.5 text-[#2196f3]" />
-                      <span>Session Validation</span>
-                    </div>
-                  </div>
-                </div>
+                {/* Footer with navigation */}
+                <div className="p-6 pt-4 border-t border-[#1e4976]/50 flex items-center justify-between">
+                  <Button 
+                    variant="outline"
+                    onClick={() => setWalkthroughStep(Math.max(0, walkthroughStep - 1))}
+                    disabled={walkthroughStep === 0}
+                    className={`${walkthroughStep === 0 ? "opacity-50" : ""}`}
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" /> Previous
+                  </Button>
+                  
+                  <span className={`text-sm ${textSecondary}`}>
+                    {walkthroughStep + 1} of {walkthroughSteps.length}
+                  </span>
 
-                {/* Phase 4 - Certification Planning */}
-                <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#ff9800]/50 transition-colors`}>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#ff980020" }}>
-                      <Target className="h-5 w-5 text-[#ff9800]" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-[#ff9800]">Phase 4</span>
-                      <h3 className={`font-semibold ${textPrimary}`}>Certification Planning</h3>
-                    </div>
-                  </div>
-                  <div className={`text-sm ${textSecondary} space-y-2`}>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#ff9800] bg-[#ff9800]/20 px-2 py-0.5 rounded">Step 1</span>
-                      <FileText className="h-3.5 w-3.5 text-[#ff9800]" />
-                      <span>Test Plan Generator</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#ff9800] bg-[#ff9800]/20 px-2 py-0.5 rounded">Step 2</span>
-                      <TestTube className="h-3.5 w-3.5 text-[#ff9800]" />
-                      <span>Test Case Creator</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#ff9800] bg-[#ff9800]/20 px-2 py-0.5 rounded">Step 3</span>
-                      <ClipboardCheck className="h-3.5 w-3.5 text-[#ff9800]" />
-                      <span>Readiness Checklist</span>
-                    </div>
-                  </div>
+                  {walkthroughStep < walkthroughSteps.length - 1 ? (
+                    <Button 
+                      onClick={() => setWalkthroughStep(walkthroughStep + 1)}
+                      style={{ backgroundColor: currentStep.color }}
+                      className="text-[#0a1628] hover:opacity-90"
+                    >
+                      Next <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={() => { setShowWalkthrough(false); setCurrentScreen("role-select"); }}
+                      className="bg-[#4caf50] text-white hover:bg-[#4caf50]/90"
+                    >
+                      Get Started <Rocket className="h-4 w-4 ml-1" />
+                    </Button>
+                  )}
                 </div>
-
-                {/* Phase 5 - Test Execution */}
-                <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#9c27b0]/50 transition-colors`}>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#9c27b020" }}>
-                      <Play className="h-5 w-5 text-[#9c27b0]" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-[#9c27b0]">Phase 5</span>
-                      <h3 className={`font-semibold ${textPrimary}`}>Test Execution</h3>
-                    </div>
-                  </div>
-                  <div className={`text-sm ${textSecondary} space-y-2`}>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#9c27b0] bg-[#9c27b0]/20 px-2 py-0.5 rounded">Step 1</span>
-                      <Server className="h-3.5 w-3.5 text-[#9c27b0]" />
-                      <span>Session Tests</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#9c27b0] bg-[#9c27b0]/20 px-2 py-0.5 rounded">Step 2</span>
-                      <Activity className="h-3.5 w-3.5 text-[#9c27b0]" />
-                      <span>Application Tests</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#9c27b0] bg-[#9c27b0]/20 px-2 py-0.5 rounded">Step 3</span>
-                      <FolderArchive className="h-3.5 w-3.5 text-[#9c27b0]" />
-                      <span>Evidence Capture</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#9c27b0] bg-[#9c27b0]/20 px-2 py-0.5 rounded">Step 4</span>
-                      <FileSearch className="h-3.5 w-3.5 text-[#9c27b0]" />
-                      <span>Log Analysis</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Phase 6 - Analysis & Remediation */}
-                <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#f44336]/50 transition-colors`}>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#f4433620" }}>
-                      <Brain className="h-5 w-5 text-[#f44336]" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-[#f44336]">Phase 6</span>
-                      <h3 className={`font-semibold ${textPrimary}`}>Analysis & Remediation</h3>
-                    </div>
-                  </div>
-                  <div className={`text-sm ${textSecondary} space-y-2`}>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#f44336] bg-[#f44336]/20 px-2 py-0.5 rounded">Step 1</span>
-                      <AlertTriangle className="h-3.5 w-3.5 text-[#f44336]" />
-                      <span>Failure Analysis</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#f44336] bg-[#f44336]/20 px-2 py-0.5 rounded">Step 2</span>
-                      <Brain className="h-3.5 w-3.5 text-[#f44336]" />
-                      <span>AI Root Cause</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#f44336] bg-[#f44336]/20 px-2 py-0.5 rounded">Step 3</span>
-                      <AlertCircle className="h-3.5 w-3.5 text-[#f44336]" />
-                      <span>Defect Tracking</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Phase 7 - Certification Decisioning */}
-                <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#2196f3]/50 transition-colors`}>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#2196f320" }}>
-                      <Award className="h-5 w-5 text-[#2196f3]" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-[#2196f3]">Phase 7</span>
-                      <h3 className={`font-semibold ${textPrimary}`}>Certification Decisioning</h3>
-                    </div>
-                  </div>
-                  <div className={`text-sm ${textSecondary} space-y-2`}>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#2196f3] bg-[#2196f3]/20 px-2 py-0.5 rounded">Step 1</span>
-                      <CheckSquare className="h-3.5 w-3.5 text-[#2196f3]" />
-                      <span>Completion Evaluation</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#2196f3] bg-[#2196f3]/20 px-2 py-0.5 rounded">Step 2</span>
-                      <Award className="h-3.5 w-3.5 text-[#2196f3]" />
-                      <span>Certification Report</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#2196f3] bg-[#2196f3]/20 px-2 py-0.5 rounded">Step 3</span>
-                      <Stamp className="h-3.5 w-3.5 text-[#2196f3]" />
-                      <span>Signoff Collection</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Phase 8 - Production Enablement */}
-                <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#4caf50]/50 transition-colors`}>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#4caf5020" }}>
-                      <Rocket className="h-5 w-5 text-[#4caf50]" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-[#4caf50]">Phase 8</span>
-                      <h3 className={`font-semibold ${textPrimary}`}>Production Enablement</h3>
-                    </div>
-                  </div>
-                  <div className={`text-sm ${textSecondary} space-y-2`}>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#4caf50] bg-[#4caf50]/20 px-2 py-0.5 rounded">Step 1</span>
-                      <Server className="h-3.5 w-3.5 text-[#4caf50]" />
-                      <span>Production Config</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#4caf50] bg-[#4caf50]/20 px-2 py-0.5 rounded">Step 2</span>
-                      <Rocket className="h-3.5 w-3.5 text-[#4caf50]" />
-                      <span>Go-Live Checklist</span>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
-                      <span className="text-xs font-bold text-[#4caf50] bg-[#4caf50]/20 px-2 py-0.5 rounded">Step 3</span>
-                      <Activity className="h-3.5 w-3.5 text-[#4caf50]" />
-                      <span>Hypercare Monitor</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* AI Capabilities Section */}
-              <div className={`mt-8 p-6 rounded-xl border ${borderColor} ${bgSecondary}`}>
-                <h3 className={`text-lg font-semibold mb-4 ${textPrimary} flex items-center gap-2`}>
-                  <Sparkles className="h-5 w-5 text-[#00e5ff]" />
-                  AI-Powered Capabilities
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {[
-                    "Document Extraction",
-                    "Gap Detection",
-                    "Config Recommendation",
-                    "Test Generation",
-                    "Failure Diagnosis",
-                    "Conversational Assistant"
-                  ].map((cap) => (
-                    <div key={cap} className={`px-3 py-2 rounded-lg border ${borderColor} ${textSecondary} text-sm flex items-center gap-2`}>
-                      <Check className="h-4 w-4 text-[#00e5ff]" />
-                      {cap}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex justify-center gap-4 mt-8">
-                <Button 
-                  onClick={() => { setShowQuickDemo(false); setCurrentScreen("role-select"); }}
-                  className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00e5ff]/80 px-8"
-                >
-                  Get Started
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={() => { setShowQuickDemo(false); setShowContactPanel(true); }}
-                  className="border-[#00e5ff] text-[#00e5ff] hover:bg-[#00e5ff]/10 px-8"
-                >
-                  Contact Us
-                </Button>
-              </div>
-            </Card>
-          </div>
-        )}
+              </Card>
+            </div>
+          )
+        })()}
       </div>
     )
   }
@@ -14258,7 +14155,7 @@ const tools = [
     const remedSevClr = (s: string) => s === "High" ? "#f44336" : s === "Medium" ? "#ff9800" : "#4caf50"
 
     const remediationStepContent: Record<number, React.ReactNode> = {
-      // Step 0 — Upload FIX Spec + ATDL
+      // Step 0 ��� Upload FIX Spec + ATDL
       0: (
         <div className="space-y-5">
           {workflowTabSelector}
