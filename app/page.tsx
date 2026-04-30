@@ -3612,7 +3612,7 @@ export default function BCometPlatform() {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Phase 1 */}
+                {/* Phase 1 - Intake & Discovery */}
                 <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#00e5ff]/50 transition-colors`}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#00e5ff20" }}>
@@ -3623,14 +3623,21 @@ export default function BCometPlatform() {
                       <h3 className={`font-semibold ${textPrimary}`}>Intake & Discovery</h3>
                     </div>
                   </div>
-                  <ul className={`text-sm ${textSecondary} space-y-2`}>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#00e5ff]" />Gather client requirements</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#00e5ff]" />Upload FIX specifications</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#00e5ff]" />Initial assessment</li>
-                  </ul>
+                  <div className={`text-sm ${textSecondary} space-y-2`}>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#00e5ff] bg-[#00e5ff]/20 px-2 py-0.5 rounded">Step 1</span>
+                      <FileText className="h-3.5 w-3.5 text-[#00e5ff]" />
+                      <span>Intake Portal</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#00e5ff] bg-[#00e5ff]/20 px-2 py-0.5 rounded">Step 2</span>
+                      <Upload className="h-3.5 w-3.5 text-[#00e5ff]" />
+                      <span>Document Upload</span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Phase 2 */}
+                {/* Phase 2 - Solution Design & Configuration */}
                 <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#4caf50]/50 transition-colors`}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#4caf5020" }}>
@@ -3641,14 +3648,41 @@ export default function BCometPlatform() {
                       <h3 className={`font-semibold ${textPrimary}`}>Solution Design & Configuration</h3>
                     </div>
                   </div>
-                  <ul className={`text-sm ${textSecondary} space-y-2`}>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Configure field mappings</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Set business rules</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Configure ATDL parameters</li>
-                  </ul>
+                  <div className={`text-sm ${textSecondary} space-y-2`}>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#4caf50] bg-[#4caf50]/20 px-2 py-0.5 rounded">Step 1</span>
+                      <RefreshCw className="h-3.5 w-3.5 text-[#4caf50]" />
+                      <span>Convert to Standardized Spec</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#4caf50] bg-[#4caf50]/20 px-2 py-0.5 rounded">Step 2</span>
+                      <GitCompare className="h-3.5 w-3.5 text-[#4caf50]" />
+                      <span>Spec Compare</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#4caf50] bg-[#4caf50]/20 px-2 py-0.5 rounded">Step 3</span>
+                      <FileSearch className="h-3.5 w-3.5 text-[#4caf50]" />
+                      <span>Create Spec from Log</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#4caf50] bg-[#4caf50]/20 px-2 py-0.5 rounded">Step 4</span>
+                      <Code className="h-3.5 w-3.5 text-[#4caf50]" />
+                      <span>ATDL Configuration</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#4caf50] bg-[#4caf50]/20 px-2 py-0.5 rounded">Step 5</span>
+                      <Server className="h-3.5 w-3.5 text-[#4caf50]" />
+                      <span>Session Config</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#4caf50] bg-[#4caf50]/20 px-2 py-0.5 rounded">Step 6</span>
+                      <Link2 className="h-3.5 w-3.5 text-[#4caf50]" />
+                      <span>Field Mapping</span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Phase 3 */}
+                {/* Phase 3 - Connectivity Setup */}
                 <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#2196f3]/50 transition-colors`}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#2196f320" }}>
@@ -3659,14 +3693,26 @@ export default function BCometPlatform() {
                       <h3 className={`font-semibold ${textPrimary}`}>Connectivity Setup</h3>
                     </div>
                   </div>
-                  <ul className={`text-sm ${textSecondary} space-y-2`}>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Configure session parameters</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Verify network routes</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Heartbeat testing</li>
-                  </ul>
+                  <div className={`text-sm ${textSecondary} space-y-2`}>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#2196f3] bg-[#2196f3]/20 px-2 py-0.5 rounded">Step 1</span>
+                      <Globe className="h-3.5 w-3.5 text-[#2196f3]" />
+                      <span>Network Provisioning</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#2196f3] bg-[#2196f3]/20 px-2 py-0.5 rounded">Step 2</span>
+                      <Zap className="h-3.5 w-3.5 text-[#2196f3]" />
+                      <span>Connectivity Test</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#2196f3] bg-[#2196f3]/20 px-2 py-0.5 rounded">Step 3</span>
+                      <CheckCircle className="h-3.5 w-3.5 text-[#2196f3]" />
+                      <span>Session Validation</span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Phase 4 */}
+                {/* Phase 4 - Certification Planning */}
                 <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#ff9800]/50 transition-colors`}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#ff980020" }}>
@@ -3677,14 +3723,26 @@ export default function BCometPlatform() {
                       <h3 className={`font-semibold ${textPrimary}`}>Certification Planning</h3>
                     </div>
                   </div>
-                  <ul className={`text-sm ${textSecondary} space-y-2`}>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#ff9800]" />Generate test plan</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#ff9800]" />Define acceptance criteria</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#ff9800]" />Coverage analysis</li>
-                  </ul>
+                  <div className={`text-sm ${textSecondary} space-y-2`}>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#ff9800] bg-[#ff9800]/20 px-2 py-0.5 rounded">Step 1</span>
+                      <FileText className="h-3.5 w-3.5 text-[#ff9800]" />
+                      <span>Test Plan Generator</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#ff9800] bg-[#ff9800]/20 px-2 py-0.5 rounded">Step 2</span>
+                      <TestTube className="h-3.5 w-3.5 text-[#ff9800]" />
+                      <span>Test Case Creator</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#ff9800] bg-[#ff9800]/20 px-2 py-0.5 rounded">Step 3</span>
+                      <ClipboardCheck className="h-3.5 w-3.5 text-[#ff9800]" />
+                      <span>Readiness Checklist</span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Phase 5 */}
+                {/* Phase 5 - Test Execution */}
                 <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#9c27b0]/50 transition-colors`}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#9c27b020" }}>
@@ -3695,14 +3753,31 @@ export default function BCometPlatform() {
                       <h3 className={`font-semibold ${textPrimary}`}>Test Execution</h3>
                     </div>
                   </div>
-                  <ul className={`text-sm ${textSecondary} space-y-2`}>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#9c27b0]" />Run automated test suite</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#9c27b0]" />Capture test results</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#9c27b0]" />Log collection</li>
-                  </ul>
+                  <div className={`text-sm ${textSecondary} space-y-2`}>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#9c27b0] bg-[#9c27b0]/20 px-2 py-0.5 rounded">Step 1</span>
+                      <Server className="h-3.5 w-3.5 text-[#9c27b0]" />
+                      <span>Session Tests</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#9c27b0] bg-[#9c27b0]/20 px-2 py-0.5 rounded">Step 2</span>
+                      <Activity className="h-3.5 w-3.5 text-[#9c27b0]" />
+                      <span>Application Tests</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#9c27b0] bg-[#9c27b0]/20 px-2 py-0.5 rounded">Step 3</span>
+                      <FolderArchive className="h-3.5 w-3.5 text-[#9c27b0]" />
+                      <span>Evidence Capture</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#9c27b0] bg-[#9c27b0]/20 px-2 py-0.5 rounded">Step 4</span>
+                      <FileSearch className="h-3.5 w-3.5 text-[#9c27b0]" />
+                      <span>Log Analysis</span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Phase 6 */}
+                {/* Phase 6 - Analysis & Remediation */}
                 <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#f44336]/50 transition-colors`}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#f4433620" }}>
@@ -3713,14 +3788,26 @@ export default function BCometPlatform() {
                       <h3 className={`font-semibold ${textPrimary}`}>Analysis & Remediation</h3>
                     </div>
                   </div>
-                  <ul className={`text-sm ${textSecondary} space-y-2`}>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#f44336]" />AI root cause analysis</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#f44336]" />Identify configuration gaps</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#f44336]" />Retest and validation</li>
-                  </ul>
+                  <div className={`text-sm ${textSecondary} space-y-2`}>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#f44336] bg-[#f44336]/20 px-2 py-0.5 rounded">Step 1</span>
+                      <AlertTriangle className="h-3.5 w-3.5 text-[#f44336]" />
+                      <span>Failure Analysis</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#f44336] bg-[#f44336]/20 px-2 py-0.5 rounded">Step 2</span>
+                      <Brain className="h-3.5 w-3.5 text-[#f44336]" />
+                      <span>AI Root Cause</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#f44336] bg-[#f44336]/20 px-2 py-0.5 rounded">Step 3</span>
+                      <AlertCircle className="h-3.5 w-3.5 text-[#f44336]" />
+                      <span>Defect Tracking</span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Phase 7 */}
+                {/* Phase 7 - Certification Decisioning */}
                 <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#2196f3]/50 transition-colors`}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#2196f320" }}>
@@ -3731,14 +3818,26 @@ export default function BCometPlatform() {
                       <h3 className={`font-semibold ${textPrimary}`}>Certification Decisioning</h3>
                     </div>
                   </div>
-                  <ul className={`text-sm ${textSecondary} space-y-2`}>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Evaluate compliance</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Generate certification report</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#2196f3]" />Collect formal signoffs</li>
-                  </ul>
+                  <div className={`text-sm ${textSecondary} space-y-2`}>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#2196f3] bg-[#2196f3]/20 px-2 py-0.5 rounded">Step 1</span>
+                      <CheckSquare className="h-3.5 w-3.5 text-[#2196f3]" />
+                      <span>Completion Evaluation</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#2196f3] bg-[#2196f3]/20 px-2 py-0.5 rounded">Step 2</span>
+                      <Award className="h-3.5 w-3.5 text-[#2196f3]" />
+                      <span>Certification Report</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#2196f3] bg-[#2196f3]/20 px-2 py-0.5 rounded">Step 3</span>
+                      <Stamp className="h-3.5 w-3.5 text-[#2196f3]" />
+                      <span>Signoff Collection</span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Phase 8 */}
+                {/* Phase 8 - Production Enablement */}
                 <div className={`${bgSecondary} rounded-xl p-5 border ${borderColor} hover:border-[#4caf50]/50 transition-colors`}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#4caf5020" }}>
@@ -3749,11 +3848,23 @@ export default function BCometPlatform() {
                       <h3 className={`font-semibold ${textPrimary}`}>Production Enablement</h3>
                     </div>
                   </div>
-                  <ul className={`text-sm ${textSecondary} space-y-2`}>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Generate production config</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Production smoke testing</li>
-                    <li className="flex items-center gap-2"><ChevronRight className="h-3 w-3 text-[#4caf50]" />Go-live & hypercare</li>
-                  </ul>
+                  <div className={`text-sm ${textSecondary} space-y-2`}>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#4caf50] bg-[#4caf50]/20 px-2 py-0.5 rounded">Step 1</span>
+                      <Server className="h-3.5 w-3.5 text-[#4caf50]" />
+                      <span>Production Config</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#4caf50] bg-[#4caf50]/20 px-2 py-0.5 rounded">Step 2</span>
+                      <Rocket className="h-3.5 w-3.5 text-[#4caf50]" />
+                      <span>Go-Live Checklist</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1e4976]/20">
+                      <span className="text-xs font-bold text-[#4caf50] bg-[#4caf50]/20 px-2 py-0.5 rounded">Step 3</span>
+                      <Activity className="h-3.5 w-3.5 text-[#4caf50]" />
+                      <span>Hypercare Monitor</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
