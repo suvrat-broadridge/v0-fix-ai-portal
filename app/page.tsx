@@ -8958,7 +8958,7 @@ const tools = [
                                     </div>
 
                                     {/* Validate button + animated results */}
-                                    {!atdlValidating && !atdlValidationDone && (
+                                    {!atdlValidating && (
                                       <div className="flex justify-center">
                                         <Button
                                           className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] px-8"
@@ -8970,7 +8970,7 @@ const tools = [
                                             }, 2000)
                                           }}
                                         >
-                                          <CheckCircle className="h-4 w-4 mr-1.5" /> Validate ATDL
+                                          {atdlValidationDone ? <RefreshCw className="h-4 w-4 mr-1.5" /> : <CheckCircle className="h-4 w-4 mr-1.5" />} Validate ATDL
                                         </Button>
                                       </div>
                                     )}
@@ -9100,10 +9100,11 @@ const tools = [
   </Strategy>
 </Strategies>`}</pre>
                                         </div>
-                                        {atdlUsageStep === 2 && (
+                                        {atdlUsageStep >= 2 && (
                                           <div className="p-4 flex justify-end">
                                             <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setAtdlUsageStep(3)}>
-                                              <Play className="h-4 w-4 mr-1.5" /> Load Strategy UI
+                                              {atdlUsageStep > 2 ? <RefreshCw className="h-4 w-4 mr-1.5" /> : <Play className="h-4 w-4 mr-1.5" />}
+                                              Load Strategy UI
                                             </Button>
                                           </div>
                                         )}
@@ -9154,10 +9155,11 @@ const tools = [
                                               <input type="text" defaultValue="200" className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`} />
                                             </div>
                                           </div>
-                                          {atdlUsageStep === 3 && (
+                                          {atdlUsageStep >= 3 && (
                                             <div className="flex justify-end mt-4">
                                               <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setAtdlUsageStep(4)}>
-                                                <Sparkles className="h-4 w-4 mr-1.5" /> Generate FIX Message
+                                                {atdlUsageStep > 3 ? <RefreshCw className="h-4 w-4 mr-1.5" /> : <Sparkles className="h-4 w-4 mr-1.5" />}
+                                                Generate FIX Message
                                               </Button>
                                             </div>
                                           )}
@@ -9192,10 +9194,11 @@ const tools = [
                                               <Download className="h-3 w-3 mr-1" /> Download
                                             </Button>
                                           </div>
-                                          {atdlUsageStep === 4 && (
+                                          {atdlUsageStep >= 4 && (
                                             <div className="flex justify-end mt-3">
                                               <Button className="bg-[#9c27b0] hover:bg-[#7b1fa2] text-white" onClick={() => setAtdlUsageStep(5)}>
-                                                <Sparkles className="h-4 w-4 mr-1.5" /> Validate Against FIX Spec
+                                                {atdlUsageStep > 4 ? <RefreshCw className="h-4 w-4 mr-1.5" /> : <Sparkles className="h-4 w-4 mr-1.5" />}
+                                                Validate Against FIX Spec
                                               </Button>
                                             </div>
                                           )}
@@ -10243,10 +10246,11 @@ const tools = [
   </Strategy>
 </Strategies>`}</pre>
                                         </div>
-                                        {remedUsageStep === 2 && (
+                                        {remedUsageStep >= 2 && (
                                           <div className="p-4 flex justify-end">
                                             <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setRemedUsageStep(3)}>
-                                              <Play className="h-4 w-4 mr-1.5" /> Load Strategy UI
+                                              {remedUsageStep > 2 ? <RefreshCw className="h-4 w-4 mr-1.5" /> : <Play className="h-4 w-4 mr-1.5" />}
+                                              Load Strategy UI
                                             </Button>
                                           </div>
                                         )}
@@ -10280,10 +10284,11 @@ const tools = [
                                               </div>
                                             ))}
                                           </div>
-                                          {remedUsageStep === 3 && (
+                                          {remedUsageStep >= 3 && (
                                             <div className="flex justify-end">
                                               <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setRemedUsageStep(4)}>
-                                                <Sparkles className="h-4 w-4 mr-1.5" /> Generate FIX Message
+                                                {remedUsageStep > 3 ? <RefreshCw className="h-4 w-4 mr-1.5" /> : <Sparkles className="h-4 w-4 mr-1.5" />}
+                                                Generate FIX Message
                                               </Button>
                                             </div>
                                           )}
@@ -10309,10 +10314,11 @@ const tools = [
                                             <Button variant="outline" size="sm" className="text-xs"><Copy className="h-3 w-3 mr-1" /> Copy</Button>
                                             <Button variant="outline" size="sm" className="text-xs"><Download className="h-3 w-3 mr-1" /> Download</Button>
                                           </div>
-                                          {remedUsageStep === 4 && (
+                                          {remedUsageStep >= 4 && (
                                             <div className="flex justify-end mt-3">
                                               <Button className="bg-[#9c27b0] hover:bg-[#7b1fa2] text-white" onClick={() => setRemedUsageStep(5)}>
-                                                <Sparkles className="h-4 w-4 mr-1.5" /> Validate Against FIX Spec
+                                                {remedUsageStep > 4 ? <RefreshCw className="h-4 w-4 mr-1.5" /> : <Sparkles className="h-4 w-4 mr-1.5" />}
+                                                Validate Against FIX Spec
                                               </Button>
                                             </div>
                                           )}
@@ -15393,10 +15399,10 @@ const tools = [
   </Strategy>
 </Strategies>`}</pre>
               </div>
-              {remedUsageStep === 2 && (
+              {remedUsageStep >= 2 && (
                 <div className="p-4 flex justify-end border-t" style={{ borderTopColor: "inherit" }}>
                   <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setRemedUsageStep(3)}>
-                    <Play className="h-4 w-4 mr-2" /> Load Strategy UI
+                    {remedUsageStep > 2 ? <RefreshCw className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />} Load Strategy UI
                   </Button>
                 </div>
               )}
@@ -15433,10 +15439,10 @@ const tools = [
                     </div>
                   ))}
                 </div>
-                {remedUsageStep === 3 && (
+                {remedUsageStep >= 3 && (
                   <div className="flex justify-end">
                     <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setRemedUsageStep(4)}>
-                      <Sparkles className="h-4 w-4 mr-2" /> Generate FIX Message
+                      {remedUsageStep > 3 ? <RefreshCw className="h-4 w-4 mr-2" /> : <Sparkles className="h-4 w-4 mr-2" />} Generate FIX Message
                     </Button>
                   </div>
                 )}
@@ -15463,10 +15469,10 @@ const tools = [
                   <Button variant="outline" size="sm" className="text-xs"><Copy className="h-3 w-3 mr-1" /> Copy</Button>
                   <Button variant="outline" size="sm" className="text-xs"><Download className="h-3 w-3 mr-1" /> Download</Button>
                 </div>
-                {remedUsageStep === 4 && (
+                {remedUsageStep >= 4 && (
                   <div className="flex justify-end mt-3">
                     <Button className="bg-[#9c27b0] hover:bg-[#7b1fa2] text-white" onClick={() => setRemedUsageStep(5)}>
-                      <Sparkles className="h-4 w-4 mr-2" /> Validate Against FIX Spec
+                      {remedUsageStep > 4 ? <RefreshCw className="h-4 w-4 mr-2" /> : <Sparkles className="h-4 w-4 mr-2" />} Validate Against FIX Spec
                     </Button>
                   </div>
                 )}
