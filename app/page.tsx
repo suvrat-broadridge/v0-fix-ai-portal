@@ -1271,6 +1271,7 @@ export default function BCometPlatform() {
   const [caseWorkflowFiles, setCaseWorkflowFiles] = useState<{name: string, size: string, type: string}[]>([])
   // Log file for spec generation
   const [logFileForSpec, setLogFileForSpec] = useState<{name: string, size: string} | null>(null)
+  const [selectedLogFilesForSpec, setSelectedLogFilesForSpec] = useState<string[]>([])
   const [generatedSpecFromLog, setGeneratedSpecFromLog] = useState<{fields: {tag: string, name: string, type: string, required: boolean, description: string}[], messageTypes: {msgType: string, name: string, category: string}[]} | null>(null)
   const [isGeneratingSpec, setIsGeneratingSpec] = useState(false)
   // Client notifications for document requests etc
@@ -8068,29 +8069,119 @@ const tools = [
                             }
                             return (
                             <div className="space-y-4">
-                              {/* Header row — description + actions */}
-                              <div className="flex items-center justify-between gap-4">
-                                <p className={textSecondary}>Load the FIX log file from intake to generate a standardized FIX specification.</p>
-                                <Button
-                                  size="sm"
-                                  disabled={isGeneratingSpec}
-                                  onClick={() => {
-                                    setIsGeneratingSpec(true)
-                                    setGeneratedSpecFromLog(null)
-                                    setTimeout(() => {
-                                      setGeneratedSpecFromLog({ fields: [], messageTypes: [] })
-                                      setIsGeneratingSpec(false)
-                                    }, 1800)
-                                  }}
-                                  className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
-                                >
-                                  {isGeneratingSpec ? (
-                                    <><Loader className="h-4 w-4 mr-1 animate-spin" /> Loading...</>
-                                  ) : (
-                                    <><Upload className="h-4 w-4 mr-1" /> Load Log File</>
-                                  )}
-                                </Button>
+                              {/* Log File Selection */}
+                              <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                  <div className="flex items-center gap-2">
+                                    <ScrollText className="h-5 w-5 text-[#ff9800]" />
+                                    <div>
+                                      <h4 className={`font-semibold ${textPrimary}`}>Select Log Files from Intake</h4>
+                                      <p className={`text-xs ${textSecondary}`}>Choose one or more log files uploaded during intake to generate spec</p>
+                                    </div>
+                                  </div>
+                                  <Button
+                                    size="sm"
+                                    disabled={isGeneratingSpec || selectedLogFilesForSpec.length === 0}
+                                    onClick={() => {
+                                      setIsGeneratingSpec(true)
+                                      setGeneratedSpecFromLog(null)
+                                      setTimeout(() => {
+                                        setGeneratedSpecFromLog({ fields: [], messageTypes: [] })
+                                        setIsGeneratingSpec(false)
+                                      }, 1800)
+                                    }}
+                                    className="bg-[#4caf50] text-white hover:bg-[#388e3c]"
+                                  >
+                                    {isGeneratingSpec ? (
+                                      <><Loader className="h-4 w-4 mr-1 animate-spin" /> Generating...</>
+                                    ) : (
+                                      <><Zap className="h-4 w-4 mr-1" /> Generate Spec ({selectedLogFilesForSpec.length} selected)</>
+                                    )}
+                                  </Button>
+                                </div>
+
+                                {/* Available Log Files List */}
+                                <div className="p-4 space-y-2">
+                                  {(() => {
+                                    // Get log files from intake - use sample data if none uploaded
+                                    const logFiles = caseWorkflowFiles.filter((f: any) => f.type === "LOG").length > 0 
+                                      ? caseWorkflowFiles.filter((f: any) => f.type === "LOG")
+                                      : [
+                                          { name: "fix_session_2024-01-15.log", size: "2.4 MB", type: "LOG" },
+                                          { name: "fix_session_2024-01-16.log", size: "3.1 MB", type: "LOG" },
+                                          { name: "fix_session_2024-01-17.log", size: "1.8 MB", type: "LOG" },
+                                          { name: "historical_messages_Q4.log", size: "12.5 MB", type: "LOG" },
+                                        ]
+                                    
+                                    if (logFiles.length === 0) {
+                                      return (
+                                        <div className={`text-center py-6 ${textSecondary}`}>
+                                          <ScrollText className="h-10 w-10 mx-auto mb-2 opacity-50" />
+                                          <p>No log files uploaded during intake</p>
+                                          <p className="text-xs mt-1">Go back to Phase 1 to upload log files</p>
+                                        </div>
+                                      )
+                                    }
+                                    
+                                    return (
+                                      <>
+                                        <div className="flex items-center justify-between mb-2">
+                                          <span className={`text-xs ${textSecondary}`}>{logFiles.length} log file(s) available</span>
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => {
+                                              if (selectedLogFilesForSpec.length === logFiles.length) {
+                                                setSelectedLogFilesForSpec([])
+                                              } else {
+                                                setSelectedLogFilesForSpec(logFiles.map((f: any) => f.name))
+                                              }
+                                            }}
+                                            className="text-xs h-7"
+                                          >
+                                            {selectedLogFilesForSpec.length === logFiles.length ? "Deselect All" : "Select All"}
+                                          </Button>
+                                        </div>
+                                        {logFiles.map((file: any, idx: number) => {
+                                          const isSelected = selectedLogFilesForSpec.includes(file.name)
+                                          return (
+                                            <div
+                                              key={idx}
+                                              onClick={() => {
+                                                setSelectedLogFilesForSpec(prev => 
+                                                  isSelected 
+                                                    ? prev.filter(f => f !== file.name)
+                                                    : [...prev, file.name]
+                                                )
+                                              }}
+                                              className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all border ${
+                                                isSelected 
+                                                  ? "bg-[#ff9800]/10 border-[#ff9800]" 
+                                                  : `${isDarkMode ? "bg-[#0a1628]/50" : "bg-gray-50"} border-transparent hover:border-[#ff9800]/50`
+                                              }`}
+                                            >
+                                              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                                                isSelected 
+                                                  ? "bg-[#ff9800] border-[#ff9800]" 
+                                                  : `border-gray-400`
+                                              }`}>
+                                                {isSelected && <Check className="h-3 w-3 text-white" />}
+                                              </div>
+                                              <ScrollText className={`h-5 w-5 ${isSelected ? "text-[#ff9800]" : textSecondary}`} />
+                                              <div className="flex-1">
+                                                <p className={`text-sm font-medium ${textPrimary}`}>{file.name}</p>
+                                                <p className={`text-xs ${textSecondary}`}>{file.size} • Uploaded in Intake</p>
+                                              </div>
+                                              {isSelected && <CheckCircle className="h-5 w-5 text-[#ff9800]" />}
+                                            </div>
+                                          )
+                                        })}
+                                      </>
+                                    )
+                                  })()}
+                                </div>
                               </div>
+
                               {/* Generating spinner */}
                               {isGeneratingSpec && (
                                 <div className={`${bgSecondary} rounded-lg p-8 flex flex-col items-center gap-3`}>
