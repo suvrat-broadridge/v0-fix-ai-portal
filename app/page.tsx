@@ -5815,10 +5815,10 @@ const clientProgressData = [
   ]
     
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
             <div>
               <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
@@ -6378,10 +6378,10 @@ const tools = [
     }
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           {/* Header */}
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button 
@@ -6620,10 +6620,10 @@ const tools = [
     ]
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <h1 className={`text-2xl font-bold ${textPrimary}`}>Onboarding Lifecycle</h1>
             <p className={textSecondary}>End-to-end FIX protocol onboarding workflow</p>
@@ -12149,10 +12149,10 @@ const tools = [
     const adHocIsLastToolInPhase = currentToolIndex >= (adHocPhaseInfo?.steps.length || 1) - 1
     
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           {/* Phase Context Banner - shows when coming from case workflow */}
           {selectedCaseId && adHocPhaseInfo && (
             <div className={`${isDarkMode ? "bg-[#0d2847]" : "bg-blue-50"} border-b ${borderColor} px-6 py-3`}>
@@ -13784,10 +13784,10 @@ const tools = [
 
     // Client mode: Show asset class-based view with pre-generated suites
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => setCurrentScreen("asset-tools")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> Back
@@ -18507,10 +18507,10 @@ const copyToClipboard = () => {
     const selectedDeltaData = correlationResults.find(r => r.testId === selectedDeltaTest)
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           {/* Header */}
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
@@ -18903,7 +18903,7 @@ const copyToClipboard = () => {
               </div>
             )}
 
-            {/* ═════════════════════════════���════════��══════════════��═
+            {/* ═════════════════════════════���═══���════��══════════════��═
                 STEP 3: GATEWAY DELTA ANALYSIS
             ═════════════════════════════════════════════���═════════ */}
             {certReportStep === "delta" && (
@@ -19014,7 +19014,7 @@ const copyToClipboard = () => {
 
             {/* ═════════════════════════════════════════════���═════════
                 STEP 4: GENERATE CLIENT REPORT
-            ═══════════════════��═══��═══════════════════════════════ */}
+            ═══════════════════��═══��══��════════════════════════════ */}
             {certReportStep === "generate" && (
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-6">
@@ -19575,10 +19575,10 @@ const copyToClipboard = () => {
     ]
     
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => selectedClient ? setCurrentScreen("client-detail") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> Back
