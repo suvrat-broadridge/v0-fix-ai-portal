@@ -7810,7 +7810,7 @@ const tools = [
                                   <div className="p-4 grid grid-cols-2 gap-3">
                                     {[
                                       { id: "fix-spec", label: "FIX Spec Upload", sub: "client_fix_spec_v1.2.xml", icon: FileText, color: "#00e5ff", available: true },
-                                      { id: "log-file", label: "Log File Upload", sub: "No log file uploaded", icon: ScrollText, color: "#ff9800", available: false },
+                                      { id: "log-file", label: "Log File Upload", sub: "historical_fix_messages.log", icon: ScrollText, color: "#ff9800", available: true },
                                     ].map((src) => (
                                       <div key={src.id}
                                         className={`rounded-lg border-2 p-3 flex items-start gap-3 transition-all ${src.available ? "cursor-pointer" : "opacity-50 cursor-not-allowed"}`}
@@ -8215,7 +8215,7 @@ const tools = [
                                       </div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                      <Button variant="outline" size="sm"><Download className="h-3 w-3 mr-1" /> Export XML</Button>
+                                      <Button variant="outline" size="sm" className="bg-[#4caf50] text-white hover:bg-[#388e3c] border-0"><Download className="h-3 w-3 mr-1" /> Download Standardized Spec</Button>
                                       <Button variant="outline" size="sm"><Copy className="h-3 w-3 mr-1" /> Copy</Button>
                                       <Button
                                         variant="outline"
@@ -8226,6 +8226,24 @@ const tools = [
                                         Reset
                                       </Button>
                                     </div>
+                                  </div>
+
+                                  {/* Conversion Result Summary */}
+                                  <div className={`px-4 py-3 border-b ${borderColor} space-y-1.5 bg-[#0d2137]/30`}>
+                                    {[
+                                      { label: "Fields Mapped",          value: "28 / 28",              ok: true },
+                                      { label: "Required Fields",        value: "15 validated",          ok: true },
+                                      { label: "Enum Values Normalized", value: "245 values",           ok: true },
+                                      { label: "Warnings",               value: "1 optional field unset", ok: false },
+                                    ].map((r) => (
+                                      <div key={r.label} className="flex items-center justify-between">
+                                        <span className={`text-sm ${textSecondary}`}>{r.label}</span>
+                                        <div className="flex items-center gap-2">
+                                          <span className={`text-sm font-medium ${textPrimary}`}>{r.value}</span>
+                                          {r.ok ? <CheckCircle className="h-4 w-4 text-[#4caf50]" /> : <AlertTriangle className="h-4 w-4 text-[#ff9800]" />}
+                                        </div>
+                                      </div>
+                                    ))}
                                   </div>
 
                                   {/* Message Type Tabs */}
