@@ -4652,10 +4652,10 @@ export default function BCometPlatform() {
       }
       
       return (
-        <div className={`fixpilot-layout min-h-screen ${bgPrimary} flex`}>
+        <div className={`fixpilot-layout h-screen overflow-hidden ${bgPrimary} flex`}>
           <Sidebar />
           <AIAssistant />
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 overflow-y-auto">
             <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
               <div className="flex items-center gap-4">
                 <div>
@@ -5021,12 +5021,12 @@ export default function BCometPlatform() {
       const readyForGoLive = clients.filter(c => c.assetClasses.every(a => a.certification === "completed")).length
 
       return (
-        <div className={`fixpilot-layout min-h-screen ${bgPrimary} flex`}>
+        <div className={`fixpilot-layout h-screen overflow-hidden ${bgPrimary} flex`}>
           <Sidebar />
           <AIAssistant />
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 overflow-y-auto">
             {/* Header with title */}
-            <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
+            <header className={`sticky top-0 z-10 ${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
               <div>
                 <h1 className={`text-xl font-bold ${textPrimary}`}>Dashboard</h1>
                 <p className={textSecondary}>Operational control tower for urgency, risk, and next actions</p>
@@ -5691,12 +5691,12 @@ export default function BCometPlatform() {
     
     // Admin Clients page - full client list
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
         {addClientModalJSX}
         
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
             <div>
               <h1 className={`text-xl font-bold ${textPrimary}`}>
@@ -6297,9 +6297,9 @@ const tools = [
   ]
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => setCurrentScreen("client-detail")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> Back to {selectedClient.name}
@@ -6782,9 +6782,9 @@ const tools = [
     }
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <div className="flex items-center gap-3">
               <FileText className="h-8 w-8 text-[#00e5ff]" />
@@ -12670,9 +12670,9 @@ const tools = [
     const logIsLastToolInPhase = currentToolIndex >= (logPhaseInfo?.steps.length || 1) - 1
     
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           {/* Phase Context Banner */}
           {selectedCaseId && logPhaseInfo && (
             <div className={`${isDarkMode ? "bg-[#0d2847]" : "bg-blue-50"} border-b ${borderColor} px-6 py-3`}>
@@ -12906,9 +12906,9 @@ const tools = [
     ]
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => isAdHocMode ? setCurrentScreen("dashboard") : setCurrentScreen("asset-tools")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> Back
@@ -13299,9 +13299,9 @@ const tools = [
 
     // Client mode: Show asset class-based view with pre-generated suites
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => setCurrentScreen("asset-tools")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> Back
@@ -14028,9 +14028,9 @@ const tools = [
     const pipelineCounts = pipeline.reduce((acc, s) => { acc[s] = workOrders.filter(w => w.status === s).length; return acc }, {} as Record<string,number>)
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -14216,9 +14216,9 @@ const tools = [
     ]
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -14365,9 +14365,9 @@ const tools = [
     ]
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -15544,9 +15544,9 @@ const tools = [
                                                           remediationStepContent
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => setCurrentScreen("atdl-workbench" as any)} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff] text-sm`}>
               <ArrowLeft className="h-4 w-4" /> Back to Workbench
@@ -16672,9 +16672,9 @@ const tools = [
     const blockerCount = findings.filter(f => f.severity === "Error").length
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => setCurrentScreen("atdl-workbench" as any)} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff] text-sm`}>
               <ArrowLeft className="h-4 w-4" /> Back to Workbench
@@ -16815,9 +16815,9 @@ const tools = [
     }
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> Back to Dashboard
@@ -17026,9 +17026,9 @@ const tools = [
     ]
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <h1 className={`text-2xl font-bold ${textPrimary}`}>{selectedRole === "admin" ? "Admin Specifications" : "Specifications Management"}</h1>
             <p className={textSecondary}>{selectedRole === "admin" ? "Manage FIX protocol specifications by asset class" : "View admin specs and manage your specs by asset class"}</p>
@@ -17233,9 +17233,9 @@ const tools = [
     ]
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> Back to Dashboard
@@ -17387,9 +17387,9 @@ const tools = [
     ]
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> Back to Dashboard
@@ -18290,9 +18290,9 @@ const copyToClipboard = () => {
     ]
     
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => selectedCaseId ? setCurrentScreen("case-workflow") : selectedClient ? setCurrentScreen("client-detail") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> {selectedCaseId ? "Back to Case" : "Back"}
@@ -19146,9 +19146,9 @@ const copyToClipboard = () => {
     ]
     
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => selectedCaseId ? setCurrentScreen("case-workflow") : selectedClient ? setCurrentScreen("client-detail") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> {selectedCaseId ? "Back to Case" : "Back"}
@@ -19310,9 +19310,9 @@ const copyToClipboard = () => {
   // Test Execution Results Dashboard
   if (currentScreen === "test-results") {
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => selectedCaseId ? setCurrentScreen("case-workflow") : selectedClient ? setCurrentScreen("client-detail") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> {selectedCaseId ? "Back to Case" : "Back"}
@@ -19456,9 +19456,9 @@ const copyToClipboard = () => {
     const readyForGoLive = completedCount === totalCount
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button onClick={() => selectedClient ? setCurrentScreen("client-detail") : setCurrentScreen("dashboard")} className={`flex items-center gap-2 mb-2 ${textSecondary} hover:text-[#00e5ff]`}>
               <ArrowLeft className="h-4 w-4" /> Back
@@ -20050,9 +20050,9 @@ const copyToClipboard = () => {
     const readinessScore = inputScore + scopeScore + ownerScore + blockerScore
     
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -20693,9 +20693,9 @@ const copyToClipboard = () => {
     ))
     
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4 flex items-center justify-between`}>
             <div className="flex items-center gap-3">
               <button onClick={() => setCurrentScreen("onboarding-cases")} className={`p-2 rounded-lg ${textSecondary} hover:bg-[#1e4976]/30`}>
@@ -21051,9 +21051,9 @@ const copyToClipboard = () => {
     })
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <div className="flex items-center gap-3">
               <Scale className="h-8 w-8 text-[#00e5ff]" />
@@ -21529,9 +21529,9 @@ const copyToClipboard = () => {
     const signatureRate = Math.round((totalSigned / totalCollected) * 100)
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -21775,9 +21775,9 @@ const copyToClipboard = () => {
     ]
     
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <button 
               onClick={() => selectedCase ? setCurrentScreen("case-workflow") : setCurrentScreen("dashboard")} 
@@ -22198,9 +22198,9 @@ ValidateFieldsHaveValues=Y`}
     )
     
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
@@ -22529,9 +22529,9 @@ ValidateFieldsHaveValues=Y`}
     const avgConfidence = Math.round(aiReviewItems.reduce((acc, i) => acc + i.confidence, 0) / aiReviewItems.length * 100)
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -22785,9 +22785,9 @@ ValidateFieldsHaveValues=Y`}
   // SLA Analytics Dashboard
   if (currentScreen === "sla-analytics") {
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-y-auto">
           <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
             <div className="flex items-center gap-3">
               <Gauge className="h-8 w-8 text-[#00e5ff]" />
