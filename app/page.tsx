@@ -8530,8 +8530,26 @@ const tools = [
                               { id: "version-upgrade" as const, icon: GitCompare, label: "Version Upgrade",     sub: "Compare & Validate", color: "#9c27b0" },
                               { id: "remediation"     as const, icon: Wrench,     label: "Validate & Remediate",sub: "Fix Existing ATDL",  color: "#ff9800" },
                             ]
+                            const workflowMeta = workflowOpts.find(o => o.id === atdlWorkflowType)
                             return (
                               <div className="space-y-5">
+                                {/* Selected workflow indicator — shown after step 0 */}
+                                {atdlWizardStep > 0 && workflowMeta && (
+                                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg border" style={{ borderColor: workflowMeta.color + "55", backgroundColor: workflowMeta.color + "15" }}>
+                                    {React.createElement(workflowMeta.icon, { className: "h-4 w-4 flex-shrink-0", style: { color: workflowMeta.color } })}
+                                    <div className="flex items-center gap-2 flex-1">
+                                      <span className="text-sm font-semibold" style={{ color: workflowMeta.color }}>{workflowMeta.label}</span>
+                                      <span className={`text-xs ${textSecondary}`}>{workflowMeta.sub}</span>
+                                    </div>
+                                    <button
+                                      onClick={() => setAtdlWizardStep(0)}
+                                      className={`text-xs underline ${textSecondary} hover:opacity-70`}
+                                    >
+                                      Change
+                                    </button>
+                                  </div>
+                                )}
+
                                 {/* Step progress bar */}
                                 <div className="flex items-center gap-0">
                                   {steps.map((step, i) => {
@@ -15566,6 +15584,30 @@ const tools = [
 
             {/* Step content card */}
             <Card className={`${bgCard} border ${borderColor} p-6 mb-4`}>
+              {/* Workflow route badge — always visible after step 0 */}
+              {atdlWizardStep > 0 && (() => {
+                const wfOpts = [
+                  { id: "conversion",      icon: RefreshCw,  label: "FIX to ATDL",        sub: "Convert & Create",   color: "#00e5ff" },
+                  { id: "version-upgrade", icon: GitCompare, label: "Version Upgrade",      sub: "Compare & Validate", color: "#9c27b0" },
+                  { id: "remediation",     icon: Wrench,     label: "Validate & Remediate", sub: "Fix Existing ATDL",  color: "#ff9800" },
+                ] as const
+                const wf = wfOpts.find(o => o.id === atdlWorkflowType)
+                if (!wf) return null
+                const WfIcon = wf.icon
+                return (
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg border mb-5" style={{ borderColor: wf.color + "55", backgroundColor: wf.color + "15" }}>
+                    <WfIcon className="h-4 w-4 flex-shrink-0" style={{ color: wf.color }} />
+                    <span className="text-sm font-semibold" style={{ color: wf.color }}>{wf.label}</span>
+                    <span className={`text-xs ${textSecondary}`}>{wf.sub}</span>
+                    <button
+                      onClick={() => setAtdlWizardStep(0)}
+                      className={`text-xs underline ml-auto ${textSecondary} hover:opacity-70`}
+                    >
+                      Change
+                    </button>
+                  </div>
+                )
+              })()}
               <div className="flex items-start gap-3 mb-5">
                 {React.createElement(steps[atdlWizardStep].icon, { className: `h-5 w-5 text-[#00e5ff] mt-0.5 flex-shrink-0` })}
                 <div>
