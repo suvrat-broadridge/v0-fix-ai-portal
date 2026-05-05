@@ -7779,18 +7779,25 @@ const tools = [
                                 </div>
                               </div>
 
-                              {/* Next Step Button */}
-                              {actualToolIndex < currentPhase.steps.length - 1 && (
-                                <div className="flex gap-3 pt-4 border-t border-[#1e4976]/30">
+                              {/* Step Navigation */}
+                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
                                   <Button
-                                    onClick={() => {
-                                      setCurrentToolIndex(actualToolIndex + 1)
-                                      setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id)
-                                    }}
-                                    className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto"
+                                    variant="outline"
+                                    onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }}
+                                    disabled={actualToolIndex === 0}
+                                    className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}
                                   >
-                                    Next Step <ChevronRight className="h-4 w-4 ml-1" />
+                                    <ChevronLeft className="h-4 w-4 mr-1" /> Previous Step
                                   </Button>
+                                  {actualToolIndex < currentPhase.steps.length - 1 && (
+                                    <Button
+                                      onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }}
+                                      className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
+                                    >
+                                      Next Step <ChevronRight className="h-4 w-4 ml-1" />
+                                    </Button>
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -8484,18 +8491,25 @@ const tools = [
                                 </div>
                               )}
 
-                              {/* Next Step Button */}
-                              {actualToolIndex < currentPhase.steps.length - 1 && (
-                                <div className="flex pt-4 border-t border-[#1e4976]/30">
+                              {/* Step Navigation */}
+                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
                                   <Button
-                                    onClick={() => {
-                                      setCurrentToolIndex(actualToolIndex + 1)
-                                      setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id)
-                                    }}
-                                    className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto"
+                                    variant="outline"
+                                    onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }}
+                                    disabled={actualToolIndex === 0}
+                                    className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}
                                   >
-                                    Next Step <ChevronRight className="h-4 w-4 ml-1" />
+                                    <ChevronLeft className="h-4 w-4 mr-1" /> Previous Step
                                   </Button>
+                                  {actualToolIndex < currentPhase.steps.length - 1 && (
+                                    <Button
+                                      onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }}
+                                      className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
+                                    >
+                                      Next Step <ChevronRight className="h-4 w-4 ml-1" />
+                                    </Button>
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -10383,17 +10397,24 @@ const tools = [
                                       Next <ChevronRight className="h-4 w-4 ml-1" />
                                     </Button>
                                   ) : (
-                                    actualToolIndex < currentPhase.steps.length - 1 ? (
-                                      <Button
-                                        onClick={() => {
-                                          setCurrentToolIndex(actualToolIndex + 1)
-                                          setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id)
-                                        }}
-                                        className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
-                                      >
-                                        Next Step <ChevronRight className="h-4 w-4 ml-1" />
-                                      </Button>
-                                    ) : null
+                                    <div className="flex items-center gap-2">
+                                      {actualToolIndex > 0 && (
+                                        <Button
+                                          variant="outline"
+                                          onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }}
+                                        >
+                                          <ChevronLeft className="h-4 w-4 mr-1" /> Previous Step
+                                        </Button>
+                                      )}
+                                      {actualToolIndex < currentPhase.steps.length - 1 && (
+                                        <Button
+                                          onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }}
+                                          className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
+                                        >
+                                          Next Step <ChevronRight className="h-4 w-4 ml-1" />
+                                        </Button>
+                                      )}
+                                    </div>
                                   )}
                                 </div>
                               </div>
@@ -10496,9 +10517,10 @@ const tools = [
                                   ))}
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.steps.length - 1 && (
-                                <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
+                                  <Button variant="outline" onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }} disabled={actualToolIndex === 0} className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}><ChevronLeft className="h-4 w-4 mr-1" /> Previous Step</Button>
+                                  {actualToolIndex < currentPhase.steps.length - 1 && <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>}
                                 </div>
                               )}
                             </div>
@@ -10537,9 +10559,10 @@ const tools = [
                                   </div>
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.steps.length - 1 && (
-                                <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
+                                  <Button variant="outline" onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }} disabled={actualToolIndex === 0} className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}><ChevronLeft className="h-4 w-4 mr-1" /> Previous Step</Button>
+                                  {actualToolIndex < currentPhase.steps.length - 1 && <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>}
                                 </div>
                               )}
                             </div>
@@ -10578,9 +10601,10 @@ const tools = [
                                   ))}
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.steps.length - 1 && (
-                                <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
+                                  <Button variant="outline" onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }} disabled={actualToolIndex === 0} className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}><ChevronLeft className="h-4 w-4 mr-1" /> Previous Step</Button>
+                                  {actualToolIndex < currentPhase.steps.length - 1 && <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>}
                                 </div>
                               )}
                             </div>
@@ -10619,9 +10643,10 @@ const tools = [
                                   ))}
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.steps.length - 1 && (
-                                <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
+                                  <Button variant="outline" onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }} disabled={actualToolIndex === 0} className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}><ChevronLeft className="h-4 w-4 mr-1" /> Previous Step</Button>
+                                  {actualToolIndex < currentPhase.steps.length - 1 && <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>}
                                 </div>
                               )}
                             </div>
@@ -10661,9 +10686,10 @@ const tools = [
                                   ))}
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.steps.length - 1 && (
-                                <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
+                                  <Button variant="outline" onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }} disabled={actualToolIndex === 0} className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}><ChevronLeft className="h-4 w-4 mr-1" /> Previous Step</Button>
+                                  {actualToolIndex < currentPhase.steps.length - 1 && <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>}
                                 </div>
                               )}
                             </div>
@@ -10699,9 +10725,10 @@ const tools = [
                                   </div>
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.steps.length - 1 && (
-                                <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
+                                  <Button variant="outline" onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }} disabled={actualToolIndex === 0} className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}><ChevronLeft className="h-4 w-4 mr-1" /> Previous Step</Button>
+                                  {actualToolIndex < currentPhase.steps.length - 1 && <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>}
                                 </div>
                               )}
                             </div>
@@ -10737,9 +10764,10 @@ const tools = [
                                   ))}
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.steps.length - 1 && (
-                                <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
+                                  <Button variant="outline" onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }} disabled={actualToolIndex === 0} className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}><ChevronLeft className="h-4 w-4 mr-1" /> Previous Step</Button>
+                                  {actualToolIndex < currentPhase.steps.length - 1 && <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>}
                                 </div>
                               )}
                             </div>
@@ -10769,9 +10797,10 @@ const tools = [
                                   <Button size="sm" variant="outline">View Details</Button>
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.steps.length - 1 && (
-                                <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
+                                  <Button variant="outline" onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }} disabled={actualToolIndex === 0} className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}><ChevronLeft className="h-4 w-4 mr-1" /> Previous Step</Button>
+                                  {actualToolIndex < currentPhase.steps.length - 1 && <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>}
                                 </div>
                               )}
                             </div>
@@ -10810,9 +10839,10 @@ const tools = [
                                   ))}
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.steps.length - 1 && (
-                                <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
+                                  <Button variant="outline" onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }} disabled={actualToolIndex === 0} className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}><ChevronLeft className="h-4 w-4 mr-1" /> Previous Step</Button>
+                                  {actualToolIndex < currentPhase.steps.length - 1 && <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>}
                                 </div>
                               )}
                             </div>
@@ -10850,9 +10880,10 @@ const tools = [
                                   ))}
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.steps.length - 1 && (
-                                <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
+                                  <Button variant="outline" onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }} disabled={actualToolIndex === 0} className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}><ChevronLeft className="h-4 w-4 mr-1" /> Previous Step</Button>
+                                  {actualToolIndex < currentPhase.steps.length - 1 && <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>}
                                 </div>
                               )}
                             </div>
@@ -10889,9 +10920,10 @@ const tools = [
                                   </ul>
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.steps.length - 1 && (
-                                <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
+                                  <Button variant="outline" onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }} disabled={actualToolIndex === 0} className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}><ChevronLeft className="h-4 w-4 mr-1" /> Previous Step</Button>
+                                  {actualToolIndex < currentPhase.steps.length - 1 && <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>}
                                 </div>
                               )}
                             </div>
@@ -10935,9 +10967,10 @@ const tools = [
                                   ))}
                                 </div>
                               </div>
-                              {actualToolIndex < currentPhase.steps.length - 1 && (
-                                <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
+                                  <Button variant="outline" onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }} disabled={actualToolIndex === 0} className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}><ChevronLeft className="h-4 w-4 mr-1" /> Previous Step</Button>
+                                  {actualToolIndex < currentPhase.steps.length - 1 && <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>}
                                 </div>
                               )}
                             </div>
@@ -11202,9 +11235,10 @@ const tools = [
                                 </div>
                               )}
 
-                              {actualToolIndex < currentPhase.steps.length - 1 && (
-                                <div className="flex pt-4 border-t border-[#1e4976]/30">
-                                  <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>
+                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
+                                  <Button variant="outline" onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }} disabled={actualToolIndex === 0} className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}><ChevronLeft className="h-4 w-4 mr-1" /> Previous Step</Button>
+                                  {actualToolIndex < currentPhase.steps.length - 1 && <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>}
                                 </div>
                               )}
                             </div>
@@ -11244,18 +11278,26 @@ const tools = [
                                 <Play className="h-4 w-4 mr-2" /> Open {tool.name}
                               </Button>
 
-                              {/* Next Step Button */}
-                              {actualToolIndex < currentPhase.steps.length - 1 && (
-                                <Button
-                                  variant="outline"
-                                  onClick={() => {
-                                    setCurrentToolIndex(actualToolIndex + 1)
-                                    setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id)
-                                  }}
-                                  className="w-full mt-2"
-                                >
-                                  Next Step <ChevronRight className="h-4 w-4 ml-1" />
-                                </Button>
+                              {/* Step Navigation */}
+                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                <div className="flex items-center justify-between mt-2">
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }}
+                                    disabled={actualToolIndex === 0}
+                                    className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}
+                                  >
+                                    <ChevronLeft className="h-4 w-4 mr-1" /> Previous Step
+                                  </Button>
+                                  {actualToolIndex < currentPhase.steps.length - 1 && (
+                                    <Button
+                                      onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }}
+                                      className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
+                                    >
+                                      Next Step <ChevronRight className="h-4 w-4 ml-1" />
+                                    </Button>
+                                  )}
+                                </div>
                               )}
                             </div>
                           )}
