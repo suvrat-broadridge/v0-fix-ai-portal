@@ -7677,56 +7677,10 @@ const tools = [
                                     ))}
                                   </div>
                                 </div>
-                              </div>
 
-                              {/* Log File Upload */}
-                              <div className={`rounded-lg border ${borderColor} overflow-hidden`}>
-                                <div className={`px-4 py-2.5 border-b ${borderColor} flex items-center gap-2 ${isDarkMode ? "bg-[#0a1628]/60" : "bg-gray-50"}`}>
-                                  <ScrollText className="h-4 w-4 text-[#ff9800]" />
-                                  <span className={`text-sm font-semibold ${textPrimary}`}>Log File Upload</span>
-                                  <span className={`ml-auto text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-[#ff9800]/15 text-[#ff9800]`}>Optional</span>
-                                </div>
-                                <div className="p-4">
-                                  <p className={`text-xs ${textSecondary} mb-3`}>Upload FIX session log files to allow FixPilot to auto-derive field usage and generate spec from log.</p>
-                                  <div
-                                    className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center cursor-pointer hover:border-[#ff9800] hover:bg-[#ff9800]/5 transition-all`}
-                                    onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-[#ff9800]", "bg-[#ff9800]/10") }}
-                                    onDragLeave={(e) => { e.currentTarget.classList.remove("border-[#ff9800]", "bg-[#ff9800]/10") }}
-                                    onDrop={(e) => {
-                                      e.preventDefault()
-                                      e.currentTarget.classList.remove("border-[#ff9800]", "bg-[#ff9800]/10")
-                                      const files = Array.from(e.dataTransfer.files)
-                                      const newFiles = files.map(f => ({ name: f.name, size: `${(f.size / (1024*1024)).toFixed(2)} MB`, type: "LOG" }))
-                                      setCaseWorkflowFiles(prev => [...prev, ...newFiles])
-                                    }}
-                                    onClick={() => {
-                                      const input = document.createElement("input")
-                                      input.type = "file"; input.multiple = true; input.accept = ".log,.txt,.csv"
-                                      input.onchange = (e) => {
-                                        const files = Array.from((e.target as HTMLInputElement).files || [])
-                                        const newFiles = files.map(f => ({ name: f.name, size: `${(f.size / (1024*1024)).toFixed(2)} MB`, type: "LOG" }))
-                                        setCaseWorkflowFiles(prev => [...prev, ...newFiles])
-                                      }
-                                      input.click()
-                                    }}
-                                  >
-                                    <ScrollText className={`h-8 w-8 mx-auto mb-2 ${textSecondary}`} />
-                                    <p className={`${textPrimary} font-medium text-sm`}>Drop log files here or click to upload</p>
-                                    <p className={`text-xs ${textSecondary} mt-1`}>Supports .log, .txt, .csv up to 100MB</p>
-                                  </div>
-                                  {caseWorkflowFiles.filter((f: any) => f.type === "LOG").length > 0 && (
-                                    <div className={`mt-3 ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} rounded-lg p-3 space-y-2`}>
-                                      {caseWorkflowFiles.filter((f: any) => f.type === "LOG").map((file: any, idx: number) => (
-                                        <div key={idx} className="flex items-center gap-3">
-                                          <ScrollText className="h-4 w-4 text-[#ff9800] shrink-0" />
-                                          <span className={`text-sm ${textPrimary} flex-1`}>{file.name}</span>
-                                          <span className={`text-xs ${textSecondary}`}>{file.size}</span>
-                                          <CheckCircle className="h-4 w-4 text-[#4caf50]" />
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                </div>
+                              {/* Conversion Action Button */}
+
+
                               </div>
 
                               {/* ATDL Upload */}
@@ -8116,90 +8070,27 @@ const tools = [
                             <div className="space-y-4">
                               {/* Header row — description + actions */}
                               <div className="flex items-center justify-between gap-4">
-                                <p className={textSecondary}>Upload a client FIX log file or generate a standardized FIX specification directly.</p>
-                                <div className="flex items-center gap-2 flex-shrink-0">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => {
-                                      setClientNotifications(prev => [...prev, {
-                                        id: Date.now().toString(),
-                                        type: "document-request",
-                                        title: "Log File Upload Required",
-                                        message: "Please upload your FIX log file so we can generate your specification.",
-                                        timestamp: new Date().toISOString(),
-                                        read: false,
-                                      }])
-                                    }}
-                                    className="text-[#ff9800] border-[#ff9800] hover:bg-[#ff9800]/10"
-                                  >
-                                    <Send className="h-3 w-3 mr-1" /> Request Log from Client
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    disabled={isGeneratingSpec}
-                                    onClick={() => {
-                                      setIsGeneratingSpec(true)
-                                      setGeneratedSpecFromLog(null)
-                                      setTimeout(() => {
-                                        setGeneratedSpecFromLog({ fields: [], messageTypes: [] })
-                                        setIsGeneratingSpec(false)
-                                      }, 1800)
-                                    }}
-                                    className="bg-[#4caf50] hover:bg-[#388e3c] text-white"
-                                  >
-                                    {isGeneratingSpec ? (
-                                      <><Loader className="h-4 w-4 mr-1 animate-spin" /> Generating...</>
-                                    ) : (
-                                      <><Zap className="h-4 w-4 mr-1" /> Create Spec</>
-                                    )}
-                                  </Button>
-                                </div>
-                              </div>
-
-                              {/* Log File Upload Area — only shown when no spec yet */}
-                              {!generatedSpecFromLog && !isGeneratingSpec && (
-                                <>
-                                  <div
-                                    className={`border-2 border-dashed ${borderColor} rounded-lg p-6 text-center cursor-pointer hover:border-[#4caf50] hover:bg-[#4caf50]/5 transition-all`}
-                                    onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-[#4caf50]") }}
-                                    onDragLeave={(e) => { e.currentTarget.classList.remove("border-[#4caf50]") }}
-                                    onDrop={(e) => {
-                                      e.preventDefault()
-                                      e.currentTarget.classList.remove("border-[#4caf50]")
-                                      const files = Array.from(e.dataTransfer.files)
-                                      if (files.length > 0) setLogFileForSpec({ name: files[0].name, size: `${(files[0].size / (1024*1024)).toFixed(2)} MB` })
-                                    }}
-                                    onClick={() => {
-                                      const input = document.createElement("input")
-                                      input.type = "file"
-                                      input.accept = ".log,.txt,.fix"
-                                      input.onchange = (e) => {
-                                        const files = Array.from((e.target as HTMLInputElement).files || [])
-                                        if (files.length > 0) setLogFileForSpec({ name: files[0].name, size: `${(files[0].size / (1024*1024)).toFixed(2)} MB` })
-                                      }
-                                      input.click()
-                                    }}
-                                  >
-                                    <FileSearch className={`h-10 w-10 mx-auto mb-3 ${textSecondary}`} />
-                                    <p className={`${textPrimary} font-medium`}>Drop log file here or click to upload</p>
-                                    <p className={`text-sm ${textSecondary} mt-1`}>Supports .log, .txt, .fix files</p>
-                                  </div>
-                                  {logFileForSpec && (
-                                    <div className={`${bgSecondary} rounded-lg px-4 py-3 flex items-center justify-between`}>
-                                      <div className="flex items-center gap-3">
-                                        <FileText className="h-5 w-5 text-[#4caf50]" />
-                                        <div>
-                                          <p className={`text-sm font-medium ${textPrimary}`}>{logFileForSpec.name}</p>
-                                          <p className={`text-xs ${textSecondary}`}>{logFileForSpec.size}</p>
-                                        </div>
-                                      </div>
-                                      <Button variant="outline" size="sm" onClick={() => setLogFileForSpec(null)} className="text-[#f44336] border-[#f44336] hover:bg-[#f44336]/10">Remove</Button>
-                                    </div>
+                                <p className={textSecondary}>Load the FIX log file from intake to generate a standardized FIX specification.</p>
+                                <Button
+                                  size="sm"
+                                  disabled={isGeneratingSpec}
+                                  onClick={() => {
+                                    setIsGeneratingSpec(true)
+                                    setGeneratedSpecFromLog(null)
+                                    setTimeout(() => {
+                                      setGeneratedSpecFromLog({ fields: [], messageTypes: [] })
+                                      setIsGeneratingSpec(false)
+                                    }, 1800)
+                                  }}
+                                  className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
+                                >
+                                  {isGeneratingSpec ? (
+                                    <><Loader className="h-4 w-4 mr-1 animate-spin" /> Loading...</>
+                                  ) : (
+                                    <><Upload className="h-4 w-4 mr-1" /> Load Log File</>
                                   )}
-                                </>
-                              )}
-
+                                </Button>
+                              </div>
                               {/* Generating spinner */}
                               {isGeneratingSpec && (
                                 <div className={`${bgSecondary} rounded-lg p-8 flex flex-col items-center gap-3`}>
@@ -18524,7 +18415,7 @@ const copyToClipboard = () => {
 
             {/* ═══════════════════════════════════════════════════════
                 STEP 1: UPLOAD
-            ════════════════��══════════════════════════════════════ */}
+            ═══════════════�����══════════════════════════════════════ */}
             {certReportStep === "upload" && (
               <div className="space-y-6">
                 {/* Upload Cards */}
