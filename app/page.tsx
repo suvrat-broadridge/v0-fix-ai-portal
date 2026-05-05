@@ -9664,10 +9664,10 @@ const tools = [
                                             </select>
                                           </div>
                                         </div>
-                                        {upgradeUsageStep === 1 && (
+                                        {upgradeUsageStep >= 1 && (
                                           <div className="flex justify-end">
                                             <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setUpgradeUsageStep(2)}>
-                                              <FileText className="h-4 w-4 mr-1.5" /> Load ATDL
+                                              {upgradeUsageStep > 1 ? <RefreshCw className="h-4 w-4 mr-1.5" /> : <FileText className="h-4 w-4 mr-1.5" />} Load ATDL
                                             </Button>
                                           </div>
                                         )}
@@ -9701,10 +9701,10 @@ const tools = [
   </Strategy>
 </Strategies>`}</pre>
                                         </div>
-                                        {upgradeUsageStep === 2 && (
+                                        {upgradeUsageStep >= 2 && (
                                           <div className="p-4 flex justify-end">
                                             <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setUpgradeUsageStep(3)}>
-                                              <Play className="h-4 w-4 mr-1.5" /> Load Strategy UI
+                                              {upgradeUsageStep > 2 ? <RefreshCw className="h-4 w-4 mr-1.5" /> : <Play className="h-4 w-4 mr-1.5" />} Load Strategy UI
                                             </Button>
                                           </div>
                                         )}
@@ -9757,10 +9757,10 @@ const tools = [
                                               <span className="text-xs px-1.5 py-0.5 rounded bg-[#4caf50]/20 text-[#4caf50]">New</span>
                                             </div>
                                           </div>
-                                          {upgradeUsageStep === 3 && (
+                                          {upgradeUsageStep >= 3 && (
                                             <div className="flex justify-end mt-4">
                                               <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]" onClick={() => setUpgradeUsageStep(4)}>
-                                                <Sparkles className="h-4 w-4 mr-1.5" /> Generate FIX Message
+                                                {upgradeUsageStep > 3 ? <RefreshCw className="h-4 w-4 mr-1.5" /> : <Sparkles className="h-4 w-4 mr-1.5" />} Generate FIX Message
                                               </Button>
                                             </div>
                                           )}
@@ -9800,10 +9800,10 @@ const tools = [
                                               <Download className="h-3 w-3 mr-1" /> Download
                                             </Button>
                                           </div>
-                                          {upgradeUsageStep === 4 && (
+                                          {upgradeUsageStep >= 4 && (
                                             <div className="flex justify-end mt-3">
                                               <Button className="bg-[#9c27b0] hover:bg-[#7b1fa2] text-white" onClick={() => setUpgradeUsageStep(5)}>
-                                                <Sparkles className="h-4 w-4 mr-1.5" /> Validate Against New FIX Spec
+                                                {upgradeUsageStep > 4 ? <RefreshCw className="h-4 w-4 mr-1.5" /> : <Sparkles className="h-4 w-4 mr-1.5" />} Validate Against New FIX Spec
                                               </Button>
                                             </div>
                                           )}
@@ -10211,10 +10211,10 @@ const tools = [
                                             </select>
                                           </div>
                                         </div>
-                                        {remedUsageStep === 1 && (
+                                        {remedUsageStep >= 1 && (
                                           <div className="flex justify-end">
                                             <Button className="bg-[#4caf50] hover:bg-[#388e3c] text-white" onClick={() => setRemedUsageStep(2)}>
-                                              <FileText className="h-4 w-4 mr-1.5" /> Load ATDL
+                                              {remedUsageStep > 1 ? <RefreshCw className="h-4 w-4 mr-1.5" /> : <FileText className="h-4 w-4 mr-1.5" />} Load ATDL
                                             </Button>
                                           </div>
                                         )}
@@ -15363,10 +15363,10 @@ const tools = [
                   </select>
                 </div>
               </div>
-              {remedUsageStep === 1 && (
+              {remedUsageStep >= 1 && (
                 <div className="flex justify-end">
                   <Button className="bg-[#4caf50] hover:bg-[#388e3c] text-white" onClick={() => setRemedUsageStep(2)}>
-                    <FileText className="h-4 w-4 mr-2" /> Load ATDL
+                    {remedUsageStep > 1 ? <RefreshCw className="h-4 w-4 mr-2" /> : <FileText className="h-4 w-4 mr-2" />} Load ATDL
                   </Button>
                 </div>
               )}
