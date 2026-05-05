@@ -10960,7 +10960,7 @@ const tools = [
                                   <div>
                                     <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Client Spec</label>
                                     <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`}>
-                                      <option>Summit Financial - Fixed Income (FIX 4.4)</option>
+                                      <option>{selectedOnboardingCase?.client} - {selectedOnboardingCase?.assetClass} ({selectedOnboardingCase?.fixVersion || "FIX 4.4"})</option>
                                       <option>Nexus Trading - Equities (FIX 4.4)</option>
                                     </select>
                                     <p className={`text-xs ${textSecondary} mt-1`}>Version: client_eq_v1.2 (Current)</p>
@@ -10968,62 +10968,239 @@ const tools = [
                                   <div>
                                     <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Admin Spec</label>
                                     <select className={`w-full p-2.5 rounded border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white"} text-sm`}>
-                                      <option>Fixed Income - FIX 4.4</option>
+                                      <option>{selectedOnboardingCase?.assetClass} - {selectedOnboardingCase?.fixVersion || "FIX 4.4"}</option>
                                       <option>Equities - FIX 4.4 v2.1</option>
                                     </select>
-                                    <p className={`text-xs ${textSecondary} mt-1`}>Version: Fixed Income FIX 4.4 v2.1 (Current)</p>
+                                    <p className={`text-xs ${textSecondary} mt-1`}>Version: {selectedOnboardingCase?.assetClass} FIX 4.4 v2.1 (Current)</p>
                                   </div>
                                 </div>
-                                <Button className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] w-full">
-                                  <Sparkles className="h-4 w-4 mr-1.5" /> Load Standardized Specs
+                                <Button
+                                  onClick={() => simulateTask(() => { setShowStandardizedSpecs(true); setShowSpecResults(false); })}
+                                  disabled={isLoading}
+                                  className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] w-full"
+                                >
+                                  <GitCompare className="h-4 w-4 mr-1.5" />
+                                  {isLoading ? "Loading..." : "Load Standardized Specs"}
                                 </Button>
                               </div>
 
-                              {/* Spec Comparison Results */}
-                              <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
-                                <div className={`px-4 py-3 border-b ${borderColor}`}>
-                                  <p className={`font-semibold ${textPrimary}`}>Comparing: Fixed Income - FIX 4.4</p>
+                              {/* Side-by-side standardized specs view */}
+                              {showStandardizedSpecs && (
+                                <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                  <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                    <div>
+                                      <h4 className={`font-semibold ${textPrimary}`}>Standardized Specifications</h4>
+                                      <p className={`text-xs ${textSecondary}`}>Both specs converted to standard format — differences highlighted</p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <div className="flex items-center gap-1.5 text-xs">
+                                        <span className="inline-block w-3 h-3 rounded-sm bg-[#f44336]/30" /> Mismatch
+                                        <span className="inline-block w-3 h-3 rounded-sm bg-[#ff9800]/30 ml-2" /> Client only
+                                        <span className="inline-block w-3 h-3 rounded-sm bg-[#2196f3]/30 ml-2" /> Admin only
+                                      </div>
+                                      <Button variant="outline" size="sm"><Download className="h-3 w-3 mr-1" /> Export</Button>
+                                    </div>
+                                  </div>
+
+                                  {/* Message Type Tabs */}
+                                  <div className={`px-4 py-2 border-b ${borderColor} flex gap-1 overflow-x-auto`}>
+                                    {[
+                                      { id: "D", label: "New Order Single (D)" },
+                                      { id: "8", label: "Execution Report (8)" },
+                                      { id: "F", label: "Cancel Request (F)" },
+                                      { id: "G", label: "Cancel/Replace (G)" },
+                                    ].map((tab) => (
+                                      <button
+                                        key={tab.id}
+                                        onClick={() => setStandardizedMsgTypeTab(tab.id)}
+                                        className={`px-3 py-1.5 rounded text-xs font-medium whitespace-nowrap transition-colors ${
+                                          standardizedMsgTypeTab === tab.id
+                                            ? "bg-[#00e5ff] text-[#0a1628]"
+                                            : `${textSecondary} hover:bg-[#1e4976]/30`
+                                        }`}
+                                      >
+                                        {tab.label}
+                                      </button>
+                                    ))}
+                                  </div>
+
+                                  {/* Side-by-side table */}
+                                  <div className="grid grid-cols-2 divide-x divide-[#1e4976]/50">
+                                    {/* Client Spec */}
+                                    <div>
+                                      <div className={`px-3 py-2 ${isDarkMode ? "bg-[#2196f3]/10" : "bg-[#2196f3]/5"} border-b ${borderColor}`}>
+                                        <span className="text-sm font-semibold text-[#2196f3]">Client: {selectedOnboardingCase?.client}</span>
+                                      </div>
+                                      <div className="overflow-auto max-h-64">
+                                        <table className="w-full text-xs">
+                                          <thead className={`sticky top-0 ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} border-b ${borderColor}`}>
+                                            <tr>
+                                              <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Tag</th>
+                                              <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Name</th>
+                                              <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Req</th>
+                                              <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Type</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody>
+                                            {(standardizedMsgTypeTab === "D" ? [
+                                              { tag: "11", name: "ClOrdID",      req: "Y",  type: "String",       diff: false },
+                                              { tag: "21", name: "HandlInst",    req: "Y",  type: "Char",         diff: false },
+                                              { tag: "38", name: "OrderQty",     req: "CR", type: "Qty",          diff: "mismatch" },
+                                              { tag: "40", name: "OrdType",      req: "Y",  type: "Char",         diff: false },
+                                              { tag: "44", name: "Price",        req: "CR", type: "Price",        diff: false },
+                                              { tag: "46", name: "OpenClose",    req: "N",  type: "String",       diff: "mismatch" },
+                                              { tag: "54", name: "Side",         req: "Y",  type: "Char",         diff: false },
+                                              { tag: "55", name: "Symbol",       req: "Y",  type: "String",       diff: false },
+                                              { tag: "375", name: "ContraBroker",req: "N",  type: "String",       diff: "client-only" },
+                                              { tag: "943", name: "TimeUnit",    req: "N",  type: "String",       diff: "client-only" },
+                                            ] : standardizedMsgTypeTab === "8" ? [
+                                              { tag: "6",   name: "AvgPx",       req: "Y",  type: "Price",        diff: false },
+                                              { tag: "14",  name: "CumQty",      req: "Y",  type: "Qty",          diff: false },
+                                              { tag: "17",  name: "ExecID",      req: "Y",  type: "String",       diff: false },
+                                              { tag: "39",  name: "OrdStatus",   req: "Y",  type: "Char",         diff: false },
+                                              { tag: "150", name: "ExecType",    req: "Y",  type: "Char",         diff: false },
+                                              { tag: "151", name: "LeavesQty",   req: "Y",  type: "Qty",          diff: false },
+                                            ] : [
+                                              { tag: "11",  name: "ClOrdID",     req: "Y",  type: "String",       diff: false },
+                                              { tag: "37",  name: "OrderID",     req: "Y",  type: "String",       diff: false },
+                                            ]).map((row, i) => (
+                                              <tr key={i} className={`border-b ${borderColor} ${
+                                                row.diff === "mismatch"    ? "bg-[#f44336]/10" :
+                                                row.diff === "client-only" ? "bg-[#ff9800]/10" : ""
+                                              }`}>
+                                                <td className={`px-2 py-1.5 font-mono ${textPrimary}`}>{row.tag}</td>
+                                                <td className={`px-2 py-1.5 ${textPrimary}`}>{row.name}</td>
+                                                <td className="px-2 py-1.5">
+                                                  <span className={`px-1 py-0.5 rounded text-xs ${row.req === "Y" ? "bg-[#4caf50]/20 text-[#4caf50]" : row.req === "CR" ? "bg-[#ff9800]/20 text-[#ff9800]" : "text-gray-400"}`}>{row.req}</span>
+                                                </td>
+                                                <td className={`px-2 py-1.5 ${textSecondary}`}>{row.type}</td>
+                                              </tr>
+                                            ))}
+                                          </tbody>
+                                        </table>
+                                      </div>
+                                    </div>
+
+                                    {/* Admin Spec */}
+                                    <div>
+                                      <div className={`px-3 py-2 ${isDarkMode ? "bg-[#00e5ff]/10" : "bg-[#00e5ff]/5"} border-b ${borderColor}`}>
+                                        <span className="text-sm font-semibold text-[#00e5ff]">Admin: {selectedOnboardingCase?.assetClass} - {selectedOnboardingCase?.fixVersion || "FIX 4.4"}</span>
+                                      </div>
+                                      <div className="overflow-auto max-h-64">
+                                        <table className="w-full text-xs">
+                                          <thead className={`sticky top-0 ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} border-b ${borderColor}`}>
+                                            <tr>
+                                              <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Tag</th>
+                                              <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Name</th>
+                                              <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Req</th>
+                                              <th className={`px-2 py-2 text-left font-semibold ${textPrimary}`}>Type</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody>
+                                            {(standardizedMsgTypeTab === "D" ? [
+                                              { tag: "11",  name: "ClOrdID",     req: "Y",  type: "String",       diff: false },
+                                              { tag: "21",  name: "HandlInst",   req: "Y",  type: "Char",         diff: false },
+                                              { tag: "38",  name: "OrderQty",    req: "Y",  type: "Qty",          diff: "mismatch" },
+                                              { tag: "40",  name: "OrdType",     req: "Y",  type: "Char",         diff: false },
+                                              { tag: "44",  name: "Price",       req: "CR", type: "Price",        diff: false },
+                                              { tag: "46",  name: "OpenClose",   req: "N",  type: "Char",         diff: "mismatch" },
+                                              { tag: "54",  name: "Side",        req: "Y",  type: "Char",         diff: false },
+                                              { tag: "55",  name: "Symbol",      req: "Y",  type: "String",       diff: false },
+                                              { tag: "111", name: "MaxFloor",    req: "N",  type: "Qty",          diff: "admin-only" },
+                                              { tag: "453", name: "NoPartyIDs",  req: "Y",  type: "NumInGroup",   diff: "admin-only" },
+                                            ] : standardizedMsgTypeTab === "8" ? [
+                                              { tag: "6",   name: "AvgPx",       req: "Y",  type: "Price",        diff: false },
+                                              { tag: "14",  name: "CumQty",      req: "Y",  type: "Qty",          diff: false },
+                                              { tag: "17",  name: "ExecID",      req: "Y",  type: "String",       diff: false },
+                                              { tag: "37",  name: "OrderID",     req: "Y",  type: "String",       diff: "admin-only" },
+                                              { tag: "39",  name: "OrdStatus",   req: "Y",  type: "Char",         diff: false },
+                                              { tag: "150", name: "ExecType",    req: "Y",  type: "Char",         diff: false },
+                                              { tag: "151", name: "LeavesQty",   req: "Y",  type: "Qty",          diff: false },
+                                            ] : [
+                                              { tag: "11",  name: "ClOrdID",     req: "Y",  type: "String",       diff: false },
+                                              { tag: "37",  name: "OrderID",     req: "Y",  type: "String",       diff: false },
+                                            ]).map((row, i) => (
+                                              <tr key={i} className={`border-b ${borderColor} ${
+                                                row.diff === "mismatch"   ? "bg-[#f44336]/10" :
+                                                row.diff === "admin-only" ? "bg-[#2196f3]/10" : ""
+                                              }`}>
+                                                <td className={`px-2 py-1.5 font-mono ${textPrimary}`}>{row.tag}</td>
+                                                <td className={`px-2 py-1.5 ${textPrimary}`}>{row.name}</td>
+                                                <td className="px-2 py-1.5">
+                                                  <span className={`px-1 py-0.5 rounded text-xs ${row.req === "Y" ? "bg-[#4caf50]/20 text-[#4caf50]" : row.req === "CR" ? "bg-[#ff9800]/20 text-[#ff9800]" : "text-gray-400"}`}>{row.req}</span>
+                                                </td>
+                                                <td className={`px-2 py-1.5 ${textSecondary}`}>{row.type}</td>
+                                              </tr>
+                                            ))}
+                                          </tbody>
+                                        </table>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Run Comparison footer */}
+                                  <div className={`px-4 py-3 border-t ${borderColor} flex justify-between items-center`}>
+                                    <span className={`text-xs ${textSecondary}`}>Differences highlighted in red (mismatch), orange (client only), blue (admin only)</span>
+                                    <Button
+                                      onClick={() => simulateTask(() => setShowSpecResults(true))}
+                                      disabled={isLoading}
+                                      className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]"
+                                    >
+                                      <GitCompare className="h-4 w-4 mr-2" />
+                                      {isLoading ? "Comparing..." : "Run Comparison"}
+                                    </Button>
+                                  </div>
                                 </div>
-                                <div className="overflow-auto max-h-96">
-                                  <table className="w-full text-xs">
-                                    <thead className={`${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
-                                      <tr className={`border-b ${borderColor}`}>
-                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary} w-1/3`}>Difference Type</th>
-                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary} w-1/3`}>Client Spec</th>
-                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary} w-1/3`}>Admin Spec</th>
-                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Status</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {[
-                                        { type: "Undefined Message Types", client: "35=K, 35=H Undefined", admin: "—", status: "customization" },
-                                        { type: "Unsupported Tags", client: "Tags 375, 943 in 35=D", admin: "Tags 111, 6454", status: "customization" },
-                                        { type: "Unsupported Values", client: "123=4, 7, 9", admin: "123=12, 55, 78", status: "flag" },
-                                        { type: "Datatype Mismatch", client: "Tag 46 is String", admin: "Tag 46 is Char", status: "flag" },
-                                      ].map((row, i) => (
-                                        <tr key={i} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
-                                          <td className={`px-4 py-2 ${textPrimary} font-medium`}>{row.type}</td>
-                                          <td className={`px-4 py-2 ${textSecondary}`}>{row.client}</td>
-                                          <td className={`px-4 py-2 ${textSecondary}`}>{row.admin}</td>
-                                          <td className="px-4 py-2">
-                                            <span className={`text-xs px-2 py-1 rounded font-medium ${
-                                              row.status === "flag" ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ff9800]/20 text-[#ff9800]"
-                                            }`}>
-                                              {row.status}
-                                            </span>
-                                          </td>
+                              )}
+
+                              {/* Spec Comparison Results diff table */}
+                              {showSpecResults && (
+                                <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+                                  <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                    <p className={`font-semibold ${textPrimary}`}>Comparing: {selectedOnboardingCase?.assetClass} - {selectedOnboardingCase?.fixVersion || "FIX 4.4"}</p>
+                                    <span className="text-xs px-2 py-1 rounded bg-[#f44336]/20 text-[#f44336]">4 differences found</span>
+                                  </div>
+                                  <div className="overflow-auto max-h-72">
+                                    <table className="w-full text-xs">
+                                      <thead className={`sticky top-0 ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} border-b ${borderColor}`}>
+                                        <tr>
+                                          <th className={`px-4 py-2 text-left font-semibold ${textPrimary} w-1/4`}>Difference Type</th>
+                                          <th className={`px-4 py-2 text-left font-semibold ${textPrimary} w-1/3`}>Client Spec</th>
+                                          <th className={`px-4 py-2 text-left font-semibold ${textPrimary} w-1/3`}>Admin Spec</th>
+                                          <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Status</th>
                                         </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
+                                      </thead>
+                                      <tbody>
+                                        {[
+                                          { type: "Undefined Message Types", client: "35=K, 35=H Undefined", admin: "—",                  status: "customization" },
+                                          { type: "Unsupported Tags",         client: "Tags 375, 943 in 35=D", admin: "Tags 111, 6454",    status: "customization" },
+                                          { type: "Unsupported Values",       client: "123=4, 7, 9",           admin: "123=12, 55, 78",    status: "flag" },
+                                          { type: "Datatype Mismatch",        client: "Tag 46 is String",      admin: "Tag 46 is Char",    status: "flag" },
+                                        ].map((row, i) => (
+                                          <tr key={i} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
+                                            <td className={`px-4 py-2 ${textPrimary} font-medium`}>{row.type}</td>
+                                            <td className={`px-4 py-2 ${textSecondary}`}>{row.client}</td>
+                                            <td className={`px-4 py-2 ${textSecondary}`}>{row.admin}</td>
+                                            <td className="px-4 py-2">
+                                              <span className={`text-xs px-2 py-1 rounded font-medium ${
+                                                row.status === "flag" ? "bg-[#f44336]/20 text-[#f44336]" : "bg-[#ff9800]/20 text-[#ff9800]"
+                                              }`}>
+                                                {row.status}
+                                              </span>
+                                            </td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                  <div className={`px-4 py-3 border-t ${borderColor} flex items-center justify-between`}>
+                                    <span className={`text-xs ${textSecondary}`}>4 differences found • 2 Customizations • 2 Flags for Review</span>
+                                    <Button variant="outline" size="sm" onClick={() => { setShowStandardizedSpecs(false); setShowSpecResults(false); }}>
+                                      Reset
+                                    </Button>
+                                  </div>
                                 </div>
-                                <div className={`px-4 py-3 border-t ${borderColor} flex items-center justify-between`}>
-                                  <span className={`text-xs ${textSecondary}`}>4 differences found • 3 Customizations • 1 Flag for Review</span>
-                                  <Button variant="outline" size="sm">
-                                    <Eye className="h-3 w-3 mr-1" /> Show All Specs
-                                  </Button>
-                                </div>
-                              </div>
+                              )}
 
                               {actualToolIndex < currentPhase.steps.length - 1 && (
                                 <div className="flex pt-4 border-t border-[#1e4976]/30">
