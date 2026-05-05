@@ -7295,12 +7295,12 @@ const tools = [
     }
 
     return (
-      <div className={`min-h-screen ${bgPrimary} flex`}>
+      <div className={`h-screen overflow-hidden ${bgPrimary} flex`}>
         <Sidebar />
         <AIAssistant />
         <div className="flex-1 flex overflow-hidden">
           {/* Phase Navigation Sidebar */}
-          <div className={`w-72 ${bgSecondary} border-r ${borderColor} overflow-y-auto`}>
+          <div className={`w-72 h-full ${bgSecondary} border-r ${borderColor} overflow-y-auto flex-shrink-0`}>
             <div className="p-4 border-b border-[#1e4976]/30">
               <button
                 onClick={() => { setSelectedToolId(null); setCurrentScreen("onboarding-cases"); }}
@@ -7398,7 +7398,7 @@ const tools = [
           {/* Main Content Area */}
           <div className="flex-1 overflow-y-auto">
             {/* Phase Header */}
-            <header className={`${bgSecondary} border-b ${borderColor} px-6 py-4`}>
+            <header className={`sticky top-0 z-10 ${bgSecondary} border-b ${borderColor} px-6 py-4`}>
               <div className="flex items-center gap-4">
                 {(() => {
                   const PhaseIcon = currentPhase.icon
