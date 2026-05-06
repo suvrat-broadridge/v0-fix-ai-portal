@@ -504,11 +504,111 @@ function TestPlanGeneratorTool({
   const bg0 = isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"
   const bg1 = isDarkMode ? "bg-[#0d1f35]" : "bg-white"
 
+  // Generation state — track if test plan has been generated
+  const [testPlanGenerated, setTestPlanGenerated] = useState(false)
+  const [generatingTestPlan, setGeneratingTestPlan] = useState(false)
+
   return (
     <div className="space-y-4">
 
-      {/* Section A — Load Certification Test Suite */}
-      <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+      {/* Pre-generation UI — Show spec selector */}
+      {!testPlanGenerated && (
+        <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+          <div className={`px-4 py-3 border-b ${borderColor} flex items-center gap-2`}>
+            <ClipboardCheck className="h-4 w-4 text-[#ff9800]" />
+            <span className={`text-sm font-semibold ${textPrimary}`}>Generate Test Plan</span>
+          </div>
+          <div className="px-4 py-6 space-y-4">
+            <p className={textSecondary}>Select a standardized specification to generate a test plan for {caseAsset} using {caseProtocol}.</p>
+            
+            {/* Spec selector */}
+            <div>
+              <label className={`block text-xs font-medium mb-2 ${textSecondary}`}>Standardized Specification</label>
+              <div className={`relative border ${borderColor} rounded-lg overflow-hidden`}>
+                <select
+                  value={selectedSuiteId}
+                  onChange={e => setSelectedSuiteId(e.target.value)}
+                  className={`w-full appearance-none px-3 py-3 pr-8 text-sm font-medium ${textPrimary} ${bg0} focus:outline-none`}
+                >
+                  {availableSuites.map(suite => (
+                    <option key={suite.id} value={suite.id}>{suite.label}</option>
+                  ))}
+                </select>
+                <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none ${textSecondary}`} />
+              </div>
+              {selectedSuiteId === defaultSuiteId && (
+                <div className="flex items-center gap-1.5 mt-2">
+                  <CheckCircle className="h-3.5 w-3.5 text-[#4caf50]" />
+                  <span className="text-xs text-[#4caf50]">Auto-matched from case: {caseClient} — {caseAsset} / {caseProtocol}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Suite preview card */}
+            {(() => {
+              const suite = availableSuites.find(s => s.id === selectedSuiteId)
+              return suite ? (
+                <div className={`${bg0} rounded-lg px-4 py-3 border ${borderColor}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className={`font-semibold ${textPrimary}`}>{suite.label}</span>
+                    <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? "bg-[#4caf50]/15 text-[#4caf50]" : "bg-green-100 text-green-700"}`}>
+                      {suite.categories.reduce((sum, cat) => sum + cat.count, 0)} tests
+                    </span>
+                  </div>
+                  <div className="space-y-1.5">
+                    {suite.categories.map((cat, i) => (
+                      <div key={i} className="flex items-center justify-between text-xs">
+                        <span className={textSecondary}>{cat.name}</span>
+                        <span className={`font-medium ${textSecondary}`}>{cat.count} cases</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null
+            })()}
+
+            {/* Generate button */}
+            <div className="flex justify-end pt-4">
+              <Button
+                className="bg-[#4caf50] hover:bg-[#388e3c] text-white px-6"
+                size="lg"
+                disabled={generatingTestPlan}
+                onClick={() => {
+                  setGeneratingTestPlan(true)
+                  setTimeout(() => {
+                    setGeneratingTestPlan(false)
+                    setTestPlanGenerated(true)
+                  }, 2000)
+                }}
+              >
+                {generatingTestPlan ? (
+                  <><Loader className="h-4 w-4 mr-2 animate-spin" /> Generating...</>
+                ) : (
+                  <><Sparkles className="h-4 w-4 mr-2" /> Generate Test Plan</>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Post-generation UI — Show full test plan content */}
+      {testPlanGenerated && (
+        <>
+          {/* Button to regenerate */}
+          <div className="flex justify-end mb-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setTestPlanGenerated(false)}
+              className={textSecondary}
+            >
+              <RotateCw className="h-3.5 w-3.5 mr-1" /> Select Different Spec
+            </Button>
+          </div>
+
+          {/* Section A — Load Certification Test Suite */}
+          <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
         <div className={`px-4 py-3 border-b ${borderColor} flex items-center gap-2`}>
           <ClipboardCheck className="h-4 w-4 text-[#ff9800]" />
           <span className={`text-sm font-semibold ${textPrimary}`}>Load Certification Test Suite</span>
@@ -775,6 +875,8 @@ function TestPlanGeneratorTool({
             Next Step <ChevronRight className="h-4 w-4 ml-1" />
           </Button>
         </div>
+      )}
+        </>
       )}
     </div>
   )
@@ -19039,7 +19141,7 @@ const copyToClipboard = () => {
 
           <div className="p-6 space-y-6">
 
-            {/* ═══════════════════════════════════════════════════════
+            {/* ═══════════════════════════════════════════��═══════════
                 STEP 1: UPLOAD
             ═══════════════�����══════════════════════════════════════ */}
             {certReportStep === "upload" && (
