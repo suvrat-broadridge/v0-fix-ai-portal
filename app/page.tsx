@@ -7993,12 +7993,12 @@ const tools = [
                   <Button
                     variant="outline"
                     onClick={() => currentCasePhase > 1 && setCurrentCasePhase(currentCasePhase - 1)}
-                    disabled={currentCasePhase === 1}
+                    disabled={currentCasePhase === 1 || currentPhase.num === 5}
                     className="disabled:opacity-50"
                   >
                     <ChevronLeft className="h-4 w-4 mr-1" /> Previous Phase
                   </Button>
-                  {!isCurrentPhaseComplete() && currentCasePhase < 8 && (
+                  {!isCurrentPhaseComplete() && currentCasePhase < 8 && currentPhase.num !== 5 && (
                     <Button
                       variant="outline"
                       onClick={() => {
@@ -8013,6 +8013,12 @@ const tools = [
                   <Button
                     onClick={() => {
                       if (currentCasePhase >= 8) return
+                      if (currentPhase.num === 5) {
+                        setCurrentCasePhase(currentCasePhase + 1)
+                        setCurrentToolIndex(0)
+                        setSelectedToolId(null)
+                        return
+                      }
                       if (!isCurrentPhaseComplete()) {
                         setShowPhaseConfirmDialog(true)
                       } else {
@@ -8077,8 +8083,47 @@ const tools = [
               </div>
             </header>
 
+            {/* TBD overlay for phases not yet implemented */}
+            {currentPhase.num === 5 && (
+              <div className="p-6 space-y-6">
+                {/* Amber notification banner */}
+                <div className="flex items-start gap-4 px-5 py-4 rounded-lg border border-[#ff9800]/40 bg-[#ff9800]/10">
+                  <AlertTriangle className="h-5 w-5 text-[#ff9800] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-[#ff9800]">Scheduled for Next Iteration</p>
+                    <p className={`text-sm mt-0.5 ${textSecondary}`}>
+                      <span className="font-medium text-[#ff9800]">Phase {currentPhase.num}: {currentPhase.name}</span> is currently under development and will be available in the next release. Use the <span className={`font-medium ${textPrimary}`}>Next Phase</span> button to continue the workflow.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Blurred / locked tools placeholder */}
+                <div className="relative rounded-lg overflow-hidden">
+                  <div className="pointer-events-none select-none opacity-30 blur-sm space-y-4">
+                    <div className={`h-10 rounded-lg ${isDarkMode ? "bg-[#1e4976]/40" : "bg-gray-200"}`} />
+                    <div className="grid grid-cols-3 gap-4">
+                      {[1, 2, 3, 4].map(i => (
+                        <div key={i} className={`h-40 rounded-lg ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-100"}`} />
+                      ))}
+                    </div>
+                    <div className={`h-14 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`} />
+                  </div>
+                  {/* Centre lock badge */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className={`flex flex-col items-center gap-3 px-8 py-6 rounded-xl border ${borderColor} ${isDarkMode ? "bg-[#0a1628]/90" : "bg-white/90"} shadow-lg`}>
+                      <Lock className="h-8 w-8 text-[#ff9800]" />
+                      <span className={`text-lg font-bold ${textPrimary}`}>TBD</span>
+                      <span className={`text-sm text-center ${textSecondary} max-w-xs`}>
+                        This phase will be implemented in the next iteration. No actions are available yet.
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Tools Grid or Selected Tool Content */}
-            <div className="p-6">
+            {currentPhase.num !== 5 && <div className="p-6">
               {selectedToolId ? (
                 // Show selected tool inline content
                 <div>
@@ -12446,8 +12491,7 @@ const tools = [
                   </div>
                 </>
               )}
-            </div>
-          </div>
+            </div>}</div>
         </div>
         
         {/* Force Complete Dialog — Step or Phase */}
@@ -20010,7 +20054,7 @@ const copyToClipboard = () => {
               </div>
             )}
 
-            {/* ═════════════════════════════════════════════���═════════
+            {/* ════════════════════════════════════���════════���═════════
                 STEP 4: GENERATE CLIENT REPORT
             ═══════════════════��═══��══��════════════════════════════ */}
             {certReportStep === "generate" && (
