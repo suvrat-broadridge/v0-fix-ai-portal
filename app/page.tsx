@@ -493,6 +493,8 @@ function TestPlanGeneratorTool({
   onNextStep?: () => void
 }) {
   const [selectedSuiteId, setSelectedSuiteId] = React.useState(defaultSuiteId)
+  const [specSelected, setSpecSelected] = React.useState(false)
+  const [selectingSpec, setSelectingSpec] = React.useState(false)
   const [testPlanGenerated, setTestPlanGenerated] = React.useState(false)
   const [generatingTestPlan, setGeneratingTestPlan] = React.useState(false)
   const [customizing, setCustomizing] = React.useState(false)
@@ -508,8 +510,8 @@ function TestPlanGeneratorTool({
   return (
     <div className="space-y-4">
 
-      {/* Step 1 — Spec selector (always shown until generated) */}
-      {!testPlanGenerated && (
+      {/* Step 1 — Select Standardized Spec (dropdown + Select button) */}
+      {!specSelected && (
         <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
           <div className={`px-4 py-3 border-b ${borderColor} flex items-center gap-2`}>
             <ClipboardCheck className="h-4 w-4 text-[#ff9800]" />
@@ -544,45 +546,21 @@ function TestPlanGeneratorTool({
               )}
             </div>
 
-            {/* Selected spec summary */}
-            {(() => {
-              const suite = availableSuites.find(s => s.id === selectedSuiteId)
-              return suite ? (
-                <div className={`${bg0} rounded-lg border ${borderColor} px-4 py-3`}>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className={`text-sm font-semibold ${textPrimary}`}>{suite.label}</span>
-                    <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? "bg-[#4caf50]/15 text-[#4caf50]" : "bg-green-100 text-green-700"}`}>
-                      {suite.categories.length} categories
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-x-8 gap-y-1.5">
-                    {suite.categories.map((cat, i) => (
-                      <div key={i} className="flex items-center justify-between text-xs">
-                        <span className={textSecondary}>{cat.name}</span>
-                        <span className={`font-medium ${textSecondary}`}>{cat.count} cases</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null
-            })()}
-
             <div className="flex justify-end pt-2">
               <Button
-                className="bg-[#4caf50] hover:bg-[#388e3c] text-white px-6"
-                size="lg"
-                disabled={generatingTestPlan}
+                className="bg-[#00e5ff] hover:bg-[#00b8d4] text-[#0a1628] px-6"
+                disabled={selectingSpec}
                 onClick={() => {
-                  setGeneratingTestPlan(true)
+                  setSelectingSpec(true)
                   setTimeout(() => {
-                    setGeneratingTestPlan(false)
-                    setTestPlanGenerated(true)
-                  }, 1800)
+                    setSelectingSpec(false)
+                    setSpecSelected(true)
+                  }, 1200)
                 }}
               >
-                {generatingTestPlan
-                  ? <><Loader className="h-4 w-4 mr-2 animate-spin" /> Generating...</>
-                  : <><Sparkles className="h-4 w-4 mr-2" /> Generate Test Plan</>
+                {selectingSpec
+                  ? <><Loader className="h-4 w-4 mr-2 animate-spin" /> Loading...</>
+                  : <>Select</>
                 }
               </Button>
             </div>
@@ -590,67 +568,127 @@ function TestPlanGeneratorTool({
         </div>
       )}
 
-      {/* Step 2 — Full generated test plan with all sections */}
+      {/* Step 2 — Spec loaded preview + Generate Test Plan button */}
+      {specSelected && !testPlanGenerated && (
+        <>
+          {/* Loaded spec header with change option */}
+          <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+            <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+              <div className="flex items-center gap-2">
+                <FileCheck className="h-4 w-4 text-[#00e5ff]" />
+                <span className={`text-sm font-semibold ${textPrimary}`}>Loaded Standardized Spec</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1 text-xs text-[#4caf50]">
+                  <CheckCircle className="h-3.5 w-3.5" /> Loaded
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => { setSpecSelected(false); setTestPlanGenerated(false); setCustomized(false) }}
+                  className={`text-xs ${textSecondary}`}
+                >
+                  Change Spec
+                </Button>
+              </div>
+            </div>
+            <div className="px-4 py-3">
+              <div className={`${bg0} rounded-lg px-4 py-3 flex items-center justify-between`}>
+                <div className="flex items-center gap-3">
+                  <FileText className={`h-5 w-5 ${textSecondary}`} />
+                  <div>
+                    <p className={`text-sm font-medium ${textPrimary}`}>{selectedSuite.label}</p>
+                    <p className={`text-xs ${textSecondary}`}>{caseProtocol} · {selectedSuite.categories.length} categories · {totalCases} test cases</p>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm"><Eye className="h-3.5 w-3.5 mr-1" /> View Spec</Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Spec preview card with categories */}
+          <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+            <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+              <span className={`text-sm font-semibold ${textPrimary}`}>{selectedSuite.label}</span>
+              <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? "bg-[#4caf50]/15 text-[#4caf50]" : "bg-green-100 text-green-700"}`}>
+                {selectedSuite.categories.length} categories
+              </span>
+            </div>
+            <div className="px-4 py-3">
+              <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+                {selectedSuite.categories.map((cat, i) => (
+                  <div key={i} className="flex items-center justify-between text-sm">
+                    <span className={textSecondary}>{cat.name}</span>
+                    <span className={`font-medium text-[#4caf50]`}>{cat.count} cases</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Generate Test Plan button */}
+          <div className="flex justify-end">
+            <Button
+              className="bg-[#4caf50] hover:bg-[#388e3c] text-white px-6"
+              size="lg"
+              disabled={generatingTestPlan}
+              onClick={() => {
+                setGeneratingTestPlan(true)
+                setTimeout(() => {
+                  setGeneratingTestPlan(false)
+                  setTestPlanGenerated(true)
+                }, 1800)
+              }}
+            >
+              {generatingTestPlan
+                ? <><Loader className="h-4 w-4 mr-2 animate-spin" /> Generating...</>
+                : <><Sparkles className="h-4 w-4 mr-2" /> Generate Test Plan</>
+              }
+            </Button>
+          </div>
+        </>
+      )}
+
+      {/* Step 3 — Full generated test plan with all sections */}
       {testPlanGenerated && (
         <>
           {/* Section A — Load Certification Test Suite */}
           <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
-            <div className={`px-4 py-3 border-b ${borderColor} flex items-center gap-2`}>
-              <ClipboardCheck className="h-4 w-4 text-[#ff9800]" />
-              <span className={`text-sm font-semibold ${textPrimary}`}>Load Certification Test Suite</span>
+            <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+              <div className="flex items-center gap-2">
+                <ClipboardCheck className="h-4 w-4 text-[#ff9800]" />
+                <span className={`text-sm font-semibold ${textPrimary}`}>Load Certification Test Suite</span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => { setSpecSelected(false); setTestPlanGenerated(false); setCustomized(false) }}
+                className={`text-xs ${textSecondary}`}
+              >
+                Change Spec
+              </Button>
             </div>
             <div className="px-4 py-4 space-y-3">
-              {/* Suite selector */}
-              <div>
-                <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Available Test Suites</label>
-                <div className={`relative border ${borderColor} rounded-lg overflow-hidden`}>
-                  <select
-                    value={selectedSuiteId}
-                    onChange={e => { setSelectedSuiteId(e.target.value); setCustomized(false) }}
-                    className={`w-full appearance-none px-3 py-2.5 pr-8 text-sm font-medium ${textPrimary} ${bg0} focus:outline-none`}
-                  >
-                    {availableSuites.map(suite => (
-                      <option key={suite.id} value={suite.id}>{suite.label}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none ${textSecondary}`} />
-                </div>
-                {/* Preloaded badge */}
-                {selectedSuiteId === defaultSuiteId && (
-                  <div className="flex items-center gap-1.5 mt-1.5">
-                    <CheckCircle className="h-3.5 w-3.5 text-[#4caf50]" />
-                    <span className="text-xs text-[#4caf50]">Auto-matched from case: {caseClient} — {caseAsset} / {caseProtocol}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Suite summary row */}
+              {/* Suite selector (read-only display) */}
               <div className={`${bg0} rounded-lg px-4 py-3 flex items-center justify-between`}>
                 <div className="flex items-center gap-3">
-                  <div className="flex flex-col gap-0.5">
-                    <span className={`text-xs ${textSecondary}`}>Categories</span>
-                    <span className={`text-lg font-bold ${textPrimary}`}>{selectedSuite.categories.length}</span>
+                  <FileText className={`h-5 w-5 ${textSecondary}`} />
+                  <div>
+                    <p className={`text-sm font-medium ${textPrimary}`}>{selectedSuite.label}</p>
+                    <p className={`text-xs ${textSecondary}`}>{caseProtocol} · {selectedSuite.categories.length} categories</p>
                   </div>
-                  <div className={`w-px h-8 ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`} />
-                  <div className="flex flex-col gap-0.5">
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex flex-col items-end gap-0.5">
                     <span className={`text-xs ${textSecondary}`}>Total Cases</span>
                     <span className={`text-lg font-bold ${customized ? "text-[#00e5ff]" : "text-[#ff9800]"}`}>
                       {customized ? customizedTotal : totalCases}
                     </span>
                   </div>
                   {customized && (
-                    <>
-                      <div className={`w-px h-8 ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`} />
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-xs text-[#4caf50]">Spec-adjusted</span>
-                        <span className="text-xs font-medium text-[#4caf50]">+{customizedTotal - totalCases} cases added</span>
-                      </div>
-                    </>
+                    <span className="text-xs font-medium text-[#4caf50]">+{customizedTotal - totalCases} added</span>
                   )}
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? "bg-[#4caf50]/15 text-[#4caf50]" : "bg-green-100 text-green-700"}`}>
-                  Standard Suite
-                </span>
               </div>
 
               {/* Category breakdown */}
