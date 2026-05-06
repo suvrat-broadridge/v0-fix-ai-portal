@@ -3,7 +3,7 @@
 // B- COMET Platform - FIX Protocol Testing Suite v2
 import React, { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
-import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, ChevronUp, ChevronsUpDown, FileText, Activity, Zap, Check, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, ClipboardList, Stamp, Code, ScrollText, Navigation, Sparkles, Minus, Loader, FolderArchive, Sliders, Bot, ExternalLink, GitMerge, FileCode, Presentation, ShoppingCart, Network, Circle, Edit3, FileSpreadsheet, Edit2, Trash2 } from "lucide-react"
+import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, ChevronUp, ChevronsUpDown, FileText, Activity, Zap, Check, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, ClipboardList, Stamp, Code, ScrollText, Navigation, Sparkles, Minus, Loader, FolderArchive, Sliders, Bot, ExternalLink, GitMerge, FileCode, Presentation, ShoppingCart, Network, Circle, Edit3, FileSpreadsheet, Edit2, Trash2, LayoutGrid } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -504,26 +504,42 @@ function TestPlanGeneratorTool({
   const bg0 = isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"
   const bg1 = isDarkMode ? "bg-[#0d1f35]" : "bg-white"
 
-  // Generation state — track if test plan has been generated
-  const [testPlanGenerated, setTestPlanGenerated] = useState(false)
-  const [generatingTestPlan, setGeneratingTestPlan] = useState(false)
+  const [testPlanGenerated, setTestPlanGenerated] = React.useState(false)
+  const [generatingTestPlan, setGeneratingTestPlan] = React.useState(false)
+
+  const planMatrix = [
+    { category: "Connectivity Tests",  priority: "Critical",  effort: "Low",    sessions: 3, orderFlow: 0,  execReports: 0, cancelReplace: 0, edgeCases: 0  },
+    { category: "Session Tests",       priority: "Critical",  effort: "Low",    sessions: 4, orderFlow: 0,  execReports: 0, cancelReplace: 0, edgeCases: 0  },
+    { category: "Order Flow Tests",    priority: "High",      effort: "Medium", sessions: 0, orderFlow: 18, execReports: 6, cancelReplace: 5, edgeCases: 0  },
+    { category: "Execution Reports",   priority: "High",      effort: "Medium", sessions: 0, orderFlow: 0,  execReports: 8, cancelReplace: 0, edgeCases: 0  },
+    { category: "Cancel / Replace",    priority: "Medium",    effort: "Medium", sessions: 0, orderFlow: 0,  execReports: 0, cancelReplace: 6, edgeCases: 0  },
+    { category: "Edge Cases",          priority: "Low",       effort: "High",   sessions: 0, orderFlow: 0,  execReports: 0, cancelReplace: 0, edgeCases: 4  },
+  ]
+
+  const priorityColor = (p: string) =>
+    p === "Critical" ? "text-[#ff4444]" : p === "High" ? "text-[#ff9800]" : p === "Medium" ? "text-[#00e5ff]" : "text-[#4caf50]"
+  const priorityBg = (p: string) =>
+    p === "Critical" ? "bg-[#ff4444]/15" : p === "High" ? "bg-[#ff9800]/15" : p === "Medium" ? "bg-[#00e5ff]/15" : "bg-[#4caf50]/15"
 
   return (
     <div className="space-y-4">
 
-      {/* Pre-generation UI — Show spec selector */}
+      {/* Step 1 — Spec selector (always shown until generated) */}
       {!testPlanGenerated && (
         <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
           <div className={`px-4 py-3 border-b ${borderColor} flex items-center gap-2`}>
             <ClipboardCheck className="h-4 w-4 text-[#ff9800]" />
-            <span className={`text-sm font-semibold ${textPrimary}`}>Generate Test Plan</span>
+            <span className={`text-sm font-semibold ${textPrimary}`}>Select Standardized Specification</span>
           </div>
-          <div className="px-4 py-6 space-y-4">
-            <p className={textSecondary}>Select a standardized specification to generate a test plan for {caseAsset} using {caseProtocol}.</p>
-            
-            {/* Spec selector */}
+          <div className="px-4 py-6 space-y-5">
+            <p className={`text-sm ${textSecondary}`}>
+              Select which standardized specification to base the test plan on for{" "}
+              <span className={`font-medium ${textPrimary}`}>{caseClient} — {caseAsset} / {caseProtocol}</span>.
+            </p>
+
+            {/* Spec dropdown */}
             <div>
-              <label className={`block text-xs font-medium mb-2 ${textSecondary}`}>Standardized Specification</label>
+              <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Standardized Specification</label>
               <div className={`relative border ${borderColor} rounded-lg overflow-hidden`}>
                 <select
                   value={selectedSuiteId}
@@ -544,18 +560,18 @@ function TestPlanGeneratorTool({
               )}
             </div>
 
-            {/* Suite preview card */}
+            {/* Selected spec summary */}
             {(() => {
               const suite = availableSuites.find(s => s.id === selectedSuiteId)
               return suite ? (
-                <div className={`${bg0} rounded-lg px-4 py-3 border ${borderColor}`}>
+                <div className={`${bg0} rounded-lg border ${borderColor} px-4 py-3`}>
                   <div className="flex items-center justify-between mb-3">
-                    <span className={`font-semibold ${textPrimary}`}>{suite.label}</span>
+                    <span className={`text-sm font-semibold ${textPrimary}`}>{suite.label}</span>
                     <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? "bg-[#4caf50]/15 text-[#4caf50]" : "bg-green-100 text-green-700"}`}>
-                      {suite.categories.reduce((sum, cat) => sum + cat.count, 0)} tests
+                      {suite.categories.length} categories
                     </span>
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-1.5">
                     {suite.categories.map((cat, i) => (
                       <div key={i} className="flex items-center justify-between text-xs">
                         <span className={textSecondary}>{cat.name}</span>
@@ -567,8 +583,7 @@ function TestPlanGeneratorTool({
               ) : null
             })()}
 
-            {/* Generate button */}
-            <div className="flex justify-end pt-4">
+            <div className="flex justify-end pt-2">
               <Button
                 className="bg-[#4caf50] hover:bg-[#388e3c] text-white px-6"
                 size="lg"
@@ -578,304 +593,168 @@ function TestPlanGeneratorTool({
                   setTimeout(() => {
                     setGeneratingTestPlan(false)
                     setTestPlanGenerated(true)
-                  }, 2000)
+                  }, 1800)
                 }}
               >
-                {generatingTestPlan ? (
-                  <><Loader className="h-4 w-4 mr-2 animate-spin" /> Generating...</>
-                ) : (
-                  <><Sparkles className="h-4 w-4 mr-2" /> Generate Test Plan</>
-                )}
+                {generatingTestPlan
+                  ? <><Loader className="h-4 w-4 mr-2 animate-spin" /> Generating...</>
+                  : <><Sparkles className="h-4 w-4 mr-2" /> Generate Test Plan</>
+                }
               </Button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Post-generation UI — Show full test plan content */}
+      {/* Step 2 — Generated test plan matrix */}
       {testPlanGenerated && (
         <>
-          {/* Button to regenerate */}
-          <div className="flex justify-end mb-2">
+          {/* Header bar with selected spec + re-select */}
+          <div className={`${bgCard} border ${borderColor} rounded-lg px-4 py-3 flex items-center justify-between`}>
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+              <div>
+                <span className={`text-sm font-semibold ${textPrimary}`}>{availableSuites.find(s => s.id === selectedSuiteId)?.label}</span>
+                <span className={`text-xs ml-2 ${textSecondary}`}>{caseAsset} / {caseProtocol}</span>
+              </div>
+            </div>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setTestPlanGenerated(false)}
-              className={textSecondary}
             >
-              <RotateCw className="h-3.5 w-3.5 mr-1" /> Select Different Spec
+              <RotateCw className="h-3.5 w-3.5 mr-1.5" /> Change Spec
             </Button>
           </div>
 
-          {/* Section A — Load Certification Test Suite */}
-          <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
-        <div className={`px-4 py-3 border-b ${borderColor} flex items-center gap-2`}>
-          <ClipboardCheck className="h-4 w-4 text-[#ff9800]" />
-          <span className={`text-sm font-semibold ${textPrimary}`}>Load Certification Test Suite</span>
-        </div>
-        <div className="px-4 py-4 space-y-3">
-          {/* Suite selector */}
-          <div>
-            <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Available Test Suites</label>
-            <div className={`relative border ${borderColor} rounded-lg overflow-hidden`}>
-              <select
-                value={selectedSuiteId}
-                onChange={e => { setSelectedSuiteId(e.target.value); setCustomized(false) }}
-                className={`w-full appearance-none px-3 py-2.5 pr-8 text-sm font-medium ${textPrimary} ${bg0} focus:outline-none`}
-              >
-                {availableSuites.map(suite => (
-                  <option key={suite.id} value={suite.id}>{suite.label}</option>
-                ))}
-              </select>
-              <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none ${textSecondary}`} />
-            </div>
-            {/* Preloaded badge */}
-            {selectedSuiteId === defaultSuiteId && (
-              <div className="flex items-center gap-1.5 mt-1.5">
-                <CheckCircle className="h-3.5 w-3.5 text-[#4caf50]" />
-                <span className="text-xs text-[#4caf50]">Auto-matched from case: {caseClient} — {caseAsset} / {caseProtocol}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Suite summary row */}
-          <div className={`${bg0} rounded-lg px-4 py-3 flex items-center justify-between`}>
-            <div className="flex items-center gap-3">
-              <div className="flex flex-col gap-0.5">
-                <span className={`text-xs ${textSecondary}`}>Categories</span>
-                <span className={`text-lg font-bold ${textPrimary}`}>{selectedSuite.categories.length}</span>
-              </div>
-              <div className={`w-px h-8 ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`} />
-              <div className="flex flex-col gap-0.5">
-                <span className={`text-xs ${textSecondary}`}>Total Cases</span>
-                <span className={`text-lg font-bold ${customized ? "text-[#00e5ff]" : "text-[#ff9800]"}`}>
-                  {customized ? customizedTotal : totalCases}
-                </span>
-              </div>
-              {customized && (
-                <>
-                  <div className={`w-px h-8 ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`} />
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-xs text-[#4caf50]">Spec-adjusted</span>
-                    <span className="text-xs font-medium text-[#4caf50]">+{customizedTotal - totalCases} cases added</span>
-                  </div>
-                </>
-              )}
-            </div>
-            <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? "bg-[#4caf50]/15 text-[#4caf50]" : "bg-green-100 text-green-700"}`}>
-              Standard Suite
-            </span>
-          </div>
-
-          {/* Category breakdown */}
-          <div className={`border ${borderColor} rounded-lg overflow-hidden`}>
-            {selectedSuite.categories.map((cat, i) => {
-              const adjustedCount = customized ? Math.round(cat.count * 1.15) : cat.count
-              return (
-                <div
-                  key={i}
-                  className={`flex items-center justify-between px-4 py-2.5 text-sm ${i < selectedSuite.categories.length - 1 ? `border-b ${borderColor}` : ""} ${bg1}`}
-                >
-                  <span className={textSecondary}>{cat.name}</span>
-                  <div className="flex items-center gap-2">
-                    {customized && cat.count !== adjustedCount && (
-                      <span className={`text-xs line-through ${textSecondary} opacity-50`}>{cat.count}</span>
-                    )}
-                    <span className={`font-medium ${customized ? "text-[#00e5ff]" : "text-[#4caf50]"}`}>{adjustedCount} cases</span>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* AI Confidence Matrix */}
-      <AIConfidenceMatrix
-        isDarkMode={isDarkMode}
-        bgCard={bgCard}
-        borderColor={borderColor}
-        textPrimary={textPrimary}
-        textSecondary={textSecondary}
-        score={87}
-        basis="Spec field coverage is complete and suite auto-matched to FIX 4.2 Equities with high historical pass rate."
-      />
-
-      {/* Section B — Standardized Spec */}
-      <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
-        <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
-          <div className="flex items-center gap-2">
-            <FileCheck className="h-4 w-4 text-[#00e5ff]" />
-            <span className={`text-sm font-semibold ${textPrimary}`}>Loaded Standardized Spec</span>
-          </div>
-          {specLoaded && (
-            <span className="flex items-center gap-1 text-xs text-[#4caf50]">
-              <CheckCircle className="h-3.5 w-3.5" /> Loaded
-            </span>
-          )}
-        </div>
-        <div className="px-4 py-3">
-          <div className={`${bg0} rounded-lg px-4 py-3 flex items-center justify-between`}>
-            <div className="flex items-center gap-3">
-              <FileText className={`h-5 w-5 ${textSecondary}`} />
-              <div>
-                <p className={`text-sm font-medium ${textPrimary}`}>{caseClient} — {caseAsset} Spec</p>
-                <p className={`text-xs ${textSecondary}`}>{caseProtocol} · 5 message types · 59 fields</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm"><Eye className="h-3.5 w-3.5 mr-1" /> View Spec</Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Section B2 — Spec Analysis Preview (shown when spec is loaded) */}
-      {specLoaded && (() => {
-        const specTabs = ["Summary", "Field Value Map", "Single Value Tests", "Core Cartesian Tests", "Pairwise Tests", "Coverage Matrix"]
-        const activeSpecTab = (typeof window !== "undefined" && (window as any).__specTab) || "Summary"
-        const setSpecTab = (t: string) => { (window as any).__specTab = t; }
-
-        const summaryFields = [
-          { tag: 63, name: "SettlmntTyp", type: "char", required: false, values: 10 },
-          { tag: 21, name: "HandlInst", type: "char", required: true, values: 3 },
-          { tag: 18, name: "ExecInst", type: "MultipleStringValue", required: false, values: 29 },
-          { tag: 81, name: "ProcessCode", type: "char", required: false, values: 7 },
-          { tag: 22, name: "IDSource", type: "String", required: false, values: 9 },
-          { tag: 167, name: "SecurityType", type: "String", required: false, values: 33 },
-          { tag: 201, name: "PutOrCall", type: "int", required: false, values: 2 },
-          { tag: 54, name: "Side", type: "char", required: true, values: 9 },
-          { tag: 40, name: "OrdType", type: "char", required: true, values: 12 },
-          { tag: 59, name: "TimeInForce", type: "char", required: false, values: 7 },
-          { tag: 427, name: "GTBookingInst", type: "int", required: false, values: 3 },
-          { tag: 47, name: "Rule80A", type: "char", required: false, values: 23 },
-        ]
-        const singleTests = [
-          { id: "TC_SINGLE_0001", field: "SettlmntTyp", tag: 63, value: "0", valueName: "Regular", desc: "Single-value test: SettlmntTyp (tag 63) = 0 (Regular)", steps: "Send NewOrderSingle with SettlmntTyp=0 (Regular)\nVerify ExecutionReport received" },
-          { id: "TC_SINGLE_0002", field: "SettlmntTyp", tag: 63, value: "1", valueName: "Cash", desc: "Single-value test: SettlmntTyp (tag 63) = 1 (Cash)", steps: "Send NewOrderSingle with SettlmntTyp=1 (Cash)\nVerify ExecutionReport received" },
-          { id: "TC_SINGLE_0003", field: "SettlmntTyp", tag: 63, value: "2", valueName: "NextDay", desc: "Single-value test: SettlmntTyp (tag 63) = 2 (NextDay)", steps: "Send NewOrderSingle with SettlmntTyp=2 (NextDay)\nVerify ExecutionReport received" },
-          { id: "TC_SINGLE_0011", field: "HandlInst", tag: 21, value: "1", valueName: "AutomatedExecutionNoIntervention", desc: "Single-value test: HandlInst (tag 21) = 1", steps: "Send NewOrderSingle with HandlInst=1\nVerify ExecutionReport received", required: true },
-          { id: "TC_SINGLE_0012", field: "HandlInst", tag: 21, value: "2", valueName: "AutomatedExecutionInterventionOK", desc: "Single-value test: HandlInst (tag 21) = 2", steps: "Send NewOrderSingle with HandlInst=2\nVerify ExecutionReport received", required: true },
-          { id: "TC_SINGLE_0014", field: "ExecInst", tag: 18, value: "0", valueName: "StayOnOfferSide", desc: "Single-value test: ExecInst (tag 18) = 0 (StayOnOfferSide)", steps: "Send NewOrderSingle with ExecInst=0\nVerify ExecutionReport received" },
-          { id: "TC_SINGLE_0015", field: "ExecInst", tag: 18, value: "1", valueName: "NotHeld", desc: "Single-value test: ExecInst (tag 18) = 1 (NotHeld)", steps: "Send NewOrderSingle with ExecInst=1\nVerify ExecutionReport received" },
-        ]
-        const coreTests = [
-          { id: "TC_CORE_0169", name: "Side=Buy(1) | OrdType=Market(1) | TimeInForce=Day(0)", desc: "Core combination: Side=Buy(1), OrdType=Market(1), TimeInForce=Day(0)", details: "tag 54 Side = 1 (Buy)\ntag 40 OrdType = 1 (Market)\ntag 59 TimeInForce = 0 (Day)", steps: "Send NewOrderSingle with Side=Buy(1), OrdType=Market(1)\nVerify ExecutionReport received" },
-          { id: "TC_CORE_0170", name: "Side=Buy(1) | OrdType=Market(1) | TimeInForce=GoodTillCancel(1)", desc: "Core combination: Side=Buy(1), OrdType=Market(1), TimeInForce=GoodTillCancel(1)", details: "tag 54 Side = 1 (Buy)\ntag 40 OrdType = 1 (Market)\ntag 59 TimeInForce = 1 (GoodTillCancel)", steps: "Send NewOrderSingle with Side=Buy(1), OrdType=Market(1)\nVerify ExecutionReport received" },
-          { id: "TC_CORE_0171", name: "Side=Buy(1) | OrdType=Limit(2) | TimeInForce=Day(0)", desc: "Core combination: Side=Buy(1), OrdType=Limit(2), TimeInForce=Day(0)", conditional: "Price=150.0", details: "tag 54 Side = 1 (Buy)\ntag 40 OrdType = 2 (Limit)\ntag 59 TimeInForce = 0 (Day)", steps: "Send NewOrderSingle with Side=Buy(1), OrdType=Limit(2)\nInclude Limit requires Price\nVerify ExecutionReport received" },
-        ]
-        const pairTests = [
-          { id: "TC_PAIR_0925", name: "Pairwise #1", desc: "Pairwise combination: SettlmntTyp=Cash, HandlInst=AutomatedExecutionNoIntervention, ExecInst=PrimaryPeg, ProcessCode=StepIn, IDSource=ISINNumber...", conditional: "", details: "tag 63 SettlmntTyp = 1 (Cash)\ntag 21 HandlInst = 1 (AutomatedExecutionNoIntervention)\ntag 18 ExecInst = R (PrimaryPeg)\ntag 81 ProcessCode = 2 (StepIn)\ntag 22 IDSource = 4 (ISINNumber)\ntag 54 Side = 2 (Sell)\ntag 40 OrdType = A (OnClose)" },
-          { id: "TC_PAIR_0926", name: "Pairwise #2", desc: "Pairwise combination: SettlmntTyp=TPlus4, HandlInst=ManualOrder, ExecInst=TryToScale, ProcessCode=SoftDollarStepOut, IDSource=ISOCountryCode...", conditional: "StopPx=145.0", details: "tag 63 SettlmntTyp = 5 (TPlus4)\ntag 21 HandlInst = 3 (ManualOrder)\ntag 18 ExecInst = 8 (TryToScale)\ntag 40 OrdType = 3 (Stop)\ntag 59 TimeInForce = 4 (FillOrKill)" },
-        ]
-        const coverageFields = [
-          { tag: 63, field: "SettlmntTyp", values: 10, single: 10, pairwise: 1047 },
-          { tag: 21, field: "HandlInst", values: 3, single: 3, pairwise: 1047 },
-          { tag: 18, field: "ExecInst", values: 29, single: 29, pairwise: 1047 },
-          { tag: 81, field: "ProcessCode", values: 7, single: 7, pairwise: 1047 },
-          { tag: 22, field: "IDSource", values: 9, single: 9, pairwise: 1047 },
-          { tag: 167, field: "SecurityType", values: 33, single: 33, pairwise: 1047 },
-          { tag: 54, field: "Side", values: 9, single: 9, pairwise: 1047 },
-          { tag: 40, field: "OrdType", values: 12, single: 12, pairwise: 1047 },
-          { tag: 59, field: "TimeInForce", values: 7, single: 7, pairwise: 1047 },
-          { tag: 47, field: "Rule80A", values: 23, single: 23, pairwise: 1047 },
-        ]
-
-        return (
-          <SpecAnalysisPreview
+          {/* AI Confidence */}
+          <AIConfidenceMatrix
             isDarkMode={isDarkMode}
             bgCard={bgCard}
             borderColor={borderColor}
             textPrimary={textPrimary}
             textSecondary={textSecondary}
-            caseClient={caseClient}
-            caseAsset={caseAsset}
-            caseProtocol={caseProtocol}
-            tabs={specTabs}
-            summaryFields={summaryFields}
-            singleTests={singleTests}
-            coreTests={coreTests}
-            pairTests={pairTests}
-            coverageFields={coverageFields}
+            score={87}
+            basis="Spec field coverage is complete and suite auto-matched with high historical pass rate."
           />
-        )
-      })()}
 
-      {/* Section C — Customize to Spec */}
-      <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
-        <div className={`px-4 py-3 border-b ${borderColor}`}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sliders className="h-4 w-4 text-[#9c27b0]" />
-              <span className={`text-sm font-semibold ${textPrimary}`}>Customize Test Cases to Spec</span>
-            </div>
-            {!customized && (
-              <Button
-                size="sm"
-                disabled={customizing}
-                onClick={() => {
-                  setCustomizing(true)
-                  setTimeout(() => { setCustomizing(false); setCustomized(true) }, 1800)
-                }}
-                className="bg-[#9c27b0] hover:bg-[#7b1fa2] text-white"
-              >
-                {customizing ? (
-                  <><Loader className="h-3.5 w-3.5 mr-1 animate-spin" /> Analyzing Spec...</>
-                ) : (
-                  <><Zap className="h-3.5 w-3.5 mr-1" /> Generate Spec-Adjusted Suite</>
-                )}
-              </Button>
-            )}
-            {customized && (
+          {/* Test Plan Coverage Matrix */}
+          <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+            <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
               <div className="flex items-center gap-2">
-                <span className="flex items-center gap-1 text-xs text-[#4caf50]"><CheckCircle className="h-3.5 w-3.5" /> Suite Generated</span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setCustomized(false)}
-                  className={`text-xs ${textSecondary}`}
-                >Reset</Button>
+                <LayoutGrid className="h-4 w-4 text-[#00e5ff]" />
+                <span className={`text-sm font-semibold ${textPrimary}`}>Test Plan Coverage Matrix</span>
               </div>
-            )}
-          </div>
-          <p className={`text-xs ${textSecondary} mt-1`}>
-            Compares the loaded spec against the standard suite and adds, removes, or adjusts test cases accordingly.
-          </p>
-        </div>
-        {customized && (
-          <div className="px-4 py-3 space-y-2">
-            <div className={`flex items-start gap-2 text-sm ${textSecondary}`}>
-              <CheckCircle className="h-4 w-4 text-[#4caf50] flex-shrink-0 mt-0.5" />
-              <span>Added 8 test cases for custom tags detected in spec (tags 9001, 9002, 9003)</span>
+              <div className="flex items-center gap-2">
+                <span className={`text-xs ${textSecondary}`}>{planMatrix.reduce((s, r) => s + r.sessions + r.orderFlow + r.execReports + r.cancelReplace + r.edgeCases, 0)} total test areas</span>
+                <Button size="sm" variant="outline">
+                  <Download className="h-3.5 w-3.5 mr-1.5" /> Export Plan
+                </Button>
+              </div>
             </div>
-            <div className={`flex items-start gap-2 text-sm ${textSecondary}`}>
-              <CheckCircle className="h-4 w-4 text-[#4caf50] flex-shrink-0 mt-0.5" />
-              <span>Updated 4 Order Flow cases to validate conditional field logic (tag 44 required when OrdType=2)</span>
-            </div>
-            <div className={`flex items-start gap-2 text-sm ${textSecondary}`}>
-              <AlertTriangle className="h-4 w-4 text-[#ff9800] flex-shrink-0 mt-0.5" />
-              <span>Removed 1 standard case — IOC order type not in client spec (TimeInForce=3)</span>
-            </div>
-            <div className={`flex items-center gap-2 mt-3 pt-3 border-t ${borderColor}`}>
-              <Button size="sm" className="bg-[#4caf50] hover:bg-[#388e3c] text-white">
-                <Download className="h-3.5 w-3.5 mr-1" /> Export Suite
-              </Button>
-              <Button size="sm" variant="outline">
-                <Eye className="h-3.5 w-3.5 mr-1" /> Preview All Cases
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
 
-      {/* Next Step */}
-      {onNextStep && (
-        <div className={`flex pt-4 border-t ${borderColor}`}>
-          <Button onClick={onNextStep} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">
-            Next Step <ChevronRight className="h-4 w-4 ml-1" />
-          </Button>
-        </div>
-      )}
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"}`}>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${textPrimary}`}>Category</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${textPrimary}`}>Priority</th>
+                    <th className={`px-4 py-3 text-left text-xs font-semibold ${textPrimary}`}>Effort</th>
+                    <th className={`px-4 py-3 text-center text-xs font-semibold ${textPrimary}`}>Session</th>
+                    <th className={`px-4 py-3 text-center text-xs font-semibold ${textPrimary}`}>Order Flow</th>
+                    <th className={`px-4 py-3 text-center text-xs font-semibold ${textPrimary}`}>Exec Reports</th>
+                    <th className={`px-4 py-3 text-center text-xs font-semibold ${textPrimary}`}>Cancel / Replace</th>
+                    <th className={`px-4 py-3 text-center text-xs font-semibold ${textPrimary}`}>Edge Cases</th>
+                    <th className={`px-4 py-3 text-center text-xs font-semibold ${textPrimary}`}>Scope</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {planMatrix.map((row, i) => {
+                    const total = row.sessions + row.orderFlow + row.execReports + row.cancelReplace + row.edgeCases
+                    const maxTotal = planMatrix.reduce((m, r) => Math.max(m, r.sessions + r.orderFlow + r.execReports + r.cancelReplace + r.edgeCases), 1)
+                    const cellVal = (v: number) => v > 0
+                      ? <div className="flex items-center justify-center"><span className={`px-2 py-0.5 rounded text-xs font-medium ${isDarkMode ? "bg-[#00e5ff]/15 text-[#00e5ff]" : "bg-blue-100 text-blue-700"}`}>{v}</span></div>
+                      : <span className={`block text-center ${textSecondary} opacity-40`}>—</span>
+                    return (
+                      <tr key={i} className={`border-b ${borderColor} hover:bg-[#1e4976]/10 transition-colors`}>
+                        <td className={`px-4 py-3 font-medium ${textPrimary}`}>{row.category}</td>
+                        <td className="px-4 py-3">
+                          <span className={`px-2 py-0.5 rounded text-xs font-semibold ${priorityBg(row.priority)} ${priorityColor(row.priority)}`}>
+                            {row.priority}
+                          </span>
+                        </td>
+                        <td className={`px-4 py-3 text-xs ${textSecondary}`}>{row.effort}</td>
+                        <td className="px-4 py-3">{cellVal(row.sessions)}</td>
+                        <td className="px-4 py-3">{cellVal(row.orderFlow)}</td>
+                        <td className="px-4 py-3">{cellVal(row.execReports)}</td>
+                        <td className="px-4 py-3">{cellVal(row.cancelReplace)}</td>
+                        <td className="px-4 py-3">{cellVal(row.edgeCases)}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2 justify-center">
+                            <div className={`flex-1 h-1.5 rounded-full ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"} max-w-[60px]`}>
+                              <div
+                                className="h-1.5 rounded-full bg-[#4caf50]"
+                                style={{ width: `${(total / maxTotal) * 100}%` }}
+                              />
+                            </div>
+                            <span className={`text-xs font-medium ${textPrimary}`}>{total}</span>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr className={`${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"} border-t-2 ${borderColor}`}>
+                    <td className={`px-4 py-3 font-bold text-xs ${textPrimary}`} colSpan={3}>Total</td>
+                    {[
+                      planMatrix.reduce((s, r) => s + r.sessions, 0),
+                      planMatrix.reduce((s, r) => s + r.orderFlow, 0),
+                      planMatrix.reduce((s, r) => s + r.execReports, 0),
+                      planMatrix.reduce((s, r) => s + r.cancelReplace, 0),
+                      planMatrix.reduce((s, r) => s + r.edgeCases, 0),
+                    ].map((t, i) => (
+                      <td key={i} className="px-4 py-3 text-center">
+                        <span className={`text-xs font-bold ${textPrimary}`}>{t}</span>
+                      </td>
+                    ))}
+                    <td className="px-4 py-3 text-center">
+                      <span className={`text-xs font-bold ${textPrimary}`}>
+                        {planMatrix.reduce((s, r) => s + r.sessions + r.orderFlow + r.execReports + r.cancelReplace + r.edgeCases, 0)}
+                      </span>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          {/* Priority summary cards */}
+          <div className="grid grid-cols-4 gap-3">
+            {(["Critical", "High", "Medium", "Low"] as const).map(p => {
+              const rows = planMatrix.filter(r => r.priority === p)
+              const count = rows.reduce((s, r) => s + r.sessions + r.orderFlow + r.execReports + r.cancelReplace + r.edgeCases, 0)
+              return (
+                <div key={p} className={`${bgCard} border ${borderColor} rounded-lg p-3 flex items-center gap-3`}>
+                  <div className={`w-1.5 h-10 rounded-full ${p === "Critical" ? "bg-[#ff4444]" : p === "High" ? "bg-[#ff9800]" : p === "Medium" ? "bg-[#00e5ff]" : "bg-[#4caf50]"}`} />
+                  <div>
+                    <p className={`text-xs ${textSecondary}`}>{p}</p>
+                    <p className={`text-xl font-bold ${textPrimary}`}>{count}</p>
+                    <p className={`text-xs ${textSecondary}`}>{rows.length} {rows.length === 1 ? "category" : "categories"}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Next Step */}
+          {onNextStep && (
+            <div className={`flex pt-4 border-t ${borderColor}`}>
+              <Button onClick={onNextStep} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] ml-auto">
+                Next Step <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+          )}
         </>
       )}
     </div>
