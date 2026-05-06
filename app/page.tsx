@@ -726,14 +726,21 @@ function TestPlanGeneratorTool({
                   caseProtocol={caseProtocol}
                 />
 
-                {/* Generate Test Plan button */}
-                <div className="flex justify-end">
+                {/* Generate Test Plan button — always reclickable */}
+                <div className="flex items-center justify-end gap-3">
+                  {testPlanGenerated && (
+                    <span className="flex items-center gap-1 text-xs text-[#4caf50]">
+                      <CheckCircle className="h-3.5 w-3.5" /> Test plan generated
+                    </span>
+                  )}
                   <Button
                     className="bg-[#4caf50] hover:bg-[#388e3c] text-white px-6"
                     size="lg"
                     disabled={generatingTestPlan}
                     onClick={() => {
                       setGeneratingTestPlan(true)
+                      setTestPlanGenerated(false)
+                      setCustomized(false)
                       setTimeout(() => {
                         setGeneratingTestPlan(false)
                         setTestPlanGenerated(true)
@@ -742,7 +749,9 @@ function TestPlanGeneratorTool({
                   >
                     {generatingTestPlan
                       ? <><Loader className="h-4 w-4 mr-2 animate-spin" /> Generating...</>
-                      : <><Sparkles className="h-4 w-4 mr-2" /> Generate Test Plan</>
+                      : testPlanGenerated
+                        ? <><RotateCw className="h-4 w-4 mr-2" /> Regenerate Test Plan</>
+                        : <><Sparkles className="h-4 w-4 mr-2" /> Generate Test Plan</>
                     }
                   </Button>
                 </div>
@@ -933,34 +942,31 @@ function TestPlanGeneratorTool({
                   <Sliders className="h-4 w-4 text-[#9c27b0]" />
                   <span className={`text-sm font-semibold ${textPrimary}`}>Customize Test Cases to Spec</span>
                 </div>
-                {!customized && (
+                <div className="flex items-center gap-2">
+                  {customized && (
+                    <span className="flex items-center gap-1 text-xs text-[#4caf50]">
+                      <CheckCircle className="h-3.5 w-3.5" /> Suite Generated
+                    </span>
+                  )}
                   <Button
                     size="sm"
                     disabled={customizing}
                     onClick={() => {
                       setCustomizing(true)
+                      setCustomized(false)
                       setTimeout(() => { setCustomizing(false); setCustomized(true) }, 1800)
                     }}
                     className="bg-[#9c27b0] hover:bg-[#7b1fa2] text-white"
                   >
                     {customizing ? (
                       <><Loader className="h-3.5 w-3.5 mr-1 animate-spin" /> Analyzing Spec...</>
+                    ) : customized ? (
+                      <><RotateCw className="h-3.5 w-3.5 mr-1" /> Regenerate Suite</>
                     ) : (
                       <><Zap className="h-3.5 w-3.5 mr-1" /> Generate Spec-Adjusted Suite</>
                     )}
                   </Button>
-                )}
-                {customized && (
-                  <div className="flex items-center gap-2">
-                    <span className="flex items-center gap-1 text-xs text-[#4caf50]"><CheckCircle className="h-3.5 w-3.5" /> Suite Generated</span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setCustomized(false)}
-                      className={`text-xs ${textSecondary}`}
-                    >Reset</Button>
-                  </div>
-                )}
+                </div>
               </div>
               <p className={`text-xs ${textSecondary} mt-1`}>
                 Compares the loaded spec against the standard suite and adds, removes, or adjusts test cases accordingly.
