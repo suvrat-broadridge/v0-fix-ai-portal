@@ -473,6 +473,7 @@ function SpecGridViewer({
   isDarkMode: boolean; bgCard: string; borderColor: string; textPrimary: string; textSecondary: string; caseProtocol: string;
 }) {
   const [activeMsgTab, setActiveMsgTab] = React.useState("D")
+  const [adminVerifiedState, setAdminVerifiedState] = React.useState<"idle" | "verified" | "waiting">("idle")
   const bg0 = isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"
   const rows = CONVERT_SPEC_ROWS[activeMsgTab] || CONVERT_SPEC_ROWS["D"]
 
@@ -590,9 +591,205 @@ function SpecGridViewer({
             <span className="font-semibold text-[#4caf50]">{rows.filter((r: any) => r.adminVerified).length}</span> / {rows.length} verified
           </span>
         </div>
-        <Button size="sm" className="bg-[#4caf50] text-white hover:bg-[#43a047]">
-          <CheckCircle className="h-3.5 w-3.5 mr-1.5" /> Mark Admin Verified
+        <Button
+          size="sm"
+          onClick={() => setAdminVerifiedState(s => s === "verified" ? "waiting" : s === "waiting" ? "idle" : "verified")}
+          className={
+            adminVerifiedState === "verified" ? "bg-[#4caf50] text-white hover:bg-[#388e3c]"
+            : adminVerifiedState === "waiting" ? "bg-[#ff9800] text-white hover:bg-[#e65100]"
+            : "bg-[#4caf50] text-white hover:bg-[#43a047]"
+          }
+        >
+          {adminVerifiedState === "verified" ? (
+            <><Clock className="h-3.5 w-3.5 mr-1.5" /> Waiting on Client Verified</>
+          ) : adminVerifiedState === "waiting" ? (
+            <><XCircle className="h-3.5 w-3.5 mr-1.5" /> Reset Verification</>
+          ) : (
+            <><CheckCircle className="h-3.5 w-3.5 mr-1.5" /> Mark Admin Verified</>
+          )}
         </Button>
+      </div>
+    </div>
+  )
+}
+
+function TestCaseGeneratorTool({
+  isDarkMode, textPrimary, textSecondary, bgCard, borderColor, caseClient, caseAsset, onPrevStep, onNextStep,
+}: {
+  isDarkMode: boolean; textPrimary: string; textSecondary: string; bgCard: string; borderColor: string;
+  caseClient: string; caseAsset: string;
+  onPrevStep?: () => void; onNextStep?: () => void;
+}) {
+  const bg0 = isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"
+  const [generatingSuite, setGeneratingSuite] = React.useState<string | null>(null)
+  const [generatedSuites, setGeneratedSuites] = React.useState<string[]>([])
+  const [selectedPlan, setSelectedPlan] = React.useState<string | null>(null)
+
+  const savedPlans = [
+    {
+      id: "equities-44",
+      assetClass: "Equities",
+      protocol: "FIX 4.4",
+      client: caseClient,
+      savedAt: "Today, 10:23 AM",
+      categories: 6,
+      totalCases: 1971,
+      breakdown: [
+        { name: "Connectivity Tests", count: 12 },
+        { name: "Order Flow Tests", count: 24 },
+        { name: "Cancel / Replace", count: 10 },
+        { name: "Session Tests", count: 8 },
+        { name: "Execution Reports", count: 18 },
+        { name: "Edge Cases", count: 15 },
+      ],
+      status: "saved",
+    },
+    {
+      id: "commodities-44",
+      assetClass: caseAsset || "Commodities",
+      protocol: "FIX 4.4",
+      client: caseClient,
+      savedAt: "Today, 09:47 AM",
+      categories: 5,
+      totalCases: 1524,
+      breakdown: [
+        { name: "Connectivity Tests", count: 10 },
+        { name: "Order Flow Tests", count: 20 },
+        { name: "Cancel / Replace", count: 8 },
+        { name: "Session Tests", count: 7 },
+        { name: "Execution Reports", count: 14 },
+      ],
+      status: "saved",
+    },
+    {
+      id: "fx-50",
+      assetClass: "FX",
+      protocol: "FIX 5.0",
+      client: caseClient,
+      savedAt: "Yesterday, 4:15 PM",
+      categories: 4,
+      totalCases: 892,
+      breakdown: [
+        { name: "Spot Orders", count: 18 },
+        { name: "Forward Orders", count: 12 },
+        { name: "Session Tests", count: 6 },
+        { name: "Execution Reports", count: 10 },
+      ],
+      status: "saved",
+    },
+  ]
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
+        <div className={`px-4 py-3 border-b ${borderColor} flex items-center gap-2`}>
+          <TestTube className="h-4 w-4 text-[#ff9800]" />
+          <span className={`text-sm font-semibold ${textPrimary}`}>Test Case Generator</span>
+        </div>
+        <div className="px-4 py-4">
+          <p className={`text-sm ${textSecondary}`}>
+            Saved test plans are loaded below. Select a plan and generate the full test suite for that asset class.
+          </p>
+        </div>
+      </div>
+
+      {/* Loaded Test Plans */}
+      <div className="space-y-3">
+        {savedPlans.map((plan) => {
+          const isSelected = selectedPlan === plan.id
+          const isGenerating = generatingSuite === plan.id
+          const isGenerated = generatedSuites.includes(plan.id)
+          return (
+            <div
+              key={plan.id}
+              className={`${bgCard} border rounded-lg overflow-hidden transition-all cursor-pointer ${
+                isSelected ? "border-[#00e5ff]" : borderColor
+              }`}
+              onClick={() => setSelectedPlan(isSelected ? null : plan.id)}
+            >
+              {/* Plan header row */}
+              <div className="px-4 py-3 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={`w-2 h-2 rounded-full ${isGenerated ? "bg-[#4caf50]" : "bg-[#ff9800]"}`} />
+                  <div>
+                    <span className={`text-sm font-semibold ${textPrimary}`}>{plan.client} — {plan.assetClass} / {plan.protocol}</span>
+                    <div className="flex items-center gap-3 mt-0.5">
+                      <span className={`text-xs ${textSecondary}`}>{plan.categories} categories</span>
+                      <span className={`text-xs font-medium ${isGenerated ? "text-[#4caf50]" : "text-[#ff9800]"}`}>{plan.totalCases} test cases</span>
+                      <span className={`text-xs ${textSecondary}`}>Saved: {plan.savedAt}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                  {isGenerated && (
+                    <span className="flex items-center gap-1 text-xs text-[#4caf50]">
+                      <CheckCircle className="h-3.5 w-3.5" /> Suite Generated
+                    </span>
+                  )}
+                  <Button
+                    size="sm"
+                    disabled={isGenerating}
+                    onClick={() => {
+                      setSelectedPlan(plan.id)
+                      setGeneratingSuite(plan.id)
+                      setGeneratedSuites(prev => prev.filter(id => id !== plan.id))
+                      setTimeout(() => {
+                        setGeneratingSuite(null)
+                        setGeneratedSuites(prev => [...prev, plan.id])
+                      }, 1800)
+                    }}
+                    className={isGenerated
+                      ? "bg-[#1e4976] hover:bg-[#1a3f6a] text-white"
+                      : "bg-[#4caf50] hover:bg-[#388e3c] text-white"
+                    }
+                  >
+                    {isGenerating ? (
+                      <><Loader className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Generating...</>
+                    ) : isGenerated ? (
+                      <><RotateCw className="h-3.5 w-3.5 mr-1.5" /> Regenerate Suite</>
+                    ) : (
+                      <><Sparkles className="h-3.5 w-3.5 mr-1.5" /> Generate Test Suite</>
+                    )}
+                  </Button>
+                  <ChevronDown className={`h-4 w-4 ${textSecondary} transition-transform ${isSelected ? "rotate-180" : ""}`} />
+                </div>
+              </div>
+
+              {/* Expanded breakdown */}
+              {isSelected && (
+                <div className={`border-t ${borderColor} px-4 py-3`}>
+                  <div className="grid grid-cols-3 gap-x-8 gap-y-1.5">
+                    {plan.breakdown.map((cat, i) => (
+                      <div key={i} className="flex items-center justify-between text-xs">
+                        <span className={textSecondary}>{cat.name}</span>
+                        <span className={`font-medium ${isGenerated ? "text-[#4caf50]" : textSecondary}`}>{cat.count} cases</span>
+                      </div>
+                    ))}
+                  </div>
+                  {isGenerated && (
+                    <div className={`mt-3 pt-3 border-t ${borderColor} flex items-center gap-2`}>
+                      <Button size="sm" variant="outline"><Eye className="h-3.5 w-3.5 mr-1" /> Preview Suite</Button>
+                      <Button size="sm" variant="outline"><Download className="h-3.5 w-3.5 mr-1" /> Export</Button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Navigation */}
+      <div className={`flex items-center justify-between pt-4 border-t ${borderColor}`}>
+        <Button variant="outline" onClick={onPrevStep} disabled={!onPrevStep} className={!onPrevStep ? "opacity-0 pointer-events-none" : ""}>
+          <ChevronLeft className="h-4 w-4 mr-1" /> Previous Step
+        </Button>
+        {onNextStep && (
+          <Button onClick={onNextStep} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">
+            Next Step <ChevronRight className="h-4 w-4 ml-1" />
+          </Button>
+        )}
       </div>
     </div>
   )
@@ -940,12 +1137,12 @@ function TestPlanGeneratorTool({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Sliders className="h-4 w-4 text-[#9c27b0]" />
-                  <span className={`text-sm font-semibold ${textPrimary}`}>Customize Test Cases to Spec</span>
+                  <span className={`text-sm font-semibold ${textPrimary}`}>Save Test Plan</span>
                 </div>
                 <div className="flex items-center gap-2">
                   {customized && (
                     <span className="flex items-center gap-1 text-xs text-[#4caf50]">
-                      <CheckCircle className="h-3.5 w-3.5" /> Suite Generated
+                      <CheckCircle className="h-3.5 w-3.5" /> Saved
                     </span>
                   )}
                   <Button
@@ -954,22 +1151,22 @@ function TestPlanGeneratorTool({
                     onClick={() => {
                       setCustomizing(true)
                       setCustomized(false)
-                      setTimeout(() => { setCustomizing(false); setCustomized(true) }, 1800)
+                      setTimeout(() => { setCustomizing(false); setCustomized(true) }, 1200)
                     }}
-                    className="bg-[#9c27b0] hover:bg-[#7b1fa2] text-white"
+                    className="bg-[#4caf50] hover:bg-[#388e3c] text-white"
                   >
                     {customizing ? (
-                      <><Loader className="h-3.5 w-3.5 mr-1 animate-spin" /> Analyzing Spec...</>
+                      <><Loader className="h-3.5 w-3.5 mr-1 animate-spin" /> Saving...</>
                     ) : customized ? (
-                      <><RotateCw className="h-3.5 w-3.5 mr-1" /> Regenerate Suite</>
+                      <><RotateCw className="h-3.5 w-3.5 mr-1" /> Save Again</>
                     ) : (
-                      <><Zap className="h-3.5 w-3.5 mr-1" /> Generate Spec-Adjusted Suite</>
+                      <><Download className="h-3.5 w-3.5 mr-1" /> Save Test Plan</>
                     )}
                   </Button>
                 </div>
               </div>
               <p className={`text-xs ${textSecondary} mt-1`}>
-                Compares the loaded spec against the standard suite and adds, removes, or adjusts test cases accordingly.
+                Saves the generated test plan for this asset class. It will be available in the Test Case Generator.
               </p>
             </div>
             {customized && (
@@ -10738,44 +10935,17 @@ const tools = [
 
                           {/* Test Case Creator — Phase 4 */}
                           {tool.id === "test-cases" && (
-                            <div className="space-y-4">
-                              <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${isDarkMode ? "bg-[#1e4976]/20" : "bg-blue-50"}`}>
-                                <TestTube className="h-5 w-5 text-[#ff9800]" />
-                                <div>
-                                  <p className={`font-medium ${textPrimary}`}>Test Case Creator</p>
-                                  <p className={`text-xs ${textSecondary}`}>Create and manage individual test cases</p>
-                                </div>
-                              </div>
-                              <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
-                                <div className={`px-4 py-2 border-b ${borderColor} flex items-center justify-between`}>
-                                  <span className={`text-sm font-medium ${textPrimary}`}>Test Cases</span>
-                                  <Button size="sm" variant="outline"><Plus className="h-3 w-3 mr-1" /> Add Case</Button>
-                                </div>
-                                <div className="divide-y divide-[#1e4976]/30">
-                                  {[
-                                    { id: "TC-001", name: "Session Logon", status: "passed", category: "Session" },
-                                    { id: "TC-002", name: "New Order Single", status: "passed", category: "Order" },
-                                    { id: "TC-003", name: "Order Cancel", status: "in-progress", category: "Order" },
-                                    { id: "TC-004", name: "Execution Report", status: "pending", category: "Execution" },
-                                  ].map(tc => (
-                                    <div key={tc.id} className="px-4 py-2 flex items-center justify-between">
-                                      <div className="flex items-center gap-3">
-                                        <span className={`text-xs font-mono ${textSecondary}`}>{tc.id}</span>
-                                        <span className={`text-sm ${textPrimary}`}>{tc.name}</span>
-                                        <span className={`text-xs px-2 py-0.5 rounded ${isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-100"} ${textSecondary}`}>{tc.category}</span>
-                                      </div>
-                                      <span className={`text-xs px-2 py-1 rounded-full ${tc.status === "passed" ? "bg-[#4caf50]/20 text-[#4caf50]" : tc.status === "in-progress" ? "bg-[#2196f3]/20 text-[#2196f3]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>{tc.status}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
-                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
-                                  <Button variant="outline" onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }} disabled={actualToolIndex === 0} className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}><ChevronLeft className="h-4 w-4 mr-1" /> Previous Step</Button>
-                                  {actualToolIndex < currentPhase.steps.length - 1 && <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>}
-                                </div>
-                              )}
-                            </div>
+                            <TestCaseGeneratorTool
+                              isDarkMode={isDarkMode}
+                              textPrimary={textPrimary}
+                              textSecondary={textSecondary}
+                              bgCard={bgCard}
+                              borderColor={borderColor}
+                              caseClient={caseClient}
+                              caseAsset={caseAsset}
+                              onPrevStep={actualToolIndex > 0 ? () => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) } : undefined}
+                              onNextStep={actualToolIndex < currentPhase.steps.length - 1 ? () => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) } : undefined}
+                            />
                           )}
 
                           {/* Readiness Checklist — Phase 4 */}
