@@ -3,7 +3,7 @@
 // B- COMET Platform - FIX Protocol Testing Suite v2
 import React, { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
-import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, ChevronUp, ChevronsUpDown, FileText, Activity, Zap, Check, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, ClipboardList, Stamp, Code, ScrollText, Navigation, Sparkles, Minus, Loader, FolderArchive, Sliders, Bot, ExternalLink, GitMerge, FileCode, Presentation, ShoppingCart, Network, Circle, Edit3, FileSpreadsheet } from "lucide-react"
+import { Shield, Building2, Sun, Moon, Users, LayoutDashboard, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, ChevronUp, ChevronsUpDown, FileText, Activity, Zap, Check, CheckCircle, AlertTriangle, AlertCircle, Clock, Upload, Play, ArrowLeft, Bell, GitCompare, FileSearch, TestTube, Award, Cog, X, Plus, ChevronDown, Wrench, Download, Eye, MessageSquare, Send, Copy, Wifi, WifiOff, Mail, Search, RefreshCw, Lock, Unlock, Server, Database, BarChart3, FileCheck, Rocket, Calendar, TrendingUp, Filter, ArrowRight, CheckSquare, Square, Link2, Unlink, Briefcase, Scale, Archive, BookOpen, Brain, Timer, History, ShieldCheck, Target, Gauge, AlertOctagon, ThumbsUp, ThumbsDown, UserCheck, FileWarning, Layers, Hash, Globe, Building, ClipboardCheck, ClipboardList, Stamp, Code, ScrollText, Navigation, Sparkles, Minus, Loader, FolderArchive, Sliders, Bot, ExternalLink, GitMerge, FileCode, Presentation, ShoppingCart, Network, Circle, Edit3, FileSpreadsheet, Edit2, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -1262,7 +1262,31 @@ export default function BCometPlatform() {
     "Summit Financial": { stage: 1, stageStatus: { 1: "in-progress", 2: "pending", 3: "pending", 4: "pending", 5: "pending", 6: "pending", 7: "pending" } },
   })
   // Field mapping rules state
-  const [fieldMappings, setFieldMappings] = useState<Record<string, Array<{clientTag: string, clientName: string, broaderTag: string, broaderName: string, transform: string | null, status: "mapped" | "custom" | "unmapped"}>>>({})
+  const [fieldMappings, setFieldMappings] = useState<Record<string, Array<{clientTag: string, clientName: string, broaderTag: string, broaderName: string, transform: string | null, status: "mapped" | "custom" | "unmapped"}>>>({
+    "Futures-FIX 5.0 SP2": [
+      { clientTag: "1", clientName: "Account", broaderTag: "1", broaderName: "Account", transform: null, status: "mapped" },
+      { clientTag: "11", clientName: "ClOrdID", broaderTag: "11", broaderName: "ClOrdID", transform: null, status: "mapped" },
+      { clientTag: "55", clientName: "Symbol", broaderTag: "55", broaderName: "Symbol", transform: null, status: "mapped" },
+      { clientTag: "5001", clientName: "ClientRef", broaderTag: "20001", broaderName: "BroaderClientRef", transform: "PREFIX:BR_", status: "custom" },
+      { clientTag: "5002", clientName: "DeskID", broaderTag: "", broaderName: "", transform: null, status: "unmapped" },
+      { clientTag: "54", clientName: "Side", broaderTag: "54", broaderName: "Side", transform: "MAP:B->1,S->2", status: "custom" },
+      { clientTag: "38", clientName: "OrderQty", broaderTag: "38", broaderName: "OrderQty", transform: null, status: "mapped" },
+      { clientTag: "44", clientName: "Price", broaderTag: "44", broaderName: "Price", transform: "SCALE:100", status: "custom" },
+    ],
+    "Equities-FIX 4.4": [
+      { clientTag: "1", clientName: "Account", broaderTag: "1", broaderName: "Account", transform: null, status: "mapped" },
+      { clientTag: "11", clientName: "ClOrdID", broaderTag: "11", broaderName: "ClOrdID", transform: null, status: "mapped" },
+      { clientTag: "55", clientName: "Symbol", broaderTag: "55", broaderName: "Symbol", transform: null, status: "mapped" },
+      { clientTag: "5001", clientName: "ClientRef", broaderTag: "20001", broaderName: "BroaderClientRef", transform: "PREFIX:BR_", status: "custom" },
+      { clientTag: "5002", clientName: "DeskID", broaderTag: "", broaderName: "", transform: null, status: "unmapped" },
+      { clientTag: "54", clientName: "Side", broaderTag: "54", broaderName: "Side", transform: "MAP:B->1,S->2", status: "custom" },
+      { clientTag: "38", clientName: "OrderQty", broaderTag: "38", broaderName: "OrderQty", transform: null, status: "mapped" },
+      { clientTag: "44", clientName: "Price", broaderTag: "44", broaderName: "Price", transform: "SCALE:100", status: "custom" },
+    ],
+  })
+  // Mapping rule panel state — null = closed, -1 = new rule, >=0 = editing existing index
+  const [mappingPanelOpen, setMappingPanelOpen] = useState<number | null>(null)
+  const [mappingPanelDraft, setMappingPanelDraft] = useState<{clientTag: string, clientName: string, broaderTag: string, broaderName: string, transform: string, transformType: string}>({ clientTag: "", clientName: "", broaderTag: "", broaderName: "", transform: "", transformType: "none" })
   // Dashboard view mode
   const [dashboardView, setDashboardView] = useState<"cards" | "kanban">("cards")
   // Phase filter — set from Workflow Overview to show cases in a specific phase
@@ -11413,133 +11437,305 @@ const tools = [
                           )}
 
                           {/* Field Mapping Tool - Inline */}
-                          {tool.id === "field-map" && (
-                            <div className="space-y-4">
-                              <p className={textSecondary}>Define field mappings between client and FIX message tags for {selectedOnboardingCase?.assetClass} {selectedOnboardingCase?.protocol}.</p>
-                              
-                              {/* Mapping Stats Summary */}
-                              <div className="grid grid-cols-4 gap-4">
-                                <Card className={`${bgCard} border ${borderColor} p-3`}>
-                                  <div className="flex items-center gap-2">
-                                    <div className="p-1.5 rounded-lg bg-[#4caf50]/20">
-                                      <CheckCircle className="h-4 w-4 text-[#4caf50]" />
-                                    </div>
-                                    <div>
-                                      <p className={`font-bold text-lg ${textPrimary}`}>5</p>
-                                      <p className={`text-xs ${textSecondary}`}>Mapped</p>
-                                    </div>
-                                  </div>
-                                </Card>
-                                <Card className={`${bgCard} border ${borderColor} p-3`}>
-                                  <div className="flex items-center gap-2">
-                                    <div className="p-1.5 rounded-lg bg-[#00e5ff]/20">
-                                      <Wrench className="h-4 w-4 text-[#00e5ff]" />
-                                    </div>
-                                    <div>
-                                      <p className={`font-bold text-lg ${textPrimary}`}>3</p>
-                                      <p className={`text-xs ${textSecondary}`}>Transforms</p>
-                                    </div>
-                                  </div>
-                                </Card>
-                                <Card className={`${bgCard} border ${borderColor} p-3`}>
-                                  <div className="flex items-center gap-2">
-                                    <div className="p-1.5 rounded-lg bg-[#ff9800]/20">
-                                      <AlertTriangle className="h-4 w-4 text-[#ff9800]" />
-                                    </div>
-                                    <div>
-                                      <p className={`font-bold text-lg ${textPrimary}`}>1</p>
-                                      <p className={`text-xs ${textSecondary}`}>Unmapped</p>
-                                    </div>
-                                  </div>
-                                </Card>
-                                <Card className={`${bgCard} border ${borderColor} p-3`}>
-                                  <div className="flex items-center gap-2">
-                                    <div className="p-1.5 rounded-lg bg-[#2196f3]/20">
-                                      <FileText className="h-4 w-4 text-[#2196f3]" />
-                                    </div>
-                                    <div>
-                                      <p className={`font-bold text-lg ${textPrimary}`}>8</p>
-                                      <p className={`text-xs ${textSecondary}`}>Total Rules</p>
-                                    </div>
-                                  </div>
-                                </Card>
-                              </div>
+                          {tool.id === "field-map" && (() => {
+                            const caseKey = `${selectedOnboardingCase?.assetClass}-${selectedOnboardingCase?.protocol}`
+                            const rules = fieldMappings[caseKey] || []
+                            const mapped = rules.filter(r => r.status === "mapped").length
+                            const custom = rules.filter(r => r.status === "custom").length
+                            const unmapped = rules.filter(r => r.status === "unmapped").length
 
-                              {/* Mapping Table */}
-                              <Card className={`${bgCard} border ${borderColor} overflow-hidden`}>
-                                <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
-                                  <h3 className={`font-bold ${textPrimary}`}>Field Mapping Rules</h3>
-                                  <Button size="sm" className="bg-[#4caf50] hover:bg-[#388e3c] text-white">
-                                    <Plus className="h-4 w-4 mr-1" /> Add Rule
-                                  </Button>
+                            const openAdd = () => {
+                              setMappingPanelDraft({ clientTag: "", clientName: "", broaderTag: "", broaderName: "", transform: "", transformType: "none" })
+                              setMappingPanelOpen(-1)
+                            }
+                            const openEdit = (i: number) => {
+                              const r = rules[i]
+                              let transformType = "none"
+                              let transformVal = ""
+                              if (r.transform) {
+                                transformType = r.transform.startsWith("PREFIX:") ? "prefix" : r.transform.startsWith("MAP:") ? "map" : r.transform.startsWith("SCALE:") ? "scale" : "custom"
+                                transformVal = r.transform.includes(":") ? r.transform.split(":").slice(1).join(":") : r.transform
+                              }
+                              setMappingPanelDraft({ clientTag: r.clientTag, clientName: r.clientName, broaderTag: r.broaderTag, broaderName: r.broaderName, transform: transformVal, transformType })
+                              setMappingPanelOpen(i)
+                            }
+                            const closePanel = () => setMappingPanelOpen(null)
+                            const saveRule = () => {
+                              const d = mappingPanelDraft
+                              const transformStr = d.transformType === "none" ? null
+                                : d.transformType === "prefix" ? `PREFIX:${d.transform}`
+                                : d.transformType === "map" ? `MAP:${d.transform}`
+                                : d.transformType === "scale" ? `SCALE:${d.transform}`
+                                : d.transform || null
+                              const status: "mapped" | "custom" | "unmapped" = !d.broaderTag ? "unmapped" : transformStr ? "custom" : "mapped"
+                              const newRule = { clientTag: d.clientTag, clientName: d.clientName, broaderTag: d.broaderTag, broaderName: d.broaderName, transform: transformStr, status }
+                              setFieldMappings(prev => {
+                                const existing = prev[caseKey] || []
+                                const updated = mappingPanelOpen === -1
+                                  ? [...existing, newRule]
+                                  : existing.map((r, i) => i === mappingPanelOpen ? newRule : r)
+                                return { ...prev, [caseKey]: updated }
+                              })
+                              closePanel()
+                            }
+                            const deleteRule = (i: number) => {
+                              setFieldMappings(prev => ({ ...prev, [caseKey]: (prev[caseKey] || []).filter((_, idx) => idx !== i) }))
+                            }
+
+                            return (
+                              <div className="space-y-4 relative">
+                                <p className={textSecondary}>Define field mappings between client and FIX message tags for {selectedOnboardingCase?.assetClass} {selectedOnboardingCase?.protocol}.</p>
+
+                                {/* Stats */}
+                                <div className="grid grid-cols-4 gap-4">
+                                  {[
+                                    { icon: <CheckCircle className="h-4 w-4 text-[#4caf50]" />, color: "bg-[#4caf50]/20", count: mapped, label: "Mapped" },
+                                    { icon: <Wrench className="h-4 w-4 text-[#00e5ff]" />, color: "bg-[#00e5ff]/20", count: custom, label: "Transforms" },
+                                    { icon: <AlertTriangle className="h-4 w-4 text-[#ff9800]" />, color: "bg-[#ff9800]/20", count: unmapped, label: "Unmapped" },
+                                    { icon: <FileText className="h-4 w-4 text-[#2196f3]" />, color: "bg-[#2196f3]/20", count: rules.length, label: "Total Rules" },
+                                  ].map(s => (
+                                    <Card key={s.label} className={`${bgCard} border ${borderColor} p-3`}>
+                                      <div className="flex items-center gap-2">
+                                        <div className={`p-1.5 rounded-lg ${s.color}`}>{s.icon}</div>
+                                        <div>
+                                          <p className={`font-bold text-lg ${textPrimary}`}>{s.count}</p>
+                                          <p className={`text-xs ${textSecondary}`}>{s.label}</p>
+                                        </div>
+                                      </div>
+                                    </Card>
+                                  ))}
                                 </div>
-                                <div className="overflow-x-auto max-h-96 overflow-y-auto">
-                                  <table className="w-full text-sm">
-                                    <thead>
-                                      <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"} sticky top-0`}>
-                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Client Tag</th>
-                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Client Name</th>
-                                        <th className={`px-4 py-2 text-center font-semibold ${textPrimary}`}></th>
-                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Admin Tag</th>
-                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Admin Name</th>
-                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Transform</th>
-                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Status</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {[
-                                        { clientTag: "1", clientName: "Account", broaderTag: "1", broaderName: "Account", transform: null, status: "mapped" as const },
-                                        { clientTag: "11", clientName: "ClOrdID", broaderTag: "11", broaderName: "ClOrdID", transform: null, status: "mapped" as const },
-                                        { clientTag: "55", clientName: "Symbol", broaderTag: "55", broaderName: "Symbol", transform: null, status: "mapped" as const },
-                                        { clientTag: "5001", clientName: "ClientRef", broaderTag: "20001", broaderName: "BroaderClientRef", transform: "PREFIX:BR_", status: "custom" as const },
-                                        { clientTag: "5002", clientName: "DeskID", broaderTag: null, broaderName: null, transform: null, status: "unmapped" as const },
-                                        { clientTag: "54", clientName: "Side", broaderTag: "54", broaderName: "Side", transform: "MAP:B->1,S->2", status: "custom" as const },
-                                        { clientTag: "38", clientName: "OrderQty", broaderTag: "38", broaderName: "OrderQty", transform: null, status: "mapped" as const },
-                                        { clientTag: "44", clientName: "Price", broaderTag: "44", broaderName: "Price", transform: "SCALE:100", status: "custom" as const },
-                                      ].map((m, i) => (
-                                        <tr key={i} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
-                                          <td className={`px-4 py-2 font-mono text-sm ${textPrimary}`}>{m.clientTag}</td>
-                                          <td className={`px-4 py-2 ${textPrimary}`}>{m.clientName}</td>
-                                          <td className="px-4 py-2 text-center">
-                                            {m.status === "mapped" || m.status === "custom" ? (
-                                              <ArrowRight className="h-4 w-4 text-[#4caf50] mx-auto" />
-                                            ) : (
-                                              <Unlink className="h-4 w-4 text-[#ff9800] mx-auto" />
-                                            )}
-                                          </td>
-                                          <td className={`px-4 py-2 font-mono text-sm ${m.broaderTag ? textPrimary : textSecondary}`}>{m.broaderTag || "-"}</td>
-                                          <td className={`px-4 py-2 ${m.broaderName ? textPrimary : textSecondary}`}>{m.broaderName || "-"}</td>
-                                          <td className={`px-4 py-2`}>
-                                            {m.transform ? (
-                                              <code className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]/50 text-[#00e5ff]" : "bg-blue-100 text-blue-700"}`}>{m.transform}</code>
-                                            ) : (
-                                              <span className={textSecondary}>-</span>
-                                            )}
-                                          </td>
-                                          <td className={`px-4 py-2`}>
-                                            <span className={`px-2 py-1 rounded text-xs ${
-                                              m.status === "mapped" ? "bg-[#4caf50]/20 text-[#4caf50]" :
-                                              m.status === "custom" ? "bg-[#00e5ff]/20 text-[#00e5ff]" :
-                                              "bg-[#ff9800]/20 text-[#ff9800]"
-                                            }`}>
-                                              {m.status === "mapped" ? "Mapped" : m.status === "custom" ? "Custom" : "Unmapped"}
-                                            </span>
-                                          </td>
+
+                                {/* Table */}
+                                <Card className={`${bgCard} border ${borderColor} overflow-hidden`}>
+                                  <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                    <h3 className={`font-bold ${textPrimary}`}>Field Mapping Rules</h3>
+                                    <Button size="sm" className="bg-[#4caf50] hover:bg-[#388e3c] text-white" onClick={openAdd}>
+                                      <Plus className="h-4 w-4 mr-1" /> Add Rule
+                                    </Button>
+                                  </div>
+                                  <div className="overflow-x-auto max-h-96 overflow-y-auto">
+                                    <table className="w-full text-sm">
+                                      <thead>
+                                        <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"} sticky top-0 z-10`}>
+                                          <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Client Tag</th>
+                                          <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Client Name</th>
+                                          <th className="w-8"></th>
+                                          <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Admin Tag</th>
+                                          <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Admin Name</th>
+                                          <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Transform</th>
+                                          <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Status</th>
+                                          <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Actions</th>
                                         </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-                                </div>
-                              </Card>
+                                      </thead>
+                                      <tbody>
+                                        {rules.length === 0 && (
+                                          <tr><td colSpan={8} className={`px-4 py-8 text-center ${textSecondary}`}>No mapping rules yet. Click &quot;Add Rule&quot; to get started.</td></tr>
+                                        )}
+                                        {rules.map((m, i) => (
+                                          <tr key={i} className={`border-b ${borderColor} hover:bg-[#1e4976]/10 transition-colors`}>
+                                            <td className={`px-4 py-2.5 font-mono text-sm ${textPrimary}`}>{m.clientTag}</td>
+                                            <td className={`px-4 py-2.5 ${textPrimary}`}>{m.clientName}</td>
+                                            <td className="px-2 py-2.5 text-center">
+                                              {m.status !== "unmapped" ? <ArrowRight className="h-4 w-4 text-[#4caf50] mx-auto" /> : <Unlink className="h-4 w-4 text-[#ff9800] mx-auto" />}
+                                            </td>
+                                            <td className={`px-4 py-2.5 font-mono text-sm ${m.broaderTag ? textPrimary : textSecondary}`}>{m.broaderTag || "-"}</td>
+                                            <td className={`px-4 py-2.5 ${m.broaderName ? textPrimary : textSecondary}`}>{m.broaderName || "-"}</td>
+                                            <td className="px-4 py-2.5">
+                                              {m.transform
+                                                ? <code className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]/50 text-[#00e5ff]" : "bg-blue-100 text-blue-700"}`}>{m.transform}</code>
+                                                : <span className={textSecondary}>-</span>}
+                                            </td>
+                                            <td className="px-4 py-2.5">
+                                              <span className={`px-2 py-1 rounded text-xs ${m.status === "mapped" ? "bg-[#4caf50]/20 text-[#4caf50]" : m.status === "custom" ? "bg-[#00e5ff]/20 text-[#00e5ff]" : "bg-[#ff9800]/20 text-[#ff9800]"}`}>
+                                                {m.status === "mapped" ? "Mapped" : m.status === "custom" ? "Custom" : "Unmapped"}
+                                              </span>
+                                            </td>
+                                            <td className="px-4 py-2.5">
+                                              <div className="flex items-center gap-2">
+                                                <button onClick={() => openEdit(i)} className={`${textSecondary} hover:text-[#00e5ff] transition-colors`} title="Edit rule">
+                                                  <Edit2 className="h-3.5 w-3.5" />
+                                                </button>
+                                                <button onClick={() => deleteRule(i)} className={`${textSecondary} hover:text-[#ff4444] transition-colors`} title="Delete rule">
+                                                  <Trash2 className="h-3.5 w-3.5" />
+                                                </button>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </Card>
 
-                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
-                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
-                                  <Button variant="outline" onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }} disabled={actualToolIndex === 0} className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}><ChevronLeft className="h-4 w-4 mr-1" /> Previous Step</Button>
-                                  {actualToolIndex < currentPhase.steps.length - 1 && <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>}
-                                </div>
-                              )}
-                            </div>
-                          )}
+                                {/* Slide-in Panel */}
+                                {mappingPanelOpen !== null && (
+                                  <>
+                                    {/* Backdrop */}
+                                    <div className="fixed inset-0 z-40 bg-black/40" onClick={closePanel} />
+                                    {/* Drawer */}
+                                    <div className={`fixed top-0 right-0 h-full w-[420px] z-50 shadow-2xl flex flex-col ${isDarkMode ? "bg-[#0d1f3c]" : "bg-white"} border-l ${borderColor}`}>
+                                      {/* Panel Header */}
+                                      <div className={`flex items-center justify-between px-6 py-4 border-b ${borderColor}`}>
+                                        <div>
+                                          <h3 className={`font-bold text-base ${textPrimary}`}>{mappingPanelOpen === -1 ? "Add Mapping Rule" : "Edit Mapping Rule"}</h3>
+                                          <p className={`text-xs mt-0.5 ${textSecondary}`}>{selectedOnboardingCase?.assetClass} {selectedOnboardingCase?.protocol}</p>
+                                        </div>
+                                        <button onClick={closePanel} className={`${textSecondary} hover:${textPrimary} transition-colors`}>
+                                          <X className="h-5 w-5" />
+                                        </button>
+                                      </div>
+
+                                      {/* Panel Body */}
+                                      <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+
+                                        {/* Client Side */}
+                                        <div className={`p-4 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                                          <p className={`text-xs font-semibold uppercase tracking-wider mb-3 ${textSecondary}`}>Client Field</p>
+                                          <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                              <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Client Tag <span className="text-[#ff4444]">*</span></label>
+                                              <Input
+                                                placeholder="e.g. 5001"
+                                                value={mappingPanelDraft.clientTag}
+                                                onChange={e => setMappingPanelDraft(p => ({ ...p, clientTag: e.target.value }))}
+                                                className={`${isDarkMode ? "bg-[#1e4976]/30 border-[#1e4976] text-white placeholder:text-slate-500" : ""}`}
+                                              />
+                                            </div>
+                                            <div>
+                                              <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Field Name</label>
+                                              <Input
+                                                placeholder="e.g. ClientRef"
+                                                value={mappingPanelDraft.clientName}
+                                                onChange={e => setMappingPanelDraft(p => ({ ...p, clientName: e.target.value }))}
+                                                className={`${isDarkMode ? "bg-[#1e4976]/30 border-[#1e4976] text-white placeholder:text-slate-500" : ""}`}
+                                              />
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        {/* Arrow divider */}
+                                        <div className="flex items-center gap-3">
+                                          <div className={`flex-1 h-px ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`} />
+                                          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border ${borderColor} ${isDarkMode ? "bg-[#0a1628] text-[#00e5ff]" : "bg-blue-50 text-blue-600"}`}>
+                                            <ArrowRight className="h-3.5 w-3.5" /> Maps to
+                                          </div>
+                                          <div className={`flex-1 h-px ${isDarkMode ? "bg-[#1e4976]" : "bg-gray-200"}`} />
+                                        </div>
+
+                                        {/* Admin Side */}
+                                        <div className={`p-4 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                                          <p className={`text-xs font-semibold uppercase tracking-wider mb-3 ${textSecondary}`}>Admin (Broadridge) Field</p>
+                                          <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                              <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Admin Tag</label>
+                                              <Input
+                                                placeholder="e.g. 20001"
+                                                value={mappingPanelDraft.broaderTag}
+                                                onChange={e => setMappingPanelDraft(p => ({ ...p, broaderTag: e.target.value }))}
+                                                className={`${isDarkMode ? "bg-[#1e4976]/30 border-[#1e4976] text-white placeholder:text-slate-500" : ""}`}
+                                              />
+                                            </div>
+                                            <div>
+                                              <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Field Name</label>
+                                              <Input
+                                                placeholder="e.g. BroaderClientRef"
+                                                value={mappingPanelDraft.broaderName}
+                                                onChange={e => setMappingPanelDraft(p => ({ ...p, broaderName: e.target.value }))}
+                                                className={`${isDarkMode ? "bg-[#1e4976]/30 border-[#1e4976] text-white placeholder:text-slate-500" : ""}`}
+                                              />
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        {/* Transform */}
+                                        <div className={`p-4 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                                          <p className={`text-xs font-semibold uppercase tracking-wider mb-3 ${textSecondary}`}>Transform</p>
+                                          <div className="space-y-3">
+                                            <div>
+                                              <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Transform Type</label>
+                                              <select
+                                                value={mappingPanelDraft.transformType}
+                                                onChange={e => setMappingPanelDraft(p => ({ ...p, transformType: e.target.value, transform: "" }))}
+                                                className={`w-full px-3 py-2 rounded-md border text-sm ${isDarkMode ? "bg-[#1e4976]/30 border-[#1e4976] text-white" : "bg-white border-gray-300 text-gray-900"}`}
+                                              >
+                                                <option value="none">None — direct mapping</option>
+                                                <option value="prefix">Prefix — prepend a string</option>
+                                                <option value="map">Value Map — e.g. B-&gt;1, S-&gt;2</option>
+                                                <option value="scale">Scale — multiply by factor</option>
+                                                <option value="custom">Custom expression</option>
+                                              </select>
+                                            </div>
+                                            {mappingPanelDraft.transformType !== "none" && (
+                                              <div>
+                                                <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>
+                                                  {mappingPanelDraft.transformType === "prefix" ? "Prefix string" :
+                                                   mappingPanelDraft.transformType === "map" ? "Value pairs (e.g. B->1,S->2)" :
+                                                   mappingPanelDraft.transformType === "scale" ? "Scale factor (e.g. 100)" :
+                                                   "Expression"}
+                                                </label>
+                                                <Input
+                                                  placeholder={
+                                                    mappingPanelDraft.transformType === "prefix" ? "BR_" :
+                                                    mappingPanelDraft.transformType === "map" ? "B->1,S->2" :
+                                                    mappingPanelDraft.transformType === "scale" ? "100" :
+                                                    "Custom expression"
+                                                  }
+                                                  value={mappingPanelDraft.transform}
+                                                  onChange={e => setMappingPanelDraft(p => ({ ...p, transform: e.target.value }))}
+                                                  className={`${isDarkMode ? "bg-[#1e4976]/30 border-[#1e4976] text-white placeholder:text-slate-500" : ""} font-mono text-sm`}
+                                                />
+                                                <p className={`text-xs mt-1.5 ${textSecondary}`}>
+                                                  Preview: <code className="text-[#00e5ff]">
+                                                    {mappingPanelDraft.transformType === "prefix" ? `PREFIX:${mappingPanelDraft.transform}` :
+                                                     mappingPanelDraft.transformType === "map" ? `MAP:${mappingPanelDraft.transform}` :
+                                                     mappingPanelDraft.transformType === "scale" ? `SCALE:${mappingPanelDraft.transform}` :
+                                                     mappingPanelDraft.transform}
+                                                  </code>
+                                                </p>
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+
+                                        {/* Status preview */}
+                                        <div className={`flex items-center gap-2 px-4 py-3 rounded-lg border ${borderColor} ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"}`}>
+                                          <span className={`text-xs ${textSecondary}`}>Resulting status:</span>
+                                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                            !mappingPanelDraft.broaderTag ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                                            mappingPanelDraft.transformType !== "none" ? "bg-[#00e5ff]/20 text-[#00e5ff]" :
+                                            "bg-[#4caf50]/20 text-[#4caf50]"
+                                          }`}>
+                                            {!mappingPanelDraft.broaderTag ? "Unmapped" : mappingPanelDraft.transformType !== "none" ? "Custom" : "Mapped"}
+                                          </span>
+                                        </div>
+                                      </div>
+
+                                      {/* Panel Footer */}
+                                      <div className={`px-6 py-4 border-t ${borderColor} flex items-center justify-between`}>
+                                        <Button variant="outline" onClick={closePanel}>Cancel</Button>
+                                        <Button
+                                          className="bg-[#4caf50] hover:bg-[#388e3c] text-white"
+                                          onClick={saveRule}
+                                          disabled={!mappingPanelDraft.clientTag}
+                                        >
+                                          <CheckCircle className="h-4 w-4 mr-1.5" />
+                                          {mappingPanelOpen === -1 ? "Add Rule" : "Save Changes"}
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </>
+                                )}
+
+                                {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                  <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
+                                    <Button variant="outline" onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }} disabled={actualToolIndex === 0} className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}><ChevronLeft className="h-4 w-4 mr-1" /> Previous Step</Button>
+                                    {actualToolIndex < currentPhase.steps.length - 1 && <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>}
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          })()}
 
                           {/* Generic fallback for other tools */}
                           {!["intake", "docs", "gap", "spec-from-log", "atdl", "test-plan", "test-cases", "checklist", "session-tests", "app-tests", "evidence", "log-analysis", "failure-analysis", "root-cause", "defects", "eval", "report", "signoff", "convert-spec", "spec-compare", "session", "field-map"].includes(tool.id) && (
