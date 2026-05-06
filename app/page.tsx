@@ -493,16 +493,8 @@ function TestPlanGeneratorTool({
   onNextStep?: () => void
 }) {
   const [selectedSuiteId, setSelectedSuiteId] = React.useState(defaultSuiteId)
-  const [specLoaded] = React.useState(true) // standardized spec always present
-  const [customizing, setCustomizing] = React.useState(false)
-  const [customized, setCustomized] = React.useState(false)
-
-  const selectedSuite = availableSuites.find(s => s.id === selectedSuiteId) ?? availableSuites[0]
-  const totalCases = selectedSuite.categories.reduce((acc, c) => acc + c.count, 0)
-  const customizedTotal = selectedSuite.categories.reduce((acc, c) => acc + Math.round(c.count * 1.15), 0)
 
   const bg0 = isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"
-  const bg1 = isDarkMode ? "bg-[#0d1f35]" : "bg-white"
 
   const [testPlanGenerated, setTestPlanGenerated] = React.useState(false)
   const [generatingTestPlan, setGeneratingTestPlan] = React.useState(false)
@@ -10434,14 +10426,12 @@ const tools = [
 
                           {/* Test Plan Generator — Phase 4 */}
                           {tool.id === "test-plan" && (() => {
-                            // Derive the preselected suite from the case context
                             const caseClient = selectedOnboardingCase?.client || "Nexus Trading Group"
                             const caseAsset  = selectedOnboardingCase?.assetClass || "Equities"
-                            const caseProtocol = "FIX 4.2"
-                            const defaultSuite = `${caseClient} — ${caseAsset} / ${caseProtocol}`
+                            const caseProtocol = selectedOnboardingCase?.protocol || "FIX 4.2"
 
                             const availableSuites = [
-                              { id: "nexus-eq-42", label: `${caseClient} — ${caseAsset} / ${caseProtocol}`, categories: [
+                              { id: "case-default", label: `${caseClient} — ${caseAsset} / ${caseProtocol}`, categories: [
                                   { name: "Connectivity Tests",   count: 12 },
                                   { name: "Session Tests",        count: 8  },
                                   { name: "Order Flow Tests",     count: 24 },
@@ -10470,15 +10460,10 @@ const tools = [
                                 ]},
                             ]
 
-                            const [selectedSuiteId, setSelectedSuiteId]             = [
-                              "nexus-eq-42",
-                              () => {},
-                            ] as const
-                            // We use component-level state via a wrapper
                             return (
                               <TestPlanGeneratorTool
                                 availableSuites={availableSuites}
-                                defaultSuiteId="nexus-eq-42"
+                                defaultSuiteId="case-default"
                                 caseClient={caseClient}
                                 caseAsset={caseAsset}
                                 caseProtocol={caseProtocol}
