@@ -641,33 +641,53 @@ function TestPlanGeneratorTool({
   return (
     <div className="space-y-4">
 
-      {/* Step 1 — Select Standardized Spec (dropdown + Select button) */}
-      {!specSelected && (
+      {/* Spec selector — always visible so user can change/reload at any time */}
+      {!testPlanGenerated && (
         <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
           <div className={`px-4 py-3 border-b ${borderColor} flex items-center gap-2`}>
             <ClipboardCheck className="h-4 w-4 text-[#ff9800]" />
             <span className={`text-sm font-semibold ${textPrimary}`}>Select Standardized Specification</span>
           </div>
-          <div className="px-4 py-6 space-y-5">
+          <div className="px-4 py-5 space-y-4">
             <p className={`text-sm ${textSecondary}`}>
               Select which standardized specification to base the test plan on for{" "}
               <span className={`font-medium ${textPrimary}`}>{caseClient} — {caseAsset} / {caseProtocol}</span>.
             </p>
 
-            {/* Spec dropdown */}
+            {/* Dropdown + Load button inline */}
             <div>
               <label className={`block text-xs font-medium mb-1.5 ${textSecondary}`}>Standardized Specification</label>
-              <div className={`relative border ${borderColor} rounded-lg overflow-hidden`}>
-                <select
-                  value={selectedSuiteId}
-                  onChange={e => setSelectedSuiteId(e.target.value)}
-                  className={`w-full appearance-none px-3 py-3 pr-8 text-sm font-medium ${textPrimary} ${bg0} focus:outline-none`}
+              <div className="flex items-center gap-2">
+                <div className={`relative flex-1 border ${borderColor} rounded-lg overflow-hidden`}>
+                  <select
+                    value={selectedSuiteId}
+                    onChange={e => { setSelectedSuiteId(e.target.value); setSpecSelected(false); setCustomized(false) }}
+                    className={`w-full appearance-none px-3 py-3 pr-8 text-sm font-medium ${textPrimary} ${bg0} focus:outline-none`}
+                  >
+                    {availableSuites.map(suite => (
+                      <option key={suite.id} value={suite.id}>{suite.label}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none ${textSecondary}`} />
+                </div>
+                <Button
+                  className="bg-[#00e5ff] hover:bg-[#00b8d4] text-[#0a1628] px-5 shrink-0"
+                  disabled={selectingSpec}
+                  onClick={() => {
+                    setSelectingSpec(true)
+                    setSpecSelected(false)
+                    setCustomized(false)
+                    setTimeout(() => {
+                      setSelectingSpec(false)
+                      setSpecSelected(true)
+                    }, 1200)
+                  }}
                 >
-                  {availableSuites.map(suite => (
-                    <option key={suite.id} value={suite.id}>{suite.label}</option>
-                  ))}
-                </select>
-                <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none ${textSecondary}`} />
+                  {selectingSpec
+                    ? <><Loader className="h-4 w-4 mr-1.5 animate-spin" /> Loading...</>
+                    : specSelected ? <>Reload</> : <>Load</>
+                  }
+                </Button>
               </div>
               {selectedSuiteId === defaultSuiteId && (
                 <div className="flex items-center gap-1.5 mt-2">
@@ -677,117 +697,96 @@ function TestPlanGeneratorTool({
               )}
             </div>
 
-            <div className="flex justify-end pt-2">
-              <Button
-                className="bg-[#00e5ff] hover:bg-[#00b8d4] text-[#0a1628] px-6"
-                disabled={selectingSpec}
-                onClick={() => {
-                  setSelectingSpec(true)
-                  setTimeout(() => {
-                    setSelectingSpec(false)
-                    setSpecSelected(true)
-                  }, 1200)
-                }}
-              >
-                {selectingSpec
-                  ? <><Loader className="h-4 w-4 mr-2 animate-spin" /> Loading...</>
-                  : <>Load</>
-                }
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Step 2 — Spec loaded preview + Generate Test Plan button */}
-      {specSelected && !testPlanGenerated && (
-        <>
-          {/* Loaded spec header with change option */}
-          <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
-            <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
-              <div className="flex items-center gap-2">
-                <FileCheck className="h-4 w-4 text-[#00e5ff]" />
-                <span className={`text-sm font-semibold ${textPrimary}`}>Loaded Standardized Spec</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="flex items-center gap-1 text-xs text-[#4caf50]">
-                  <CheckCircle className="h-3.5 w-3.5" /> Loaded
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => { setSpecSelected(false); setTestPlanGenerated(false); setCustomized(false) }}
-                  className={`text-xs ${textSecondary}`}
-                >
-                  Change Spec
-                </Button>
-              </div>
-            </div>
-            <div className="px-4 py-3">
-              <div className={`${bg0} rounded-lg px-4 py-3 flex items-center justify-between`}>
-                <div className="flex items-center gap-3">
-                  <FileText className={`h-5 w-5 ${textSecondary}`} />
-                  <div>
-                    <p className={`text-sm font-medium ${textPrimary}`}>{selectedSuite.label}</p>
-                    <p className={`text-xs ${textSecondary}`}>{caseProtocol} · {selectedSuite.categories.length} categories · {totalCases} test cases</p>
+            {/* Loaded status + spec grid */}
+            {specSelected && (
+              <div className="space-y-4">
+                <div className={`${bg0} rounded-lg px-4 py-3 flex items-center justify-between`}>
+                  <div className="flex items-center gap-3">
+                    <FileText className={`h-5 w-5 ${textSecondary}`} />
+                    <div>
+                      <p className={`text-sm font-medium ${textPrimary}`}>{selectedSuite.label}</p>
+                      <p className={`text-xs ${textSecondary}`}>{caseProtocol} · {selectedSuite.categories.length} categories · {totalCases} test cases</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="flex items-center gap-1 text-xs text-[#4caf50]">
+                      <CheckCircle className="h-3.5 w-3.5" /> Loaded
+                    </span>
+                    <Button variant="outline" size="sm"><Eye className="h-3.5 w-3.5 mr-1" /> View Spec</Button>
                   </div>
                 </div>
-                <Button variant="outline" size="sm"><Eye className="h-3.5 w-3.5 mr-1" /> View Spec</Button>
+
+                {/* Full Standardized Specifications Grid */}
+                <SpecGridViewer
+                  isDarkMode={isDarkMode}
+                  bgCard={bgCard}
+                  borderColor={borderColor}
+                  textPrimary={textPrimary}
+                  textSecondary={textSecondary}
+                  caseProtocol={caseProtocol}
+                />
+
+                {/* Generate Test Plan button */}
+                <div className="flex justify-end">
+                  <Button
+                    className="bg-[#4caf50] hover:bg-[#388e3c] text-white px-6"
+                    size="lg"
+                    disabled={generatingTestPlan}
+                    onClick={() => {
+                      setGeneratingTestPlan(true)
+                      setTimeout(() => {
+                        setGeneratingTestPlan(false)
+                        setTestPlanGenerated(true)
+                      }, 1800)
+                    }}
+                  >
+                    {generatingTestPlan
+                      ? <><Loader className="h-4 w-4 mr-2 animate-spin" /> Generating...</>
+                      : <><Sparkles className="h-4 w-4 mr-2" /> Generate Test Plan</>
+                    }
+                  </Button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
-
-          {/* Full Standardized Specifications Grid — same as Spec Standardization phase */}
-          <SpecGridViewer
-            isDarkMode={isDarkMode}
-            bgCard={bgCard}
-            borderColor={borderColor}
-            textPrimary={textPrimary}
-            textSecondary={textSecondary}
-            caseProtocol={caseProtocol}
-          />
-
-          {/* Generate Test Plan button */}
-          <div className="flex justify-end">
-            <Button
-              className="bg-[#4caf50] hover:bg-[#388e3c] text-white px-6"
-              size="lg"
-              disabled={generatingTestPlan}
-              onClick={() => {
-                setGeneratingTestPlan(true)
-                setTimeout(() => {
-                  setGeneratingTestPlan(false)
-                  setTestPlanGenerated(true)
-                }, 1800)
-              }}
-            >
-              {generatingTestPlan
-                ? <><Loader className="h-4 w-4 mr-2 animate-spin" /> Generating...</>
-                : <><Sparkles className="h-4 w-4 mr-2" /> Generate Test Plan</>
-              }
-            </Button>
-          </div>
-        </>
+        </div>
       )}
 
       {/* Step 3 — Full generated test plan with all sections */}
       {testPlanGenerated && (
         <>
-          {/* Section A — Load Certification Test Suite */}
+          {/* Section A — Load Certification Test Suite (selector remains visible to reload) */}
           <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
             <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
               <div className="flex items-center gap-2">
                 <ClipboardCheck className="h-4 w-4 text-[#ff9800]" />
                 <span className={`text-sm font-semibold ${textPrimary}`}>Load Certification Test Suite</span>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => { setSpecSelected(false); setTestPlanGenerated(false); setCustomized(false) }}
-                className={`text-xs ${textSecondary}`}
-              >
-                Change Spec
-              </Button>
+              <span className="flex items-center gap-1 text-xs text-[#4caf50]">
+                <CheckCircle className="h-3.5 w-3.5" /> Loaded
+              </span>
+            </div>
+            <div className={`px-4 py-3 border-b ${borderColor}`}>
+              <div className="flex items-center gap-2">
+                <div className={`relative flex-1 border ${borderColor} rounded-lg overflow-hidden`}>
+                  <select
+                    value={selectedSuiteId}
+                    onChange={e => { setSelectedSuiteId(e.target.value); setCustomized(false) }}
+                    className={`w-full appearance-none px-3 py-2.5 pr-8 text-sm font-medium ${textPrimary} ${bg0} focus:outline-none`}
+                  >
+                    {availableSuites.map(suite => (
+                      <option key={suite.id} value={suite.id}>{suite.label}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none ${textSecondary}`} />
+                </div>
+                <Button
+                  className="bg-[#00e5ff] hover:bg-[#00b8d4] text-[#0a1628] px-5 shrink-0"
+                  onClick={() => { setTestPlanGenerated(false); setCustomized(false); setTimeout(() => setTestPlanGenerated(true), 1200) }}
+                >
+                  Reload
+                </Button>
+              </div>
             </div>
             <div className="px-4 py-4 space-y-3">
               {/* Suite selector (read-only display) */}
