@@ -606,23 +606,56 @@ function TestPlanGeneratorTool({
             </div>
           </div>
 
-          {/* Spec preview card with categories */}
+          {/* Standardized Specifications Table */}
           <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
             <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
-              <span className={`text-sm font-semibold ${textPrimary}`}>{selectedSuite.label}</span>
-              <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? "bg-[#4caf50]/15 text-[#4caf50]" : "bg-green-100 text-green-700"}`}>
-                {selectedSuite.categories.length} categories
+              <span className={`text-sm font-semibold ${textPrimary}`}>Standardized Specifications</span>
+              <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? "bg-[#00e5ff]/15 text-[#00e5ff]" : "bg-blue-100 text-blue-700"}`}>
+                FIX {caseProtocol.split(" ")[1]}
               </span>
             </div>
-            <div className="px-4 py-3">
-              <div className="grid grid-cols-2 gap-x-8 gap-y-2">
-                {selectedSuite.categories.map((cat, i) => (
-                  <div key={i} className="flex items-center justify-between text-sm">
-                    <span className={textSecondary}>{cat.name}</span>
-                    <span className={`font-medium text-[#4caf50]`}>{cat.count} cases</span>
-                  </div>
-                ))}
-              </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-50"}`}>
+                    <th className={`px-3 py-2.5 text-left font-semibold ${textPrimary}`}>Tag</th>
+                    <th className={`px-3 py-2.5 text-left font-semibold ${textPrimary}`}>Description</th>
+                    <th className={`px-3 py-2.5 text-left font-semibold ${textPrimary}`}>Type</th>
+                    <th className={`px-3 py-2.5 text-left font-semibold ${textPrimary}`}>Req</th>
+                    <th className={`px-3 py-2.5 text-left font-semibold ${textPrimary}`}>Datatype</th>
+                    <th className={`px-3 py-2.5 text-left font-semibold ${textPrimary}`}>Values</th>
+                    <th className={`px-3 py-2.5 text-left font-semibold ${textPrimary}`}>Comment</th>
+                    <th className={`px-3 py-2.5 text-center font-semibold ${textPrimary}`}>Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { tag: "1", name: "Account", type: "String", req: false, datatype: "String", values: "", comment: "", notes: "Y" },
+                    { tag: "11", name: "ClOrdID", type: "String", req: true, datatype: "String", values: "", comment: "", notes: "Y" },
+                    { tag: "21", name: "HandlInst", type: "char", req: true, datatype: "char", values: "1,2,3", comment: "", notes: "" },
+                    { tag: "40", name: "OrdType", type: "char", req: true, datatype: "char", values: "1,2", comment: "Required if OrderQty", notes: "Y" },
+                    { tag: "44", name: "Price", type: "Price", req: false, datatype: "Price", values: "", comment: "Required if OrderQty specified and OrdType=2", notes: "" },
+                    { tag: "54", name: "Side", type: "char", req: true, datatype: "char", values: "1,2", comment: "", notes: "" },
+                    { tag: "55", name: "Symbol", type: "String", req: true, datatype: "String", values: "", comment: "", notes: "Y" },
+                    { tag: "167", name: "SecurityType", type: "String", req: false, datatype: "String", values: "", comment: "", notes: "" },
+                  ].map((field, i) => (
+                    <tr key={i} className={`border-b ${borderColor} ${i % 2 === 0 ? "" : isDarkMode ? "bg-[#0d1f35]/50" : "bg-gray-50/30"}`}>
+                      <td className={`px-3 py-2 font-mono text-xs ${textSecondary}`}>{field.tag}</td>
+                      <td className={`px-3 py-2 ${textSecondary}`}><span className="text-[#00e5ff]">{field.name}</span></td>
+                      <td className={`px-3 py-2 ${textSecondary}`}>{field.type}</td>
+                      <td className={`px-3 py-2 ${textSecondary}`}>{field.req ? "✓" : ""}</td>
+                      <td className={`px-3 py-2 ${textSecondary}`}>{field.datatype}</td>
+                      <td className={`px-3 py-2 ${textSecondary}`}>{field.values}</td>
+                      <td className={`px-3 py-2 max-w-xs text-xs ${textSecondary}`}>{field.comment}</td>
+                      <td className={`px-3 py-2 text-center ${field.notes ? "text-[#4caf50]" : ""}`}>{field.notes}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className={`px-4 py-2.5 border-t ${borderColor} text-xs ${textSecondary} flex items-center justify-between`}>
+              <span>Showing 8 of 59 fields</span>
+              <Button size="sm" variant="outline">View Full Spec</Button>
             </div>
           </div>
 
@@ -1321,7 +1354,6 @@ export default function BCometPlatform() {
         if (next >= EXIT_ANGLE) {
           // Reset all planets to grey for next cycle
           setVisitedPlanets([])
-          setActivePlanetTools(null)
           return 0
         }
         
@@ -1334,10 +1366,8 @@ export default function BCometPlatform() {
             if (diff < 3) { // within 3 degrees of planet
               // Mark visited and show tools
               setVisitedPlanets(vp => vp.includes(i) ? vp : [...vp, i])
-              if (activePlanetTools !== i) {
-                setActivePlanetTools(i)
-                setTimeout(() => setActivePlanetTools(ap => ap === i ? null : ap), 2500)
-              }
+              setActivePlanetTools(i)
+              setTimeout(() => setActivePlanetTools(ap => ap === i ? null : ap), 2500)
               break
             }
           }
@@ -1347,7 +1377,7 @@ export default function BCometPlatform() {
       })
     }, TICK)
     return () => clearInterval(id)
-  }, [currentScreen, activePlanetTools, showContactPanel, showDemoForm, showWalkthrough, showQuickDemo])
+  }, [currentScreen, showContactPanel, showDemoForm, showWalkthrough, showQuickDemo])
   const [isLoading, setIsLoading] = useState(false)
   // Session configuration state
   const [sessionConfigs, setSessionConfigs] = useState<Record<string, {host: string, port: string, senderCompId: string, targetCompId: string, protocol: string, ssl: boolean, heartbeat: number, connected: boolean, lastTested: string | null}>>({
