@@ -467,6 +467,137 @@ interface TestSuite {
   categories: { name: string; count: number }[]
 }
 
+function SpecGridViewer({
+  isDarkMode, bgCard, borderColor, textPrimary, textSecondary, caseProtocol,
+}: {
+  isDarkMode: boolean; bgCard: string; borderColor: string; textPrimary: string; textSecondary: string; caseProtocol: string;
+}) {
+  const [activeMsgTab, setActiveMsgTab] = React.useState("D")
+  const bg0 = isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"
+  const rows = CONVERT_SPEC_ROWS[activeMsgTab] || CONVERT_SPEC_ROWS["D"]
+
+  return (
+    <div className={`rounded-lg border ${borderColor} overflow-hidden`}>
+      {/* Header */}
+      <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between ${bg0}`}>
+        <div>
+          <h3 className={`text-sm font-bold ${textPrimary}`}>Standardized Specifications</h3>
+          <p className={`text-xs ${textSecondary}`}>Review and edit before saving — changes are applied to the client spec.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" className={`text-xs`}>
+            <Plus className="h-3 w-3 mr-1" /> Add Row
+          </Button>
+          <Button size="sm" className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4] text-xs">
+            <Download className="h-3 w-3 mr-1" /> Export
+          </Button>
+        </div>
+      </div>
+
+      {/* Message type tabs */}
+      <div className={`flex overflow-x-auto border-b ${borderColor} ${isDarkMode ? "bg-[#0d2137]" : "bg-gray-50"}`}>
+        {CONVERT_SPEC_MSG_TABS.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveMsgTab(tab.id)}
+            className={`px-4 py-2.5 text-xs font-medium whitespace-nowrap transition-colors border-b-2 ${
+              activeMsgTab === tab.id
+                ? "border-[#00e5ff] text-[#00e5ff]"
+                : `border-transparent ${textSecondary} hover:text-white`
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Legend */}
+      <div className={`px-4 py-2 border-b ${borderColor} flex flex-wrap items-center gap-4 text-[10px] ${textSecondary}`}>
+        <span className="font-semibold">Legend:</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#f44336]" /> Low Confidence — needs review</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#ff9800]" /> Medium Confidence</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#4caf50]" /> High Confidence</span>
+        <span className="flex items-center gap-1"><Edit3 className="h-3 w-3 text-[#9c27b0]" /> User Modified</span>
+      </div>
+
+      {/* Editable grid */}
+      <div className="overflow-auto max-h-96">
+        <table className="w-full text-xs">
+          <thead className={`sticky top-0 border-b ${borderColor}`} style={{ backgroundColor: "#1a3a5c" }}>
+            <tr>
+              <th className="px-2 py-2 text-center text-[11px] font-bold text-white uppercase tracking-wide w-8">
+                <span title="AI Confidence">AI</span>
+              </th>
+              {["Tag", "GroupTag", "TagName", "Req", "CRCondition", "DataType", "Values", "Comment"].map((h) => (
+                <th key={h} className="px-3 py-2 text-left text-[11px] font-bold text-white uppercase tracking-wide whitespace-nowrap">{h}</th>
+              ))}
+              <th className="px-2 py-2 text-center text-[11px] font-bold text-white uppercase tracking-wide whitespace-nowrap">Admin Verified</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row: any, i: number) => {
+              const confColor = row.confidence === "high" ? "#4caf50" : row.confidence === "medium" ? "#ff9800" : "#f44336"
+              const isLowConf = row.confidence === "low"
+              const rowBg = isLowConf ? (isDarkMode ? "bg-[#f44336]/10" : "bg-red-50") : ""
+              const inputCls = `px-1 py-0.5 rounded border ${borderColor} text-xs ${isDarkMode ? "bg-[#0a1628] text-white" : "bg-white text-[#0a1628]"} focus:outline-none focus:border-[#00e5ff]`
+              return (
+                <tr key={i} className={`border-b ${borderColor} ${rowBg} ${isDarkMode ? "hover:bg-[#1e4976]/20" : "hover:bg-gray-50"} transition-colors`}>
+                  <td className="px-2 py-1.5 text-center">
+                    <div className="flex items-center justify-center gap-1">
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: confColor }} title={`${row.confidence} confidence`} />
+                      {row.modified && <span title="User modified"><Edit3 className="h-3 w-3 text-[#9c27b0]" /></span>}
+                    </div>
+                  </td>
+                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.tag}         className={`${inputCls} w-10`} /></td>
+                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.groupTag}    className={`${inputCls} w-12`} /></td>
+                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.name}        className={`${inputCls} w-24`} /></td>
+                  <td className="px-2 py-1.5">
+                    <select defaultValue={row.required} className={`${inputCls} w-12`} style={{ color: row.required === "Y" ? "#4caf50" : row.required === "CR" ? "#ff9800" : undefined }}>
+                      <option value="Y">Y</option>
+                      <option value="N">N</option>
+                      <option value="CR">CR</option>
+                    </select>
+                  </td>
+                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.crCondition} className={`${inputCls} w-16`} style={{ color: row.crCondition ? "#ff9800" : undefined }} /></td>
+                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.dataType}    className={`${inputCls} w-20`} /></td>
+                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.values}      className={`${inputCls} w-16`} /></td>
+                  <td className="px-2 py-1.5"><input type="text" defaultValue={row.comment}     className={`${inputCls} w-full min-w-[100px]`} /></td>
+                  <td className="px-2 py-1.5 text-center">
+                    <input
+                      type="checkbox"
+                      defaultChecked={row.adminVerified}
+                      className="h-4 w-4 rounded border-gray-400 text-[#00e5ff] focus:ring-[#00e5ff] cursor-pointer"
+                      title="Mark as admin verified"
+                    />
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Footer */}
+      <div className={`px-4 py-3 border-t ${borderColor} flex items-center justify-between`}>
+        <div className="flex items-center gap-4 text-xs">
+          <span className={textSecondary}>
+            <span className="font-semibold text-[#f44336]">{rows.filter((r: any) => r.confidence === "low").length}</span> items need review
+          </span>
+          <span className={textSecondary}>
+            <span className="font-semibold text-[#9c27b0]">{rows.filter((r: any) => r.modified).length}</span> user modified
+          </span>
+          <span className={textSecondary}>
+            <span className="font-semibold text-[#4caf50]">{rows.filter((r: any) => r.adminVerified).length}</span> / {rows.length} verified
+          </span>
+        </div>
+        <Button size="sm" className="bg-[#4caf50] text-white hover:bg-[#43a047]">
+          <CheckCircle className="h-3.5 w-3.5 mr-1.5" /> Mark Admin Verified
+        </Button>
+      </div>
+    </div>
+  )
+}
+
 function TestPlanGeneratorTool({
   availableSuites,
   defaultSuiteId,
@@ -606,58 +737,15 @@ function TestPlanGeneratorTool({
             </div>
           </div>
 
-          {/* Standardized Specifications Table */}
-          <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
-            <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
-              <span className={`text-sm font-semibold ${textPrimary}`}>Standardized Specifications</span>
-              <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? "bg-[#00e5ff]/15 text-[#00e5ff]" : "bg-blue-100 text-blue-700"}`}>
-                FIX {caseProtocol.split(" ")[1]}
-              </span>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/30" : "bg-gray-50"}`}>
-                    <th className={`px-3 py-2.5 text-left font-semibold ${textPrimary}`}>Tag</th>
-                    <th className={`px-3 py-2.5 text-left font-semibold ${textPrimary}`}>Description</th>
-                    <th className={`px-3 py-2.5 text-left font-semibold ${textPrimary}`}>Type</th>
-                    <th className={`px-3 py-2.5 text-left font-semibold ${textPrimary}`}>Req</th>
-                    <th className={`px-3 py-2.5 text-left font-semibold ${textPrimary}`}>Datatype</th>
-                    <th className={`px-3 py-2.5 text-left font-semibold ${textPrimary}`}>Values</th>
-                    <th className={`px-3 py-2.5 text-left font-semibold ${textPrimary}`}>Comment</th>
-                    <th className={`px-3 py-2.5 text-center font-semibold ${textPrimary}`}>Notes</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    { tag: "1", name: "Account", type: "String", req: false, datatype: "String", values: "", comment: "", notes: "Y" },
-                    { tag: "11", name: "ClOrdID", type: "String", req: true, datatype: "String", values: "", comment: "", notes: "Y" },
-                    { tag: "21", name: "HandlInst", type: "char", req: true, datatype: "char", values: "1,2,3", comment: "", notes: "" },
-                    { tag: "40", name: "OrdType", type: "char", req: true, datatype: "char", values: "1,2", comment: "Required if OrderQty", notes: "Y" },
-                    { tag: "44", name: "Price", type: "Price", req: false, datatype: "Price", values: "", comment: "Required if OrderQty specified and OrdType=2", notes: "" },
-                    { tag: "54", name: "Side", type: "char", req: true, datatype: "char", values: "1,2", comment: "", notes: "" },
-                    { tag: "55", name: "Symbol", type: "String", req: true, datatype: "String", values: "", comment: "", notes: "Y" },
-                    { tag: "167", name: "SecurityType", type: "String", req: false, datatype: "String", values: "", comment: "", notes: "" },
-                  ].map((field, i) => (
-                    <tr key={i} className={`border-b ${borderColor} ${i % 2 === 0 ? "" : isDarkMode ? "bg-[#0d1f35]/50" : "bg-gray-50/30"}`}>
-                      <td className={`px-3 py-2 font-mono text-xs ${textSecondary}`}>{field.tag}</td>
-                      <td className={`px-3 py-2 ${textSecondary}`}><span className="text-[#00e5ff]">{field.name}</span></td>
-                      <td className={`px-3 py-2 ${textSecondary}`}>{field.type}</td>
-                      <td className={`px-3 py-2 ${textSecondary}`}>{field.req ? "✓" : ""}</td>
-                      <td className={`px-3 py-2 ${textSecondary}`}>{field.datatype}</td>
-                      <td className={`px-3 py-2 ${textSecondary}`}>{field.values}</td>
-                      <td className={`px-3 py-2 max-w-xs text-xs ${textSecondary}`}>{field.comment}</td>
-                      <td className={`px-3 py-2 text-center ${field.notes ? "text-[#4caf50]" : ""}`}>{field.notes}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className={`px-4 py-2.5 border-t ${borderColor} text-xs ${textSecondary} flex items-center justify-between`}>
-              <span>Showing 8 of 59 fields</span>
-              <Button size="sm" variant="outline">View Full Spec</Button>
-            </div>
-          </div>
+          {/* Full Standardized Specifications Grid — same as Spec Standardization phase */}
+          <SpecGridViewer
+            isDarkMode={isDarkMode}
+            bgCard={bgCard}
+            borderColor={borderColor}
+            textPrimary={textPrimary}
+            textSecondary={textSecondary}
+            caseProtocol={caseProtocol}
+          />
 
           {/* Generate Test Plan button */}
           <div className="flex justify-end">
@@ -19168,7 +19256,7 @@ const copyToClipboard = () => {
 
           <div className="p-6 space-y-6">
 
-            {/* ═══════════════════════════════════════════��═══════════
+            {/* ═══════════════════════════════════════════��═════��═════
                 STEP 1: UPLOAD
             ═══════════════�����══════════════════════════════════════ */}
             {certReportStep === "upload" && (
