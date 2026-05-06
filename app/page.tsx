@@ -10888,7 +10888,7 @@ const tools = [
                             )
                           })()}
 
-                          {/* Test Case Creator — Phase 4 */}
+                          {/* Test Case Generator — Phase 4 */}
                           {tool.id === "test-cases" && (
                             <TestCaseGeneratorTool
                               isDarkMode={isDarkMode}
@@ -10896,8 +10896,8 @@ const tools = [
                               textSecondary={textSecondary}
                               bgCard={bgCard}
                               borderColor={borderColor}
-                              caseClient={caseClient}
-                              caseAsset={caseAsset}
+                              caseClient={selectedOnboardingCase?.client || "Nexus Trading Group"}
+                              caseAsset={selectedOnboardingCase?.assetClass || "Equities"}
                               onPrevStep={actualToolIndex > 0 ? () => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) } : undefined}
                               onNextStep={actualToolIndex < currentPhase.steps.length - 1 ? () => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) } : undefined}
                             />
@@ -19388,7 +19388,7 @@ const copyToClipboard = () => {
 
             {/* ═══════════════════════════════════════════��═════��═════
                 STEP 1: UPLOAD
-            ═══════════════�����══════════════════════════════════════ */}
+            ═══════════════�����════════════════════��═════════════════ */}
             {certReportStep === "upload" && (
               <div className="space-y-6">
                 {/* Upload Cards */}
