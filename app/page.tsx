@@ -1131,68 +1131,23 @@ function TestPlanGeneratorTool({
             ]}
           />
 
-          {/* Section C — Customize to Spec */}
-          <div className={`${bgCard} border ${borderColor} rounded-lg overflow-hidden`}>
-            <div className={`px-4 py-3 border-b ${borderColor}`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Sliders className="h-4 w-4 text-[#9c27b0]" />
-                  <span className={`text-sm font-semibold ${textPrimary}`}>Save Test Plan</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {customized && (
-                    <span className="flex items-center gap-1 text-xs text-[#4caf50]">
-                      <CheckCircle className="h-3.5 w-3.5" /> Saved
-                    </span>
-                  )}
-                  <Button
-                    size="sm"
-                    disabled={customizing}
-                    onClick={() => {
-                      setCustomizing(true)
-                      setCustomized(false)
-                      setTimeout(() => { setCustomizing(false); setCustomized(true) }, 1200)
-                    }}
-                    className="bg-[#4caf50] hover:bg-[#388e3c] text-white"
-                  >
-                    {customizing ? (
-                      <><Loader className="h-3.5 w-3.5 mr-1 animate-spin" /> Saving...</>
-                    ) : customized ? (
-                      <><RotateCw className="h-3.5 w-3.5 mr-1" /> Save Again</>
-                    ) : (
-                      <><Download className="h-3.5 w-3.5 mr-1" /> Save Test Plan</>
-                    )}
-                  </Button>
-                </div>
-              </div>
-              <p className={`text-xs ${textSecondary} mt-1`}>
-                Saves the generated test plan for this asset class. It will be available in the Test Case Generator.
-              </p>
-            </div>
-            {customized && (
-              <div className="px-4 py-3 space-y-2">
-                <div className={`flex items-start gap-2 text-sm ${textSecondary}`}>
-                  <CheckCircle className="h-4 w-4 text-[#4caf50] flex-shrink-0 mt-0.5" />
-                  <span>Added 8 test cases for custom tags detected in spec (tags 9001, 9002, 9003)</span>
-                </div>
-                <div className={`flex items-start gap-2 text-sm ${textSecondary}`}>
-                  <CheckCircle className="h-4 w-4 text-[#4caf50] flex-shrink-0 mt-0.5" />
-                  <span>Updated 4 Order Flow cases to validate conditional field logic (tag 44 required when OrdType=2)</span>
-                </div>
-                <div className={`flex items-start gap-2 text-sm ${textSecondary}`}>
-                  <AlertTriangle className="h-4 w-4 text-[#ff9800] flex-shrink-0 mt-0.5" />
-                  <span>Removed 1 standard case — IOC order type not in client spec (TimeInForce=3)</span>
-                </div>
-                <div className={`flex items-center gap-2 mt-3 pt-3 border-t ${borderColor}`}>
-                  <Button size="sm" className="bg-[#4caf50] hover:bg-[#388e3c] text-white">
-                    <Download className="h-3.5 w-3.5 mr-1" /> Export Suite
-                  </Button>
-                  <Button size="sm" variant="outline">
-                    <Eye className="h-3.5 w-3.5 mr-1" /> Preview All Cases
-                  </Button>
-                </div>
-              </div>
-            )}
+          {/* Simple Save button */}
+          <div className="flex items-center justify-end gap-2">
+            <Button
+              size="sm"
+              className="bg-[#4caf50] hover:bg-[#388e3c] text-white"
+              onClick={() => {
+                setCustomizing(true)
+                setTimeout(() => { setCustomizing(false); setCustomized(true) }, 1200)
+              }}
+              disabled={customizing || customized}
+            >
+              {customizing ? (
+                <><Loader className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Saving...</>
+              ) : (
+                <><Download className="h-3.5 w-3.5 mr-1.5" /> Save</>
+              )}
+            </Button>
           </div>
 
           {/* Next Step */}
