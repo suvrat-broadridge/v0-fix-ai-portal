@@ -11412,8 +11412,137 @@ const tools = [
                             </div>
                           )}
 
+                          {/* Field Mapping Tool - Inline */}
+                          {tool.id === "field-map" && (
+                            <div className="space-y-4">
+                              <p className={textSecondary}>Define field mappings between client and FIX message tags for {selectedOnboardingCase?.assetClass} {selectedOnboardingCase?.protocol}.</p>
+                              
+                              {/* Mapping Stats Summary */}
+                              <div className="grid grid-cols-4 gap-4">
+                                <Card className={`${bgCard} border ${borderColor} p-3`}>
+                                  <div className="flex items-center gap-2">
+                                    <div className="p-1.5 rounded-lg bg-[#4caf50]/20">
+                                      <CheckCircle className="h-4 w-4 text-[#4caf50]" />
+                                    </div>
+                                    <div>
+                                      <p className={`font-bold text-lg ${textPrimary}`}>5</p>
+                                      <p className={`text-xs ${textSecondary}`}>Mapped</p>
+                                    </div>
+                                  </div>
+                                </Card>
+                                <Card className={`${bgCard} border ${borderColor} p-3`}>
+                                  <div className="flex items-center gap-2">
+                                    <div className="p-1.5 rounded-lg bg-[#00e5ff]/20">
+                                      <Wrench className="h-4 w-4 text-[#00e5ff]" />
+                                    </div>
+                                    <div>
+                                      <p className={`font-bold text-lg ${textPrimary}`}>3</p>
+                                      <p className={`text-xs ${textSecondary}`}>Transforms</p>
+                                    </div>
+                                  </div>
+                                </Card>
+                                <Card className={`${bgCard} border ${borderColor} p-3`}>
+                                  <div className="flex items-center gap-2">
+                                    <div className="p-1.5 rounded-lg bg-[#ff9800]/20">
+                                      <AlertTriangle className="h-4 w-4 text-[#ff9800]" />
+                                    </div>
+                                    <div>
+                                      <p className={`font-bold text-lg ${textPrimary}`}>1</p>
+                                      <p className={`text-xs ${textSecondary}`}>Unmapped</p>
+                                    </div>
+                                  </div>
+                                </Card>
+                                <Card className={`${bgCard} border ${borderColor} p-3`}>
+                                  <div className="flex items-center gap-2">
+                                    <div className="p-1.5 rounded-lg bg-[#2196f3]/20">
+                                      <FileText className="h-4 w-4 text-[#2196f3]" />
+                                    </div>
+                                    <div>
+                                      <p className={`font-bold text-lg ${textPrimary}`}>8</p>
+                                      <p className={`text-xs ${textSecondary}`}>Total Rules</p>
+                                    </div>
+                                  </div>
+                                </Card>
+                              </div>
+
+                              {/* Mapping Table */}
+                              <Card className={`${bgCard} border ${borderColor} overflow-hidden`}>
+                                <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                  <h3 className={`font-bold ${textPrimary}`}>Field Mapping Rules</h3>
+                                  <Button size="sm" className="bg-[#4caf50] hover:bg-[#388e3c] text-white">
+                                    <Plus className="h-4 w-4 mr-1" /> Add Rule
+                                  </Button>
+                                </div>
+                                <div className="overflow-x-auto max-h-96 overflow-y-auto">
+                                  <table className="w-full text-sm">
+                                    <thead>
+                                      <tr className={`border-b ${borderColor} ${isDarkMode ? "bg-[#1e4976]/20" : "bg-gray-50"} sticky top-0`}>
+                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Client Tag</th>
+                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Client Name</th>
+                                        <th className={`px-4 py-2 text-center font-semibold ${textPrimary}`}></th>
+                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Admin Tag</th>
+                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Admin Name</th>
+                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Transform</th>
+                                        <th className={`px-4 py-2 text-left font-semibold ${textPrimary}`}>Status</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {[
+                                        { clientTag: "1", clientName: "Account", broaderTag: "1", broaderName: "Account", transform: null, status: "mapped" as const },
+                                        { clientTag: "11", clientName: "ClOrdID", broaderTag: "11", broaderName: "ClOrdID", transform: null, status: "mapped" as const },
+                                        { clientTag: "55", clientName: "Symbol", broaderTag: "55", broaderName: "Symbol", transform: null, status: "mapped" as const },
+                                        { clientTag: "5001", clientName: "ClientRef", broaderTag: "20001", broaderName: "BroaderClientRef", transform: "PREFIX:BR_", status: "custom" as const },
+                                        { clientTag: "5002", clientName: "DeskID", broaderTag: null, broaderName: null, transform: null, status: "unmapped" as const },
+                                        { clientTag: "54", clientName: "Side", broaderTag: "54", broaderName: "Side", transform: "MAP:B->1,S->2", status: "custom" as const },
+                                        { clientTag: "38", clientName: "OrderQty", broaderTag: "38", broaderName: "OrderQty", transform: null, status: "mapped" as const },
+                                        { clientTag: "44", clientName: "Price", broaderTag: "44", broaderName: "Price", transform: "SCALE:100", status: "custom" as const },
+                                      ].map((m, i) => (
+                                        <tr key={i} className={`border-b ${borderColor} hover:bg-[#1e4976]/10`}>
+                                          <td className={`px-4 py-2 font-mono text-sm ${textPrimary}`}>{m.clientTag}</td>
+                                          <td className={`px-4 py-2 ${textPrimary}`}>{m.clientName}</td>
+                                          <td className="px-4 py-2 text-center">
+                                            {m.status === "mapped" || m.status === "custom" ? (
+                                              <ArrowRight className="h-4 w-4 text-[#4caf50] mx-auto" />
+                                            ) : (
+                                              <Unlink className="h-4 w-4 text-[#ff9800] mx-auto" />
+                                            )}
+                                          </td>
+                                          <td className={`px-4 py-2 font-mono text-sm ${m.broaderTag ? textPrimary : textSecondary}`}>{m.broaderTag || "-"}</td>
+                                          <td className={`px-4 py-2 ${m.broaderName ? textPrimary : textSecondary}`}>{m.broaderName || "-"}</td>
+                                          <td className={`px-4 py-2`}>
+                                            {m.transform ? (
+                                              <code className={`text-xs px-2 py-1 rounded ${isDarkMode ? "bg-[#1e4976]/50 text-[#00e5ff]" : "bg-blue-100 text-blue-700"}`}>{m.transform}</code>
+                                            ) : (
+                                              <span className={textSecondary}>-</span>
+                                            )}
+                                          </td>
+                                          <td className={`px-4 py-2`}>
+                                            <span className={`px-2 py-1 rounded text-xs ${
+                                              m.status === "mapped" ? "bg-[#4caf50]/20 text-[#4caf50]" :
+                                              m.status === "custom" ? "bg-[#00e5ff]/20 text-[#00e5ff]" :
+                                              "bg-[#ff9800]/20 text-[#ff9800]"
+                                            }`}>
+                                              {m.status === "mapped" ? "Mapped" : m.status === "custom" ? "Custom" : "Unmapped"}
+                                            </span>
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </Card>
+
+                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
+                                  <Button variant="outline" onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }} disabled={actualToolIndex === 0} className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}><ChevronLeft className="h-4 w-4 mr-1" /> Previous Step</Button>
+                                  {actualToolIndex < currentPhase.steps.length - 1 && <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
                           {/* Generic fallback for other tools */}
-                          {!["intake", "docs", "gap", "spec-from-log", "atdl", "test-plan", "test-cases", "checklist", "session-tests", "app-tests", "evidence", "log-analysis", "failure-analysis", "root-cause", "defects", "eval", "report", "signoff", "convert-spec", "spec-compare", "session"].includes(tool.id) && (
+                          {!["intake", "docs", "gap", "spec-from-log", "atdl", "test-plan", "test-cases", "checklist", "session-tests", "app-tests", "evidence", "log-analysis", "failure-analysis", "root-cause", "defects", "eval", "report", "signoff", "convert-spec", "spec-compare", "session", "field-map"].includes(tool.id) && (
                             <div className="space-y-4">
                               <p className={textSecondary}>This tool is available for use. Click below to open the full interface.</p>
                               <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} mb-4`}>
