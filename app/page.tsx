@@ -624,6 +624,86 @@ function TestCaseGeneratorTool({
   const [generatingSuite, setGeneratingSuite] = React.useState<string | null>(null)
   const [generatedSuites, setGeneratedSuites] = React.useState<string[]>([])
   const [selectedPlan, setSelectedPlan] = React.useState<string | null>(null)
+  const [activeCategory, setActiveCategory] = React.useState<Record<string, string>>({})
+
+  // Test cases data per category
+  const testCasesData: Record<string, { id: string; name: string; description: string; priority: string; status: string }[]> = {
+    "Connectivity Tests": [
+      { id: "TC-CON-001", name: "TCP Connection Establishment", description: "Verify TCP socket connection to FIX gateway", priority: "Critical", status: "Ready" },
+      { id: "TC-CON-002", name: "SSL/TLS Handshake", description: "Validate secure connection with proper certificates", priority: "Critical", status: "Ready" },
+      { id: "TC-CON-003", name: "Logon Message (35=A)", description: "Send valid Logon with credentials and validate response", priority: "Critical", status: "Ready" },
+      { id: "TC-CON-004", name: "Heartbeat Exchange", description: "Verify heartbeat messages at configured interval", priority: "High", status: "Ready" },
+      { id: "TC-CON-005", name: "Test Request Response", description: "Send TestRequest and verify Heartbeat response", priority: "High", status: "Ready" },
+      { id: "TC-CON-006", name: "Sequence Number Reset", description: "Test sequence reset on Logon with ResetSeqNumFlag=Y", priority: "High", status: "Ready" },
+      { id: "TC-CON-007", name: "Invalid Credentials Rejection", description: "Verify rejection with invalid username/password", priority: "Medium", status: "Ready" },
+      { id: "TC-CON-008", name: "Duplicate Logon Handling", description: "Test behavior when already logged on", priority: "Medium", status: "Ready" },
+      { id: "TC-CON-009", name: "Logout Message (35=5)", description: "Send Logout and verify clean disconnection", priority: "High", status: "Ready" },
+      { id: "TC-CON-010", name: "Connection Timeout", description: "Verify timeout handling when gateway unresponsive", priority: "Medium", status: "Ready" },
+      { id: "TC-CON-011", name: "Reconnection Logic", description: "Test automatic reconnection after disconnect", priority: "High", status: "Ready" },
+      { id: "TC-CON-012", name: "Multiple Session Handling", description: "Validate behavior with concurrent sessions", priority: "Low", status: "Ready" },
+    ],
+    "Order Flow Tests": [
+      { id: "TC-ORD-001", name: "New Order Single - Market", description: "Submit market order and verify acknowledgement", priority: "Critical", status: "Ready" },
+      { id: "TC-ORD-002", name: "New Order Single - Limit", description: "Submit limit order with price validation", priority: "Critical", status: "Ready" },
+      { id: "TC-ORD-003", name: "Order Qty Validation", description: "Verify order quantity within allowed limits", priority: "High", status: "Ready" },
+      { id: "TC-ORD-004", name: "Symbol Validation", description: "Test valid and invalid symbol handling", priority: "High", status: "Ready" },
+      { id: "TC-ORD-005", name: "Side Validation (Buy/Sell)", description: "Verify Side field values 1=Buy, 2=Sell", priority: "Critical", status: "Ready" },
+      { id: "TC-ORD-006", name: "TimeInForce - Day", description: "Test Day order expiration behavior", priority: "High", status: "Ready" },
+      { id: "TC-ORD-007", name: "TimeInForce - IOC", description: "Test Immediate-Or-Cancel execution", priority: "High", status: "Ready" },
+      { id: "TC-ORD-008", name: "TimeInForce - FOK", description: "Test Fill-Or-Kill execution", priority: "High", status: "Ready" },
+      { id: "TC-ORD-009", name: "ClOrdID Uniqueness", description: "Verify rejection of duplicate ClOrdID", priority: "Critical", status: "Ready" },
+      { id: "TC-ORD-010", name: "Price Precision", description: "Test decimal precision handling for prices", priority: "Medium", status: "Ready" },
+    ],
+    "Cancel / Replace": [
+      { id: "TC-CXL-001", name: "Order Cancel Request", description: "Cancel pending order and verify cancellation", priority: "Critical", status: "Ready" },
+      { id: "TC-CXL-002", name: "Cancel Filled Order", description: "Attempt cancel on filled order, expect rejection", priority: "High", status: "Ready" },
+      { id: "TC-CXL-003", name: "Order Replace - Qty", description: "Modify order quantity via replace request", priority: "High", status: "Ready" },
+      { id: "TC-CXL-004", name: "Order Replace - Price", description: "Modify limit price via replace request", priority: "High", status: "Ready" },
+      { id: "TC-CXL-005", name: "Replace Partial Fill", description: "Replace partially filled order", priority: "Medium", status: "Ready" },
+      { id: "TC-CXL-006", name: "OrigClOrdID Validation", description: "Verify OrigClOrdID matches existing order", priority: "Critical", status: "Ready" },
+      { id: "TC-CXL-007", name: "Cancel Race Condition", description: "Cancel during execution, verify state", priority: "Medium", status: "Ready" },
+      { id: "TC-CXL-008", name: "Bulk Cancel", description: "Cancel multiple orders in sequence", priority: "Low", status: "Ready" },
+    ],
+    "Session Tests": [
+      { id: "TC-SES-001", name: "Sequence Gap Detection", description: "Detect and handle message sequence gaps", priority: "Critical", status: "Ready" },
+      { id: "TC-SES-002", name: "Resend Request", description: "Request retransmission of missed messages", priority: "Critical", status: "Ready" },
+      { id: "TC-SES-003", name: "Sequence Reset - Gap Fill", description: "Handle SequenceReset with GapFillFlag=Y", priority: "High", status: "Ready" },
+      { id: "TC-SES-004", name: "Sequence Reset - Reset", description: "Handle SequenceReset with GapFillFlag=N", priority: "High", status: "Ready" },
+      { id: "TC-SES-005", name: "PossDupFlag Handling", description: "Process messages with PossDupFlag=Y", priority: "High", status: "Ready" },
+      { id: "TC-SES-006", name: "Message Integrity", description: "Validate checksum and body length", priority: "Critical", status: "Ready" },
+    ],
+    "Execution Reports": [
+      { id: "TC-EXE-001", name: "New Order Ack (150=0)", description: "Receive and validate new order acknowledgement", priority: "Critical", status: "Ready" },
+      { id: "TC-EXE-002", name: "Partial Fill (150=1)", description: "Handle partial execution report", priority: "Critical", status: "Ready" },
+      { id: "TC-EXE-003", name: "Full Fill (150=2)", description: "Handle complete fill execution report", priority: "Critical", status: "Ready" },
+      { id: "TC-EXE-004", name: "Order Rejected (150=8)", description: "Handle order rejection with reason", priority: "High", status: "Ready" },
+      { id: "TC-EXE-005", name: "Order Canceled (150=4)", description: "Receive cancel confirmation", priority: "High", status: "Ready" },
+      { id: "TC-EXE-006", name: "Order Replaced (150=5)", description: "Receive replace confirmation", priority: "High", status: "Ready" },
+      { id: "TC-EXE-007", name: "Execution Price Validation", description: "Verify LastPx within expected range", priority: "High", status: "Ready" },
+      { id: "TC-EXE-008", name: "CumQty Tracking", description: "Validate cumulative quantity accuracy", priority: "High", status: "Ready" },
+      { id: "TC-EXE-009", name: "LeavesQty Calculation", description: "Verify remaining quantity calculation", priority: "Medium", status: "Ready" },
+      { id: "TC-EXE-010", name: "ExecID Uniqueness", description: "Confirm unique ExecID per execution", priority: "Medium", status: "Ready" },
+    ],
+    "Edge Cases": [
+      { id: "TC-EDG-001", name: "Max Order Qty", description: "Test order at maximum allowed quantity", priority: "Medium", status: "Ready" },
+      { id: "TC-EDG-002", name: "Min Order Qty", description: "Test order at minimum allowed quantity", priority: "Medium", status: "Ready" },
+      { id: "TC-EDG-003", name: "Zero Price Order", description: "Market order with no price specified", priority: "Medium", status: "Ready" },
+      { id: "TC-EDG-004", name: "Special Characters", description: "Test symbols with special characters", priority: "Low", status: "Ready" },
+      { id: "TC-EDG-005", name: "Unicode in Text Fields", description: "Handle unicode in Text/Comment fields", priority: "Low", status: "Ready" },
+      { id: "TC-EDG-006", name: "Timestamp Edge Cases", description: "Test around market open/close times", priority: "Medium", status: "Ready" },
+      { id: "TC-EDG-007", name: "High Volume Burst", description: "Submit orders in rapid succession", priority: "High", status: "Ready" },
+    ],
+    "Spot Orders": [
+      { id: "TC-FX-001", name: "Spot Buy Order", description: "Submit FX spot buy order", priority: "Critical", status: "Ready" },
+      { id: "TC-FX-002", name: "Spot Sell Order", description: "Submit FX spot sell order", priority: "Critical", status: "Ready" },
+      { id: "TC-FX-003", name: "Currency Pair Validation", description: "Verify valid currency pair format", priority: "High", status: "Ready" },
+    ],
+    "Forward Orders": [
+      { id: "TC-FWD-001", name: "Forward Buy Order", description: "Submit FX forward buy with value date", priority: "Critical", status: "Ready" },
+      { id: "TC-FWD-002", name: "Forward Sell Order", description: "Submit FX forward sell with value date", priority: "Critical", status: "Ready" },
+      { id: "TC-FWD-003", name: "Value Date Validation", description: "Verify forward value date rules", priority: "High", status: "Ready" },
+    ],
+  }
 
   const savedPlans = [
     {
@@ -700,16 +780,21 @@ function TestCaseGeneratorTool({
           const isSelected = selectedPlan === plan.id
           const isGenerating = generatingSuite === plan.id
           const isGenerated = generatedSuites.includes(plan.id)
+          const currentCategory = activeCategory[plan.id] || plan.breakdown[0]?.name
+          const categoryTests = testCasesData[currentCategory] || []
+
           return (
             <div
               key={plan.id}
-              className={`${bgCard} border rounded-lg overflow-hidden transition-all cursor-pointer ${
+              className={`${bgCard} border rounded-lg overflow-hidden transition-all ${
                 isSelected ? "border-[#00e5ff]" : borderColor
               }`}
-              onClick={() => setSelectedPlan(isSelected ? null : plan.id)}
             >
               {/* Plan header row */}
-              <div className="px-4 py-3 flex items-center justify-between">
+              <div
+                className="px-4 py-3 flex items-center justify-between cursor-pointer"
+                onClick={() => setSelectedPlan(isSelected ? null : plan.id)}
+              >
                 <div className="flex items-center gap-3">
                   <div className={`w-2 h-2 rounded-full ${isGenerated ? "bg-[#4caf50]" : "bg-[#ff9800]"}`} />
                   <div>
@@ -737,6 +822,7 @@ function TestCaseGeneratorTool({
                       setTimeout(() => {
                         setGeneratingSuite(null)
                         setGeneratedSuites(prev => [...prev, plan.id])
+                        setActiveCategory(prev => ({ ...prev, [plan.id]: plan.breakdown[0]?.name }))
                       }, 1800)
                     }}
                     className={isGenerated
@@ -756,22 +842,100 @@ function TestCaseGeneratorTool({
                 </div>
               </div>
 
-              {/* Expanded breakdown */}
+              {/* Expanded view when selected */}
               {isSelected && (
-                <div className={`border-t ${borderColor} px-4 py-3`}>
-                  <div className="grid grid-cols-3 gap-x-8 gap-y-1.5">
-                    {plan.breakdown.map((cat, i) => (
-                      <div key={i} className="flex items-center justify-between text-xs">
-                        <span className={textSecondary}>{cat.name}</span>
-                        <span className={`font-medium ${isGenerated ? "text-[#4caf50]" : textSecondary}`}>{cat.count} cases</span>
+                <div className={`border-t ${borderColor}`}>
+                  {/* Category summary grid (before generation) */}
+                  {!isGenerated && (
+                    <div className="px-4 py-3">
+                      <div className="grid grid-cols-3 gap-x-8 gap-y-1.5">
+                        {plan.breakdown.map((cat, i) => (
+                          <div key={i} className="flex items-center justify-between text-xs">
+                            <span className={textSecondary}>{cat.name}</span>
+                            <span className={`font-medium ${textSecondary}`}>{cat.count} cases</span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                  {isGenerated && (
-                    <div className={`mt-3 pt-3 border-t ${borderColor} flex items-center gap-2`}>
-                      <Button size="sm" variant="outline"><Eye className="h-3.5 w-3.5 mr-1" /> Preview Suite</Button>
-                      <Button size="sm" variant="outline"><Download className="h-3.5 w-3.5 mr-1" /> Export</Button>
                     </div>
+                  )}
+
+                  {/* Detailed tabbed view (after generation) */}
+                  {isGenerated && (
+                    <>
+                      {/* Category tabs */}
+                      <div className={`flex overflow-x-auto border-b ${borderColor} ${isDarkMode ? "bg-[#0d2137]" : "bg-gray-50"}`}>
+                        {plan.breakdown.map((cat) => (
+                          <button
+                            key={cat.name}
+                            onClick={() => setActiveCategory(prev => ({ ...prev, [plan.id]: cat.name }))}
+                            className={`px-4 py-2.5 text-xs font-medium whitespace-nowrap transition-colors border-b-2 ${
+                              currentCategory === cat.name
+                                ? "border-[#00e5ff] text-[#00e5ff]"
+                                : `border-transparent ${textSecondary} hover:text-white`
+                            }`}
+                          >
+                            {cat.name}
+                            <span className={`ml-1.5 px-1.5 py-0.5 rounded text-[10px] ${
+                              currentCategory === cat.name
+                                ? "bg-[#00e5ff]/20"
+                                : isDarkMode ? "bg-[#1e4976]/50" : "bg-gray-200"
+                            }`}>
+                              {cat.count}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Test cases table */}
+                      <div className="overflow-auto max-h-80">
+                        <table className="w-full text-xs">
+                          <thead className={`sticky top-0 ${isDarkMode ? "bg-[#1a3a5c]" : "bg-gray-100"}`}>
+                            <tr>
+                              <th className={`px-3 py-2 text-left font-semibold ${textPrimary} w-28`}>Test ID</th>
+                              <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Test Name</th>
+                              <th className={`px-3 py-2 text-left font-semibold ${textPrimary}`}>Description</th>
+                              <th className={`px-3 py-2 text-center font-semibold ${textPrimary} w-20`}>Priority</th>
+                              <th className={`px-3 py-2 text-center font-semibold ${textPrimary} w-20`}>Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {categoryTests.map((tc, i) => (
+                              <tr key={tc.id} className={`border-b ${borderColor} ${isDarkMode ? "hover:bg-[#1e4976]/20" : "hover:bg-gray-50"} transition-colors`}>
+                                <td className={`px-3 py-2 font-mono ${textSecondary}`}>{tc.id}</td>
+                                <td className={`px-3 py-2 font-medium text-[#00e5ff]`}>{tc.name}</td>
+                                <td className={`px-3 py-2 ${textSecondary}`}>{tc.description}</td>
+                                <td className="px-3 py-2 text-center">
+                                  <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${
+                                    tc.priority === "Critical" ? "bg-[#f44336]/20 text-[#f44336]" :
+                                    tc.priority === "High" ? "bg-[#ff9800]/20 text-[#ff9800]" :
+                                    tc.priority === "Medium" ? "bg-[#2196f3]/20 text-[#2196f3]" :
+                                    "bg-[#9e9e9e]/20 text-[#9e9e9e]"
+                                  }`}>
+                                    {tc.priority}
+                                  </span>
+                                </td>
+                                <td className="px-3 py-2 text-center">
+                                  <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-[#4caf50]/20 text-[#4caf50]">
+                                    {tc.status}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Footer actions */}
+                      <div className={`px-4 py-3 border-t ${borderColor} flex items-center justify-between`}>
+                        <div className="flex items-center gap-2">
+                          <Button size="sm" variant="outline"><Eye className="h-3.5 w-3.5 mr-1.5" /> Preview Suite</Button>
+                          <Button size="sm" variant="outline"><Download className="h-3.5 w-3.5 mr-1.5" /> Export</Button>
+                        </div>
+                        <span className={`text-xs ${textSecondary}`}>
+                          Showing {categoryTests.length} tests in {currentCategory}
+                        </span>
+                      </div>
+                    </>
                   )}
                 </div>
               )}
