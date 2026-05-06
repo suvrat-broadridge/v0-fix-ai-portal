@@ -11250,8 +11250,170 @@ const tools = [
                             </div>
                           )}
 
+                          {/* Session Config Tool - Inline */}
+                          {tool.id === "session" && (
+                            <div className="space-y-4">
+                              <p className={textSecondary}>Configure FIX session parameters for {selectedOnboardingCase?.assetClass || "this asset class"}.</p>
+                              
+                              {/* Environment Selector */}
+                              <div className="flex items-center gap-4 mb-4">
+                                <span className={`font-medium ${textSecondary} text-sm`}>Environment:</span>
+                                <div className={`flex gap-1 p-1 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-100"}`}>
+                                  {["UAT", "Staging", "Production"].map(env => (
+                                    <button 
+                                      key={env}
+                                      className={`px-4 py-1.5 rounded text-sm font-medium transition-colors ${env === "UAT" ? "bg-[#00e5ff] text-[#0a1628]" : textSecondary}`}
+                                    >
+                                      {env}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Session Config Card for this case's asset class */}
+                              {(() => {
+                                const caseAsset = selectedOnboardingCase?.assetClass || "Equities"
+                                const caseProtocol = selectedOnboardingCase?.protocol || "FIX 4.4"
+                                const sessionKey = `${caseAsset}-${caseProtocol}`
+                                const config = sessionConfigs[sessionKey]
+                                const isConfigured = !!config
+                                
+                                return (
+                                  <Card className={`${bgCard} border ${borderColor}`}>
+                                    <div className={`px-4 py-3 border-b ${borderColor} flex items-center justify-between`}>
+                                      <div className="flex items-center gap-3">
+                                        <Server className="h-5 w-5 text-[#00e5ff]" />
+                                        <span className={`font-bold ${textPrimary}`}>{caseAsset} - {caseProtocol}</span>
+                                        {isConfigured ? (
+                                          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs bg-[#4caf50]/20 text-[#4caf50]">
+                                            <Wifi className="h-3 w-3" /> Connected
+                                          </span>
+                                        ) : (
+                                          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs bg-[#ff9800]/20 text-[#ff9800]">
+                                            <WifiOff className="h-3 w-3" /> Not Configured
+                                          </span>
+                                        )}
+                                      </div>
+                                      {isConfigured && config.lastTested && (
+                                        <span className={`text-xs ${textSecondary}`}>Last tested: {config.lastTested}</span>
+                                      )}
+                                    </div>
+                                    
+                                    <div className="p-4 space-y-4">
+                                      <div className="grid grid-cols-4 gap-4">
+                                        <div>
+                                          <label className={`block text-xs font-medium mb-1 ${textSecondary}`}>Host</label>
+                                          <Input 
+                                            placeholder="fix.exchange.com"
+                                            defaultValue={config?.host || ""}
+                                            className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className={`block text-xs font-medium mb-1 ${textSecondary}`}>Port</label>
+                                          <Input 
+                                            placeholder="9876"
+                                            defaultValue={config?.port || ""}
+                                            className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className={`block text-xs font-medium mb-1 ${textSecondary}`}>SenderCompID</label>
+                                          <Input 
+                                            placeholder="CLIENT_ID"
+                                            defaultValue={config?.senderCompId || ""}
+                                            className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className={`block text-xs font-medium mb-1 ${textSecondary}`}>TargetCompID</label>
+                                          <Input 
+                                            placeholder="BROADRIDGE"
+                                            defaultValue={config?.targetCompId || ""}
+                                            className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                                          />
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="grid grid-cols-4 gap-4">
+                                        <div>
+                                          <label className={`block text-xs font-medium mb-1 ${textSecondary}`}>Heartbeat Interval (sec)</label>
+                                          <Input 
+                                            type="number"
+                                            placeholder="30"
+                                            defaultValue={config?.heartbeat || 30}
+                                            className={`${isDarkMode ? "bg-[#0a1628] border-[#1e4976]" : ""}`}
+                                          />
+                                        </div>
+                                        <div className="flex items-end gap-4">
+                                          <label className="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" defaultChecked={config?.ssl || false} className="h-4 w-4" />
+                                            <span className={`text-sm ${textPrimary}`}>SSL/TLS Enabled</span>
+                                          </label>
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="flex gap-3 pt-2">
+                                        <Button 
+                                          size="sm"
+                                          className="bg-[#4caf50] hover:bg-[#388e3c] text-white"
+                                          onClick={() => {
+                                            setSessionConfigs(prev => ({
+                                              ...prev,
+                                              [sessionKey]: {
+                                                host: "fix.client.com",
+                                                port: "9876",
+                                                senderCompId: "CLIENT",
+                                                targetCompId: "BROADRIDGE",
+                                                protocol: caseProtocol,
+                                                ssl: true,
+                                                heartbeat: 30,
+                                                connected: false,
+                                                lastTested: null
+                                              }
+                                            }))
+                                          }}
+                                        >
+                                          <Database className="h-4 w-4 mr-1.5" /> Save Configuration
+                                        </Button>
+                                        <Button 
+                                          size="sm" 
+                                          variant="outline"
+                                          onClick={async () => {
+                                            await new Promise(r => setTimeout(r, 1500))
+                                            const now = new Date().toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true })
+                                            setSessionConfigs(prev => ({
+                                              ...prev,
+                                              [sessionKey]: {
+                                                ...prev[sessionKey],
+                                                connected: true,
+                                                lastTested: now
+                                              }
+                                            }))
+                                          }}
+                                        >
+                                          <Wifi className="h-4 w-4 mr-1.5" /> Test Connection
+                                        </Button>
+                                        <Button size="sm" variant="outline">
+                                          <Play className="h-4 w-4 mr-1.5" /> Send Test Logon
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </Card>
+                                )
+                              })()}
+
+                              {(actualToolIndex > 0 || actualToolIndex < currentPhase.steps.length - 1) && (
+                                <div className="flex items-center justify-between pt-4 border-t border-[#1e4976]/30">
+                                  <Button variant="outline" onClick={() => { setCurrentToolIndex(actualToolIndex - 1); setSelectedToolId(currentPhase.steps[actualToolIndex - 1].id) }} disabled={actualToolIndex === 0} className={actualToolIndex === 0 ? "opacity-0 pointer-events-none" : ""}><ChevronLeft className="h-4 w-4 mr-1" /> Previous Step</Button>
+                                  {actualToolIndex < currentPhase.steps.length - 1 && <Button onClick={() => { setCurrentToolIndex(actualToolIndex + 1); setSelectedToolId(currentPhase.steps[actualToolIndex + 1].id) }} className="bg-[#00e5ff] text-[#0a1628] hover:bg-[#00b8d4]">Next Step <ChevronRight className="h-4 w-4 ml-1" /></Button>}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
                           {/* Generic fallback for other tools */}
-                          {!["intake", "docs", "gap", "spec-from-log", "atdl", "test-plan", "test-cases", "checklist", "session-tests", "app-tests", "evidence", "log-analysis", "failure-analysis", "root-cause", "defects", "eval", "report", "signoff", "convert-spec", "spec-compare"].includes(tool.id) && (
+                          {!["intake", "docs", "gap", "spec-from-log", "atdl", "test-plan", "test-cases", "checklist", "session-tests", "app-tests", "evidence", "log-analysis", "failure-analysis", "root-cause", "defects", "eval", "report", "signoff", "convert-spec", "spec-compare", "session"].includes(tool.id) && (
                             <div className="space-y-4">
                               <p className={textSecondary}>This tool is available for use. Click below to open the full interface.</p>
                               <div className={`p-3 rounded-lg ${isDarkMode ? "bg-[#0a1628]" : "bg-gray-50"} mb-4`}>
